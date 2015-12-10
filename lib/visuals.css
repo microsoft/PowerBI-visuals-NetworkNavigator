@@ -1,0 +1,3058 @@
+/*! jQuery UI - v1.11.4 - 2015-08-25
+* http://jqueryui.com
+* Includes: core.css, resizable.css, datepicker.css, theme.css
+* To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=Verdana%2CArial%2Csans-serif&fwDefault=normal&fsDefault=1.1em&cornerRadius=4px&bgColorHeader=cccccc&bgTextureHeader=highlight_soft&bgImgOpacityHeader=75&borderColorHeader=aaaaaa&fcHeader=222222&iconColorHeader=222222&bgColorContent=ffffff&bgTextureContent=flat&bgImgOpacityContent=75&borderColorContent=aaaaaa&fcContent=222222&iconColorContent=222222&bgColorDefault=e6e6e6&bgTextureDefault=glass&bgImgOpacityDefault=75&borderColorDefault=d3d3d3&fcDefault=555555&iconColorDefault=888888&bgColorHover=dadada&bgTextureHover=glass&bgImgOpacityHover=75&borderColorHover=999999&fcHover=212121&iconColorHover=454545&bgColorActive=ffffff&bgTextureActive=glass&bgImgOpacityActive=65&borderColorActive=aaaaaa&fcActive=212121&iconColorActive=454545&bgColorHighlight=fbf9ee&bgTextureHighlight=glass&bgImgOpacityHighlight=55&borderColorHighlight=fcefa1&fcHighlight=363636&iconColorHighlight=2e83ff&bgColorError=fef1ec&bgTextureError=glass&bgImgOpacityError=95&borderColorError=cd0a0a&fcError=cd0a0a&iconColorError=cd0a0a&bgColorOverlay=aaaaaa&bgTextureOverlay=flat&bgImgOpacityOverlay=0&opacityOverlay=30&bgColorShadow=aaaaaa&bgTextureShadow=flat&bgImgOpacityShadow=0&opacityShadow=30&thicknessShadow=8px&offsetTopShadow=-8px&offsetLeftShadow=-8px&cornerRadiusShadow=8px
+* Copyright 2015 jQuery Foundation and other contributors; Licensed MIT */
+.ui-helper-hidden {
+  display: none;
+}
+.ui-helper-hidden-accessible {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+.ui-helper-reset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  line-height: 1.3;
+  text-decoration: none;
+  font-size: 100%;
+  list-style: none;
+}
+.ui-helper-clearfix:before,
+.ui-helper-clearfix:after {
+  content: "";
+  display: table;
+  border-collapse: collapse;
+}
+.ui-helper-clearfix:after {
+  clear: both;
+}
+.ui-helper-clearfix {
+  min-height: 0;
+}
+.ui-helper-zfix {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+  opacity: 0;
+  filter: alpha(opacity=0);
+}
+.ui-front {
+  z-index: 100;
+}
+.ui-state-disabled {
+  cursor: default !important;
+}
+.ui-icon {
+  display: block;
+  text-indent: -99999px;
+  overflow: hidden;
+  background-repeat: no-repeat;
+}
+.ui-widget-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.ui-resizable {
+  position: relative;
+}
+.ui-resizable-handle {
+  position: absolute;
+  font-size: 0.1px;
+  display: block;
+  -ms-touch-action: none;
+  touch-action: none;
+}
+.ui-resizable-disabled .ui-resizable-handle,
+.ui-resizable-autohide .ui-resizable-handle {
+  display: none;
+}
+.ui-resizable-n {
+  cursor: n-resize;
+  height: 7px;
+  width: 100%;
+  top: -5px;
+  left: 0;
+}
+.ui-resizable-s {
+  cursor: s-resize;
+  height: 7px;
+  width: 100%;
+  bottom: -5px;
+  left: 0;
+}
+.ui-resizable-e {
+  cursor: e-resize;
+  width: 7px;
+  right: -5px;
+  top: 0;
+  height: 100%;
+}
+.ui-resizable-w {
+  cursor: w-resize;
+  width: 7px;
+  left: -5px;
+  top: 0;
+  height: 100%;
+}
+.ui-resizable-se {
+  cursor: se-resize;
+  width: 12px;
+  height: 12px;
+  right: 1px;
+  bottom: 1px;
+}
+.ui-resizable-sw {
+  cursor: sw-resize;
+  width: 9px;
+  height: 9px;
+  left: -5px;
+  bottom: -5px;
+}
+.ui-resizable-nw {
+  cursor: nw-resize;
+  width: 9px;
+  height: 9px;
+  left: -5px;
+  top: -5px;
+}
+.ui-resizable-ne {
+  cursor: ne-resize;
+  width: 9px;
+  height: 9px;
+  right: -5px;
+  top: -5px;
+}
+.ui-datepicker {
+  width: 17em;
+  padding: .2em .2em 0;
+  display: none;
+}
+.ui-datepicker .ui-datepicker-header {
+  position: relative;
+  padding: 0.2em 0;
+}
+.ui-datepicker .ui-datepicker-prev,
+.ui-datepicker .ui-datepicker-next {
+  position: absolute;
+  top: 2px;
+  width: 1.8em;
+  height: 1.8em;
+}
+.ui-datepicker .ui-datepicker-prev-hover,
+.ui-datepicker .ui-datepicker-next-hover {
+  top: 1px;
+}
+.ui-datepicker .ui-datepicker-prev {
+  left: 2px;
+}
+.ui-datepicker .ui-datepicker-next {
+  right: 2px;
+}
+.ui-datepicker .ui-datepicker-prev-hover {
+  left: 1px;
+}
+.ui-datepicker .ui-datepicker-next-hover {
+  right: 1px;
+}
+.ui-datepicker .ui-datepicker-prev span,
+.ui-datepicker .ui-datepicker-next span {
+  display: block;
+  position: absolute;
+  left: 50%;
+  margin-left: -8px;
+  top: 50%;
+  margin-top: -8px;
+}
+.ui-datepicker .ui-datepicker-title {
+  margin: 0 2.3em;
+  line-height: 1.8em;
+  text-align: center;
+}
+.ui-datepicker .ui-datepicker-title select {
+  font-size: 1em;
+  margin: 1px 0;
+}
+.ui-datepicker select.ui-datepicker-month,
+.ui-datepicker select.ui-datepicker-year {
+  width: 45%;
+}
+.ui-datepicker table {
+  width: 100%;
+  font-size: .9em;
+  border-collapse: collapse;
+  margin: 0 0 0.4em;
+}
+.ui-datepicker th {
+  padding: .7em .3em;
+  text-align: center;
+  font-weight: bold;
+  border: 0;
+}
+.ui-datepicker td {
+  border: 0;
+  padding: 1px;
+}
+.ui-datepicker td span,
+.ui-datepicker td a {
+  display: block;
+  padding: .2em;
+  text-align: right;
+  text-decoration: none;
+}
+.ui-datepicker .ui-datepicker-buttonpane {
+  background-image: none;
+  margin: .7em 0 0 0;
+  padding: 0 .2em;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+.ui-datepicker .ui-datepicker-buttonpane button {
+  float: right;
+  margin: .5em .2em .4em;
+  cursor: pointer;
+  padding: .2em .6em .3em .6em;
+  width: auto;
+  overflow: visible;
+}
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current {
+  float: left;
+}
+.ui-datepicker.ui-datepicker-multi {
+  width: auto;
+}
+.ui-datepicker-multi .ui-datepicker-group {
+  float: left;
+}
+.ui-datepicker-multi .ui-datepicker-group table {
+  width: 95%;
+  margin: 0 auto 0.4em;
+}
+.ui-datepicker-multi-2 .ui-datepicker-group {
+  width: 50%;
+}
+.ui-datepicker-multi-3 .ui-datepicker-group {
+  width: 33.3%;
+}
+.ui-datepicker-multi-4 .ui-datepicker-group {
+  width: 25%;
+}
+.ui-datepicker-multi .ui-datepicker-group-last .ui-datepicker-header,
+.ui-datepicker-multi .ui-datepicker-group-middle .ui-datepicker-header {
+  border-left-width: 0;
+}
+.ui-datepicker-multi .ui-datepicker-buttonpane {
+  clear: left;
+}
+.ui-datepicker-row-break {
+  clear: both;
+  width: 100%;
+  font-size: 0;
+}
+.ui-datepicker-rtl {
+  direction: rtl;
+}
+.ui-datepicker-rtl .ui-datepicker-prev {
+  right: 2px;
+  left: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-next {
+  left: 2px;
+  right: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-prev:hover {
+  right: 1px;
+  left: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-next:hover {
+  left: 1px;
+  right: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-buttonpane {
+  clear: right;
+}
+.ui-datepicker-rtl .ui-datepicker-buttonpane button {
+  float: left;
+}
+.ui-datepicker-rtl .ui-datepicker-buttonpane button.ui-datepicker-current,
+.ui-datepicker-rtl .ui-datepicker-group {
+  float: right;
+}
+.ui-datepicker-rtl .ui-datepicker-group-last .ui-datepicker-header,
+.ui-datepicker-rtl .ui-datepicker-group-middle .ui-datepicker-header {
+  border-right-width: 0;
+  border-left-width: 1px;
+}
+.ui-widget {
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 1.1em;
+}
+.ui-widget .ui-widget {
+  font-size: 1em;
+}
+.ui-widget input,
+.ui-widget select,
+.ui-widget textarea,
+.ui-widget button {
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 1em;
+}
+.ui-widget-content {
+  border: 1px solid #aaa;
+  background: #fff url("images/ui-bg_flat_75_ffffff_40x100.png") 50% 50% repeat-x;
+  color: #222;
+}
+.ui-widget-content a {
+  color: #222;
+}
+.ui-widget-header {
+  border: 1px solid #aaa;
+  background: #ccc url("images/ui-bg_highlight-soft_75_cccccc_1x100.png") 50% 50% repeat-x;
+  color: #222;
+  font-weight: bold;
+}
+.ui-widget-header a {
+  color: #222;
+}
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+  border: 1px solid #d3d3d3;
+  background: #e6e6e6 url("images/ui-bg_glass_75_e6e6e6_1x400.png") 50% 50% repeat-x;
+  font-weight: normal;
+  color: #555;
+}
+.ui-state-default a,
+.ui-state-default a:link,
+.ui-state-default a:visited {
+  color: #555;
+  text-decoration: none;
+}
+.ui-state-hover,
+.ui-widget-content .ui-state-hover,
+.ui-widget-header .ui-state-hover,
+.ui-state-focus,
+.ui-widget-content .ui-state-focus,
+.ui-widget-header .ui-state-focus {
+  border: 1px solid #999;
+  background: #dadada url("images/ui-bg_glass_75_dadada_1x400.png") 50% 50% repeat-x;
+  font-weight: normal;
+  color: #212121;
+}
+.ui-state-hover a,
+.ui-state-hover a:hover,
+.ui-state-hover a:link,
+.ui-state-hover a:visited,
+.ui-state-focus a,
+.ui-state-focus a:hover,
+.ui-state-focus a:link,
+.ui-state-focus a:visited {
+  color: #212121;
+  text-decoration: none;
+}
+.ui-state-active,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-active {
+  border: 1px solid #aaa;
+  background: #fff url("images/ui-bg_glass_65_ffffff_1x400.png") 50% 50% repeat-x;
+  font-weight: normal;
+  color: #212121;
+}
+.ui-state-active a,
+.ui-state-active a:link,
+.ui-state-active a:visited {
+  color: #212121;
+  text-decoration: none;
+}
+.ui-state-highlight,
+.ui-widget-content .ui-state-highlight,
+.ui-widget-header .ui-state-highlight {
+  border: 1px solid #fcefa1;
+  background: #fbf9ee url("images/ui-bg_glass_55_fbf9ee_1x400.png") 50% 50% repeat-x;
+  color: #363636;
+}
+.ui-state-highlight a,
+.ui-widget-content .ui-state-highlight a,
+.ui-widget-header .ui-state-highlight a {
+  color: #363636;
+}
+.ui-state-error,
+.ui-widget-content .ui-state-error,
+.ui-widget-header .ui-state-error {
+  border: 1px solid #cd0a0a;
+  background: #fef1ec url("images/ui-bg_glass_95_fef1ec_1x400.png") 50% 50% repeat-x;
+  color: #cd0a0a;
+}
+.ui-state-error a,
+.ui-widget-content .ui-state-error a,
+.ui-widget-header .ui-state-error a {
+  color: #cd0a0a;
+}
+.ui-state-error-text,
+.ui-widget-content .ui-state-error-text,
+.ui-widget-header .ui-state-error-text {
+  color: #cd0a0a;
+}
+.ui-priority-primary,
+.ui-widget-content .ui-priority-primary,
+.ui-widget-header .ui-priority-primary {
+  font-weight: bold;
+}
+.ui-priority-secondary,
+.ui-widget-content .ui-priority-secondary,
+.ui-widget-header .ui-priority-secondary {
+  opacity: .7;
+  filter: alpha(opacity=70);
+  font-weight: normal;
+}
+.ui-state-disabled,
+.ui-widget-content .ui-state-disabled,
+.ui-widget-header .ui-state-disabled {
+  opacity: .35;
+  filter: alpha(opacity=35);
+  background-image: none;
+}
+.ui-state-disabled .ui-icon {
+  filter: alpha(opacity=35);
+}
+.ui-icon {
+  width: 16px;
+  height: 16px;
+}
+.ui-icon,
+.ui-widget-content .ui-icon {
+  background-image: url("images/ui-icons_222222_256x240.png");
+}
+.ui-widget-header .ui-icon {
+  background-image: url("images/ui-icons_222222_256x240.png");
+}
+.ui-state-default .ui-icon {
+  background-image: url("images/ui-icons_888888_256x240.png");
+}
+.ui-state-hover .ui-icon,
+.ui-state-focus .ui-icon {
+  background-image: url("images/ui-icons_454545_256x240.png");
+}
+.ui-state-active .ui-icon {
+  background-image: url("images/ui-icons_454545_256x240.png");
+}
+.ui-state-highlight .ui-icon {
+  background-image: url("images/ui-icons_2e83ff_256x240.png");
+}
+.ui-state-error .ui-icon,
+.ui-state-error-text .ui-icon {
+  background-image: url("images/ui-icons_cd0a0a_256x240.png");
+}
+.ui-icon-blank {
+  background-position: 16px 16px;
+}
+.ui-icon-carat-1-n {
+  background-position: 0 0;
+}
+.ui-icon-carat-1-ne {
+  background-position: -16px 0;
+}
+.ui-icon-carat-1-e {
+  background-position: -32px 0;
+}
+.ui-icon-carat-1-se {
+  background-position: -48px 0;
+}
+.ui-icon-carat-1-s {
+  background-position: -64px 0;
+}
+.ui-icon-carat-1-sw {
+  background-position: -80px 0;
+}
+.ui-icon-carat-1-w {
+  background-position: -96px 0;
+}
+.ui-icon-carat-1-nw {
+  background-position: -112px 0;
+}
+.ui-icon-carat-2-n-s {
+  background-position: -128px 0;
+}
+.ui-icon-carat-2-e-w {
+  background-position: -144px 0;
+}
+.ui-icon-triangle-1-n {
+  background-position: 0 -16px;
+}
+.ui-icon-triangle-1-ne {
+  background-position: -16px -16px;
+}
+.ui-icon-triangle-1-e {
+  background-position: -32px -16px;
+}
+.ui-icon-triangle-1-se {
+  background-position: -48px -16px;
+}
+.ui-icon-triangle-1-s {
+  background-position: -64px -16px;
+}
+.ui-icon-triangle-1-sw {
+  background-position: -80px -16px;
+}
+.ui-icon-triangle-1-w {
+  background-position: -96px -16px;
+}
+.ui-icon-triangle-1-nw {
+  background-position: -112px -16px;
+}
+.ui-icon-triangle-2-n-s {
+  background-position: -128px -16px;
+}
+.ui-icon-triangle-2-e-w {
+  background-position: -144px -16px;
+}
+.ui-icon-arrow-1-n {
+  background-position: 0 -32px;
+}
+.ui-icon-arrow-1-ne {
+  background-position: -16px -32px;
+}
+.ui-icon-arrow-1-e {
+  background-position: -32px -32px;
+}
+.ui-icon-arrow-1-se {
+  background-position: -48px -32px;
+}
+.ui-icon-arrow-1-s {
+  background-position: -64px -32px;
+}
+.ui-icon-arrow-1-sw {
+  background-position: -80px -32px;
+}
+.ui-icon-arrow-1-w {
+  background-position: -96px -32px;
+}
+.ui-icon-arrow-1-nw {
+  background-position: -112px -32px;
+}
+.ui-icon-arrow-2-n-s {
+  background-position: -128px -32px;
+}
+.ui-icon-arrow-2-ne-sw {
+  background-position: -144px -32px;
+}
+.ui-icon-arrow-2-e-w {
+  background-position: -160px -32px;
+}
+.ui-icon-arrow-2-se-nw {
+  background-position: -176px -32px;
+}
+.ui-icon-arrowstop-1-n {
+  background-position: -192px -32px;
+}
+.ui-icon-arrowstop-1-e {
+  background-position: -208px -32px;
+}
+.ui-icon-arrowstop-1-s {
+  background-position: -224px -32px;
+}
+.ui-icon-arrowstop-1-w {
+  background-position: -240px -32px;
+}
+.ui-icon-arrowthick-1-n {
+  background-position: 0 -48px;
+}
+.ui-icon-arrowthick-1-ne {
+  background-position: -16px -48px;
+}
+.ui-icon-arrowthick-1-e {
+  background-position: -32px -48px;
+}
+.ui-icon-arrowthick-1-se {
+  background-position: -48px -48px;
+}
+.ui-icon-arrowthick-1-s {
+  background-position: -64px -48px;
+}
+.ui-icon-arrowthick-1-sw {
+  background-position: -80px -48px;
+}
+.ui-icon-arrowthick-1-w {
+  background-position: -96px -48px;
+}
+.ui-icon-arrowthick-1-nw {
+  background-position: -112px -48px;
+}
+.ui-icon-arrowthick-2-n-s {
+  background-position: -128px -48px;
+}
+.ui-icon-arrowthick-2-ne-sw {
+  background-position: -144px -48px;
+}
+.ui-icon-arrowthick-2-e-w {
+  background-position: -160px -48px;
+}
+.ui-icon-arrowthick-2-se-nw {
+  background-position: -176px -48px;
+}
+.ui-icon-arrowthickstop-1-n {
+  background-position: -192px -48px;
+}
+.ui-icon-arrowthickstop-1-e {
+  background-position: -208px -48px;
+}
+.ui-icon-arrowthickstop-1-s {
+  background-position: -224px -48px;
+}
+.ui-icon-arrowthickstop-1-w {
+  background-position: -240px -48px;
+}
+.ui-icon-arrowreturnthick-1-w {
+  background-position: 0 -64px;
+}
+.ui-icon-arrowreturnthick-1-n {
+  background-position: -16px -64px;
+}
+.ui-icon-arrowreturnthick-1-e {
+  background-position: -32px -64px;
+}
+.ui-icon-arrowreturnthick-1-s {
+  background-position: -48px -64px;
+}
+.ui-icon-arrowreturn-1-w {
+  background-position: -64px -64px;
+}
+.ui-icon-arrowreturn-1-n {
+  background-position: -80px -64px;
+}
+.ui-icon-arrowreturn-1-e {
+  background-position: -96px -64px;
+}
+.ui-icon-arrowreturn-1-s {
+  background-position: -112px -64px;
+}
+.ui-icon-arrowrefresh-1-w {
+  background-position: -128px -64px;
+}
+.ui-icon-arrowrefresh-1-n {
+  background-position: -144px -64px;
+}
+.ui-icon-arrowrefresh-1-e {
+  background-position: -160px -64px;
+}
+.ui-icon-arrowrefresh-1-s {
+  background-position: -176px -64px;
+}
+.ui-icon-arrow-4 {
+  background-position: 0 -80px;
+}
+.ui-icon-arrow-4-diag {
+  background-position: -16px -80px;
+}
+.ui-icon-extlink {
+  background-position: -32px -80px;
+}
+.ui-icon-newwin {
+  background-position: -48px -80px;
+}
+.ui-icon-refresh {
+  background-position: -64px -80px;
+}
+.ui-icon-shuffle {
+  background-position: -80px -80px;
+}
+.ui-icon-transfer-e-w {
+  background-position: -96px -80px;
+}
+.ui-icon-transferthick-e-w {
+  background-position: -112px -80px;
+}
+.ui-icon-folder-collapsed {
+  background-position: 0 -96px;
+}
+.ui-icon-folder-open {
+  background-position: -16px -96px;
+}
+.ui-icon-document {
+  background-position: -32px -96px;
+}
+.ui-icon-document-b {
+  background-position: -48px -96px;
+}
+.ui-icon-note {
+  background-position: -64px -96px;
+}
+.ui-icon-mail-closed {
+  background-position: -80px -96px;
+}
+.ui-icon-mail-open {
+  background-position: -96px -96px;
+}
+.ui-icon-suitcase {
+  background-position: -112px -96px;
+}
+.ui-icon-comment {
+  background-position: -128px -96px;
+}
+.ui-icon-person {
+  background-position: -144px -96px;
+}
+.ui-icon-print {
+  background-position: -160px -96px;
+}
+.ui-icon-trash {
+  background-position: -176px -96px;
+}
+.ui-icon-locked {
+  background-position: -192px -96px;
+}
+.ui-icon-unlocked {
+  background-position: -208px -96px;
+}
+.ui-icon-bookmark {
+  background-position: -224px -96px;
+}
+.ui-icon-tag {
+  background-position: -240px -96px;
+}
+.ui-icon-home {
+  background-position: 0 -112px;
+}
+.ui-icon-flag {
+  background-position: -16px -112px;
+}
+.ui-icon-calendar {
+  background-position: -32px -112px;
+}
+.ui-icon-cart {
+  background-position: -48px -112px;
+}
+.ui-icon-pencil {
+  background-position: -64px -112px;
+}
+.ui-icon-clock {
+  background-position: -80px -112px;
+}
+.ui-icon-disk {
+  background-position: -96px -112px;
+}
+.ui-icon-calculator {
+  background-position: -112px -112px;
+}
+.ui-icon-zoomin {
+  background-position: -128px -112px;
+}
+.ui-icon-zoomout {
+  background-position: -144px -112px;
+}
+.ui-icon-search {
+  background-position: -160px -112px;
+}
+.ui-icon-wrench {
+  background-position: -176px -112px;
+}
+.ui-icon-gear {
+  background-position: -192px -112px;
+}
+.ui-icon-heart {
+  background-position: -208px -112px;
+}
+.ui-icon-star {
+  background-position: -224px -112px;
+}
+.ui-icon-link {
+  background-position: -240px -112px;
+}
+.ui-icon-cancel {
+  background-position: 0 -128px;
+}
+.ui-icon-plus {
+  background-position: -16px -128px;
+}
+.ui-icon-plusthick {
+  background-position: -32px -128px;
+}
+.ui-icon-minus {
+  background-position: -48px -128px;
+}
+.ui-icon-minusthick {
+  background-position: -64px -128px;
+}
+.ui-icon-close {
+  background-position: -80px -128px;
+}
+.ui-icon-closethick {
+  background-position: -96px -128px;
+}
+.ui-icon-key {
+  background-position: -112px -128px;
+}
+.ui-icon-lightbulb {
+  background-position: -128px -128px;
+}
+.ui-icon-scissors {
+  background-position: -144px -128px;
+}
+.ui-icon-clipboard {
+  background-position: -160px -128px;
+}
+.ui-icon-copy {
+  background-position: -176px -128px;
+}
+.ui-icon-contact {
+  background-position: -192px -128px;
+}
+.ui-icon-image {
+  background-position: -208px -128px;
+}
+.ui-icon-video {
+  background-position: -224px -128px;
+}
+.ui-icon-script {
+  background-position: -240px -128px;
+}
+.ui-icon-alert {
+  background-position: 0 -144px;
+}
+.ui-icon-info {
+  background-position: -16px -144px;
+}
+.ui-icon-notice {
+  background-position: -32px -144px;
+}
+.ui-icon-help {
+  background-position: -48px -144px;
+}
+.ui-icon-check {
+  background-position: -64px -144px;
+}
+.ui-icon-bullet {
+  background-position: -80px -144px;
+}
+.ui-icon-radio-on {
+  background-position: -96px -144px;
+}
+.ui-icon-radio-off {
+  background-position: -112px -144px;
+}
+.ui-icon-pin-w {
+  background-position: -128px -144px;
+}
+.ui-icon-pin-s {
+  background-position: -144px -144px;
+}
+.ui-icon-play {
+  background-position: 0 -160px;
+}
+.ui-icon-pause {
+  background-position: -16px -160px;
+}
+.ui-icon-seek-next {
+  background-position: -32px -160px;
+}
+.ui-icon-seek-prev {
+  background-position: -48px -160px;
+}
+.ui-icon-seek-end {
+  background-position: -64px -160px;
+}
+.ui-icon-seek-start {
+  background-position: -80px -160px;
+}
+.ui-icon-seek-first {
+  background-position: -80px -160px;
+}
+.ui-icon-stop {
+  background-position: -96px -160px;
+}
+.ui-icon-eject {
+  background-position: -112px -160px;
+}
+.ui-icon-volume-off {
+  background-position: -128px -160px;
+}
+.ui-icon-volume-on {
+  background-position: -144px -160px;
+}
+.ui-icon-power {
+  background-position: 0 -176px;
+}
+.ui-icon-signal-diag {
+  background-position: -16px -176px;
+}
+.ui-icon-signal {
+  background-position: -32px -176px;
+}
+.ui-icon-battery-0 {
+  background-position: -48px -176px;
+}
+.ui-icon-battery-1 {
+  background-position: -64px -176px;
+}
+.ui-icon-battery-2 {
+  background-position: -80px -176px;
+}
+.ui-icon-battery-3 {
+  background-position: -96px -176px;
+}
+.ui-icon-circle-plus {
+  background-position: 0 -192px;
+}
+.ui-icon-circle-minus {
+  background-position: -16px -192px;
+}
+.ui-icon-circle-close {
+  background-position: -32px -192px;
+}
+.ui-icon-circle-triangle-e {
+  background-position: -48px -192px;
+}
+.ui-icon-circle-triangle-s {
+  background-position: -64px -192px;
+}
+.ui-icon-circle-triangle-w {
+  background-position: -80px -192px;
+}
+.ui-icon-circle-triangle-n {
+  background-position: -96px -192px;
+}
+.ui-icon-circle-arrow-e {
+  background-position: -112px -192px;
+}
+.ui-icon-circle-arrow-s {
+  background-position: -128px -192px;
+}
+.ui-icon-circle-arrow-w {
+  background-position: -144px -192px;
+}
+.ui-icon-circle-arrow-n {
+  background-position: -160px -192px;
+}
+.ui-icon-circle-zoomin {
+  background-position: -176px -192px;
+}
+.ui-icon-circle-zoomout {
+  background-position: -192px -192px;
+}
+.ui-icon-circle-check {
+  background-position: -208px -192px;
+}
+.ui-icon-circlesmall-plus {
+  background-position: 0 -208px;
+}
+.ui-icon-circlesmall-minus {
+  background-position: -16px -208px;
+}
+.ui-icon-circlesmall-close {
+  background-position: -32px -208px;
+}
+.ui-icon-squaresmall-plus {
+  background-position: -48px -208px;
+}
+.ui-icon-squaresmall-minus {
+  background-position: -64px -208px;
+}
+.ui-icon-squaresmall-close {
+  background-position: -80px -208px;
+}
+.ui-icon-grip-dotted-vertical {
+  background-position: 0 -224px;
+}
+.ui-icon-grip-dotted-horizontal {
+  background-position: -16px -224px;
+}
+.ui-icon-grip-solid-vertical {
+  background-position: -32px -224px;
+}
+.ui-icon-grip-solid-horizontal {
+  background-position: -48px -224px;
+}
+.ui-icon-gripsmall-diagonal-se {
+  background-position: -64px -224px;
+}
+.ui-icon-grip-diagonal-se {
+  background-position: -80px -224px;
+}
+.ui-corner-all,
+.ui-corner-top,
+.ui-corner-left,
+.ui-corner-tl {
+  border-top-left-radius: 4px;
+}
+.ui-corner-all,
+.ui-corner-top,
+.ui-corner-right,
+.ui-corner-tr {
+  border-top-right-radius: 4px;
+}
+.ui-corner-all,
+.ui-corner-bottom,
+.ui-corner-left,
+.ui-corner-bl {
+  border-bottom-left-radius: 4px;
+}
+.ui-corner-all,
+.ui-corner-bottom,
+.ui-corner-right,
+.ui-corner-br {
+  border-bottom-right-radius: 4px;
+}
+.ui-widget-overlay {
+  background: #aaa url("images/ui-bg_flat_0_aaaaaa_40x100.png") 50% 50% repeat-x;
+  opacity: .3;
+  filter: alpha(opacity=30);
+}
+.ui-widget-shadow {
+  margin: -8px 0 0 -8px;
+  padding: 8px;
+  background: #aaa url("images/ui-bg_flat_0_aaaaaa_40x100.png") 50% 50% repeat-x;
+  opacity: .3;
+  filter: alpha(opacity=30);
+  border-radius: 8px;
+}
+
+/*
+ *  Power BI Visualizations
+ *
+ *  Copyright (c) Microsoft Corporation
+ *  All rights reserved. 
+ *  MIT License
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the ""Software""), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *   
+ *  The above copyright notice and this permission notice shall be included in 
+ *  all copies or substantial portions of the Software.
+ *   
+ *  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
+/*
+LESS variables are information about icon's compiled state, stored under its original file name
+
+.icon-home {
+  width: @icon-home-width;
+}
+
+The large array-like variables contain all information about a single icon
+@icon-home: x y offset_x offset_y width height total_width total_height image_path name;
+
+At the bottom of this section, we provide information about the spritesheet itself
+@spritesheet: width height image @spritesheet-sprites;
+*/
+/*
+The provided classes are intended to be used with the array-like variables
+
+.icon-home {
+  .sprite-width(@icon-home);
+}
+.icon-email {
+  .sprite(@icon-email);
+}
+*/
+/*
+The `.sprites` mixin generates identical output to the CSS template
+  but can be overridden inside of LESS
+
+This must be run when you have at least 2 sprites.
+  If run with a single sprite, then there will be reference errors.
+
+.sprites(@spritesheet-sprites);
+*/
+/*
+ *  Power BI Visualizations
+ *
+ *  Copyright (c) Microsoft Corporation
+ *  All rights reserved. 
+ *  MIT License
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the ""Software""), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *   
+ *  The above copyright notice and this permission notice shall be included in 
+ *  all copies or substantial portions of the Software.
+ *   
+ *  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
+/*
+ *  Power BI Visualizations
+ *
+ *  Copyright (c) Microsoft Corporation
+ *  All rights reserved. 
+ *  MIT License
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the ""Software""), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *   
+ *  The above copyright notice and this permission notice shall be included in 
+ *  all copies or substantial portions of the Software.
+ *   
+ *  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
+/* 
+    POWER BI V2 "Bumblebee" COLOR PALLETE
+    Please use only the colors declared here  - this file is to be kept in sync with the palette defined by the design team
+    If you need a color that is not here, talk to your designer and get it added to the main palette and then add it here
+
+    - Use #HEX codes - if you need to get alpha use fadeout(color, percentage)
+    - Colors should be reusable, and not duplicated.
+*/
+/* THEME COLORS */
+/* NEUTRAL COLORS */
+/* ACCENT COLORS */
+/* APPLICATION CHROME COLORS */
+/*dark chrome*/
+/*light chrome*/
+/*@primaryChromeColor: @whiteColor;
+@secondaryChromeColor: @whiteColor;
+@tertiaryChromeColor: @whiteColor;*/
+/* 
+    DEPRECATED COLORS: Please refrain from adding one time use colors to the section below.
+    These will be all be removed. New colors must be provided by design and be in the design OneNote palette
+*/
+/* PowerView specific colors */
+/* Visual colors */
+/*
+ *  Power BI Visualizations
+ *
+ *  Copyright (c) Microsoft Corporation
+ *  All rights reserved. 
+ *  MIT License
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the ""Software""), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *   
+ *  The above copyright notice and this permission notice shall be included in 
+ *  all copies or substantial portions of the Software.
+ *   
+ *  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
+/*
+ *  Power BI Visualizations
+ *
+ *  Copyright (c) Microsoft Corporation
+ *  All rights reserved. 
+ *  MIT License
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the ""Software""), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *   
+ *  The above copyright notice and this permission notice shall be included in 
+ *  all copies or substantial portions of the Software.
+ *   
+ *  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
+body {
+  -webkit-font-smoothing: antialiased;
+}
+.secondaryFont {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+}
+.secondaryBoldFont {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+}
+.lightFont {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+}
+.semilightFont {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+}
+.regularFont {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+}
+.semiboldFont {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+}
+.boldFontFamily {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+}
+/*
+ *  Power BI Visualizations
+ *
+ *  Copyright (c) Microsoft Corporation
+ *  All rights reserved. 
+ *  MIT License
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the ""Software""), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *   
+ *  The above copyright notice and this permission notice shall be included in 
+ *  all copies or substantial portions of the Software.
+ *   
+ *  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
+/* 
+ * Color styles MUST be set through the color palette in colors.less. This
+ * will allow us to easily change the palette and get a consistent look. DO NOT
+ * hard-code colors directly inside classes.
+ *
+ * To get integrated VS support for LESS install the Visual Studio Web Essentials.
+ */
+.unselectable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+.trimmedTextWithEllipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.preTextWithEllipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: pre;
+}
+.skittlesNormal {
+  opacity: 0;
+  border: 1px solid #A6A6A6;
+  color: #333333;
+  background-color: #FFF;
+  margin-bottom: 5px;
+  margin-left: 5px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  -moz-transition: opacity 0.2s ease-in;
+  -o-transition: opacity 0.2s ease-in;
+  -webkit-transition: opacity 0.2s ease-in;
+  transition: opacity 0.2s ease-in;
+  -webkit-transition-delay: 0s;
+  /* Safari */
+  transition-delay: 0s;
+}
+.skittlesHovered {
+  background-color: #F4F4F4;
+}
+.skittlesPressed {
+  border-color: #777777;
+  background-color: #EAEAEA;
+}
+.skittlesIconNormal {
+  vertical-align: middle;
+  text-align: center;
+  color: #A6A6A6;
+}
+.skittlesIconHovered {
+  color: #777777;
+}
+.visible {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.5s linear, left 0.5s linear, transform 0.5s;
+  -webkit-transition: opacity 0.5s linear, left 0.5s linear, transform 0.5s;
+}
+.hidden {
+  visibility: hidden;
+  /* Fully hide the element*/
+  opacity: 0;
+  transition: visibility 0s 0.5s, width 0s 0.5s, height 0s 0.5s, opacity 0.5s linear, left 0.5s linear, transform 0.5s;
+  -webkit-transition: visibility 0s 0.5s, width 0s 0.5s, height 0s 0.5s, opacity 0.5s linear, left 0.5s linear, transform 0.5s;
+}
+.hiddenNoTransition {
+  visibility: hidden;
+  opacity: 0;
+}
+.expAppBarMenu {
+  position: absolute;
+  left: 10px;
+  top: 7px;
+  content: '';
+}
+.expAppBar {
+  position: absolute;
+  left: 10px;
+  content: '';
+}
+/*
+ *  Power BI Visualizations
+ *
+ *  Copyright (c) Microsoft Corporation
+ *  All rights reserved. 
+ *  MIT License
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the ""Software""), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *   
+ *  The above copyright notice and this permission notice shall be included in 
+ *  all copies or substantial portions of the Software.
+ *   
+ *  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
+.slicerContainer .slicerHeader {
+  margin: 0 0 0 8px;
+  box-sizing: border-box;
+}
+.slicerContainer .headerText {
+  color: #333333;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: auto;
+  float: none;
+}
+.slicerContainer .slicerItemContainer {
+  margin: 2px 0 0 8px;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+.slicerContainer .slicerItemContainer * {
+  display: table-cell;
+  vertical-align: bottom;
+}
+.slicerContainer .slicerItemContainer:hover .slicerCheckbox span::before {
+  opacity: 1;
+}
+.slicerContainer .slicerCheckbox {
+  cursor: pointer;
+}
+.slicerContainer .slicerCheckbox input {
+  display: none;
+}
+.slicerContainer .slicerCheckbox span {
+  display: table-cell;
+}
+.slicerContainer .slicerCheckbox span::before {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -156px -116px;
+  width: 13px;
+  height: 13px;
+  opacity: 0.5;
+}
+.slicerContainer .slicerCheckbox input:checked + span::before {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -156px -129px;
+  width: 13px;
+  height: 13px;
+  opacity: 1;
+}
+.slicerContainer .slicerCheckbox input.partiallySelected + span::before {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -156px -142px;
+  width: 13px;
+  height: 13px;
+  opacity: 1;
+}
+.slicerContainer .slicerText {
+  cursor: pointer;
+  font-size: 14px;
+}
+.slicerContainer .clear {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -136px -120px;
+  width: 13px;
+  height: 12px;
+  margin: 4px 2px;
+  float: right;
+  cursor: pointer;
+}
+.visual svg.legend .navArrow {
+  fill: #333333;
+  cursor: pointer;
+  /* stroke enabled for a bigger click target, but smaller visible arrow size */
+  stroke: #FFF;
+  stroke-width: 2px;
+}
+.visual svg .showLinesOnAxis path {
+  display: none;
+}
+.visual svg .showLinesOnAxis .tick line {
+  stroke: #e9e9e9;
+  stroke-width: 1px;
+  padding-left: 10px;
+}
+.visual svg .showLinesOnAxis .tick line.zero-line {
+  stroke: #A6A6A6;
+}
+.visual svg .hideLinesOnAxis .tick line {
+  display: none;
+}
+.visual svg .hideLinesOnAxis path {
+  stroke-width: 1px;
+}
+.visual svg .hideLinesOnAxis .domain {
+  display: none;
+}
+/* Animated Text (and card) Styles */
+.animatedNumber .mainText,
+.card .mainText {
+  fill: #333333;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+}
+/* Column chart styles */
+.columnChart .column {
+  fill: #28ace2;
+}
+.columnChart .column:hover {
+  fill: #239fd1;
+}
+.columnChart .axisGraphicsContext {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  font-size: 11px;
+}
+.columnChart .axisGraphicsContext text {
+  fill: #777777;
+}
+.columnChart .axisGraphicsContext .axis path,
+.columnChart .axisGraphicsContext .axis line {
+  fill: none;
+  stroke: #777777;
+  shape-rendering: crispEdges;
+}
+.columnChart .interactive-hover-line {
+  stroke: #666666;
+  stroke-width: 3px;
+  opacity: 1;
+}
+.columnChart .drag-handle {
+  fill: #666666;
+  opacity: 1;
+}
+.dataDotChart .dataDotChartMainGraphicsContext {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  font-size: 11px;
+}
+.dataDotChart .dataDotChartMainGraphicsContext .dot {
+  fill: #28ace2;
+}
+.dataDotChart .dataDotChartMainGraphicsContext .dot:hover {
+  fill: #239fd1;
+}
+.dataDotChart .dataDotChartMainGraphicsContext .dot.null-value {
+  display: none;
+}
+.dataDotChart .dataDotChartMainGraphicsContext .label {
+  fill: white;
+  text-anchor: middle;
+}
+.dataDotChart .dataDotChartMainGraphicsContext .label.null-value {
+  display: none;
+}
+.dataDotChart .dataDotChartMainGraphicsContext .label.overflowed {
+  display: none;
+}
+.dataDotChart .axisGraphicsContext {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  font-size: 11px;
+}
+.dataDotChart .axisGraphicsContext text {
+  fill: #777777;
+}
+.dataDotChart .axisGraphicsContext .axis path,
+.dataDotChart .axisGraphicsContext .axis line {
+  fill: none;
+  stroke: #777777;
+  shape-rendering: crispEdges;
+}
+.waterfallChart .column {
+  fill: #28ace2;
+}
+.waterfallChart .column:hover {
+  fill: #239fd1;
+}
+.waterfallChart .axisGraphicsContext {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  font-size: 11px;
+}
+.waterfallChart .axisGraphicsContext text {
+  fill: #777777;
+}
+.waterfallChart .axisGraphicsContext .axis path,
+.waterfallChart .axisGraphicsContext .axis line {
+  fill: none;
+  stroke: #777777;
+  shape-rendering: crispEdges;
+}
+.waterfallChart .waterfall-connector {
+  stroke: #A6A6A6;
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
+.lineChart .mainGraphicsContext path {
+  fill: none;
+  stroke-width: 3px;
+  stroke-linecap: round;
+}
+.lineChart .mainGraphicsContext .catBackground path {
+  stroke-width: 6px;
+  stroke: white;
+}
+.lineChart .mainGraphicsContext .interactivity-line {
+  stroke: #FFF;
+  stroke-opacity: 0;
+  stroke-width: 10px;
+}
+.lineChart .hover-line {
+  stroke: #e9e9e9;
+  fill: #eb5e5e;
+}
+.lineChart .hover-line .interactive {
+  stroke: #666666;
+  stroke-width: 3px;
+  opacity: 1;
+}
+.lineChart .drag-handle {
+  fill: #666666;
+  opacity: 1;
+}
+.lineChart .axisGraphicsContext {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  font-size: 11px;
+}
+.lineChart .axisGraphicsContext text {
+  fill: #777777;
+}
+.lineChart .axisGraphicsContext .axis path,
+.lineChart .axisGraphicsContext .axis line {
+  fill: none;
+  stroke: #777777;
+  shape-rendering: crispEdges;
+}
+.lineChart .axisGraphicsContext .line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+.funnelChart line {
+  shape-rendering: crispEdges;
+}
+.funnelChart .percentBars line {
+  fill: none;
+  stroke: #A6A6A6;
+  stroke-width: 1px;
+}
+.funnelChart .percentBars text {
+  text-anchor: middle;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+}
+.funnelChart .axis path,
+.funnelChart .axis line {
+  fill: none;
+  stroke: #000;
+}
+.funnelChart .axis .data-labels {
+  font-size: 12px;
+}
+.funnelChart .axis .tick line {
+  display: none;
+}
+.funnelChart .axis .domain {
+  display: none;
+}
+.donutChart {
+  overflow: visible !important;
+}
+.donutChart path.slice {
+  stroke-width: 1px;
+  stroke: white;
+}
+.donutChart path.slice-highlight {
+  stroke-width: 1px;
+  stroke: white;
+}
+.donutChart .labels text {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  font-size: 11px;
+  fill: #777777;
+}
+.donutChart polyline {
+  stroke: #777777;
+  stroke-width: 1px;
+  fill: rgba(0, 0, 0, 0);
+}
+.donutChart .donutLegendArrow {
+  fill: #666666;
+}
+.donutLegend .legend-item .category {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  color: #666666;
+}
+.donutLegend .legend-item .percentage {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  /* No need for color, as it would be overriden afterwards */
+}
+.donutLegend .legend-item .value {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  color: #666666;
+}
+.scatterChart .mainGraphicsContext path {
+  fill: none;
+  stroke-width: 3px;
+}
+.scatterChart .mainGraphicsContext .notSelected {
+  opacity: 0.6;
+}
+.scatterChart .mainGraphicsContext .selected {
+  opacity: 1;
+}
+.scatterChart .crosshair .horizontal {
+  stroke: #666666;
+  stroke-width: 3px;
+  opacity: 0.6;
+}
+.scatterChart .crosshair .vertical {
+  stroke: #666666;
+  stroke-width: 3px;
+  opacity: 0.6;
+}
+.scatterChart .axisGraphicsContext {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  font-size: 11px;
+}
+.scatterChart .axisGraphicsContext text {
+  fill: #777777;
+}
+.scatterChart .axisGraphicsContext .axis path,
+.scatterChart .axisGraphicsContext .axis line {
+  fill: none;
+  stroke: #777777;
+  shape-rendering: crispEdges;
+}
+.playChart .traceLine {
+  fill: none;
+  stroke-width: 2px;
+  stroke-linecap: round;
+}
+.playChart .mainGraphicsContext .notSelected {
+  opacity: 0.6;
+}
+.playChart .mainGraphicsContext .selected {
+  opacity: 1;
+}
+.playChart .axisGraphicsContext {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  font-size: 11px;
+}
+.playChart .axisGraphicsContext text {
+  fill: #777777;
+}
+.playChart .axisGraphicsContext .axis path,
+.playChart .axisGraphicsContext .axis line {
+  fill: none;
+  stroke: #777777;
+  shape-rendering: crispEdges;
+}
+.playChart .button-container {
+  height: 24px;
+  width: 24px;
+  overflow: hidden;
+  -moz-border-radius: 13px;
+  -webkit-border-radius: 13px;
+  border-radius: 13px;
+  border: 1px solid #666666;
+  margin: 10px;
+  display: inline-block;
+  cursor: pointer;
+}
+.playChart .play {
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 11px solid #999999;
+  border-right: 1px solid transparent;
+  padding: 0;
+  margin: 6px 8px;
+  background: transparent;
+  display: block;
+}
+.playChart .pause {
+  width: 4px;
+  height: 12px;
+  border-top: 0px;
+  border-bottom: 0px;
+  border-left: 4px solid #999;
+  border-right: 4px solid #999;
+  padding: 0;
+  margin: 6px 6px;
+  background-color: transparent;
+  display: block;
+}
+.playChart .sliders {
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 18px;
+}
+.playChart .callout {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: #888888;
+  opacity: 0.5;
+}
+.tableContainer {
+  overflow: auto;
+  /* table */
+}
+.tableContainer .table {
+  width: 100%;
+  color: #333333;
+  text-align: left;
+}
+.tableContainer .table th {
+  color: #777777;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* We cannot use the border-spacing on the table style for spacing since the UX spec wants unbroken row separator lines */
+  padding: 0px 12px 0px 0px;
+}
+.tableContainer .table th:last-child {
+  padding: 0px;
+}
+.tableContainer .table tr {
+  height: 20px;
+  color: #333;
+  font-size: 11px;
+  font-weight: normal;
+}
+.tableContainer .table td {
+  border-top: 1px solid #C8C8C8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* We cannot use the border-spacing on the table style for spacing since the UX spec wants unbroken row separator lines */
+  padding: 0px 12px 0px 0px;
+}
+.tableContainer .table td:last-child {
+  padding: 0px;
+}
+.tableContainer .table .numeric {
+  text-align: right;
+}
+.tableContainer .table .total {
+  font-weight: bold;
+}
+.tableContainer.scrollbarPad .table th:last-child {
+  padding: 0px 20px 0px 0px;
+}
+.tableContainer.scrollbarPad .table td:last-child {
+  padding: 0px 20px 0px 0px;
+}
+.tablixContainer {
+  overflow: auto;
+}
+.tablixContainer .bi-tablix {
+  position: relative;
+  text-align: left;
+}
+.tablixContainer .bi-tablix .unselectable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+.tablixContainer .bi-tablix table {
+  border-collapse: collapse;
+  line-height: normal;
+  padding: 0px;
+  border: 0px;
+  margin: 0px;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  color: #666666;
+  font-size: 14px;
+  font-weight: normal;
+}
+.tablixContainer .bi-tablix tr {
+  line-height: normal;
+  padding: 0px;
+  border: 0px;
+  margin: 0px;
+}
+.tablixContainer .bi-tablix td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tablixContainer .bi-tablix .bi-table-column-header {
+  border-bottom-width: 1pt;
+  border-bottom-style: solid;
+  border-bottom-color: #CCCCCC;
+  font-size: 16px;
+  /* Having a right padding of 5px is crucial to make sure that we do not fire click events on the table column
+               header (and trigger sorting) when resizing a column.  The allowed offset from the parent td's right border
+               to trigger resizing is 4px (see TablixResizer.resizeHandleSize) and thus less than the 5px padding.
+            */
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-tablix .bi-table-cell-numeric {
+  text-align: right;
+}
+.tablixContainer .bi-tablix .bi-table-row {
+  border-bottom-width: 1pt;
+  border-bottom-style: solid;
+  border-bottom-color: #E8E8E8;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  color: #333333;
+  font-size: 14px;
+  padding: 0px 0px 0px 10px;
+}
+.tablixContainer .bi-tablix .bi-table-last-row {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  color: #333333;
+  font-size: 14px;
+  padding: 0px 0px 0px 10px;
+}
+.tablixContainer .bi-tablix .bi-table-footer {
+  border-top-width: 1pt;
+  border-top-style: solid;
+  border-top-color: #CCCCCC;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  color: #333333;
+  font-size: 14px;
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-tablix .bi-tablix-header {
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-tablix .bi-tablix-row-header-leaf {
+  border-right-width: 1px;
+  border-right-color: #CCCCCC;
+  border-right-style: solid;
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-tablix .bi-tablix-row-header-static-leaf {
+  border-right-width: 1px;
+  border-right-color: #CCCCCC;
+  border-right-style: solid;
+  padding: 0px 0px 0px 0px;
+}
+.tablixContainer .bi-tablix .bi-tablix-row-header-toplevel-static-leaf {
+  border-right-width: 1px;
+  border-right-color: #CCCCCC;
+  border-right-style: solid;
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-tablix .bi-tablix-column-header-leaf {
+  border-bottom-width: 1px;
+  border-bottom-color: #CCCCCC;
+  border-bottom-style: solid;
+  /* Having a right padding of 5px is crucial to make sure that we do not fire click events on the tablix column
+               header (and trigger sorting) when resizing a column.  The allowed offset from the parent td's right border
+               to trigger resizing is 4px (see TablixResizer.resizeHandleSize) and thus less than the 5px padding.
+            */
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-tablix .bi-matrix-body-cell {
+  text-align: right;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  color: #333333;
+  font-size: 14px;
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-tablix .total {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+}
+.tablixContainer .bi-tablix .scroll-bar-div {
+  background: #F1F1F1;
+  position: relative;
+  user-select: none;
+}
+.tablixContainer .bi-tablix .scroll-bar-part-arrow {
+  background: #F1F1F1;
+  position: absolute;
+  text-align: center;
+  user-select: none;
+}
+.tablixContainer .bi-tablix .scroll-bar-part-arrow:hover {
+  background-color: #cecece;
+}
+.tablixContainer .bi-tablix .scroll-bar-part-bar {
+  background: #cecece;
+  position: absolute;
+  text-align: center;
+  user-select: none;
+}
+.tablixContainer .bi-tablix .scroll-bar-part-bar:hover {
+  background: #c0c0c0;
+}
+.tablixContainer .bi-dashboard-tablix {
+  position: relative;
+  text-align: left;
+}
+.tablixContainer .bi-dashboard-tablix .unselectable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+.tablixContainer .bi-dashboard-tablix table {
+  border-collapse: collapse;
+  line-height: normal;
+  padding: 0px;
+  border: 0px;
+  margin: 0px;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  color: #666666;
+  font-size: 11px;
+  font-weight: normal;
+}
+.tablixContainer .bi-dashboard-tablix tr {
+  line-height: normal;
+  padding: 0px;
+  border: 0px;
+  margin: 0px;
+}
+.tablixContainer .bi-dashboard-tablix td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tablixContainer .bi-dashboard-tablix .bi-table-column-header {
+  border-bottom-width: 1pt;
+  border-bottom-style: solid;
+  border-bottom-color: #CCCCCC;
+  font-size: 11px;
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-dashboard-tablix .bi-table-cell-numeric {
+  text-align: right;
+}
+.tablixContainer .bi-dashboard-tablix .bi-table-row {
+  border-bottom-width: 1pt;
+  border-bottom-style: solid;
+  border-bottom-color: #E8E8E8;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  color: #333333;
+  font-size: 11px;
+  padding: 0px 0px 0px 10px;
+}
+.tablixContainer .bi-dashboard-tablix .bi-table-last-row {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  color: #333333;
+  font-size: 11px;
+  padding: 0px 0px 0px 10px;
+}
+.tablixContainer .bi-dashboard-tablix .bi-table-footer {
+  border-top-width: 1pt;
+  border-top-style: solid;
+  border-top-color: #CCCCCC;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  font-weight: bold;
+  color: #333333;
+  font-size: 11px;
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-dashboard-tablix .bi-tablix-header {
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-dashboard-tablix .bi-tablix-row-header-leaf {
+  border-right-width: 1px;
+  border-right-color: #CCCCCC;
+  border-right-style: solid;
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-dashboard-tablix .bi-tablix-row-header-static-leaf {
+  border-right-width: 1px;
+  border-right-color: #CCCCCC;
+  border-right-style: solid;
+  padding: 0px 0px 0px 0px;
+}
+.tablixContainer .bi-dashboard-tablix .bi-tablix-row-header-toplevel-static-leaf {
+  border-right-width: 1px;
+  border-right-color: #CCCCCC;
+  border-right-style: solid;
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-dashboard-tablix .bi-tablix-column-header-leaf {
+  border-bottom-width: 1px;
+  border-bottom-color: #CCCCCC;
+  border-bottom-style: solid;
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-dashboard-tablix .bi-matrix-body-cell {
+  text-align: right;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  color: #333333;
+  font-size: 11px;
+  padding: 0px 5px 0px 10px;
+}
+.tablixContainer .bi-dashboard-tablix .total {
+  font-weight: bold;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+}
+.callout {
+  /*temp styles, waiting on behaviour spec*/
+  height: 15px;
+  top: -49px;
+  color: #777777;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.callout .label {
+  font-weight: bold;
+}
+.callout .labelValue {
+  font-weight: normal;
+}
+.triangle-border {
+  position: absolute;
+  padding: 10px;
+  margin: 1em 0 3em;
+  border: 1px solid #a5ddeb;
+  color: #333;
+  background: #ffffff;
+  /* css3 */
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+}
+.triangle-border:before {
+  content: "";
+  position: absolute;
+  bottom: -11px;
+  /* value = - border-top-width - border-bottom-width */
+  border-width: 11px 11px 0;
+  border-style: solid;
+  border-color: #a5ddeb transparent;
+  /* reduce the damage in FF3.0 */
+  display: block;
+  width: 0;
+}
+/* creates the smaller  triangle */
+.triangle-border:after {
+  content: "";
+  position: absolute;
+  bottom: -9px;
+  /* value = - border-top-width - border-bottom-width */
+  border-width: 9px 9px 0;
+  border-style: solid;
+  border-color: #ffffff transparent;
+  /* reduce the damage in FF3.0 */
+  display: block;
+  width: 0;
+}
+.visual .mapControl {
+  position: relative;
+}
+.visual .mapShapes {
+  stroke-linejoin: round;
+}
+.visual .textbox {
+  color: #000;
+  line-height: 1;
+}
+.visual .imageBackground {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.visual .treemap .shapes {
+  stroke: white;
+}
+.visual .treemap .shapes .rootNode {
+  fill: none;
+}
+.visual .treemap .shapes .parentGroup {
+  stroke-width: 1.5px;
+  stroke-opacity: 0.8;
+}
+.visual .treemap .shapes .nodeGroup {
+  stroke-width: 1px;
+  stroke-opacity: 0.2;
+  fill: none;
+}
+.visual .treemap .labels {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  fill: #FFF;
+}
+.visual .treemap .labels .majorLabel {
+  font-size: 12px;
+}
+.visual .treemap .labels .minorLabel {
+  font-size: 10px;
+}
+.visual div.kpiTrafficLightSingle0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -100px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiTrafficLightSingle1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -120px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiTrafficLightSingle2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -156px 0px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeFlagsColored0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -100px -116px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeFlagsColored1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -136px 0px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeFlagsColored2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -136px -20px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeStarsColored0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -136px -40px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeStarsColored1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -136px -60px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeStarsColored2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -136px -80px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeSymbolsUnCircledColored0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -136px -100px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeSymbolsUnCircledColored1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: 0px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeSymbolsUnCircledColored2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -20px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiRoadSigns0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -116px -80px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiRoadSigns1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: 0px -116px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiRoadSigns2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -20px -116px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiTrafficLight0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -40px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiTrafficLight1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -60px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiTrafficLight2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -80px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiShapes0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -40px -116px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiShapes1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -60px -116px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiShapes2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -80px -116px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBars0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -48px -72px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBars1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -68px -72px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBars2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -96px 0px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBars3 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -96px -20px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBars4 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -96px -40px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBoxes0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -96px -60px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBoxes1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: 0px -96px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBoxes2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -20px -96px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBoxes3 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -40px -96px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBoxes4 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -60px -96px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiGauge0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -80px -96px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiGauge1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -116px 0px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiGauge2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -116px -20px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiGauge3 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -116px -40px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiGauge4 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -116px -60px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiTrafficLightSingleBig0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -100px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiTrafficLightSingleBig1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -120px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiTrafficLightSingleBig2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -156px 0px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeFlagsBigColored0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -100px -116px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeFlagsBigColored1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -136px 0px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeFlagsBigColored2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -136px -20px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeStarsBigColored0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -136px -40px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeStarsBigColored1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -136px -60px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeStarsBigColored2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -136px -80px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeSymbolsUnCircledBigColored0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -136px -100px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeSymbolsUnCircledBigColored1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: 0px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiThreeSymbolsUnCircledBigColored2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -20px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiRoadSignsBig0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -116px -80px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiRoadSignsBig1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: 0px -116px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiRoadSignsBig2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -20px -116px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiTrafficLightBig0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -40px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiTrafficLightBig1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -60px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiTrafficLightBig2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -80px -136px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiShapesBig0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -40px -116px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiShapesBig1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -60px -116px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiShapesBig2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -80px -116px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBarsBig0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -48px -72px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBarsBig1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -68px -72px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBarsBig2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -96px 0px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBarsBig4 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -96px -20px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBarsBig5 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -96px -40px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBoxesBig0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -96px -60px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBoxesBig1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: 0px -96px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBoxesBig2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -20px -96px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBoxesBig3 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -40px -96px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiFiveBoxesBig4 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -60px -96px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiGaugeBig0 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -80px -96px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiGaugeBig1 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -116px 0px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiGaugeBig2 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -116px -20px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiGaugeBig3 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -116px -40px;
+  width: 20px;
+  height: 20px;
+}
+.visual div.kpiGaugeBig4 {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -116px -60px;
+  width: 20px;
+  height: 20px;
+}
+.interactive-legend {
+  white-space: nowrap;
+  text-align: left;
+  overflow: hidden;
+}
+.interactive-legend .title {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  font-size: 16px;
+  color: #666666;
+}
+.interactive-legend .item {
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  font-size: 12px;
+  color: #666666;
+  padding-right: 22px;
+  padding-bottom: 0px;
+  padding-top: 3px;
+}
+.interactive-legend .icon {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: middle;
+  margin-left: auto;
+}
+.tooltip-container {
+  position: absolute;
+  font-size: 11px;
+  background-color: #333333;
+  pointer-events: none;
+  z-index: 999;
+}
+.tooltip-container .tooltip-content-container {
+  padding: 12px;
+  max-width: 390px;
+}
+.tooltip-container .tooltip-row {
+  display: table-row;
+  line-height: 16px;
+}
+.tooltip-container div.tooltip-title-cell {
+  display: table-cell;
+  word-wrap: break-word;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  text-transform: uppercase;
+  max-width: 130px;
+  padding-right: 12px;
+  color: #A6A6A6;
+}
+.tooltip-container div.tooltip-value-cell {
+  display: table-cell;
+  word-wrap: break-word;
+  max-width: 260px;
+  font-weight: bold;
+  color: #FFF;
+  letter-spacing: 1px;
+}
+.tooltip-container .arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.tooltip-container .arrow.top {
+  top: 7px;
+}
+.tooltip-container .arrow.bottom {
+  bottom: 7px;
+}
+.tooltip-container .arrow.left {
+  left: -7px;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 7px solid #333333;
+}
+.tooltip-container .arrow.right {
+  right: -7px;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 7px solid #333333;
+}
+.data-labels {
+  font-size: 12px;
+  text-anchor: middle;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  /* Enables tooltip when hovering on data label inside visual */
+  pointer-events: none;
+}
+.richtextbox {
+  color: #333333;
+  pointer-events: all;
+}
+.richtextbox a {
+  color: #0000EE;
+}
+.richtextbox .ql-container {
+  padding: 0px;
+  cursor: auto;
+}
+.richtextbox .ql-editor {
+  line-height: normal;
+  word-wrap: break-word;
+}
+div.ql-toolbar {
+  padding: 4px;
+  background: #333333;
+  color: #FFF;
+  white-space: nowrap;
+  overflow-x: hidden;
+  font-size: 14px;
+  /*
+    select::-ms-expand {
+        display: none;
+    }
+    */
+}
+div.ql-toolbar .ql-format-group {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0px 2px;
+}
+div.ql-toolbar select.ql-picker {
+  margin: 3px;
+  padding: 3px;
+  background: #444444;
+  border: 1px solid #000;
+}
+div.ql-toolbar select.ql-font {
+  width: 122px;
+}
+div.ql-toolbar label {
+  margin: 3px;
+}
+div.ql-toolbar .ql-format-button {
+  margin: 3px;
+  display: inline-block;
+  vertical-align: middle;
+}
+div.ql-toolbar .toolbar-url-input {
+  display: inline-block;
+  vertical-align: middle;
+}
+div.ql-toolbar .toolbar-url-input .ql-link div {
+  height: 100%;
+}
+div.ql-toolbar .toolbar-url-input .ql-link-tooltip {
+  display: none;
+  top: 0 !important;
+  left: 0 !important;
+  position: relative;
+  margin: 0 3px;
+  padding: 0px;
+  line-height: 100%;
+  vertical-align: middle;
+  border: none;
+  background-color: inherit;
+}
+div.ql-toolbar .toolbar-url-input .ql-link-tooltip input {
+  color: #333333;
+}
+div.ql-toolbar .toolbar-url-input .ql-link-tooltip a {
+  margin: 0 3px;
+  color: #A6A6A6;
+  background: inherit;
+}
+div.ql-toolbar .toolbar-url-input .ql-link-tooltip a:hover {
+  color: #BE9A27;
+}
+div.ql-toolbar .toolbar-url-input .ql-link-tooltip .bar {
+  font-size: 18px;
+  color: #A6A6A6;
+}
+div.ql-toolbar .toolbar-url-input .ql-link-tooltip .change {
+  display: none;
+}
+div.ql-toolbar .toolbar-url-input .ql-link-tooltip.editing .bar {
+  display: none;
+}
+div.ql-toolbar .toolbar-url-input .ql-link.ql-active + .ql-link-tooltip,
+div.ql-toolbar .toolbar-url-input .ql-link-tooltip.editing {
+  display: inline-block;
+}
+div.ql-toolbar .ql-format-button:hover {
+  background: #F2C811;
+  color: #333333;
+}
+div.ql-toolbar .ql-format-button.ql-active {
+  background: #F2C811;
+  color: #333333;
+}
+div.ql-toolbar .ql-format-button[data-value="left"] {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -48px 0px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button[data-value="left"].ql-active {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -24px -72px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button[data-value="left"]:hover {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -24px -72px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button[data-value="right"] {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: 0px -24px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button[data-value="right"].ql-active {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -24px -24px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button[data-value="right"]:hover {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -24px -24px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button[data-value="center"] {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -48px -48px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button[data-value="center"].ql-active {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: 0px 0px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button[data-value="center"]:hover {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: 0px 0px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button.ql-bold {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: 0px -48px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button.ql-bold.ql-active {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -48px -24px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button.ql-bold:hover {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -48px -24px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button.ql-italic {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: 0px -72px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button.ql-italic.ql-active {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -72px -48px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button.ql-italic:hover {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -72px -48px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button.ql-underline {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -24px 0px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button.ql-underline.ql-active {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -24px -48px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button.ql-underline:hover {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -24px -48px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button.ql-link {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -72px -24px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button.ql-link.ql-active {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -72px 0px;
+  width: 24px;
+  height: 24px;
+}
+div.ql-toolbar .ql-format-button.ql-link:hover {
+  background-image: url(../images/visuals.sprites.png);
+  background-position: -72px 0px;
+  width: 24px;
+  height: 24px;
+}
+.multiRowCard .card {
+  box-sizing: border-box;
+  border-left: 3px solid;
+  border-left-color: #A6A6A6;
+  color: #767676;
+  padding-left: 10px;
+  position: relative;
+  width: 100%;
+}
+.multiRowCard .card.mrtile {
+  border-bottom: 1px solid #C8C8C8;
+  border-left: 0px;
+  padding-bottom: 5px;
+  padding-left: 0px;
+  padding-top: 5px;
+}
+.multiRowCard .card.mrtile .cardItemContainer {
+  padding-top: 5px;
+}
+.multiRowCard .card .cardItemContainer {
+  box-sizing: border-box;
+  padding-top: 7px;
+  position: relative;
+  vertical-align: top;
+}
+.multiRowCard .card .cardItemContainer .caption {
+  color: #333333;
+  font-size: 14px;
+  line-height: 20px;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.multiRowCard .card .cardItemContainer .details {
+  color: #A6A6A6;
+  font-size: 12px;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.multiRowCard .card .cardItemContainer .imgCon img {
+  display: inline-block;
+  vertical-align: sub;
+}
+.multiRowCard .card .title {
+  font-size: 18px;
+  font-family: Tahoma,Verdana,Geneva,sans-serif;
+  line-height: 24px;
+  margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.multiRowCard .row:last-child .card.mrtile {
+  border-bottom: 0px;
+  padding-bottom: 0px;
+}
+.clearCatcher {
+  fill-opacity: 0;
+}
+.visual.owlGaugeVisual {
+  overflow: hidden;
+}
+.visual.owlGaugeVisual.sad .owlGaugeBg .st0 {
+  fill: #EF4137;
+}
+.visual.owlGaugeVisual.sad .owlGaugeBg .st1 {
+  fill: #FAAF42;
+}
+.visual.owlGaugeVisual.sad .owlGaugeBg .st2 {
+  fill: #F15B2A;
+}
+.visual.owlGaugeVisual.sad .owlGaugeBg .st3 {
+  fill: #F15B2A;
+}
+.visual.owlGaugeVisual.sad .owlGaugeTail {
+  animation: owlTailAmbientAnimation 2.5s infinite;
+}
+.visual.owlGaugeVisual.meh .owlGaugeBg .st0 {
+  fill: #F18D05;
+}
+.visual.owlGaugeVisual.meh .owlGaugeBg .st1 {
+  fill: #FAAF42;
+}
+.visual.owlGaugeVisual.meh .owlGaugeBg .st2 {
+  fill: #F15B2A;
+}
+.visual.owlGaugeVisual.meh .owlGaugeBg .st3 {
+  fill: #F15B2A;
+}
+.visual.owlGaugeVisual.meh .owlGaugeTail {
+  animation: owlTailAmbientAnimation 1.5s infinite;
+}
+.visual.owlGaugeVisual.happy .owlGaugeBg .st0 {
+  fill: #32742C;
+}
+.visual.owlGaugeVisual.happy .owlGaugeBg .st1 {
+  fill: #D0D102;
+}
+.visual.owlGaugeVisual.happy .owlGaugeBg .st2 {
+  fill: #61AE24;
+}
+.visual.owlGaugeVisual.happy .owlGaugeBg .st3 {
+  fill: #23AA65;
+}
+.visual.owlGaugeVisual.happy .owlGaugeTail {
+  animation: owlTailAmbientAnimation .5s infinite;
+}
+.visual.owlGaugeVisual > svg {
+  position: absolute;
+  transition: all 0.25s;
+}
+.visual.owlGaugeVisual .owlGaugeBody {
+  width: 30%;
+  left: 35%;
+  bottom: 0;
+  transform: translate(0, 30%);
+}
+.visual.owlGaugeVisual .owlGaugeTail {
+  width: 70%;
+  left: 15%;
+  bottom: 0;
+  transform-origin: 50% 100%;
+}
+.visual.owlGaugeVisual .owlGaugeBg {
+  width: 120%;
+  left: -10%;
+  bottom: 0;
+  transform-origin: 50% 100%;
+  transform: rotate(-180deg);
+}
+.visual.owlGaugeVisual .owlGaugeBg path {
+  transition: fill 0.5s;
+}
+@keyframes owlTailAmbientAnimation {
+  0% {
+    transform: rotate(2deg);
+  }
+  50% {
+    transform: rotate(-2deg);
+  }
+  100% {
+    transform: rotate(2deg);
+  }
+}
+.streamGraph .axis path,
+.streamGraph .axis line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
+.streamGraph .axis text {
+  font-family: sans-serif;
+  font-size: 11px;
+}

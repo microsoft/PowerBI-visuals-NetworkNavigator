@@ -1,0 +1,49 @@
+{
+    "build": "11.0.9168.916",
+    "version": "1.0.0",
+    "licenseTerms": null,
+    "privacyTerms": null,
+    "resources": [
+        {
+            "resourceId": "rId0",
+            "sourceType": 5,
+            "file": "resources/LineUpVisual.ts"
+        },
+        {
+            "resourceId": "rId1",
+            "sourceType": 0,
+            "file": "resources/LineUpVisual.js"
+        },
+        {
+            "resourceId": "rId2",
+            "sourceType": 1,
+            "file": "resources/LineUpVisual.css"
+        },
+        {
+            "resourceId": "rId3",
+            "sourceType": 3,
+            "file": "resources/icon.png"
+        }
+    ],
+    "visual": {
+        "name": "LineUpVisual",
+        "displayName": "LineUpVisual",
+        "guid": "LineUpVisual1450434005853"
+    },
+    "images": {
+        "icon": {
+            "resourceId": "rId3"
+        }
+    },
+    "code": {
+        "typeScript": {
+            "resourceId": "rId0"
+        },
+        "javaScript": {
+            "resourceId": "rId1"
+        },
+        "css": {
+            "resourceId": "rId2"
+        }
+    }
+}
