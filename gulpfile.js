@@ -2,12 +2,17 @@ var gulp = require('gulp');
 var del = require('del');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
+var order = require("gulp-order");
+var replace = require("gulp-replace");
+
 
 var paths = {
   scripts: ['src/**/*.ts'],
   styles: ['src/**/*.css'],
   buildDir: 'build'
 };
+
+var projectName = "GraphVisual";
 
 // Not all tasks need to use streams
 // A gulpfile is just another node program and you can use any package available on npm
@@ -18,6 +23,11 @@ gulp.task('clean', function() {
 
 gulp.task('build-js', function() {
     return gulp.src(paths.scripts)
+         .pipe(order([
+            paths.scripts[0],
+            "**/" + projectName + ".ts"
+        ]))
+        .pipe(replace(/\/\/\/\s*<reference.*/g, ''))
         .pipe(concat('project.ts'))
         // .pipe(uglify())
         .pipe(gulp.dest(paths.buildDir));
