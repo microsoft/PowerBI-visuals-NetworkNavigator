@@ -4,6 +4,7 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var order = require("gulp-order");
 var replace = require("gulp-replace");
+var fs = require("fs");
 
 var paths = {
   scripts: ['src/**/*.ts'],
@@ -15,31 +16,33 @@ var projectName = "GraphVisual";
 
 // Not all tasks need to use streams
 // A gulpfile is just another node program and you can use any package available on npm
-gulp.task('clean', function(cb) {
+gulp.task('clean', function() {
   // You can use multiple globbing patterns as you would with `gulp.src`
   return del.sync([paths.buildDir]);
 });
 
-gulp.task('build:js', function() {
+gulp.task('build:js', ['build:css'], function() {
+    var css = fs.readFileSync(paths.buildDir + "/project.css");
     return gulp.src(paths.scripts)
         .pipe(order([
             paths.scripts[0],
             "**/" + projectName + ".ts"
         ]))
         .pipe(replace(/\/\/\/\s*<reference.*/g, ''))
+        .pipe(replace("\/*INLINE_CSS*\/", css))
         .pipe(concat('project.ts'))
         // .pipe(uglify())
         .pipe(gulp.dest(paths.buildDir));
 });
 
-gulp.task('build:css', function() {
+gulp.task('build:css', ['clean'], function() {
     return gulp.src(paths.styles)
         .pipe(concat('project.css'))
         // .pipe(uglify())
         .pipe(gulp.dest(paths.buildDir));
 });
 
-gulp.task('build', ['clean', 'build:js', 'build:css']);
+// gulp.task('build', ['']);
 
 // The default task (called when you run `gulp` from cli)
-gulp.task('default', ['build']);
+gulp.task('default', ['build:js']);
