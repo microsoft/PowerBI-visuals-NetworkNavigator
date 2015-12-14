@@ -26,6 +26,7 @@ gulp.task('build:js', ['build:css'], function() {
     return gulp.src(paths.scripts)
         .pipe(order([
             paths.scripts[0],
+            "**/VisualBase.ts",
             "**/" + projectName + ".ts"
         ]))
         .pipe(replace(/\/\/\/\s*<reference.*/g, ''))
