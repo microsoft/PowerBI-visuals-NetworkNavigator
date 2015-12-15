@@ -4,7 +4,7 @@
 
 class VisualBase {
     protected element: JQuery;
-    private container: JQuery;
+    protected container: JQuery;
     private iframe : JQuery;
 
     /** This is called once when the visual is initialially created */
@@ -13,15 +13,7 @@ class VisualBase {
         this.iframe = $('<iframe style="width:' + options.viewport.width + 'px;height:' + options.viewport.height + 'px"/>');
         this.container.append(this.iframe);
         this.element = this.iframe.contents().find("body");
-        this.getExternalCssResources().map((resource) => {
-            var link = 'li' + 'nk';
-            var integrity = resource.integrity ? `integrity="${resource.integrity}"` : '';
-            var href = `href="${resource.url}"`;
-            var crossorigin = resource.crossorigin ? ` crossorigin="${resource.crossorigin}"` : '';
-            var rel = 'rel="stylesheet"';
-            return `<${link} ${href} ${rel} ${integrity} ${crossorigin}>`;
-        });
-
+        this.element.append(this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource)));
         this.element.append("<st" + "yle>" + this.getCss() + "</st" + "yle>");
     }
 
@@ -34,6 +26,18 @@ class VisualBase {
      */
     protected getCss() : string[] {
         return [`/*INLINE_CSS*/`];
+    }
+
+    /**
+     * Builds the link for the given external css resource
+     */
+    protected buildExternalCssLink(resource: ExternalCssResource) : string {
+        var link = 'li' + 'nk';
+        var integrity = resource.integrity ? `integrity="${resource.integrity}"` : '';
+        var href = `href="${resource.url}"`;
+        var crossorigin = resource.crossorigin ? ` crossorigin="${resource.crossorigin}"` : '';
+        var rel = 'rel="stylesheet"';
+        return `<${link} ${href} ${rel} ${integrity} ${crossorigin}>`;
     }
 
     /**
