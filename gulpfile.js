@@ -5,6 +5,7 @@ var uglify = require('gulp-uglify');
 var order = require("gulp-order");
 var replace = require("gulp-replace");
 var fs = require("fs");
+var tslint = require('gulp-tslint');
 
 var paths = {
   scripts: ['src/**/*.ts'],
@@ -19,6 +20,12 @@ var projectName = "GraphVisual";
 gulp.task('clean', function() {
   // You can use multiple globbing patterns as you would with `gulp.src`
   return del.sync([paths.buildDir]);
+});
+
+gulp.task('tslint', function() {
+    return gulp.src(paths.scripts)
+        .pipe(tslint())
+        .pipe(tslint.report('verbose'))
 });
 
 gulp.task('build:js', ['build:css'], function() {
@@ -46,4 +53,4 @@ gulp.task('build:css', ['clean'], function() {
 // gulp.task('build', ['']);
 
 // The default task (called when you run `gulp` from cli)
-gulp.task('default', ['build:js']);
+gulp.task('default', ['tslint', 'build:js']);
