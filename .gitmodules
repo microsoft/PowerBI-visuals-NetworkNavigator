@@ -1,0 +1,3 @@
+[submodule "power-bi"]
+	path = power-bi
+	url = git://github.com/Microsoft/PowerBI-visuals.git

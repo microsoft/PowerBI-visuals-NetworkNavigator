@@ -7,33 +7,23 @@
         {
             "resourceId": "rId0",
             "sourceType": 5,
-            "file": "resources/LineUpVisual.ts"
+            "file": "resources/%PROJECT_NAME%.ts"
         },
         {
             "resourceId": "rId1",
             "sourceType": 0,
-            "file": "resources/LineUpVisual.js"
+            "file": "resources/%PROJECT_NAME%.js"
         },
         {
             "resourceId": "rId2",
             "sourceType": 1,
-            "file": "resources/LineUpVisual.css"
-        },
-        {
-            "resourceId": "rId3",
-            "sourceType": 3,
-            "file": "resources/icon.png"
+            "file": "resources/%PROJECT_NAME%.css"
         }
     ],
     "visual": {
-        "name": "LineUpVisual",
-        "displayName": "LineUpVisual",
-        "guid": "LineUpVisual1450434005853"
-    },
-    "images": {
-        "icon": {
-            "resourceId": "rId3"
-        }
+        "name": "%PROJECT_NAME%",
+        "displayName": "%PROJECT_NAME%",
+        "guid": "%PROJECT_NAME%%PROJECT_ID%"
     },
     "code": {
         "typeScript": {

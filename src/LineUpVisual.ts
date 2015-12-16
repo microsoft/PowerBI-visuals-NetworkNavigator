@@ -1,15 +1,34 @@
-/// <reference path="../lib/powerbi-visuals.d.ts"/>
-/// <reference path="../lib/powerbi-externals.d.ts"/>
+/// <reference path="./references.d.ts"/>
 /// <reference path="./lineup.ts"/>
+/// <reference path="./VisualBase.ts"/>
 
 declare var LineUp;
 
 module powerbi.visuals {
-    export class LineUpVisual implements IVisual {
+    export class LineUpVisual extends VisualBase implements IVisual {
         private dataViewTable: DataViewTable;
-        private element: JQuery;
+        private dataView: DataView;
+        private host : IVisualHostServices;
         private lineup: any;
+        private loadingMoreData = false;
 
+        private static DEFAULT_SETTINGS : LineUpVisualSettings = {
+            presentation: {
+                values: false,
+                stacked: true,
+                histograms: true,
+                animation: true
+            }
+        };
+
+        /**
+         * The current set of settings
+         */
+        private settings : LineUpVisualSettings = $.extend(true, {}, LineUpVisual.DEFAULT_SETTINGS);
+
+        /**
+         * The set of capabilities for the visual
+         */
         public static capabilities: VisualCapabilities = {
             dataRoles: [{
                 name: 'Values',
@@ -25,156 +44,140 @@ module powerbi.visuals {
                 },
             }],
             objects: {
-              /*  appearance: {
-                    displayName: "Appearance",
+                presentation: {
+                    displayName: "Presentation",
                     properties: {
-                        histogram: {
-                            displayName: "Histogram",
-                            description: "Hide/Show the histogram below column headers",
+                        stacked: {
+                            displayName: "Stacked",
+                            description: "If true, when columns are combined, the all columns will be displayed stacked",
+                            type: { bool: true }
+                        },
+                        values: {
+                            displayName: "Values",
+                            description: "If the actual values should be displayed under the bars",
+                            type: { bool: true }
+                        },
+                        histograms: {
+                            displayName: "Histograms",
+                            description: "Show histograms in the column headers",
+                            type: { bool: true }
+                        },
+                        animation: {
+                            displayName: "Animation",
+                            description: "Should the grid be animated when sorting",
                             type: { bool: true }
                         }
-                    }
-                }
-            }*/
-
-            general: {
-                displayName: data.createDisplayNameGetter('Visual_General'),
-                properties: {
-                    formatString: {
-                        type: { formatting: { formatString: true } },
-                    },
-                },
-            },
-            dataPoint: {
-                displayName: data.createDisplayNameGetter('Visual_DataPoint'),
-                description: data.createDisplayNameGetter('Visual_DataPointDescription'),
-                properties: {
-                    defaultColor: {
-                        displayName: data.createDisplayNameGetter('Visual_DefaultColor'),
-                        type: { fill: { solid: { color: true } } }
-                    },
-                    fill: {
-                        displayName: data.createDisplayNameGetter('Visual_Fill'),
-                        type: { fill: { solid: { color: true } } }
-                    },
-                    fillRule: {
-                        displayName: data.createDisplayNameGetter('Visual_Gradient'),
-                        type: { fillRule: {} },
-                        rule: {
-                            inputRole: 'Gradient',
-                            output: {
-                                property: 'fill',
-                                selector: ['Category'],
-                            },
-                        },
-                    }
-                }
-            },
-            labels: {
-                displayName: data.createDisplayNameGetter('Visual_DataPointsLabels'),
-                description: data.createDisplayNameGetter('Visual_DataPointsLabelsDescription'),
-                properties: {
-                    show: {
-                        displayName: data.createDisplayNameGetter('Visual_Show'),
-                        type: { bool: true }
-                    },
-                    color: {
-                        displayName: data.createDisplayNameGetter('Visual_LabelsFill'),
-                        description: data.createDisplayNameGetter('Visual_LabelsFillDescription'),
-                        type: { fill: { solid: { color: true } } }
-                    },
-                    labelPosition: {
-                        displayName: data.createDisplayNameGetter('Visual_Position'),
-                        type: { enumeration: labelPosition.type }
-                    },
-                    labelDisplayUnits: {
-                        displayName: data.createDisplayNameGetter('Visual_DisplayUnits'),
-                        description: data.createDisplayNameGetter('Visual_DisplayUnitsDescription'),
-                        type: { formatting: { labelDisplayUnits: true } }
-                    },
-                    labelPrecision: {
-                        displayName: data.createDisplayNameGetter('Visual_Precision'),
-                        description: data.createDisplayNameGetter('Visual_PrecisionDescription'),
-                        placeHolderText: data.createDisplayNameGetter('Visual_Precision_Auto'),
-                        type: { numeric: true }
-                    },
-                    fontSize: {
-                        displayName: data.createDisplayNameGetter('Visual_TextSize'),
-                        type: { formatting: { fontSize: true } }
                     },
                 }
-            },
+            }
         };
 
-        private menuActions = [
-            {name: " new combined", icon: "fa-plus", action: () => {
-            this.lineup.addNewStackedColumnDialog();
-            }},
-            {name: " add single columns", icon: "fa-plus", action: () => {
-            this.lineup.addNewSingleColumnDialog();
-            }}
-        ];
-
-        private static lineUpDemoConfig = {
+        /**
+         * The configuration for the lineup viewer
+         */
+        private lineUpConfig = {
             svgLayout: {
                 mode: 'separate',
+                addPlusSigns: true,
                 plusSigns: {
                     addStackedColumn: {
-                        title: "add stacked column",
+                        name: "Add a new Stacked Column",
                         action: "addNewEmptyStackedColumn",
+                        x: 0, y: 2,
+                        w: 21, h: 21 // LineUpGlobal.htmlLayout.headerHeight/2-4
+                    },
+
+                    addColumn: {
+                        title: "Add a Column",
+                        action: () => this.lineup.addNewSingleColumnDialog(),
                         x: 0, y: 2,
                         w: 21, h: 21 // LineUpGlobal.htmlLayout.headerHeight/2-4
                     }
                 }
-            },
-            renderingOptions: {
-                stacked: true
             }
         };
 
-        // private template : string = `
-        //     <div class="load-container load5">
-        //         <div class="loader">Loading...</div>
-        //     </div>`;
+        /**
+         * The font awesome resource
+         */
+        private fontAwesome: ExternalCssResource = {
+            url: '//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css',
+            integrity: 'sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==',
+            crossorigin: "anonymous"
+        };
+
+        /**
+         * The template for the grid
+         */
         private template: string = `
             <div>
-                <li` + `nk href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg=="crossorigin="anonymous">
-                    <div id="lugui-menu">
-                        <div style="display: inline-block; float: left; padding-left:5px; padding-top:2px;">
-                            <span id="lugui-menu-rendering"> </span>
-                            <span id="lugui-menu-actions"> </span>
-                        </div>
-                    </div>
                 <div class="grid"></div>
             </div>
         `;
 
         /** This is called once when the visual is initialially created */
         public init(options: VisualInitOptions): void {
-            this.element = options.element;
+            super.init(options);
+            this.host = options.host;
             this.element.append(this.template);
+
+            // Temporary, because the popups will load outside of the iframe for some reason
+            this.container.append(this.buildExternalCssLink(this.fontAwesome));
         }
 
         /** Update is called for data updates, resizes & formatting changes */
         public update(options: VisualUpdateOptions) {
-            this.dataViewTable = options.dataViews[0].table;
+            super.update(options);
+            this.dataView = options.dataViews[0];
+            this.dataViewTable = this.dataView.table;
+
+            // Copy over new presentation values
+            if (this.dataView.metadata.objects) {
+                $.extend(true, this.settings, this.dataView.metadata.objects);
+            } else {
+                $.extend(true, this.settings, LineUpVisual.DEFAULT_SETTINGS);
+            }
+
             var colArr = this.dataViewTable.columns.map((col) => col.displayName);
-            var data = [];
+            var data : LineUpRow[] = [];
             this.dataViewTable.rows.forEach((row) => {
-                var result = {};
+                var result : LineUpRow = {};
                 row.forEach((colInRow, i) => {
                     result[colArr[i]] = colInRow;
-                })
+                });
                 data.push(result);
             });
-
             this.loadData(colArr, data);
-            this.updateMenu();
+            this.loadingMoreData = false;
         }
 
+        /**
+         * Enumerates the instances for the objects that appear in the power bi panel
+         */
+        public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
+            return [{
+                selector: null,
+                objectName: 'presentation',
+                properties: $.extend({}, this.settings.presentation)
+            }];
+        }
+
+        /**
+        * Gets the external css paths used for this visualization
+        */
+        protected getExternalCssResources() : ExternalCssResource[] {
+            return super.getExternalCssResources().concat(this.fontAwesome);
+        }
+
+        /**
+         * Returns true if the given object is numeric
+         */
         private isNumeric = (obj) => (obj - parseFloat(obj) + 1) >= 0;
 
-        private deriveDesc(columns: string[], data, separator?) {
+        /**
+         * Derives the desciption for the given column
+         */
+        private deriveDesc(columns: string[], data : LineUpRow[], separator?) {
             var cols = columns.map((col) => {
                 var r: any = {
                     column: col,
@@ -182,7 +185,7 @@ module powerbi.visuals {
                 };
                 if (this.isNumeric(data[0][col])) {
                     r.type = 'number';
-                    r.domain = d3.extent(data, (row) => row[col].length === 0 ? undefined : +(row[col]));
+                    r.domain = d3.extent(data, (row) => row[col] && row[col].length === 0 ? undefined : +(row[col]));
                 } else {
                     var sset = d3.set(data.map((row) => row[col]));
                     if (sset.size() <= Math.max(20, data.length * 0.2)) { //at most 20 percent unique values
@@ -199,13 +202,19 @@ module powerbi.visuals {
             };
         }
 
-        public loadData(headers, rows) {
+        /**
+         * Loads the data into the lineup view
+         */
+        private loadData(columns: string[], rows : LineUpRow[]) {
             //derive a description file
-            var desc = this.deriveDesc(headers, rows);
+            var desc = this.deriveDesc(columns, rows);
             var name = 'data';
             this.loadDataImpl(name, desc, rows);
         }
 
+        /**
+         * Loads the data into the lineup view
+         */
         private loadDataImpl(name: string, desc, _data) {
             var spec: any = {};
             spec.name = name;
@@ -216,33 +225,60 @@ module powerbi.visuals {
             spec.storage = LineUp.createLocalStorage(_data, desc.columns, desc.layout, desc.primaryKey);
 
             if (this.lineup) {
+                for (var key in this.settings.presentation) {
+                    if (this.settings.presentation.hasOwnProperty(key)) {
+                        this.lineup.changeRenderingOption(key, this.settings.presentation[key]);
+                    }
+                }
                 this.lineup.changeDataStorage(spec);
             } else {
-                this.lineup = LineUp.create(spec, d3.select(this.element.find('.grid')[0]), LineUpVisual.lineUpDemoConfig);
+                var finalOptions = $.extend(this.lineUpConfig, { renderingOptions: this.settings.presentation });
+                this.lineup = LineUp.create(spec, d3.select(this.element.find('.grid')[0]), finalOptions);
+                var scrolled = this.lineup.scrolled;
+                var me = this;
+                this.lineup.scrolled = function(...args) {
+                    me.onLineUpScrolled.apply(me, args);
+                    return scrolled.apply(this, args);
+                };
             }
         }
 
-        private updateMenu() {
-            var config = this.lineup.config;
-            var kv = d3.entries(this.lineup.config.renderingOptions);
-            var kvNodes = d3.select("#lugui-menu-rendering").selectAll("span").data(kv, (d) => d.key);
-            kvNodes.exit().remove();
-            kvNodes.enter().append("span").on('click', (d) => {
-                this.lineup.changeRenderingOption(d.key, !config.renderingOptions[d.key]);
-                this.updateMenu();
-            });
-            kvNodes.html(function(d) {
-                return '<i class="fa ' + (d.value ? 'fa-check-square-o' : 'fa-square-o') + '" ></i> ' + d.key + '&nbsp;&nbsp;'
-            });
-
-            d3.select("#lugui-menu-actions").selectAll("span").data(this.menuActions)
-                .enter().append("span").html(
-                function(d) {
-                    return '<i class="fa ' + (d.icon) + '" ></i>' + d.name + '&nbsp;&nbsp;'
+        /**
+         * Listener for when the lineup viewer is scrolled
+         */
+        private onLineUpScrolled() {
+            // truthy this.dataView.metadata.segment means there is more data to be loaded
+            if (!this.loadingMoreData && this.dataView.metadata.segment) {
+                var scrollElement = $(this.lineup.$container.node()).find('div.lu-wrapper')[0];
+                var scrollHeight = scrollElement.scrollHeight;
+                var top = scrollElement.scrollTop;
+                if (scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200) {
+                    this.loadingMoreData = true;
+                    this.host.loadMoreData();
                 }
-                ).on("click", function(d) {
-                    d.action.call(d);
-                })
+            }
         }
+    }
+
+    /**
+     * Represents the settings for this visual
+     */
+    interface LineUpVisualSettings {
+        presentation: {
+            values?: boolean;
+            stacked?: boolean;
+            histograms?: boolean;
+            animation?: boolean;
+        };
+    }
+
+    /**
+     * The lineup data
+     */
+    interface LineUpRow {
+        /**
+         * Data for each column in the row
+         */
+        [columnName: string] : any;
     }
 }

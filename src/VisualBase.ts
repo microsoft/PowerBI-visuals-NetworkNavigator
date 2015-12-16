@@ -1,5 +1,4 @@
-/// <reference path="../lib/powerbi-visuals.d.ts"/>
-/// <reference path="../lib/powerbi-externals.d.ts"/>
+/// <reference path="./references.d.ts"/>
 /// <reference path="./lineup.ts"/>
 
 class VisualBase {
