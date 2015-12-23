@@ -8,6 +8,8 @@ module powerbi.visuals {
         private myGraph: ForceGraph;
         private _selectedNode : IForceGraphNode;
         private host : IVisualHostServices;
+        private interactivityService : IInteractivityService;
+        private behavior : GraphVisualBehavior;
 
         private static DEFAULT_SETTINGS: GraphVisualSettings = {
             columnMappings: {
@@ -125,8 +127,9 @@ module powerbi.visuals {
             super.init(options, this.template);
             this.element.append(this.template);
             this.myGraph = new ForceGraph(this.element.find("#node_graph"), 500, 500);
-            this.myGraph.addEventListener("nodeClicked", (node) => this.onNodeSelected(node));
             this.host = options.host;
+            this.interactivityService = new InteractivityService(this.host);
+            this.behavior = new GraphVisualBehavior();
         }
 
         /** Update is called for data updates, resizes & formatting changes */
@@ -138,7 +141,15 @@ module powerbi.visuals {
             var forceDataReload = this.updateSettings(options);
 
             if (dataViewTable && (forceDataReload || this.hasDataChanged(this.dataViewTable, dataViewTable))) {
-                this.myGraph.setData(GraphVisual.converter(dataView, this.settings));
+                var parsedData = GraphVisual.converter(dataView, this.settings);
+                this.myGraph.setData(parsedData);
+                if (this.interactivityService) {
+                    this.interactivityService.bind(parsedData.nodes, this.behavior, {
+                        graph: this.myGraph,
+                        host: this.host
+                    });
+                }
+                this.interactivityService.applySelectionStateToData(parsedData.nodes);
             }
 
             this.dataViewTable = dataViewTable;
@@ -165,9 +176,9 @@ module powerbi.visuals {
         /**
          * Converts the data view into an internal data structure
          */
-        public static converter(dataView: DataView, settings: GraphVisualSettings): IForceGraphData {
+        public static converter(dataView: DataView, settings: GraphVisualSettings): IForceGraphData<ForceGraphSelectableNode> {
             var nodeList = [];
-            var nodeMap = {};
+            var nodeMap : { [name: string] : ForceGraphSelectableNode } = {};
             var linkList = [];
             var table = dataView.table;
 
@@ -191,16 +202,23 @@ module powerbi.visuals {
             var targetIdx = colMap[settings.columnMappings.target.toLocaleLowerCase()];
             var edgeValueIdx = colMap[settings.columnMappings.edgeValue.toLocaleLowerCase()];
 
-            function getNode(id: string, identity: DataViewScopeIdentity, color: string = "gray", group: number = 0) {
+            var sourceField = dataView.categorical.categories[0].identityFields[sourceIdx];
+            var targetField = dataView.categorical.categories[0].identityFields[targetIdx];
+
+            function getNode(id: string, identity: DataViewScopeIdentity, isSource: boolean, color: string = "gray", group: number = 0) : ForceGraphSelectableNode {
                 var node = nodeMap[id];
+                // var expr = identity.expr;
+                var expr = powerbi.data.SQExprBuilder.equal(isSource ? sourceField : targetField, powerbi.data.SQExprBuilder.text(id));
+
                 if (!nodeMap[id]) {
                     node = nodeMap[id] = {
                         name: id,
                         color: color || "gray",
-                        // group: group || 0,
                         index: nodeList.length,
-                        filterExpr: identity.expr,
-                        num: 1
+                        filterExpr: expr,
+                        num: 1,
+                        selected: false,
+                        identity: SelectionId.createWithId(data.createDataViewScopeIdentity(expr))
                     };
                     nodeList.push(node);
                 }
@@ -210,8 +228,8 @@ module powerbi.visuals {
             table.rows.forEach((row, idx) => {
                 var identity = table.identity[idx];
                 var edge = {
-                    source: getNode(row[sourceIdx], identity, row[sourceColorIdx], row[sourceGroup]).index,
-                    target: getNode(row[targetIdx], identity, row[targetColorIdx], row[targetGroupIdx]).index,
+                    source: getNode(row[sourceIdx], identity, true, row[sourceColorIdx], row[sourceGroup]).index,
+                    target: getNode(row[targetIdx], identity, false, row[targetColorIdx], row[targetGroupIdx]).index,
                     value: row[edgeValueIdx]
                 };
                 nodeList[edge.source].num += 1;
@@ -272,18 +290,70 @@ module powerbi.visuals {
             // If there are any elements in newdata that arent in the old data
             return _.any(newData.identity, n => !_.any(oldData.identity, m => m.key.indexOf(n.key) === 0));
         }
+    }
+
+    class GraphVisualBehavior implements IInteractiveBehavior {
+        private selectionEnabled : boolean;
+        private isMultiSelection : boolean;
+        private myGraph: ForceGraph;
+        private _selectedNode : IForceGraphNode;
+        private selectionHandler: ISelectionHandler;
+        private host : IVisualHostServices;
+        private listener : { destroy: Function; };
+
+        /**
+        * Turns on or off selection
+        */
+        public toggleSelection(enabled: boolean, multi : boolean = false) {
+            this.selectionEnabled = enabled;
+            this.isMultiSelection = multi;
+            this.attachEvents();
+        }
+
+        public bindEvents(options: any, selectionHandler: ISelectionHandler) {
+            this.selectionHandler = selectionHandler;
+
+            if (options.graph) {
+                this.myGraph = options.graph;
+                this.attachEvents();
+            }
+
+            this.host = options.host;
+        }
+
+        /**
+         * Renders the actual selection visually
+         */
+        public renderSelection(hasSelection: boolean) {
+            this.myGraph.redrawSelection();
+        }
+
+        /**
+         * Attaches the line up events to lineup
+         */
+        private attachEvents() {
+            if (this.myGraph) {
+                // Cleans up events
+                if (this.listener) {
+                    this.listener.destroy();
+                }
+                this.listener = this.myGraph.addEventListener("nodeClicked", (node) => this.onNodeSelected(node));
+            }
+        }
 
         /**
          * Gets called when a node is selected
          */
-        private onNodeSelected(node: { filterExpr: data.SQExpr }) {
+        private onNodeSelected(node: ForceGraphSelectableNode) {
             var filter;
             if (node && node !== this._selectedNode) {
                 filter = powerbi.data.SemanticFilter.fromSQExpr(node.filterExpr);
+                this._selectedNode = <IForceGraphNode>node;
             } else {
-                node = undefined;
+                this._selectedNode = undefined;
             }
-            this._selectedNode = <IForceGraphNode>node;
+
+            this.selectionHandler.handleSelection(node, false);
 
             var objects: VisualObjectInstancesToPersist = {
                 merge: [
@@ -321,6 +391,27 @@ module powerbi.visuals {
             labels?: boolean;
         };
     };
+
+    /**
+     * The lineup data
+     */
+    interface ForceGraphSelectableNode extends SelectableDataPoint, IForceGraphNode {
+
+        /**
+         * The nodes index into the node list
+         */
+        index: number;
+
+        /**
+         * Represents the number of edges that this node is connected to
+         */
+        num: number;
+
+        /**
+         * The expression that will exactly match this row
+         */
+        filterExpr : data.SQExpr;
+    }
 
     /**
      * Class which represents the force graph
@@ -436,7 +527,7 @@ module powerbi.visuals {
         /**
          * Sets the data for this force graph
          */
-        public setData(graph: IForceGraphData) {
+        public setData(graph: IForceGraphData<IForceGraphNode>) {
             var me = this;
 
             var zoom = d3.behavior.zoom()
@@ -479,7 +570,7 @@ module powerbi.visuals {
                 var t = nodes[link.target];
                 var w = link.value;
                 var i = {}; // intermediate node
-                nodes.push(i);
+                nodes.push(<any>i);
                 links.push({ source: s, target: i }, { source: i, target: t });
                 bilinks.push([s, i, t, w]);
             });
@@ -523,6 +614,8 @@ module powerbi.visuals {
             node.append("svg:circle")
                 .attr("r", (d) => Math.log((d.num * 100)))
                 .style("fill", (d) => d.color)
+                .style("stroke", "red")
+                .style("stroke-width", (d) => d.selected ? 1 : 0)
                 .style("opacity", 1);
 
             node.on("click", (n) => {
@@ -571,11 +664,24 @@ module powerbi.visuals {
         }
 
         /**
+         * Redraws the selections on the nodes
+         */
+        public redrawSelection() {
+            this.vis.selectAll(".node circle")
+                .style("stroke-width", (d) => d.selected ? 1 : 0);
+        }
+
+        /**
          * Adds an event listener for the given event
          */
         public addEventListener(name: string, handler: Function) {
             var listeners = this.listeners[name] = this.listeners[name] || [];
             listeners.push(handler);
+            return {
+                destroy: () => {
+                    this.removeEventListener(name, handler)
+                }
+            };
         }
 
         /**
@@ -617,6 +723,11 @@ module powerbi.visuals {
          * The color of the node
          */
         color?: string;
+
+        /**
+         * Whether or not the given node is selected
+         */
+        selected: boolean;
     }
 
     /**
@@ -642,12 +753,12 @@ module powerbi.visuals {
     /**
      * The data for the force graph
      */
-    interface IForceGraphData {
+    interface IForceGraphData<NodeType> {
 
         /**
          * The list of the nodes in the force graph
          */
-        nodes?: IForceGraphNode[];
+        nodes?: NodeType[];
 
         /**
          * The links in the force graph
