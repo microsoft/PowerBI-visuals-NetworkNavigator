@@ -2951,7 +2951,7 @@ module powerbi.visuals.lineup {
         if (Array.isArray(row)) {
         this.storage.setSelection(row);
         row = row.map(function(d) { return d[primaryKey]; });
-        $rows.classed('selected', function(d) { return row.indexOf(d[primaryKey]) > 0; });
+        $rows.classed('selected', function(d) { return row.indexOf(d[primaryKey]) >= 0; });
         } else if (row) {
         this.storage.setSelection([row]);
         $rows.classed('selected',function(d) { return d[primaryKey] === row[primaryKey]; });
@@ -3175,6 +3175,9 @@ module powerbi.visuals.lineup {
                 //remove the last one
                 that.listeners['selected'](null);
                 }
+
+                // DT: Fix, was not removing the deselected one from the allselected list
+                allselected.splice(allselected.indexOf(row), 1);
             } else {
                 $row.classed('selected', true);
                 that.storage.select(row);
