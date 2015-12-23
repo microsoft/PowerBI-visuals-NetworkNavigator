@@ -1,4 +1,4 @@
-/// <reference path="./references.d.ts"/>
+/// <reference path="../../base/references.d.ts"/>
 
 declare var define;
 declare var module;

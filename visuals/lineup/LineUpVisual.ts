@@ -1,6 +1,6 @@
-/// <reference path="./references.d.ts"/>
+/// <reference path="../../base/references.d.ts"/>
 /// <reference path="./lineup.ts"/>
-/// <reference path="./VisualBase.ts"/>
+/// <reference path="../../base/VisualBase.ts"/>
 
 declare var LineUp;
 

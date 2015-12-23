@@ -1,6 +1,5 @@
-/// <reference path="../power-bi/lib/powerbi-externals.d.ts"/>
-/// <reference path="../power-bi/lib/powerbi-visuals.d.ts"/>
-/// <reference path="./VisualBase.ts"/>
+/// <reference path="../../base/references.d.ts"/>
+/// <reference path="../../base/VisualBase.ts"/>
 
 declare var _;
 
