@@ -26,7 +26,9 @@ module powerbi.visuals {
                 linkStrength: 2,
                 gravity: .1,
                 charge: -120,
-                labels: false
+                labels: false,
+                minZoom: .1,
+                maxZoom: 100
             }
         };
 
@@ -106,6 +108,14 @@ module powerbi.visuals {
                             displayName: "Labels",
                             description: "If labels on the nodes should be shown",
                             type: { bool: true }
+                        },
+                        minZoom: {
+                            displayName: "Min Zoom",
+                            type: { numeric: true }
+                        },
+                        maxZoom: {
+                            displayName: "Max Zoom",
+                            type: { numeric: true }
                         }
                     }
                 }
@@ -389,6 +399,8 @@ module powerbi.visuals {
             gravity?: number;
             charge?: number;
             labels?: boolean;
+            minZoom?: number;
+            maxZoom?: number;
         };
     };
 
@@ -421,13 +433,16 @@ module powerbi.visuals {
         private svg: D3.Selection;
         private vis: D3.Selection;
         private force: D3.Layout.ForceLayout;
+        private zoom: D3.Behavior.Zoom;
         private _dimensions: { width: number; height: number; };
-        private _configuration: any = {
+        private _configuration = {
             linkDistance: 10,
             linkStrength: 2,
             charge: -120,
             gravity: .1,
-            labels: false
+            labels: false,
+            minZoom: .1,
+            maxZoom: 100
         };
         private listeners : { [id: string] : Function[]; } = { };
 
@@ -483,7 +498,7 @@ module powerbi.visuals {
          * Setter for the configuration
          */
         public set configuration(newConfig) {
-            var newConfig = $.extend(true, {}, this._configuration, newConfig);
+            newConfig = $.extend(true, {}, this._configuration, newConfig);
             if (this.force) {
                 var runStart;
 
@@ -501,6 +516,11 @@ module powerbi.visuals {
                 runStart = runStart || updateForceConfig("linkStrength", 2);
                 runStart = runStart || updateForceConfig("charge", -120);
                 runStart = runStart || updateForceConfig("gravity", .1);
+
+                if (newConfig.minZoom !== this._configuration.minZoom ||
+                    newConfig.maxZoom !== this._configuration.maxZoom) {
+                    this.zoom.scaleExtent([newConfig.minZoom, newConfig.maxZoom]);
+                }
 
                 if (runStart) {
                     this.force.start();
@@ -530,8 +550,8 @@ module powerbi.visuals {
         public setData(graph: IForceGraphData<IForceGraphNode>) {
             var me = this;
 
-            var zoom = d3.behavior.zoom()
-                .scaleExtent([1, 10])
+            this.zoom = d3.behavior.zoom()
+                .scaleExtent([this._configuration.minZoom, this._configuration.maxZoom])
                 .on("zoom", () => this.redraw());
 
             var drag = d3.behavior.drag()
@@ -558,7 +578,7 @@ module powerbi.visuals {
                 .attr("preserveAspectRatio", "xMidYMid meet")
                 .attr("pointer-events", "all")
                 // Function is important here
-                .call(zoom);
+                .call(this.zoom);
             this.vis = this.svg.append('svg:g');
 
             var nodes = graph.nodes.slice();
