@@ -1,5 +1,4 @@
 /// <reference path="../../base/references.d.ts"/>
-/// <reference path="../../base/VisualBase.ts"/>
 
 declare var _;
 
@@ -169,7 +168,6 @@ module powerbi.visuals {
         public static converter(dataView: DataView, settings: GraphVisualSettings): IForceGraphData {
             var nodeList = [];
             var nodeMap = {};
-            var nodeList = [];
             var linkList = [];
             var table = dataView.table;
 
@@ -321,8 +319,8 @@ module powerbi.visuals {
             gravity?: number;
             charge?: number;
             labels?: boolean;
-        }
-    }
+        };
+    };
 
     /**
      * Class which represents the force graph
@@ -454,7 +452,7 @@ module powerbi.visuals {
                     me.force.start();
                 })
                 .on("drag", function(d) {
-                    d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y)
+                    d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
                 })
                 .on("dragend", function(d) {
                     d3.select(this).classed("dragging", false);

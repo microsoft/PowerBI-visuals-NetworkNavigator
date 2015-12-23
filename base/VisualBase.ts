@@ -1,5 +1,4 @@
 /// <reference path="./references.d.ts"/>
-/// <reference path="./lineup.ts"/>
 
 class VisualBase {
     protected element: JQuery;
@@ -8,8 +7,10 @@ class VisualBase {
 
     /** This is called once when the visual is initialially created */
     public init(options: powerbi.VisualInitOptions, template?: string): void {
+        var width = options.viewport.width;
+        var height = options.viewport.height;
         this.container = options.element;
-        this.iframe = $('<iframe style="width:' + options.viewport.width + 'px;height:' + options.viewport.height + 'px;border:0;margin:0;padding:0" frameBorder="0"/>');
+        this.iframe = $(`<iframe style="width:${width}px;height:${height}px;border:0;margin:0;padding:0" frameBorder="0"/>`);
         this.container.append(this.iframe);
         this.element = this.iframe.contents().find("body");
         this.element.append(this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource)));

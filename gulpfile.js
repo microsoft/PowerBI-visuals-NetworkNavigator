@@ -9,20 +9,28 @@ var tslint = require('gulp-tslint');
 var typescript = require('gulp-typescript');
 var sequence = require('gulp-sequence');
 var zip = require('gulp-zip');
+var args  = require('yargs').argv;
+
+var project = args.project;
+if (!project) {
+    throw new Error("A project is required to build, use --project <project name> to specify the project");
+}
 
 var paths = {
-  scripts: ['src/**/*.ts'],
-  styles: ['src/**/*.css'],
-  buildDir: 'build',
-  buildJS: ['build/**/*.js'],
-  buildTS: ['build/**/*.ts'],
-  buildCSS: ['build/**/*.css'],
+  scripts: ['visuals/' + project + '/**/*.ts', 'base/**/*.ts'],
+  styles: ['visuals/' + project + '/**/*.css'],
+  buildDir: 'build/' + project,
+  buildJS: ['build/' + project + '/**/*.js'],
+  buildTS: ['build/' + project + '/**/*.ts'],
+  buildCSS: ['build/' + project + '/**/*.css'],
   packageDir: ['package'],
-  buildPackageDir: 'build/package'
+  buildPackageDir: 'build/' + project + '/package'
 };
 
-var projectName = "LineUpVisual";
-var projectId = "1450434005853";
+var projectConfig = JSON.parse(fs.readFileSync('visuals/' + project + '/visualconfig.json').toString());
+
+// var projectName = "LineUpVisual";
+// var projectId = "1450434005853";
 
 // Not all tasks need to use streams
 // A gulpfile is just another node program and you can use any package available on npm
@@ -32,7 +40,14 @@ gulp.task('clean', function() {
 });
 
 gulp.task('tslint', function() {
-    return gulp.src(paths.scripts)
+    var toLint = paths.scripts;
+    if (projectConfig.lintFiles) {
+        toLint = projectConfig.lintFiles.map(function (file) {
+           return "visuals/" + project + "/" + file;
+        });
+    }
+
+    return gulp.src(toLint)
         .pipe(tslint())
         .pipe(tslint.report('verbose'))
 });
@@ -43,7 +58,7 @@ gulp.task('build:ts', ['build:css'], function() {
         .pipe(order([
             paths.scripts[0],
             "**/VisualBase.ts",
-            "**/" + projectName + ".ts"
+            "**/" + projectConfig.mainVisual + ".ts"
         ]))
         .pipe(replace(/\/\/\/\s*<reference.*/g, ''))
         .pipe(replace("\/*INLINE_CSS*\/", css))
@@ -58,7 +73,7 @@ gulp.task('build:js', ['build:ts'], function() {
         .pipe(order([
             paths.scripts[0],
             "**/VisualBase.ts",
-            "**/" + projectName + ".ts"
+            "**/" + projectConfig.mainVisual + ".ts"
         ]))
         .pipe(replace("\/*INLINE_CSS*\/", css))
         .pipe(typescript())
@@ -76,8 +91,8 @@ gulp.task('build:css', ['clean'], function() {
 
 gulp.task('package:package_json', function() {
     return gulp.src([paths.packageDir + "/package.json"])
-        .pipe(replace("%PROJECT_NAME%", projectName))
-        .pipe(replace("%PROJECT_ID%", projectId))
+        .pipe(replace("%PROJECT_NAME%", projectConfig.mainVisual))
+        .pipe(replace("%PROJECT_ID%", projectConfig.projectId))
         .pipe(gulp.dest(paths.buildPackageDir));
 });
 
@@ -89,7 +104,7 @@ gulp.task('package:copy', function() {
 
 gulp.task('package:zip', function() {
     return gulp.src([paths.buildPackageDir + "/*"])
-        .pipe(zip(projectName + ".pbiviz"))
+        .pipe(zip(projectConfig.mainVisual + ".pbiviz"))
         .pipe(gulp.dest(paths.buildDir));
 });
 
