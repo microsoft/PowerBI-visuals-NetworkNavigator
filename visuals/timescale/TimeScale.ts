@@ -64,6 +64,7 @@ class TimeScale {
         this.timeScalePath
             .datum(data)
             .attr("d", this.area);
+        this.resizeElements();
     }
 
     /**
@@ -108,9 +109,6 @@ class TimeScale {
      * Builds the initial timescale
      */
     private buildTimeScale() {
-        var xAxis = d3.svg.axis().scale(this.x).orient("bottom"),
-            yAxis = d3.svg.axis().scale(this.y).orient("left");
-
         this.area = d3.svg.area()
             .interpolate("monotone")
             .x((d) => this.x(d.date))
@@ -131,8 +129,7 @@ class TimeScale {
             .attr("class", "area");
 
         this.xAxis = this.context.append("g")
-            .attr("class", "x axis")
-            .call(xAxis);
+            .attr("class", "x axis");
 
         var brushed = _.debounce(() => {
             this.events.raiseEvent("rangeSelected", this.brush.empty() ? [] : this.brush.extent());
