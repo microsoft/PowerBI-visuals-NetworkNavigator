@@ -3,3 +3,7 @@
 /// <reference path="../power-bi/lib/powerbi-externals.d.ts"/>
 /// <reference path="../power-bi/lib/powerbi-visuals.d.ts"/>
 /// <reference path="./VisualBase.ts"/>
+/// <reference path="./EventEmitter.ts"/>
+/// <reference path="./Utils.ts"/>
+
+

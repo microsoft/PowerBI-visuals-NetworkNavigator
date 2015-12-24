@@ -57,7 +57,7 @@ gulp.task('build:ts', ['build:css'], function() {
     return gulp.src(paths.scripts)
         .pipe(order([
             paths.scripts[0],
-            "**/VisualBase.ts",
+            "**/base/**/*.ts",
             "**/" + projectConfig.mainVisual + ".ts"
         ]))
         .pipe(replace(/\/\/\/\s*<reference.*/g, ''))
@@ -72,7 +72,7 @@ gulp.task('build:js', ['build:ts'], function() {
     return gulp.src(paths.scripts)
         .pipe(order([
             paths.scripts[0],
-            "**/VisualBase.ts",
+            "**/base/**/*.ts",
             "**/" + projectConfig.mainVisual + ".ts"
         ]))
         .pipe(replace("\/*INLINE_CSS*\/", css))
