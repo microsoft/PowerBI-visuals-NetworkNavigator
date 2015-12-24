@@ -83,6 +83,9 @@ module powerbi.visuals {
                 var dataViewCategorical = dataView.categorical;
                 var data = TimeScaleVisual.converter(dataView);
 
+                // Stash this bad boy for later, so we can filter the time column
+                this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
+
                 var item: any = dataView.metadata.objects;
                 if (dataView.metadata.objects && item.general && item.general.filter
                     && item.general.filter.whereItems && item.general.filter.whereItems[0]
@@ -97,10 +100,10 @@ module powerbi.visuals {
                     if (!currentSelection ||
                        currentSelection.length !== 2 ||
                        startDate !== currentSelection[0] ||
-                       endDate !== currentSelection[1])
-                    this.timeScale.selectedRange = [startDate, endDate];
+                       endDate !== currentSelection[1]) {
+                        this.timeScale.selectedRange = [startDate, endDate];
+                    }
                 }
-                this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
 
                 // If the data has changed at all, then update the timeScale
                 if (Utils.hasDataChanged(data, <TimeScaleVisualDataItem[]>this.timeScale.data)) {
@@ -121,7 +124,7 @@ module powerbi.visuals {
             var items : TimeScaleVisualDataItem[];
             var dataViewCategorical = dataView && dataView.categorical;
 
-            // Must be two columns, one time, the other values
+            // Must be two columns: times and values
             if (dataViewCategorical && dataViewCategorical.categories.length === 2) {
                 items = dataViewCategorical.categories[0].values.map((val, i) => ({
                     date: val,
