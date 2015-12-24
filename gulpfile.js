@@ -17,7 +17,7 @@ if (!project) {
 }
 
 var paths = {
-  scripts: ['visuals/' + project + '/**/*.ts', 'base/**/*.ts'],
+  scripts: ['base/**/*.ts', 'visuals/' + project + '/**/*.ts'],
   styles: ['visuals/' + project + '/**/*.css'],
   buildDir: 'build/' + project,
   buildJS: ['build/' + project + '/**/*.js'],
@@ -55,11 +55,10 @@ gulp.task('tslint', function() {
 gulp.task('build:ts', ['build:css'], function() {
     var css = fs.readFileSync(paths.buildDir + "/project.css");
     return gulp.src(paths.scripts)
-        .pipe(order([
-            paths.scripts[0],
-            "**/base/**/*.ts",
-            "**/" + projectConfig.mainVisual + ".ts"
-        ]))
+        // .pipe(order([
+        //     paths.scripts[1],
+        //     paths.scripts[0]
+        // ]))
         .pipe(replace(/\/\/\/\s*<reference.*/g, ''))
         .pipe(replace("\/*INLINE_CSS*\/", css))
         .pipe(concat('project.ts'))
@@ -70,11 +69,11 @@ gulp.task('build:ts', ['build:css'], function() {
 gulp.task('build:js', ['build:ts'], function() {
     var css = fs.readFileSync(paths.buildDir + "/project.css");
     return gulp.src(paths.scripts)
-        .pipe(order([
-            paths.scripts[0],
-            "**/base/**/*.ts",
-            "**/" + projectConfig.mainVisual + ".ts"
-        ]))
+        // .pipe(order([
+        //     paths.scripts[0],
+        //     "**/base/**/*.ts",
+        //     "**/" + projectConfig.mainVisual + ".ts"
+        // ]))
         .pipe(replace("\/*INLINE_CSS*\/", css))
         .pipe(typescript())
         .pipe(concat('project.js'))

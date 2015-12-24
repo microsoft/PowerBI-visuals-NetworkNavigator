@@ -291,7 +291,7 @@ module powerbi.visuals {
                 }
             }
 
-            if (!this.lineup || this.hasDataChanged(this.lineup.storage.getData(), _data)) {
+            if (!this.lineup || Utils.hasDataChanged(this.lineup.storage.getData(), _data)) {
                 var spec: any = {};
                 spec.name = name;
                 spec.dataspec = desc;
@@ -344,19 +344,6 @@ module powerbi.visuals {
                     this.host.loadMoreData();
                 }
             }
-        }
-
-        /**
-         * Determins if the old data is different from the new data.
-         */
-        private hasDataChanged(oldData : LineUpRow[], newData: LineUpRow[]) : boolean {
-            if (oldData.length !== newData.length) {
-                return true;
-            }
-            var oldMapped = oldData.map((n) => n.identity);
-
-            // If there are any elements in newdata that arent in the old data
-            return _.any(newData, n => !_.any(oldMapped, m => m.equals(n.identity)));
         }
     }
 
