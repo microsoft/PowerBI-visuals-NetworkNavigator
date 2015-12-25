@@ -11,12 +11,25 @@ module powerbi.visuals {
               <input class="search" placeholder="Search" />
               <div class="list" style="margin-top:5px;overflow:hidden;overflow-y:auto"></div>
             </div>
-        `;
+        `.trim().replace(/\n/g, '');
 
         /**
          * The template used to render list items
          */
-        private listItemTemplate = `<div style="white-space:nowrap" class="item"><label style="cursor:pointer"><input style="vertical-align:middle;cursor:pointer" type="checkbox"><span style="margin-left: 5px;vertical-align:middle" class="value"></span></label></div>`;
+        private listItemTemplate =
+        `<div style="white-space:nowrap" class="item">
+                <label style="cursor:pointer">
+                    <input style="vertical-align:middle;cursor:pointer" type="checkbox">
+                    <span style="margin-left: 5px;vertical-align:middle" class="display-container">
+                        <span style="display:inline-block;width:50%;overflow:hidden" class="category-container">
+                            <span class="category"></span>
+                        </span>
+                        <span style="display:inline-block;width:50%" class="value-container">
+                            <span style="display:inline-block;background-color:blue;width:0px" class="value-display">&nbsp;</span>
+                        </span>
+                    </span>
+                </label>
+            </div>`.trim().replace(/\n/g, '');
 
         /**
          * The list container
@@ -26,7 +39,7 @@ module powerbi.visuals {
         /**
          * The actual list element
          */
-        private listEle : JQuery;
+        private listEle: JQuery;
 
         /**
          * The reference to the list.js instance
@@ -51,29 +64,32 @@ module powerbi.visuals {
         /**
          * The current set of data
          */
-        private _data : any[];
+        private _data: any[];
 
         /**
          * The selection manager
          */
-        private selectionManager : utility.SelectionManager;
+        private selectionManager: utility.SelectionManager;
 
         /**
          * The set of capabilities for the visual
          */
         public static capabilities: VisualCapabilities = {
             dataRoles: [{
-                name: 'Values',
+                name: 'Categories',
                 kind: VisualDataRoleKind.Grouping
-            }],
+            }, {
+                    name: 'Values',
+                    kind: VisualDataRoleKind.Measure
+                }],
             dataViewMappings: [{
-                table: {
-                    rows: {
-                        for: { in: 'Values' },
-                        dataReductionAlgorithm: { window: { count: 100 } }
-                    },
-                    rowCount: { preferred: { min: 1 } }
-                },
+                categorical: {
+                    categories: { for: { in: "Categories" } },
+                    dataReductionAlgorithm: { top: {} },
+                    values: {
+                        select: [{ bind: { to: "Values" } }]
+                    }
+                }
             }],
             // Sort this crap by default
             sorting: {
@@ -107,7 +123,7 @@ module powerbi.visuals {
             this.listEle = this.listContainer.find(".list");
             this.listEle.scroll(() => this.onListScroll());
             this.myList = new List(this.listContainer[0], {
-                valueName: ['value'],
+                valueName: ['category'],
                 item: this.listItemTemplate,
                 page: 20000 // Hack
             });
@@ -122,35 +138,55 @@ module powerbi.visuals {
         public update(options: powerbi.VisualUpdateOptions) {
             super.update(options);
 
+            this.listEle.find(".display_container").css({ width: options.viewport.width - 20 });
             this.listEle.css({ width: options.viewport.width - 10, height: options.viewport.height - 45 });
 
             this.dataView = options.dataViews && options.dataViews[0];
             if (this.dataView) {
                 var selectedIds = this.selectionManager.getSelectionIds() || [];
-                var newData = this.dataView.table.rows.map((row, i) => {
-                   var id = SelectionId.createWithId(this.dataView.table.identity[i]);
-                   return {
-                        value: row[0],
+                var categorical = this.dataView.categorical;
+                var values = [];
+                if (categorical.values && categorical.values.length) {
+                    values = categorical.values[0].values;
+                }
+                var maxValue = 0;
+                var newData = categorical.categories[0].values.map((category, i) => {
+                    var id = SelectionId.createWithId(this.dataView.categorical.categories[0].identity[i]);
+                    var item = {
+                        category: category,
                         identity: id,
-                        selected: !!_.find(selectedIds, (oId) => oId.equals(id))
-                   };
+                        selected: !!_.find(selectedIds, (oId) => oId.equals(id)),
+                        value: values[i] || 0
+                    };
+                    if (item.value > maxValue) {
+                        maxValue = item.value;
+                    }
+                    return item;
                 });
 
                 Utils.listDiff<ListItem>(this._data, newData, {
                     // BUG: below should work, but once it passes 100, its busted
-                //    equals: (one, two) => one.identity.equals(two.identity),
-                   equals: (one, two) => one.value === two.value,
-                   onAdd: (item) => {
-                       this.myList.add(item);
-                       this.element.find(".item").last().find("input").prop('checked', item.selected);
-                   },
-                   onRemove: (item) => this.myList.remove("value", item.value),
-                   onUpdate: (existing, newItem) => {
-                       $.extend(existing, newItem);
-                       var item = this.myList.get("value", existing.value)[0];
-                       item.values({ selected: existing.selected });
-                       $(item.elm).find("input").prop('checked', existing.selected);
-                   }
+                    //    equals: (one, two) => one.identity.equals(two.identity),
+                    equals: (one, two) => one.category === two.category,
+                    onAdd: (item) => {
+                        this.myList.add(item);
+                        var ele = this.element.find(".item").last();
+                        if (maxValue) {
+                            ele.find(".value-display").css({ width: ((item.value / maxValue) * 100) + "%" });
+                        }
+                        ele.find("input").prop('checked', item.selected);
+                    },
+                    onRemove: (item) => this.myList.remove("category", item.category),
+                    onUpdate: (existing, newItem) => {
+                        $.extend(existing, newItem);
+                        var item = this.myList.get("category", existing.category)[0];
+                        var ele = $(item.elm);
+                        item.values({ selected: existing.selected });
+                        if (maxValue) {
+                            ele.find(".value-display").css({ width: ((existing.value / maxValue) * 100) + "%" });
+                        }
+                        ele.find("input").prop('checked', existing.selected);
+                    }
                 });
 
                 this._data = newData;
@@ -164,7 +200,7 @@ module powerbi.visuals {
                     // If we have a search, then load more data as necessary
                     setTimeout(() => this.loadMoreDataBasedOnSearch(), 10);
                 }
-                this.myList.sort('value', { order: 'asc' });
+                this.myList.sort('category', { order: 'asc' });
             }
 
             this.loadingMoreData = false;
@@ -247,6 +283,7 @@ module powerbi.visuals {
      * Represents a list item
      */
     interface ListItem extends SelectableDataPoint {
+        category: any;
         value: any;
     }
 }
