@@ -22,10 +22,10 @@ module powerbi.visuals {
                 <label style="cursor:pointer">
                     <input style="vertical-align:middle;cursor:pointer" type="checkbox">
                     <span style="margin-left: 5px;vertical-align:middle" class="display-container">
-                        <span style="display:inline-block;width:50%;overflow:hidden" class="category-container">
+                        <span style="display:inline-block;overflow:hidden" class="category-container">
                             <span class="category"></span>
                         </span>
-                        <span style="display:inline-block;width:50%" class="value-container">
+                        <span style="display:inline-block" class="value-container">
                             <span style="display:inline-block;background-color:blue;width:0px" class="value-display">&nbsp;</span>
                         </span>
                     </span>
@@ -60,7 +60,7 @@ module powerbi.visuals {
         /**
          * A reference to the loading element
          */
-        private loadingElement : JQuery;
+        private loadingElement: JQuery;
 
         /**
          * The current set of data
@@ -76,20 +76,28 @@ module powerbi.visuals {
          * The set of capabilities for the visual
          */
         public static capabilities: VisualCapabilities = {
-            dataRoles: [{
-                name: 'Categories',
-                kind: VisualDataRoleKind.Grouping
-            }, {
+            dataRoles: [
+                {
+                    name: 'Category',
+                    kind: VisualDataRoleKind.Grouping,
+                    displayName: powerbi.data.createDisplayNameGetter('Role_DisplayName_Field'),
+                    description: data.createDisplayNameGetter('Role_DisplayName_FieldDescription')
+                }, {
                     name: 'Values',
                     kind: VisualDataRoleKind.Measure
-                }],
+                },
+            ],
             dataViewMappings: [{
+                conditions: [{ 'Category': { max: 1 } }],
                 categorical: {
-                    categories: { for: { in: "Categories" } },
-                    dataReductionAlgorithm: { top: {} },
+                    categories: {
+                        for: { in: 'Category' },
+                        dataReductionAlgorithm: { window: {} }
+                    },
                     values: {
                         select: [{ bind: { to: "Values" } }]
-                    }
+                    },
+                    includeEmptyGroups: true,
                 }
             }],
             // Sort this crap by default
@@ -148,6 +156,8 @@ module powerbi.visuals {
 
             this.dataView = options.dataViews && options.dataViews[0];
             if (this.dataView) {
+                var categorical = this.dataView && this.dataView.categorical;
+                this.element.toggleClass("has-values", !!categorical && !!categorical.values && categorical.values.length > 0);
                 var newData = AdvancedSlicerVisual.converter(this.dataView, this.selectionManager);
                 Utils.listDiff<ListItem>(this._data, newData, {
                     // BUG: below should work, but once it passes 100, its busted
@@ -196,8 +206,8 @@ module powerbi.visuals {
         /**
          * Converts the given dataview into a list of listitems
          */
-        public static converter(dataView: DataView, selectionManager: utility.SelectionManager) : ListItem[] {
-            var converted : ListItem[];
+        public static converter(dataView: DataView, selectionManager: utility.SelectionManager): ListItem[] {
+            var converted: ListItem[];
             var selectedIds = selectionManager.getSelectionIds() || [];
             var categorical = dataView && dataView.categorical;
             var values = [];

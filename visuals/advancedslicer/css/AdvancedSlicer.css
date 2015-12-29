@@ -165,3 +165,21 @@
 .loading .load-spinner {
     display: block;
 }
+
+.category-container {
+    width: 100%;
+    margin-right: 10px;
+}
+
+.value-container {
+    width: 100%;
+    display: none;
+}
+
+.has-values .category-container {
+    width: 50%;
+}
+.has-values .value-container {
+    width: 50%;
+    display: inline-block;
+}
