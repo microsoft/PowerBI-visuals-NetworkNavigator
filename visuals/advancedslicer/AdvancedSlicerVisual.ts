@@ -10,6 +10,7 @@ module powerbi.visuals {
             <div id='slicer-list'>
               <input class="search" placeholder="Search" />
               <div class="list" style="margin-top:5px;overflow:hidden;overflow-y:auto"></div>
+              <div class='load-spinner' style='transform:scale(0.6);'><div>
             </div>
         `.trim().replace(/\n/g, '');
 
@@ -57,9 +58,9 @@ module powerbi.visuals {
         private host: IVisualHostServices;
 
         /**
-         * A boolean indicating whether or not the list is loading more data
+         * A reference to the loading element
          */
-        private loadingMoreData = false;
+        private loadingElement : JQuery;
 
         /**
          * The current set of data
@@ -130,6 +131,10 @@ module powerbi.visuals {
             this.host = options.host;
             this.attachEvents();
             this.selectionManager = new visuals.utility.SelectionManager({ hostServices: this.host });
+
+            // These two are here because the devtools call init more than once
+            this.loadingMoreData = true;
+            this._data = [];
         }
 
         /**
@@ -143,27 +148,7 @@ module powerbi.visuals {
 
             this.dataView = options.dataViews && options.dataViews[0];
             if (this.dataView) {
-                var selectedIds = this.selectionManager.getSelectionIds() || [];
-                var categorical = this.dataView.categorical;
-                var values = [];
-                if (categorical.values && categorical.values.length) {
-                    values = categorical.values[0].values;
-                }
-                var maxValue = 0;
-                var newData = categorical.categories[0].values.map((category, i) => {
-                    var id = SelectionId.createWithId(this.dataView.categorical.categories[0].identity[i]);
-                    var item = {
-                        category: category,
-                        identity: id,
-                        selected: !!_.find(selectedIds, (oId) => oId.equals(id)),
-                        value: values[i] || 0
-                    };
-                    if (item.value > maxValue) {
-                        maxValue = item.value;
-                    }
-                    return item;
-                });
-
+                var newData = AdvancedSlicerVisual.converter(this.dataView, this.selectionManager);
                 Utils.listDiff<ListItem>(this._data, newData, {
                     // BUG: below should work, but once it passes 100, its busted
                     //    equals: (one, two) => one.identity.equals(two.identity),
@@ -171,8 +156,9 @@ module powerbi.visuals {
                     onAdd: (item) => {
                         this.myList.add(item);
                         var ele = this.element.find(".item").last();
-                        if (maxValue) {
-                            ele.find(".value-display").css({ width: ((item.value / maxValue) * 100) + "%" });
+                        var renderedValue = item.renderedValue();
+                        if (renderedValue) {
+                            ele.find(".value-display").css({ width: (renderedValue + "%") });
                         }
                         ele.find("input").prop('checked', item.selected);
                     },
@@ -182,8 +168,9 @@ module powerbi.visuals {
                         var item = this.myList.get("category", existing.category)[0];
                         var ele = $(item.elm);
                         item.values({ selected: existing.selected });
-                        if (maxValue) {
-                            ele.find(".value-display").css({ width: ((existing.value / maxValue) * 100) + "%" });
+                        var renderedValue = existing.renderedValue();
+                        if (renderedValue) {
+                            ele.find(".value-display").css({ width: (renderedValue + "%") });
                         }
                         ele.find("input").prop('checked', existing.selected);
                     }
@@ -204,6 +191,57 @@ module powerbi.visuals {
             }
 
             this.loadingMoreData = false;
+        }
+
+        /**
+         * Converts the given dataview into a list of listitems
+         */
+        public static converter(dataView: DataView, selectionManager: utility.SelectionManager) : ListItem[] {
+            var converted : ListItem[];
+            var selectedIds = selectionManager.getSelectionIds() || [];
+            var categorical = dataView && dataView.categorical;
+            var values = [];
+            if (categorical.values && categorical.values.length) {
+                values = categorical.values[0].values;
+            }
+            var maxValue = 0;
+            if (categorical && categorical.categories && categorical.categories.length > 0) {
+                converted = categorical.categories[0].values.map((category, i) => {
+                    var id = SelectionId.createWithId(categorical.categories[0].identity[i]);
+                    var item = {
+                        category: category,
+                        identity: id,
+                        selected: !!_.find(selectedIds, (oId) => oId.equals(id)),
+                        value: values[i] || 0,
+                        renderedValue: () => {
+                            if (values[i]) {
+                                return (values[i] / maxValue) * 100;
+                            }
+                        }
+                    };
+                    if (item.value > maxValue) {
+                        maxValue = item.value;
+                    }
+                    return item;
+                });
+            }
+            return converted;
+        }
+
+        /**
+         * A boolean indicating whether or not the list is loading more data
+         */
+        private _loadingMoreData = false; // Don't use this directly
+        private get loadingMoreData() {
+            return this._loadingMoreData;
+        }
+
+        /**
+         * Setter for loadingMoreData
+         */
+        private set loadingMoreData(value: boolean) {
+            this._loadingMoreData = value;
+            this.element.toggleClass("loading", value);
         }
 
         /**
@@ -285,5 +323,11 @@ module powerbi.visuals {
     interface ListItem extends SelectableDataPoint {
         category: any;
         value: any;
+
+        /**
+         * The value that should be displayed
+         * TODO: Better name, basically it is the value that should be displayed in the histogram
+         */
+        renderedValue: () => any;
     }
 }
