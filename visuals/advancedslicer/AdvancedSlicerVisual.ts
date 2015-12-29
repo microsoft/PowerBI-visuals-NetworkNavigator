@@ -17,8 +17,8 @@ module powerbi.visuals {
         /**
          * The template used to render list items
          */
-        private listItemTemplate =
-        `<div style="white-space:nowrap" class="item">
+        private listItemTemplate = `
+            <div style="white-space:nowrap" class="item">
                 <label style="cursor:pointer">
                     <input style="vertical-align:middle;cursor:pointer" type="checkbox">
                     <span style="margin-left: 5px;vertical-align:middle" class="display-container">
@@ -30,7 +30,8 @@ module powerbi.visuals {
                         </span>
                     </span>
                 </label>
-            </div>`.trim().replace(/\n/g, '');
+            </div>
+        `.trim().replace(/\n/g, '');
 
         /**
          * The list container
@@ -102,7 +103,7 @@ module powerbi.visuals {
             }],
             // Sort this crap by default
             sorting: {
-                default: {}
+                default:{}
             },
             objects: {
                 general: {
@@ -118,7 +119,18 @@ module powerbi.visuals {
                             }
                         },
                     },
-                },
+                }/*,
+                sorting: {
+                    displayName: "Sorting",
+                    properties: {
+                        byHistogram: {
+                            type: { bool: true }
+                        },
+                        byName: {
+                            type: { bool: true }
+                        }
+                    }
+                }*/
             }
         };
 
@@ -166,7 +178,7 @@ module powerbi.visuals {
                     onAdd: (item) => {
                         this.myList.add(item);
                         var ele = this.element.find(".item").last();
-                        var renderedValue = item.renderedValue();
+                        var renderedValue = item.renderedValue;
                         if (renderedValue) {
                             ele.find(".value-display").css({ width: (renderedValue + "%") });
                         }
@@ -178,7 +190,7 @@ module powerbi.visuals {
                         var item = this.myList.get("category", existing.category)[0];
                         var ele = $(item.elm);
                         item.values({ selected: existing.selected });
-                        var renderedValue = existing.renderedValue();
+                        var renderedValue = existing.renderedValue;
                         if (renderedValue) {
                             ele.find(".value-display").css({ width: (renderedValue + "%") });
                         }
@@ -192,15 +204,16 @@ module powerbi.visuals {
                 if (searchString) {
                     this.myList.search(searchString);
 
-                    this.loadingMoreData = false;
-
                     // If we have a search, then load more data as necessary
-                    setTimeout(() => this.loadMoreDataBasedOnSearch(), 10);
+                    setTimeout(() => this.loadMoreDataBasedOnSearch(true), 10);
+                } else {
+                    this.loadingMoreData = false;
                 }
-                this.myList.sort('category', { order: 'asc' });
-            }
 
-            this.loadingMoreData = false;
+                this.myList.sort('category', { order: 'asc' });
+            } else {
+               this.loadingMoreData = false;
+            }
         }
 
         /**
@@ -223,16 +236,15 @@ module powerbi.visuals {
                         identity: id,
                         selected: !!_.find(selectedIds, (oId) => oId.equals(id)),
                         value: values[i] || 0,
-                        renderedValue: () => {
-                            if (values[i]) {
-                                return (values[i] / maxValue) * 100;
-                            }
-                        }
+                        renderedValue: undefined
                     };
                     if (item.value > maxValue) {
                         maxValue = item.value;
                     }
                     return item;
+                });
+                converted.forEach((c) => {
+                    c.renderedValue = c.value ? (c.value / maxValue) * 100 : undefined;
                 });
             }
             return converted;
@@ -276,15 +288,22 @@ module powerbi.visuals {
 
         /**
          * Loads more data based on search
+         * @param force Force the loading of new data, if it can
          */
-        private loadMoreDataBasedOnSearch() {
+        private loadMoreDataBasedOnSearch (force: boolean = false) {
             var scrollElement = this.listEle[0];
             var scrollHeight = scrollElement.scrollHeight;
             // Only need to load if:
-            // 1. There is more data. 2. We are not currently loading more data. 3. There is already too much stuff on the screen (not causing a scroll)
-            if (this.dataView.metadata.segment && !this.loadingMoreData && scrollHeight <= scrollElement.clientHeight) {
-                this.loadingMoreData = true;
-                this.host.loadMoreData();
+            // 1. There is more data. 2. There is not too much stuff on the screen (not causing a scroll)
+            if (this.dataView.metadata.segment && scrollHeight <= scrollElement.clientHeight) {
+                // If we aren't already attempting to load more data, then do it
+                if (!this.loadingMoreData || force) {
+                    this.loadingMoreData = true;
+                    this.host.loadMoreData();
+                }
+            } else {
+                // No need to load more data
+                this.loadingMoreData = false;
             }
         }
 
@@ -338,6 +357,6 @@ module powerbi.visuals {
          * The value that should be displayed
          * TODO: Better name, basically it is the value that should be displayed in the histogram
          */
-        renderedValue: () => any;
+        renderedValue: number;
     }
 }
