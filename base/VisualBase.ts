@@ -15,6 +15,9 @@ class VisualBase {
         this.element = this.iframe.contents().find("body");
         this.element.append(this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource)));
         this.element.append("<st" + "yle>" + this.getCss() + "</st" + "yle>");
+        if (template) {
+            this.element = this.element.append($(template));
+        }
     }
 
     public update(options: powerbi.VisualUpdateOptions) {
