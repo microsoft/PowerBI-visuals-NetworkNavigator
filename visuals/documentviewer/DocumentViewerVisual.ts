@@ -1,5 +1,5 @@
 /// <reference path="../../base/references.d.ts"/>
-
+declare var DOMPurify;
 module powerbi.visuals {
     export class DocumentViewerVisual extends VisualBase implements IVisual {
 
@@ -24,6 +24,7 @@ module powerbi.visuals {
                             { bind: { to: 'Html' } },
                         ]
                     },
+                    rowCount: 1
                 }
             }],
             objects: {}
@@ -76,8 +77,13 @@ module powerbi.visuals {
                                     <div class="contents ${item.type.html ? "html" : "text"}"></div>
                                 </div>
                             `);
-                            newEle.find('.contents')
-                                .append(item.type.html ? $(`<div>${item.value}</div>`) : $(`<div>${item.value}</div>`));
+
+                            var contents = newEle.find('.contents');
+                            if (item.type.html) {
+                                contents.append(`<div>${DOMPurify.sanitize(item.value)}</div>`);
+                            } else {
+                                contents.text(item.value);
+                            }
                             return newEle;
                         })
                     );
@@ -93,10 +99,11 @@ module powerbi.visuals {
          */
         public static converter(dataView: DataView): IDocumentViewerDocument[] {
             var data: IDocumentViewerDocument[] = [];
-            if (dataView && dataView.table) {
+            if (dataView && dataView.table && dataView.table.rows.length > 0) {
                 var table = dataView.table;
                 var columns = table.columns;
-                table.rows.forEach((row, i) => {
+                // table.rows.forEach((row, i) => {
+                    var row = table.rows[0];
                     data.push({
                         items: row.map((value, colNum) => ({
                             type: columns[colNum].roles['Html'] ? { html: {} } : { text: {} },
@@ -104,7 +111,7 @@ module powerbi.visuals {
                             value: value
                         }))
                     });
-                });
+                // });
             }
             return data;
         }

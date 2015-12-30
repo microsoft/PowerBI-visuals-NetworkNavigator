@@ -17,7 +17,10 @@
     "gulp-uglify": "^1.5.1"
   },
   "devDependencies": {
+    "gulp-filter": "^3.0.1",
+    "gulp-modify": "^0.1.1",
     "gulp-sequence": "^0.4.1",
+    "gulp-sourcemaps": "^1.6.0",
     "gulp-tslint": "^4.2.1",
     "gulp-typescript": "^2.10.0",
     "gulp-zip": "^3.0.2",
