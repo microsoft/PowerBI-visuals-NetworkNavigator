@@ -1,5 +1,5 @@
-/// <reference path="../../base/references.d.ts"/>
-declare var DOMPurify;
+/// <reference path="./references.d.ts"/>
+
 module powerbi.visuals {
     export class DocumentViewerVisual extends VisualBase implements IVisual {
 
