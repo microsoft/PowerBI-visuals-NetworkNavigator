@@ -1,5 +1,7 @@
 /// <reference path="./references.d.ts"/>
 
+/* DECLARE_VARS:DOMPurify */
+
 module powerbi.visuals {
     export class DocumentViewerVisual extends VisualBase implements IVisual {
 
@@ -58,6 +60,8 @@ module powerbi.visuals {
          * Notifies the IVisual of an update (data, viewmode, size change).
          */
         public update(options: VisualUpdateOptions) {
+            super.update(options);
+
             if (options.dataViews && options.dataViews.length > 0) {
                 var data = DocumentViewerVisual.converter(options.dataViews[0]);
                 this.tableElement.empty();

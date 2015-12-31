@@ -10,10 +10,4 @@ This is a base project for developing Power BI visuals.  It is hopefully a tempo
     * For your main visual, extend `VisualBase.ts`, it contains some logic to load external css, and loading the frame, please review it, and extend as needed.
 
 #Debugging
-* Run `gulp --project <projectFolder>` or `gulp --project <projectFolder> build:ts`, this will create two files in the `build\<projectFolder>` directory. Go to [Power BI Dev Tools](https://app.powerbi.com/devTools), copy the contents of the `project.ts` file into the Script Pane, and copy the contents of `project.css` into the Styling pane, and run `Run + Compile`. This will then show your Visual in the right pane. You can then go back to [Power BI](https://app.powerbi.com), and use this new visual.
-
-#Packaging
-* Run `gulp --proejct <projectFolder> package` to create a redistributable `pbiviz` file, which you can then be imported anywhere.
-
-
-
+* Run `gulp --project <projectFolder>` or `gulp --project <projectFolder> build`, this will create two files in the `build\<projectFolder>` directory. Go to [Power BI Dev Tools](https://app.powerbi.com/devTools), copy the contents of the `project.ts` file into the Script Pane, and copy the contents of `project.css` into the Styling pane, and run `Run + Compile`. This will then show your Visual in the right pane. You can then go back to [Power BI](https://app.powerbi.com), and use this new visual.

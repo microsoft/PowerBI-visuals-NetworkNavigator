@@ -24,6 +24,7 @@
     "gulp-tslint": "^4.2.1",
     "gulp-typescript": "^2.10.0",
     "gulp-zip": "^3.0.2",
+    "tslint": "^3.2.1",
     "yargs": "^3.31.0"
   }
 }

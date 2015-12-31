@@ -86,6 +86,9 @@ gulp.task('build:ts', ['build:css'], function() {
 
         /** Typescript processing */
 		.pipe(tsFilter)
+        .pipe(replace(/\/\*\s*DECLARE_VARS\s*:\s*([\w\,]+)\s*\*\//g, function(substring) {
+            return "declare var " + arguments[1].split(",").join(";\ndeclare var ") + ";";
+        }))
         .pipe(replace(/\/\/\/\s*<reference.*/g, ''))
         .pipe(replace("\/*INLINE_CSS*\/", css))
 		.pipe(tsFilter.restore)
