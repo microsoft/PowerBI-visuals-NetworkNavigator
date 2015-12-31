@@ -10,7 +10,13 @@ module powerbi.visuals {
         private _selectedNode : IForceGraphNode;
         private host : IVisualHostServices;
         private interactivityService : IInteractivityService;
-        private behavior : GraphVisualBehavior;
+
+        private listener : { destroy: Function; };
+
+        /**
+         * The selection manager
+         */
+        private selectionManager: utility.SelectionManager;
 
         private static DEFAULT_SETTINGS: GraphVisualSettings = {
             columnMappings: {
@@ -140,7 +146,8 @@ module powerbi.visuals {
             this.myGraph = new ForceGraph(this.element.find("#node_graph"), 500, 500);
             this.host = options.host;
             this.interactivityService = new InteractivityService(this.host);
-            this.behavior = new GraphVisualBehavior();
+            this.attachEvents();
+            this.selectionManager = new visuals.utility.SelectionManager({ hostServices: this.host });
         }
 
         /** Update is called for data updates, resizes & formatting changes */
@@ -151,17 +158,29 @@ module powerbi.visuals {
             var dataViewTable = dataView && dataView.table;
             var forceDataReload = this.updateSettings(options);
 
-            if (dataViewTable && (forceDataReload || this.hasDataChanged(this.dataViewTable, dataViewTable))) {
-                var parsedData = GraphVisual.converter(dataView, this.settings);
-                this.myGraph.setData(parsedData);
-                if (this.interactivityService) {
-                    this.interactivityService.bind(parsedData.nodes, this.behavior, {
-                        graph: this.myGraph,
-                        host: this.host
-                    });
+            if (dataViewTable) {
+                if ((forceDataReload || this.hasDataChanged(this.dataViewTable, dataViewTable))) {
+                    var parsedData = GraphVisual.converter(dataView, this.settings);
+                    this.myGraph.setData(parsedData);
                 }
-                this.interactivityService.applySelectionStateToData(parsedData.nodes);
+                var selectedIds = this.selectionManager.getSelectionIds();
+                var data = this.myGraph.getData();
+                if (data && data.nodes && data.nodes.length) {
+                    var updated = false;
+                    data.nodes.forEach((n) => {
+                        var isSelected = !!_.find(selectedIds, (id : SelectionId) => id.equals((<ForceGraphSelectableNode>n).identity));
+                        if (isSelected !== n.selected) {
+                            n.selected = isSelected;
+                            updated = true;
+                        }
+                    });
+
+                    if (updated) {
+                        this.myGraph.redrawSelection();
+                    }
+                }
             }
+
 
             this.dataViewTable = dataViewTable;
 
@@ -301,43 +320,6 @@ module powerbi.visuals {
             // If there are any elements in newdata that arent in the old data
             return _.any(newData.identity, n => !_.any(oldData.identity, m => m.key.indexOf(n.key) === 0));
         }
-    }
-
-    class GraphVisualBehavior implements IInteractiveBehavior {
-        private selectionEnabled : boolean;
-        private isMultiSelection : boolean;
-        private myGraph: ForceGraph;
-        private _selectedNode : IForceGraphNode;
-        private selectionHandler: ISelectionHandler;
-        private host : IVisualHostServices;
-        private listener : { destroy: Function; };
-
-        /**
-        * Turns on or off selection
-        */
-        public toggleSelection(enabled: boolean, multi : boolean = false) {
-            this.selectionEnabled = enabled;
-            this.isMultiSelection = multi;
-            this.attachEvents();
-        }
-
-        public bindEvents(options: any, selectionHandler: ISelectionHandler) {
-            this.selectionHandler = selectionHandler;
-
-            if (options.graph) {
-                this.myGraph = options.graph;
-                this.attachEvents();
-            }
-
-            this.host = options.host;
-        }
-
-        /**
-         * Renders the actual selection visually
-         */
-        public renderSelection(hasSelection: boolean) {
-            this.myGraph.redrawSelection();
-        }
 
         /**
          * Attaches the line up events to lineup
@@ -364,7 +346,7 @@ module powerbi.visuals {
                 this._selectedNode = undefined;
             }
 
-            this.selectionHandler.handleSelection(node, false);
+            this.selectionManager.select(node.identity, false);
 
             var objects: VisualObjectInstancesToPersist = {
                 merge: [
@@ -377,6 +359,7 @@ module powerbi.visuals {
                     }
                 ]
             };
+
             this.host.persistProperties(objects);
         }
     }

@@ -1,6 +1,6 @@
 /// <reference path="./references.d.ts"/>
 
-class VisualBase {
+class VisualBase implements powerbi.IVisual {
     protected element: JQuery;
     protected container: JQuery;
     private iframe : JQuery;
@@ -13,13 +13,17 @@ class VisualBase {
         this.iframe = $(`<iframe style="width:${width}px;height:${height}px;border:0;margin:0;padding:0" frameBorder="0"/>`);
         this.container.append(this.iframe);
         this.element = this.iframe.contents().find("body");
-        this.element.append(this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource)));
+        $.when(this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource)))
+            .then((styles) => this.element.append(styles.map((s) => $(s))));
         this.element.append("<st" + "yle>" + this.getCss() + "</st" + "yle>");
         if (template) {
             this.element = this.element.append($(template));
         }
     }
 
+    /**
+     * Notifies the IVisual of an update (data, viewmode, size change).
+     */
     public update(options: powerbi.VisualUpdateOptions) {
         this.iframe.css({ width: options.viewport.width, height: options.viewport.height });
     }
@@ -34,13 +38,15 @@ class VisualBase {
     /**
      * Builds the link for the given external css resource
      */
-    protected buildExternalCssLink(resource: ExternalCssResource) : string {
+    protected buildExternalCssLink(resource: ExternalCssResource) : JQueryPromise<string> {
         var link = 'li' + 'nk';
         var integrity = resource.integrity ? `integrity="${resource.integrity}"` : '';
         var href = `href="${resource.url}"`;
         var crossorigin = resource.crossorigin ? ` crossorigin="${resource.crossorigin}"` : '';
         var rel = 'rel="stylesheet"';
-        return `<${link} ${href} ${rel} ${integrity} ${crossorigin}>`;
+        var defer = $.Deferred<string>();
+        defer.resolve(`<${link} ${href} ${rel} ${integrity} ${crossorigin}>`);
+        return defer.promise();
     }
 
     /**

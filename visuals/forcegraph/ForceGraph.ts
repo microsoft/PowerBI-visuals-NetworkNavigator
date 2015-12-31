@@ -10,6 +10,7 @@ class ForceGraph {
     private vis: D3.Selection;
     private force: D3.Layout.ForceLayout;
     private zoom: D3.Behavior.Zoom;
+    private graph: IForceGraphData<IForceGraphNode>;
     private _dimensions: { width: number; height: number; };
     private _configuration = {
         linkDistance: 10,
@@ -126,10 +127,18 @@ class ForceGraph {
     }
 
     /**
+     * Gets the data associated with this graph
+     */
+    public getData() : IForceGraphData<IForceGraphNode> {
+        return this.graph;
+    }
+
+    /**
      * Sets the data for this force graph
      */
     public setData(graph: IForceGraphData<IForceGraphNode>) {
         var me = this;
+        this.graph = graph;
 
         this.zoom = d3.behavior.zoom()
             .scaleExtent([this._configuration.minZoom, this._configuration.maxZoom])
