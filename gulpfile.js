@@ -14,6 +14,7 @@ var modify = require('gulp-modify');
 var querystring = require('querystring');
 var gulpFilter = require('gulp-filter');
 var sourcemaps = require('gulp-sourcemaps');
+var lzstring = require("./lzstring");
 
 var project = args.project;
 if (!project) {
@@ -66,7 +67,6 @@ gulp.task('build:ts', ['build:css'], function() {
         .pipe(sourcemaps.write())
         .pipe(modify({
             fileModifier: function(file, contents) {
-                var encoded = new Buffer(querystring.unescape(encodeURIComponent(contents)), 'binary').toString("base64");
                 /**
                  * What the below is doing is basically removing the define/require calls, to remove the AMD load logic from some libraries
                  * and then restoring it after the library is done loading
@@ -75,7 +75,7 @@ gulp.task('build:ts', ['build:css'], function() {
                     '(function() {',
                     'var __w = window,__od=__w["define"], __or=__w["require"];',
                     '__w["require"]=__w["define"]=undefined;',
-                    'window["eval"](decodeURIComponent(window["escape"](window.atob("' + encoded + '"))));',
+                    'window["eval"](window["LZString"].decompressFromEncodedURIComponent("' + lzstring.compressToEncodedURIComponent(contents) + '"));',
                     '__w["define"]=__od;__w["require"]=__or;',
                     '})()'
                 ];
@@ -164,3 +164,4 @@ gulp.task('default', ['tslint', 'build']);
 // gulp.task('package', function(cb) {
 //     sequence(['tslint', 'compile:ts'], 'package:package_json', 'package:copy', 'package:zip', 'package:clean_build', cb);
 // });
+
