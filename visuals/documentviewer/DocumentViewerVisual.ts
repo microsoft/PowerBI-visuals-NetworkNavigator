@@ -38,6 +38,7 @@ module powerbi.visuals {
         private static template = `
             <div>
                 <div class="table"></div>
+                <div class="error"></div>
             </div>
         `.trim();
 
@@ -62,40 +63,50 @@ module powerbi.visuals {
         public update(options: VisualUpdateOptions) {
             super.update(options);
 
+            var error;
             if (options.dataViews && options.dataViews.length > 0) {
-                var data = DocumentViewerVisual.converter(options.dataViews[0]);
-                this.tableElement.empty();
-                this.tableElement.css({ width: options.viewport.width - 10, height: options.viewport.height - 10 });
+                var table = options.dataViews[0].table;
+                if (table.rows.length === 1) {
+                    var data = DocumentViewerVisual.converter(options.dataViews[0]);
+                    this.tableElement.empty();
+                    this.tableElement.css({ width: options.viewport.width - 10, height: options.viewport.height - 10 });
 
-                var eles = data.map((doc) => {
-                    var docEle = $(`
-                        <div class="document">
-                        </div>
-                    `.trim());
+                    var eles = data.map((doc) => {
+                        var docEle = $(`
+                            <div class="document">
+                            </div>
+                        `.trim());
 
-                    docEle.append(
-                        doc.items.map((item) => {
-                            var newEle = $(`
-                                <div>
-                                    <div class="column-label">${item.name}:&nbsp;</div>
-                                    <div class="contents ${item.type.html ? "html" : "text"}"></div>
-                                </div>
-                            `);
+                        docEle.append(
+                            doc.items.map((item) => {
+                                var newEle = $(`
+                                    <div>
+                                        <div class="column-label">${item.name}:&nbsp;</div>
+                                        <div class="contents ${item.type.html ? "html" : "text"}"></div>
+                                    </div>
+                                `);
 
-                            var contents = newEle.find('.contents');
-                            if (item.type.html) {
-                                contents.append(`<div>${DOMPurify.sanitize(item.value)}</div>`);
-                            } else {
-                                contents.text(item.value);
-                            }
-                            return newEle;
-                        })
-                    );
+                                var contents = newEle.find('.contents');
+                                if (item.type.html) {
+                                    contents.append(`<div>${DOMPurify.sanitize(item.value)}</div>`);
+                                } else {
+                                    contents.text(item.value);
+                                }
+                                return newEle;
+                            })
+                        );
 
-                    return docEle;
-                });
-                this.tableElement.append(eles);
+                        return docEle;
+                    });
+                    this.tableElement.append(eles);
+                } else if (table.rows.length > 1) {
+                    error = "Too many documents, please select a filter to limit the number of documents to a single document.";
+                } else {
+                    error = "No Results";
+                }
             }
+            this.tableElement.toggle(!error);
+            this.element.find(".error").text(error || "").toggle(!!error);
         }
 
         /**
@@ -103,7 +114,7 @@ module powerbi.visuals {
          */
         public static converter(dataView: DataView): IDocumentViewerDocument[] {
             var data: IDocumentViewerDocument[] = [];
-            if (dataView && dataView.table && dataView.table.rows.length > 0) {
+            if (dataView && dataView.table && /*dataView.table.rows.length > 0 */ dataView.table.rows.length === 1) {
                 var table = dataView.table;
                 var columns = table.columns;
                 // table.rows.forEach((row, i) => {

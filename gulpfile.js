@@ -71,22 +71,21 @@ gulp.task('build:ts', ['build:css'], function() {
                  * What the below is doing is basically removing the define/require calls, to remove the AMD load logic from some libraries
                  * and then restoring it after the library is done loading
                  */
-                var lines = [
-                    '(function() {',
-                    'var __w = window,__od=__w["define"], __or=__w["require"];',
-                    '__w["require"]=__w["define"]=undefined;',
-                    'window["eval"](window["LZString"].decompressFromEncodedURIComponent("' + lzstring.compressToEncodedURIComponent(contents) + '"));',
-                    '__w["define"]=__od;__w["require"]=__or;',
-                    '})()'
-                ];
-                return lines.join("\n");
+                return `
+(function() {
+    var __w = window,__od=__w["define"], __or=__w["require"];
+    __w["require"]=__w["define"]=undefined;
+    window["eval"](window["LZString"].decompressFromEncodedURIComponent("${lzstring.compressToEncodedURIComponent(contents)}"));
+    __w["define"]=__od;__w["require"]=__or;
+})()
+                `.trim().replace("\n", "");
             }
         }))
 		.pipe(jsFilter.restore)
 
         /** Typescript processing */
 		.pipe(tsFilter)
-        .pipe(replace(/\/\*\s*DECLARE_VARS\s*:\s*([\w\,]+)\s*\*\//g, function(substring) {
+        .pipe(replace(/\/\*\s*DECLARE_VARS\s*:\s*([\w\,]+)\s*\*\//g, function (substring) {
             return "declare var " + arguments[1].split(",").join(";\ndeclare var ") + ";";
         }))
         .pipe(replace(/\/\/\/\s*<reference.*/g, ''))
