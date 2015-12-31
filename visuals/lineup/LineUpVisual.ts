@@ -12,6 +12,9 @@ module powerbi.visuals {
         private host : IVisualHostServices;
         private lineup: any;
         private loadingMoreData = false;
+        private selectionEnabled : boolean;
+        private isMultiSelection : boolean;
+        private selectionManager : utility.SelectionManager;
 
         private static DEFAULT_SETTINGS : LineUpVisualSettings = {
             selection: {
@@ -116,8 +119,6 @@ module powerbi.visuals {
             }
         };
 
-        private interactivityService : IInteractivityService;
-
         /**
          * The configuration for the lineup viewer
          */
@@ -156,8 +157,6 @@ module powerbi.visuals {
             crossorigin: "anonymous"
         };
 
-        private behavior: LineUpVisualBehavior;
-
         /**
          * The template for the grid
          */
@@ -165,7 +164,7 @@ module powerbi.visuals {
             <div>
                 <div class="grid"></div>
             </div>
-        `;
+        `.trim();
 
         /** This is called once when the visual is initialially created */
         public init(options: VisualInitOptions): void {
@@ -173,11 +172,13 @@ module powerbi.visuals {
             this.host = options.host;
             this.element.append(this.template);
 
-            this.interactivityService = new InteractivityService(this.host);
-
             // Temporary, because the popups will load outside of the iframe for some reason
-            this.container.append(this.buildExternalCssLink(this.fontAwesome));
-            this.behavior = new LineUpVisualBehavior();
+            this.buildExternalCssLink(this.fontAwesome).then((ele) => {
+                this.container.append($(ele));
+            });
+            this.selectionManager = new utility.SelectionManager({
+                hostServices: options.host
+            });
         }
 
         /** Update is called for data updates, resizes & formatting changes */
@@ -196,22 +197,22 @@ module powerbi.visuals {
 
                 var colArr = this.dataViewTable.columns.map((col) => col.displayName);
                 var data : ILineUpVisualRow[] = [];
+                var selectedIds = this.selectionManager.getSelectionIds();
                 this.dataViewTable.rows.forEach((row, rowIndex) => {
                     var identity = this.dataView.categorical.categories[0].identity[rowIndex];
+                    var newId = SelectionId.createWithId(identity);
                     // The below is busted > 100
                     //var identity = SelectionId.createWithId(this.dataViewTable.identity[rowIndex]);
                     var result : ILineUpVisualRow = {
-                        identity: SelectionId.createWithId(identity),
+                        identity: newId,
                         filterExpr: identity.expr,
-                        selected: false
+                        selected: !!_.find(selectedIds, (id : SelectionId) => id.equals(newId))
                     };
                     row.forEach((colInRow, i) => {
                         result[colArr[i]] = colInRow;
                     });
                     data.push(result);
                 });
-
-                this.interactivityService.applySelectionStateToData(data);
 
                 this.loadData(colArr, data);
                 this.loadingMoreData = false;
@@ -315,13 +316,6 @@ module powerbi.visuals {
                         me.onLineUpScrolled.apply(me, args);
                         return scrolled.apply(this, args);
                     };
-
-                    if (this.interactivityService) {
-                        this.interactivityService.bind(_data, this.behavior, {
-                            lineup: this.lineup,
-                            host: this.host
-                        });
-                    }
                 }
             }
 
@@ -329,7 +323,10 @@ module powerbi.visuals {
 
             var singleSelect = this.settings.selection.singleSelect;
             var multiSelect = this.settings.selection.multiSelect;
-            this.behavior.toggleSelection(singleSelect || multiSelect, multiSelect);
+            this.selectionEnabled = singleSelect || multiSelect;
+
+            this.isMultiSelection = multiSelect;
+            this.attachEvents();
         }
 
         /**
@@ -345,6 +342,78 @@ module powerbi.visuals {
                     this.loadingMoreData = true;
                     this.host.loadMoreData();
                 }
+            }
+        }
+
+
+        /**
+         * Attaches the line up events to lineup
+         */
+        private attachEvents() {
+            if (this.lineup) {
+                // Cleans up events
+                this.lineup.listeners.on("multiselected.lineup", null);
+                this.lineup.listeners.on("selected.lineup", null);
+
+                if (this.isMultiSelection) {
+                    this.lineup.listeners.on("multiselected.lineup", (rows : ILineUpVisualRow[]) => this.onRowSelected(rows));
+                } else {
+                    this.lineup.listeners.on("selected.lineup", (row : ILineUpVisualRow) => this.onRowSelected(row ? [row] : []));
+                }
+            }
+        }
+
+        /**
+         * Selects the given rows
+         */
+        private onRowSelected(rows : ILineUpVisualRow[]) {
+            var filter;
+            if (this.selectionEnabled) {
+                if (rows && rows.length) {
+                    var expr = rows[0].filterExpr;
+
+                    // If we are allowing multiSelect
+                    if (rows.length > 0 && this.isMultiSelection) {
+                        rows.slice(1).forEach((r) => {
+                        expr = powerbi.data.SQExprBuilder.or(expr, r.filterExpr);
+                        });
+                    }
+                    filter = powerbi.data.SemanticFilter.fromSQExpr(expr);
+                }
+
+                var objects: powerbi.VisualObjectInstancesToPersist = {
+                    merge: [
+                        <powerbi.VisualObjectInstance>{
+                            objectName: "general",
+                            selector: undefined,
+                            properties: {
+                                "filter": filter
+                            }
+                        }
+                    ]
+                };
+
+                // rows are what are currently selected in lineup
+                if (rows && rows.length) {
+                    var smSelectedIds = this.selectionManager.getSelectionIds();
+                    var unselectedRows = smSelectedIds.filter((n) => {
+                        return rows.filter((m) => m.identity.equals(n)).length === 0;
+                    });
+                    var newSelectedRows = rows.filter((n) => {
+                        return smSelectedIds.filter((m) => m.equals(n.identity)).length === 0;
+                    });
+
+                    // This should work, but there is a bug with selectionManager
+                    // newSelectedRows.concat(unselectedRows).forEach((r) => this.selectionManager.select(r.identity, true));
+
+                    // HACK
+                    this.selectionManager.clear();
+                    rows.forEach((r) => this.selectionManager.select(r.identity, true));
+                } else {
+                    this.selectionManager.clear();
+                }
+
+                this.host.persistProperties(objects);
             }
         }
     }

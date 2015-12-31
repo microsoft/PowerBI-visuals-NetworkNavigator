@@ -13,8 +13,8 @@ class VisualBase implements powerbi.IVisual {
         this.iframe = $(`<iframe style="width:${width}px;height:${height}px;border:0;margin:0;padding:0" frameBorder="0"/>`);
         this.container.append(this.iframe);
         this.element = this.iframe.contents().find("body");
-        $.when(this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource)))
-            .then((styles) => this.element.append(styles.map((s) => $(s))));
+        var promises = this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource));
+        $.when.apply($, promises).then((...styles) => this.element.append(styles.map((s)=> $(s))));
         this.element.append("<st" + "yle>" + this.getCss() + "</st" + "yle>");
         if (template) {
             this.element = this.element.append($(template));
