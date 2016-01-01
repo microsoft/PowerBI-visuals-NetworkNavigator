@@ -195,7 +195,7 @@ module powerbi.visuals {
                     $.extend(true, this.settings, LineUpVisual.DEFAULT_SETTINGS);
                 }
 
-                var colArr = this.dataViewTable.columns.map((col) => col.displayName);
+                var colArr = this.dataViewTable.columns.slice(0);
                 var data : ILineUpVisualRow[] = [];
                 var selectedIds = this.selectionManager.getSelectionIds();
                 this.dataViewTable.rows.forEach((row, rowIndex) => {
@@ -209,7 +209,7 @@ module powerbi.visuals {
                         selected: !!_.find(selectedIds, (id : SelectionId) => id.equals(newId))
                     };
                     row.forEach((colInRow, i) => {
-                        result[colArr[i]] = colInRow;
+                        result[colArr[i].displayName] = colInRow;
                     });
                     data.push(result);
                 });
@@ -245,17 +245,17 @@ module powerbi.visuals {
         /**
          * Derives the desciption for the given column
          */
-        private deriveDesc(columns: string[], data : ILineUpVisualRow[], separator? : string) {
+        private deriveDesc(columns: DataViewMetadataColumn[], data : ILineUpVisualRow[], separator? : string) {
             var cols = columns.map((col) => {
                 var r: any = {
                     column: col,
                     type: 'string'
                 };
-                if (this.isNumeric(data[0][col])) {
+                if (/*this.isNumeric(data[0][col])*/ col.type.numeric) {
                     r.type = 'number';
-                    r.domain = d3.extent(data, (row) => row[col] && row[col].length === 0 ? undefined : +(row[col]));
+                    r.domain = d3.extent(data, (row) => row[col.displayName] && row[col.displayName].length === 0 ? undefined : +(row[col.displayName]));
                 } else {
-                    var sset = d3.set(data.map((row) => row[col]));
+                    var sset = d3.set(data.map((row) => row[col.displayName]));
                     if (sset.size() <= Math.max(20, data.length * 0.2)) { //at most 20 percent unique values
                         r.type = 'categorical';
                         r.categories = sset.values().sort();
@@ -273,7 +273,7 @@ module powerbi.visuals {
         /**
          * Loads the data into the lineup view
          */
-        private loadData(columns: string[], rows : ILineUpVisualRow[]) {
+        private loadData(columns: DataViewMetadataColumn[], rows : ILineUpVisualRow[]) {
             //derive a description file
             var desc = this.deriveDesc(columns, rows);
             var name = 'data';
