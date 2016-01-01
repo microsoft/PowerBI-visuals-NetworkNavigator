@@ -76,3 +76,19 @@ interface ExternalCssResource {
      */
     crossorigin?: string;
 }
+
+/* HACK FIXES */
+powerbi.visuals.utility.SelectionManager.prototype['selectInternal'] = function(selectionId: powerbi.visuals.SelectionId, multiSelect: boolean) {
+    if (powerbi.visuals.utility.SelectionManager.containsSelection(this.selectedIds, selectionId)) {
+        this.selectedIds = multiSelect
+            ? this.selectedIds.filter(d => !powerbi.data.Selector.equals(d.getSelector(), selectionId.getSelector()))
+            : this.selectedIds.length > 1
+                ? [selectionId] : [];
+    } else {
+        if (multiSelect)
+            this.selectedIds.push(selectionId);
+        else
+            this.selectedIds = [selectionId];
+    }
+};
+console.warn("Monkey Patched: powerbi.visuals.utility.SelectionManager.prototype.selectInternal");

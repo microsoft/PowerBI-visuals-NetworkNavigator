@@ -163,8 +163,8 @@ module powerbi.visuals {
         public update(options: powerbi.VisualUpdateOptions) {
             super.update(options);
 
-            this.listEle.find(".display_container").css({ width: options.viewport.width - 20 });
-            this.listEle.css({ width: options.viewport.width - 10, height: options.viewport.height - 45 });
+            this.listEle.find(".display_container").css({ width: "100%" });
+            this.listEle.css({ width: "100%", height: options.viewport.height - 30 });
 
             this.dataView = options.dataViews && options.dataViews[0];
             if (this.dataView) {
@@ -183,6 +183,7 @@ module powerbi.visuals {
                             ele.find(".value-display").css({ width: (renderedValue + "%") });
                         }
                         ele.find("input").prop('checked', item.selected);
+                        ele.data("item", item);
                     },
                     onRemove: (item) => this.myList.remove("category", item.category),
                     onUpdate: (existing, newItem) => {
@@ -195,6 +196,7 @@ module powerbi.visuals {
                             ele.find(".value-display").css({ width: (renderedValue + "%") });
                         }
                         ele.find("input").prop('checked', existing.selected);
+                        ele.data("item", existing);
                     }
                 });
 
@@ -243,6 +245,7 @@ module powerbi.visuals {
                     }
                     return item;
                 });
+                var percentage = maxValue < 100 ? true: false;
                 converted.forEach((c) => {
                     c.renderedValue = c.value ? (c.value / maxValue) * 100 : undefined;
                 });
@@ -277,8 +280,7 @@ module powerbi.visuals {
                 var target = $(evt.target);
                 var ele = $((<HTMLElement>evt.target)).parents(".item");
                 if (ele.length > 0 && target.attr("type") === "checkbox") {
-                    var idx = ele.index();
-                    this.selectionManager.select(this.myList.items[idx].values().identity, true);
+                    this.selectionManager.select(ele.data("item")['values']().identity, true);
                     this.updateSelectionFilter();
                 }
                 evt.stopImmediatePropagation();

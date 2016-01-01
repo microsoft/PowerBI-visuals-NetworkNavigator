@@ -23,7 +23,7 @@ if (!project) {
 
 var paths = {
   scripts: ['base/**/*.ts', 'visuals/' + project + '/**/*.ts', 'base/**/*.js', 'visuals/' + project + '/**/*.js'],
-  styles: ['visuals/' + project + '/**/*.css'],
+  styles: ['base/**/*.css', 'visuals/' + project + '/**/*.css'],
   buildDir: 'build/' + project,
   buildJS: ['build/' + project + '/**/*.js'],
   buildTS: ['build/' + project + '/typescripts.ts', 'build/' + project + '/javascripts.ts'],

@@ -167,19 +167,23 @@
 }
 
 .category-container {
-    width: 100%;
+    width: calc(100% - 15px);
     margin-right: 10px;
 }
 
 .value-container {
-    width: 100%;
+    width: calc(100% - 25px);
     display: none;
 }
 
 .has-values .category-container {
-    width: 50%;
+    width: calc(50% - 15px);
 }
 .has-values .value-container {
-    width: 50%;
+    width: calc(50% - 25px);
     display: inline-block;
+}
+
+body {
+    margin: 2px;
 }
