@@ -15,6 +15,7 @@ class VisualBase implements powerbi.IVisual {
         this.element = this.iframe.contents().find("body");
         var promises = this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource));
         $.when.apply($, promises).then((...styles) => this.element.append(styles.map((s)=> $(s))));
+        this.container.append("<st" + "yle>" + this.getCss() + "</st" + "yle>");
         this.element.append("<st" + "yle>" + this.getCss() + "</st" + "yle>");
         if (template) {
             this.element = this.element.append($(template));

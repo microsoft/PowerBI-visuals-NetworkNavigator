@@ -31,10 +31,8 @@ class Utils {
             return true;
         }
 
-        var oldMapped = oldData.map((n) => n.identity);
-
         // If there are any elements in newdata that arent in the old data
-        return _.any(newData, n => !_.any(oldMapped, m => m.equals(n.identity)));
+        return _.any(newData, n => !_.any(oldData, m => m.identity.equals(n.identity) && _.isEqual(m, n)));
     }
 
 
