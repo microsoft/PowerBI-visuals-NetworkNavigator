@@ -212,7 +212,13 @@ module powerbi.visuals {
                     this.loadingMoreData = false;
                 }
 
-                this.myList.sort('category', { order: 'asc' });
+                var sortedColumns = this.dataView.metadata.columns.filter((c) => !!c.sort);
+                if (sortedColumns.length) {
+                    var lastColumn = sortedColumns[sortedColumns.length - 1];
+                    this.myList.sort(sortedColumns[sortedColumns.length - 1].roles['Category'] ? 'category' : 'value', {
+                         order: lastColumn.sort == 1/*SortDirection.Ascending*/ ? "asc" : "desc"
+                    });
+                }
             } else {
                this.loadingMoreData = false;
             }
