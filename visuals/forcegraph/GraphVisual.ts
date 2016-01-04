@@ -257,14 +257,19 @@ module powerbi.visuals {
 
             table.rows.forEach((row, idx) => {
                 var identity = table.identity[idx];
-                var edge = {
-                    source: getNode(row[sourceIdx], identity, true, row[sourceColorIdx], row[sourceGroup]).index,
-                    target: getNode(row[targetIdx], identity, false, row[targetColorIdx], row[targetGroupIdx]).index,
-                    value: row[edgeValueIdx]
-                };
-                nodeList[edge.source].num += 1;
-                nodeList[edge.target].num += 1;
-                linkList.push(edge);
+                if (row[sourceIdx] && row[targetIdx]) {
+                    /** These need to be strings to work properly */
+                    var sourceId = row[sourceIdx] + "";
+                    var targetId = row[targetIdx] + "";
+                    var edge = {
+                        source: getNode(sourceId, identity, true, row[sourceColorIdx], row[sourceGroup]).index,
+                        target: getNode(targetId, identity, false, row[targetColorIdx], row[targetGroupIdx]).index,
+                        value: row[edgeValueIdx]
+                    };
+                    nodeList[edge.source].num += 1;
+                    nodeList[edge.target].num += 1;
+                    linkList.push(edge);
+                }
             });
 
             return {
