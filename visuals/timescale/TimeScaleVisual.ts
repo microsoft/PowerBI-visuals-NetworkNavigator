@@ -18,10 +18,10 @@ module powerbi.visuals {
                 kind: VisualDataRoleKind.Grouping,
                 displayName: "Time"
             }, {
-                    name: 'Values',
-                    kind: VisualDataRoleKind.Measure,
-                    displayName: "Values"
-                }],
+                name: 'Values',
+                kind: VisualDataRoleKind.Measure,
+                displayName: "Values"
+            }],
             dataViewMappings: [{
                 // conditions: [
                 //     { 'Times': { max: 1, min: 1 }, 'Values': { max: 1, min: 1 } },
@@ -125,11 +125,13 @@ module powerbi.visuals {
             var dataViewCategorical = dataView && dataView.categorical;
 
             // Must be two columns: times and values
-            if (dataViewCategorical && dataViewCategorical.categories.length === 2) {
+            if (dataViewCategorical &&
+                dataViewCategorical.categories.length === 1 &&
+                dataViewCategorical.values && dataViewCategorical.values.length) {
                 items = dataViewCategorical.categories[0].values.map((val, i) => ({
                     date: val,
-                    value: dataViewCategorical.categories[1].values[i],
-                    identity: SelectionId.createWithId(dataViewCategorical.categories[1].identity[i])
+                    value: dataViewCategorical.values[0].values[i],
+                    identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
                 }))
             }
 
