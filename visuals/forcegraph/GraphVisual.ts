@@ -345,9 +345,13 @@ module powerbi.visuals {
         private onNodeSelected(node: ForceGraphSelectableNode) {
             var filter;
             if (node && node !== this._selectedNode) {
+                node.selected = true;
                 filter = powerbi.data.SemanticFilter.fromSQExpr(node.filterExpr);
                 this._selectedNode = <IForceGraphNode>node;
             } else {
+                if (this._selectedNode) {
+                    this._selectedNode.selected = false;
+                }
                 this._selectedNode = undefined;
             }
 
@@ -366,6 +370,7 @@ module powerbi.visuals {
             };
 
             this.host.persistProperties(objects);
+            this.myGraph.redrawSelection();
         }
     }
 
