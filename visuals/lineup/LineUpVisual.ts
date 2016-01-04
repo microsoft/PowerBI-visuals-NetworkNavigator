@@ -1,7 +1,6 @@
 /// <reference path="../../base/references.d.ts"/>
 /// <reference path="./lineup.ts"/>
 /// <reference path="./ILineUpVisualRow.ts"/>
-/// <reference path="./LineUpVisualBehavior.ts"/>
 
 declare var LineUp;
 
@@ -46,8 +45,11 @@ module powerbi.visuals {
             }],
             dataViewMappings: [{
                 categorical: {
-                    categories: { for: { in: 'Category' }},
-                    values: { select: [{ for: { in: 'Values'}}]}
+                    categories: { for: { in: 'Category' }, dataReductionAlgorithm: { top: {} }},
+                    values: {
+                        select: [{ for: { in: 'Values'}}]
+                    },
+                    dataReductionAlgorithm: { top: {} }
                 }
             }],
             objects: {
@@ -167,9 +169,8 @@ module powerbi.visuals {
 
         /** This is called once when the visual is initialially created */
         public init(options: VisualInitOptions): void {
-            super.init(options);
+            super.init(options, this.template, true);
             this.host = options.host;
-            this.element.append(this.template);
 
             // Temporary, because the popups will load outside of the iframe for some reason
             this.buildExternalCssLink(this.fontAwesome).then((ele) => {
@@ -185,8 +186,11 @@ module powerbi.visuals {
             super.update(options);
 
             this.dataView = options.dataViews[0];
-            var categorical = this.dataView.categorical;
-            if (categorical) {
+            var categorical = this.dataView && this.dataView.categorical;
+            if (categorical &&
+                categorical.values &&
+                categorical.values.length &&
+                categorical.categories.length) {
                 // Copy over new presentation values
                 if (this.dataView.metadata.objects) {
                     $.extend(true, this.settings, this.dataView.metadata.objects);

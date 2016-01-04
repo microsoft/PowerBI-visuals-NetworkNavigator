@@ -226,7 +226,7 @@ module powerbi.visuals {
             var selectedIds = selectionManager.getSelectionIds() || [];
             var categorical = dataView && dataView.categorical;
             var values = [];
-            if (categorical.values && categorical.values.length) {
+            if (categorical && categorical.values && categorical.values.length) {
                 values = categorical.values[0].values;
             }
             var maxValue = 0;
@@ -280,7 +280,7 @@ module powerbi.visuals {
                 var target = $(evt.target);
                 var ele = $((<HTMLElement>evt.target)).parents(".item");
                 if (ele.length > 0 && target.attr("type") === "checkbox") {
-                    this.selectionManager.select(ele.data("item")['values']().identity, true);
+                    this.selectionManager.select(ele.data("item")['identity'], true);
                     this.updateSelectionFilter();
                 }
                 evt.stopImmediatePropagation();
