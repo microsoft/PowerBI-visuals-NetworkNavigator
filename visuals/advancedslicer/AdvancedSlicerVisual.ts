@@ -89,7 +89,7 @@ module powerbi.visuals {
                 },
             ],
             dataViewMappings: [{
-                conditions: [{ 'Category': { max: 1 } }],
+                conditions: [{ 'Category': { max: 1, min: 1 }, 'Values': { max: 1, min: 0 }}],
                 categorical: {
                     categories: {
                         for: { in: 'Category' },
