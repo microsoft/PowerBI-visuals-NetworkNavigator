@@ -69,7 +69,7 @@ module powerbi.visuals {
                 if (table.rows.length === 1) {
                     var data = DocumentViewerVisual.converter(options.dataViews[0]);
                     this.tableElement.empty();
-                    this.tableElement.css({ width: options.viewport.width - 10, height: options.viewport.height - 10 });
+                    this.tableElement.css({ height: options.viewport.height - 10 });
 
                     var eles = data.map((doc) => {
                         var docEle = $(`

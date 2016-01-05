@@ -6,6 +6,10 @@ body, html {
     font-size: 12px;
 }
 
+body {
+    overflow: auto;
+}
+
 .column-label {
     display: inline-block;
     font-weight: bold;
@@ -22,3 +26,8 @@ body, html {
 .contents.html {
     display: block;
 }
+
+.table {
+    width: 100%;
+}
+
