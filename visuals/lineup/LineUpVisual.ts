@@ -6,6 +6,7 @@ declare var LineUp;
 
 module powerbi.visuals {
     export class LineUpVisual extends VisualBase implements IVisual {
+        private dataViewTable: DataViewTable;
         private dataView: DataView;
         private host : IVisualHostServices;
         private lineup: any;
@@ -37,19 +38,16 @@ module powerbi.visuals {
          */
         public static capabilities: VisualCapabilities = {
             dataRoles: [{
-                name: 'Category',
-                kind: VisualDataRoleKind.Grouping
-            }, {
                 name: 'Values',
-                kind: VisualDataRoleKind.Measure
+                kind: VisualDataRoleKind.Grouping
             }],
             dataViewMappings: [{
-                categorical: {
-                    categories: { for: { in: 'Category' }, dataReductionAlgorithm: { top: {} }},
-                    values: {
-                        select: [{ for: { in: 'Values'}}]
+                table: {
+                    rows: {
+                        for: { in: 'Values' },
+                        dataReductionAlgorithm: { window: { count: 100 } }
                     },
-                    dataReductionAlgorithm: { top: {} }
+                    rowCount: { preferred: { min: 1 } }
                 }
             }],
             objects: {
@@ -186,11 +184,8 @@ module powerbi.visuals {
             super.update(options);
 
             this.dataView = options.dataViews[0];
-            var categorical = this.dataView && this.dataView.categorical;
-            if (categorical &&
-                categorical.values &&
-                categorical.values.length &&
-                categorical.categories.length) {
+            this.dataViewTable = this.dataView && this.dataView.table;
+            if (this.dataViewTable) {
                 // Copy over new presentation values
                 if (this.dataView.metadata.objects) {
                     $.extend(true, this.settings, this.dataView.metadata.objects);
@@ -198,25 +193,23 @@ module powerbi.visuals {
                     $.extend(true, this.settings, LineUpVisual.DEFAULT_SETTINGS);
                 }
 
-                var categoryField = categorical.categories[0];
-                var valueFields = categorical.values;
-                var colArr = [categoryField.source].concat(valueFields.map(n => n.source));
+                var colArr = this.dataViewTable.columns.slice(0);
                 var data : ILineUpVisualRow[] = [];
                 var selectedIds = this.selectionManager.getSelectionIds();
-                categoryField.values.forEach((categoryValue, catIdx) => {
-                    var identity = categoryField.identity[catIdx];
+                this.dataViewTable.rows.forEach((row, rowIndex) => {
+                    var identity = this.dataView.categorical.categories[0].identity[rowIndex];
                     var newId = SelectionId.createWithId(identity);
-                    var dataItem : ILineUpVisualRow = {
+                    // The below is busted > 100
+                    //var identity = SelectionId.createWithId(this.dataViewTable.identity[rowIndex]);
+                    var result : ILineUpVisualRow = {
                         identity: newId,
                         filterExpr: identity.expr,
                         selected: !!_.find(selectedIds, (id : SelectionId) => id.equals(newId))
                     };
-                    dataItem[categoryField.source.displayName] = categoryValue;
-                    valueFields.forEach((v) => {
-                        dataItem[v.source.displayName] = v.values[catIdx];
+                    row.forEach((colInRow, i) => {
+                        result[colArr[i].displayName] = colInRow;
                     });
-
-                    data.push(dataItem);
+                    data.push(result);
                 });
 
                 this.loadData(colArr, data);
@@ -253,21 +246,24 @@ module powerbi.visuals {
         private deriveDesc(columns: DataViewMetadataColumn[], data : ILineUpVisualRow[], separator? : string) {
             var cols = columns.map((col) => {
                 var r: any = {
-                    column: col.displayName,
+                    column: col,
                     type: 'string'
                 };
                 if (/*this.isNumeric(data[0][col])*/ col.type.numeric) {
                     r.type = 'number';
                     r.domain = d3.extent(data, (row) => row[col.displayName] && row[col.displayName].length === 0 ? undefined : +(row[col.displayName]));
-                } else if (col.roles["Category"]) {
-                    r.type = 'categorical';
-                    r.categories = d3.set(data.map((row) => row[col.displayName])).values().sort();
+                } else {
+                    var sset = d3.set(data.map((row) => row[col.displayName]));
+                    if (sset.size() <= Math.max(20, data.length * 0.2)) { //at most 20 percent unique values
+                        r.type = 'categorical';
+                        r.categories = sset.values().sort();
+                    }
                 }
                 return r;
             });
             return {
                 separator: separator,
-                primaryKey: columns[0].displayName,
+                primaryKey: columns[0],
                 columns: cols
             };
         }
