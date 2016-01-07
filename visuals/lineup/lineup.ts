@@ -2693,6 +2693,12 @@ module powerbi.visuals.lineup {
         .attr('x', function (d) {
             return d.offsetX;
         })
+        .attr({
+            // Added this fix to for updated text rows, they weren't getting updated clip paths
+            'clip-path': function (d) {
+                return d.clip;
+            }
+        })
         .text(function (d) {
             return d.label;
         });

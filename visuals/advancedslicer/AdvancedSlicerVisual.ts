@@ -9,7 +9,11 @@ module powerbi.visuals {
         private template = `
             <div id='slicer-list'>
               <input class="search" placeholder="Search" />
-              <div class="list" style="margin-top:5px;overflow:hidden;overflow-y:auto"></div>
+              <div style="margin:0;padding:0;margin-top:5px;">
+                <label style="vertical-align:middle"><input class="check-all" type="checkbox" style="margin-right:5px;vertical-align:middle"/>&nbsp;Select All</label>
+              </div>
+              <hr/>
+              <div class="list" style="overflow:hidden;overflow-y:auto"></div>
               <div class='load-spinner' style='transform:scale(0.6);'><div>
             </div>
         `.trim().replace(/\n/g, '');
@@ -44,6 +48,11 @@ module powerbi.visuals {
         private listEle: JQuery;
 
         /**
+         * The check all button
+         */
+        private checkAllButton: JQuery;
+
+        /**
          * The reference to the list.js instance
          */
         private myList: any;
@@ -66,7 +75,7 @@ module powerbi.visuals {
         /**
          * The current set of data
          */
-        private _data: any[];
+        private _data: ListItem[];
 
         /**
          * The selection manager
@@ -155,6 +164,7 @@ module powerbi.visuals {
             // These two are here because the devtools call init more than once
             this.loadingMoreData = true;
             this._data = [];
+            this.checkAllButton = this.element.find(".check-all").on("click", () => this.toggleSelectAll());
         }
 
         /**
@@ -201,6 +211,8 @@ module powerbi.visuals {
                 });
 
                 this._data = newData;
+
+                this.updateSelectAllButtonState();
 
                 var searchString = this.element.find(".search").val();
                 if (searchString) {
@@ -276,6 +288,31 @@ module powerbi.visuals {
         }
 
         /**
+         * Toggle the select all state
+         */
+        private toggleSelectAll() {
+            var checked = this.checkAllButton.prop('checked');
+            this.selectionManager.clear();
+            if (!!checked) {
+                this._data.forEach((n) => {
+                    this.selectionManager.select(n.identity, true);
+                });
+            }
+            this.updateSelectionFilter();
+            this.element.find(".item input").prop('checked', checked);
+            this.checkAllButton.prop('indeterminate', false);
+        }
+
+        /**
+         * Updates the select all button state to match the data
+         */
+        private updateSelectAllButtonState() {
+            var selectedIds = this.selectionManager.getSelectionIds();
+            this.checkAllButton.prop('indeterminate', selectedIds.length > 0 && this._data.length !== selectedIds.length);
+            this.checkAllButton.prop('checked', this.selectionManager.getSelectionIds().length > 0);
+        }
+
+        /**
          * Attaches all the necessary events
          */
         private attachEvents() {
@@ -288,6 +325,7 @@ module powerbi.visuals {
                 if (ele.length > 0 && target.attr("type") === "checkbox") {
                     this.selectionManager.select(ele.data("item")['identity'], true);
                     this.updateSelectionFilter();
+                    this.updateSelectAllButtonState();
                 }
                 evt.stopImmediatePropagation();
                 evt.stopPropagation();
