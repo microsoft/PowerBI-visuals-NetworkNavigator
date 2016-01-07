@@ -15,23 +15,73 @@ module powerbi.visuals {
         private isMultiSelection : boolean;
         private selectionManager : utility.SelectionManager;
 
-        private static DEFAULT_SETTINGS : LineUpVisualSettings = {
+        /**
+         * Represents the settings
+         */
+        private static DEFAULT_SETTINGS : ILineUpVisualSettings = {
             selection: {
-                singleSelect: true,
-                multiSelect: false
+                displayName: "Selection",
+                properties: {
+                    singleSelect: {
+                        displayName: "Single Select",
+                        description: "If true, when a row is selected, other data is filtered",
+                        type: { bool: true },
+                        value: true
+                    },
+                    multiSelect: {
+                        displayName: "Multi Select",
+                        description: "If true, multiple rows can be selected",
+                        type: { bool: true },
+                        value: true
+                    }
+                }
+            },
+            data: {
+                displayName: "Data",
+                properties: {
+                    inferColumnTypes: {
+                        displayName: "Infer Column Types",
+                        description: "Infer the coulmn types from the data, vs using the PowerBI defined column types",
+                        type: { bool: true },
+                        value: false
+                    }
+                }
             },
             presentation: {
-                values: false,
-                stacked: true,
-                histograms: true,
-                animation: true
+                displayName: "Presentation",
+                properties: {
+                    stacked: {
+                        displayName: "Stacked",
+                        description: "If true, when columns are combined, the all columns will be displayed stacked",
+                        type: { bool: true },
+                        value: true,
+                    },
+                    values: {
+                        displayName: "Values",
+                        description: "If the actual values should be displayed under the bars",
+                        type: { bool: true },
+                        value: false,
+                    },
+                    histograms: {
+                        displayName: "Histograms",
+                        description: "Show histograms in the column headers",
+                        type: { bool: true },
+                        value: true,
+                    },
+                    animation: {
+                        displayName: "Animation",
+                        description: "Should the grid be animated when sorting",
+                        type: { bool: true },
+                        value: true,
+                    }
+                },
             }
         };
 
         /**
          * The current set of settings
          */
-        private settings : LineUpVisualSettings = $.extend(true, {}, LineUpVisual.DEFAULT_SETTINGS);
+        private settings : ILineUpVisualSettings = $.extend(true, {}, LineUpVisual.DEFAULT_SETTINGS);
 
         /**
          * The set of capabilities for the visual
@@ -50,7 +100,7 @@ module powerbi.visuals {
                     rowCount: { preferred: { min: 1 } }
                 }
             }],
-            objects: {
+            objects: $.extend({
                 general: {
                     displayName: data.createDisplayNameGetter('Visual_General'),
                     properties: {
@@ -74,48 +124,8 @@ module powerbi.visuals {
                             }
                         },
                     },
-                },
-                selection: {
-                    displayName: "Selection",
-                    properties: {
-                        singleSelect: {
-                            displayName: "Single Select",
-                            description: "If true, when a row is selected, other data is filtered",
-                            type: { bool: true }
-                        },
-                        multiSelect: {
-                            displayName: "Multi Select",
-                            description: "If true, multiple rows can be selected",
-                            type: { bool: true }
-                        }
-                    },
-                },
-                presentation: {
-                    displayName: "Presentation",
-                    properties: {
-                        stacked: {
-                            displayName: "Stacked",
-                            description: "If true, when columns are combined, the all columns will be displayed stacked",
-                            type: { bool: true }
-                        },
-                        values: {
-                            displayName: "Values",
-                            description: "If the actual values should be displayed under the bars",
-                            type: { bool: true }
-                        },
-                        histograms: {
-                            displayName: "Histograms",
-                            description: "Show histograms in the column headers",
-                            type: { bool: true }
-                        },
-                        animation: {
-                            displayName: "Animation",
-                            description: "Should the grid be animated when sorting",
-                            type: { bool: true }
-                        }
-                    },
                 }
-            }
+            }, <any>LineUpVisual.DEFAULT_SETTINGS)
         };
 
         /**
@@ -142,7 +152,7 @@ module powerbi.visuals {
                 }
             },
             interaction: {
-                multiselect: (evt) => this.settings.selection.multiSelect
+                multiselect: (evt) => this.settings.selection.properties.multiSelect.value
             }
         };
 
@@ -183,14 +193,32 @@ module powerbi.visuals {
         public update(options: VisualUpdateOptions) {
             super.update(options);
 
+            var forceReloadLineup = false;
             this.dataView = options.dataViews[0];
             this.dataViewTable = this.dataView && this.dataView.table;
             if (this.dataViewTable) {
-                // Copy over new presentation values
-                if (this.dataView.metadata.objects) {
-                    $.extend(true, this.settings, this.dataView.metadata.objects);
-                } else {
-                    $.extend(true, this.settings, LineUpVisual.DEFAULT_SETTINGS);
+
+                // Store this to compare
+                var oldSettings : ILineUpVisualSettings = $.extend(true, {}, this.settings);
+
+                // Make sure we have the default values
+                $.extend(true, this.settings, LineUpVisual.DEFAULT_SETTINGS);
+
+                // Copy over new values
+                var newObjs = this.dataView.metadata.objects;
+                if (newObjs) {
+                    for (var section in newObjs) {
+                        var values = newObjs[section];
+                        for (var prop in values) {
+                            this.settings[section].properties[prop].value = values[prop];
+                        }
+                    }
+                }
+
+                // If the infer types setting has changed
+                if (oldSettings.data.properties.inferColumnTypes.value !==
+                    this.settings.data.properties.inferColumnTypes.value) {
+                    forceReloadLineup = true;
                 }
 
                 var colArr = this.dataViewTable.columns.slice(0);
@@ -212,7 +240,7 @@ module powerbi.visuals {
                     data.push(result);
                 });
 
-                this.loadData(colArr, data);
+                this.loadData(colArr, data, forceReloadLineup);
                 this.loadingMoreData = false;
             }
         }
@@ -221,10 +249,15 @@ module powerbi.visuals {
          * Enumerates the instances for the objects that appear in the power bi panel
          */
         public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
+            var outProps : { [name: string] : boolean; } = {};
+            var inProps = (this.settings[options.objectName] && this.settings[options.objectName].properties) || {};
+            for (var key in inProps) {
+                outProps[key] = inProps[key].value;
+            }
             return [{
                 selector: null,
                 objectName: options.objectName,
-                properties: $.extend({}, this.settings[options.objectName])
+                properties: outProps
             }];
         }
 
@@ -249,10 +282,35 @@ module powerbi.visuals {
                     column: col.displayName,
                     type: 'string'
                 };
-                if (/*this.isNumeric(data[0][col])*/ col.type.numeric) {
-                    r.type = 'number';
-                    r.domain = d3.extent(data, (row) => row[col.displayName] && row[col.displayName].length === 0 ? undefined : +(row[col.displayName]));
+                if (this.settings.data.properties.inferColumnTypes.value) {
+                    var allNumeric = true;
+                    var minMax = { min: Number.MAX_VALUE, max: 0 };
+                    for (var i = 0; i < data.length; i++) {
+                        var value = data[i][r.column];
+                        if (value !== 0 && !!value && !this.isNumeric(value)) {
+                            allNumeric = false;
+                            break;
+                        } else {
+                            if (+value > minMax.max) {
+                                minMax.max = value;
+                            } else if (+value < minMax.min) {
+                                minMax.min = +value;
+                            }
+                        }
+                    }
+                    if (allNumeric) {
+                        r.type = 'number';
+                        r.domain = [minMax.min, minMax.max];
+                    }
                 } else {
+                    if (col.type.numeric) {
+                        r.type = 'number';
+                        r.domain = d3.extent(data, (row) => row[col.displayName] && row[col.displayName].length === 0 ? undefined : +(row[col.displayName]));
+                    }
+                }
+
+                // If is a string, try to see if it is a category
+                if (r.type === 'string') {
                     var sset = d3.set(data.map((row) => row[col.displayName]));
                     if (sset.size() <= Math.max(20, data.length * 0.2)) { //at most 20 percent unique values
                         r.type = 'categorical';
@@ -271,28 +329,30 @@ module powerbi.visuals {
         /**
          * Loads the data into the lineup view
          */
-        private loadData(columns: DataViewMetadataColumn[], rows : ILineUpVisualRow[]) {
+        private loadData(columns: DataViewMetadataColumn[], rows : ILineUpVisualRow[], force : boolean = false) {
             //derive a description file
             var desc = this.deriveDesc(columns, rows);
             var name = 'data';
-            this.loadDataImpl(name, desc, rows);
+            this.loadDataImpl(name, desc, rows, force);
         }
 
         /**
          * Loads the data into the lineup view
          */
-        private loadDataImpl(name: string, desc, _data : ILineUpVisualRow[]) {
+        private loadDataImpl(name: string, desc, _data : ILineUpVisualRow[], force : boolean = false) {
 
             // Update the rendering options
             if (this.lineup) {
-                for (var key in this.settings.presentation) {
-                    if (this.settings.presentation.hasOwnProperty(key)) {
-                        this.lineup.changeRenderingOption(key, this.settings.presentation[key]);
+                var presProps = this.settings.presentation.properties;
+                for (var key in presProps) {
+                    if (presProps.hasOwnProperty(key)) {
+                        this.lineup.changeRenderingOption(key, presProps[key].value);
                     }
                 }
             }
 
-            if (!this.lineup || Utils.hasDataChanged(this.lineup.storage.getData(), _data)) {
+            /* Only reload lineup if we are forced to, if we haven't loaded lineup in the first place, or if the data has changed */
+            if (force || !this.lineup || Utils.hasDataChanged(this.lineup.storage.getData(), _data)) {
                 var spec: any = {};
                 spec.name = name;
                 spec.dataspec = desc;
@@ -319,8 +379,8 @@ module powerbi.visuals {
 
             this.lineup.select(_data.filter((n) => n.selected));
 
-            var singleSelect = this.settings.selection.singleSelect;
-            var multiSelect = this.settings.selection.multiSelect;
+            var singleSelect = this.settings.selection.properties.singleSelect.value;
+            var multiSelect = this.settings.selection.properties.multiSelect.value;
             this.selectionEnabled = singleSelect || multiSelect;
 
             this.isMultiSelection = multiSelect;
@@ -417,18 +477,48 @@ module powerbi.visuals {
     }
 
     /**
+     * Represents a setting with a value
+     */
+    interface IVisualBaseSettingWithValue<T> extends powerbi.data.DataViewObjectPropertyDescriptor {
+        value?: T;
+    }
+
+    /**
      * Represents the settings for this visual
      */
-    interface LineUpVisualSettings {
-        selection: {
-            singleSelect?: boolean;
-            multiSelect?: boolean;
+    interface ILineUpVisualSettings /* extends powerbi.data.DataViewObjectDescriptor */ {
+        selection?: {
+            displayName?: string;
+            properties?: {
+                singleSelect?: IVisualBaseSettingWithValue<boolean>;
+                multiSelect?: IVisualBaseSettingWithValue<boolean>;
+                [propName2 : string] : IVisualBaseSettingWithValue<boolean>;
+            }
         };
-        presentation: {
-            values?: boolean;
-            stacked?: boolean;
-            histograms?: boolean;
-            animation?: boolean;
+        data?: {
+            displayName?: string;
+            properties?: {
+                inferColumnTypes?: IVisualBaseSettingWithValue<boolean>;
+                [propName2 : string] : IVisualBaseSettingWithValue<boolean>;
+            }
+        };
+        presentation?: {
+            displayName?: string;
+            properties?: {
+                values?: IVisualBaseSettingWithValue<boolean>;
+                stacked?: IVisualBaseSettingWithValue<boolean>;
+                histograms?: IVisualBaseSettingWithValue<boolean>;
+                animation?: IVisualBaseSettingWithValue<boolean>;
+                [propName2 : string] : IVisualBaseSettingWithValue<boolean>;
+            }
+        };
+
+        // For ease of lookup
+        [propName : string ] : {
+            displayName?: string;
+            properties?: {
+                [propName2 : string] : IVisualBaseSettingWithValue<any>;
+            }
         };
     }
  }
