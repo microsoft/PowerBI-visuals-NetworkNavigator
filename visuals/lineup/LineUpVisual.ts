@@ -210,7 +210,11 @@ module powerbi.visuals {
                     for (var section in newObjs) {
                         var values = newObjs[section];
                         for (var prop in values) {
-                            this.settings[section].properties[prop].value = values[prop];
+                            // Only save properties that we know about.
+                            if (this.settings[section] &&
+                                this.settings[section].properties[prop]) {
+                                this.settings[section].properties[prop].value = values[prop];
+                            }
                         }
                     }
                 }
