@@ -246,7 +246,7 @@ module powerbi.visuals {
         private deriveDesc(columns: DataViewMetadataColumn[], data : ILineUpVisualRow[], separator? : string) {
             var cols = columns.map((col) => {
                 var r: any = {
-                    column: col,
+                    column: col.displayName,
                     type: 'string'
                 };
                 if (/*this.isNumeric(data[0][col])*/ col.type.numeric) {
@@ -263,7 +263,7 @@ module powerbi.visuals {
             });
             return {
                 separator: separator,
-                primaryKey: columns[0],
+                primaryKey: columns[0].displayName,
                 columns: cols
             };
         }
