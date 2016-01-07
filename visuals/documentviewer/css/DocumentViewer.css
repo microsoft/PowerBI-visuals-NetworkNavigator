@@ -2,7 +2,7 @@ body, html {
     overflow: hidden;
     padding: 0;
     margin: 0;
-    font-family: 'Segoe UI Semibold',wf_segoe-ui_semibold,helvetica,arial,sans-serif;
+    font-family: 'Segoe UI',wf_segoe-ui_normal,helvetica,arial,sans-serif;
     font-size: 12px;
 }
 
