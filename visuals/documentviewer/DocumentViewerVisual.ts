@@ -88,7 +88,7 @@ module powerbi.visuals {
 
                                 var contents = newEle.find('.contents');
                                 if (item.type.html) {
-                                    contents.append(`<div>${DOMPurify.sanitize(item.value)}</div>`);
+                                    contents.append(`<div>${DOMPurify.sanitize(item.value, { SAFE_FOR_JQUERY: true })}</div>`);
                                 } else {
                                     contents.text(item.value);
                                 }
