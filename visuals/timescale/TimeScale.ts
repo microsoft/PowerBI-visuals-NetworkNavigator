@@ -32,11 +32,6 @@ class TimeScale {
     private _dimensions : { width: number; height: number; } = { width: 500, height: 500 };
     private _eventEmitter = new EventEmitter();
     private _data : TimeScaleDataItem[];
-    private config: {
-        continuous: boolean; // Should the chart be rendered in a continuous fashion, ie value[0] connects to value[1]
-    } = {
-        continuous: true
-    };
 
     /**
      * Constructor for the timescale
@@ -64,30 +59,9 @@ class TimeScale {
      * Setter for the data
      */
     public set data(data: TimeScaleDataItem[]) {
+        this._data = data;
         this.x.domain(d3.extent(data.map((d) => d.date)));
         this.y.domain([0, d3.max(data.map((d) => d.value))]);
-        var timeScaleData = data;
-
-        if (this.config.continuous) {
-            var tempData = data.sort((i, j) => i.date.getTime() - j.date.getTime()).slice(0);
-            timeScaleData = this.x.ticks(this.x.range()[1]).map((n) => {
-                var value = 0;
-                while (tempData.length && tempData[0].date < n) {
-                    value = tempData.splice(0, 1)[0].value;
-                }
-                return {
-                    date: n,
-                    value: value
-                };
-            });
-            if (tempData.length) {
-                timeScaleData[timeScaleData.length - 1].value = tempData[0].value;
-            }
-        }
-
-        this.timeScalePath
-            .datum(timeScaleData)
-            .attr("d", this.area);
         this.resizeElements();
     }
 
@@ -129,16 +103,12 @@ class TimeScale {
         }
     }
 
+    private bars : D3.Selection;
+
     /**
      * Builds the initial timescale
      */
     private buildTimeScale() {
-        this.area = d3.svg.area()
-            .interpolate("monotone")
-            .x((d) => this.x(d.date))
-            .y0(this._dimensions.height)
-            .y1((d) => this.y(d.value));
-
         this.svg = d3.select(this.element[0]).append("svg");
 
         this.clip = this.svg.append("defs").append("clipPath")
@@ -148,9 +118,9 @@ class TimeScale {
         this.context = this.svg.append("g")
             .attr("class", "context");
 
-        this.timeScalePath =
-            this.context.append("path")
-            .attr("class", "area");
+        this.bars = this.context.append("g")
+            .attr("class", "bars")
+            .style("fill", "rgba(0,100,200,.5)");
 
         this.xAxis = this.context.append("g")
             .attr("class", "x axis");
@@ -172,12 +142,27 @@ class TimeScale {
             height = this._dimensions.height - margin.top - margin.bottom;
 
         this.x.range([0, width])
-        this.y.range([height, 0]);
+        this.y.range([0, height]);
 
-        this.area = d3.svg.area()
-            .x((d) => this.x(d.date))
-            .y0(height)
-            .y1((d) => this.y(d.value));
+        if (this.bars && this._data) {
+            var tmp = this.bars
+                .selectAll("rect")
+                    .data(this._data);
+            tmp
+                .enter().append("rect");
+
+            tmp
+                .attr("transform", (d, i) => {
+                    var rectHeight = this.y(d.value);
+                    return  `translate(${this.x(d.date)},${height - rectHeight})`;
+                })
+                .style({ "width": 2 })
+                .style("height", (d) => {
+                    return this.y(d.value);
+                });
+
+            tmp.exit().remove();
+        }
 
         this.svg
             .attr("width", width + margin.left + margin.right)
