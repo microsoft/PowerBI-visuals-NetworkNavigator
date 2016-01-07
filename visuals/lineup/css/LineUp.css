@@ -252,7 +252,6 @@
     z-index: 3;
 
     font-family: 'Lato', Helvetica, Arial;
-    font-size: 9pt;
     text-align: left;
 
     padding: 2px;
@@ -260,6 +259,7 @@
 .lu-tooltip table {
     width: 100%;
     border-collapse: collapse;
+    font-size: 1em;
 }
 .lu-tooltip tbody th{
     width: 100px;
