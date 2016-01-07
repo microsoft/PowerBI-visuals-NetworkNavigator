@@ -32,6 +32,11 @@ class TimeScale {
     private _dimensions : { width: number; height: number; } = { width: 500, height: 500 };
     private _eventEmitter = new EventEmitter();
     private _data : TimeScaleDataItem[];
+    private config: {
+        continuous: boolean; // Should the chart be rendered in a continuous fashion, ie value[0] connects to value[1]
+    } = {
+        continuous: true
+    };
 
     /**
      * Constructor for the timescale
@@ -61,8 +66,27 @@ class TimeScale {
     public set data(data: TimeScaleDataItem[]) {
         this.x.domain(d3.extent(data.map((d) => d.date)));
         this.y.domain([0, d3.max(data.map((d) => d.value))]);
+        var timeScaleData = data;
+
+        if (this.config.continuous) {
+            var tempData = data.sort((i, j) => i.date.getTime() - j.date.getTime()).slice(0);
+            timeScaleData = this.x.ticks(this.x.range()[1]).map((n) => {
+                var value = 0;
+                while (tempData.length && tempData[0].date < n) {
+                    value = tempData.splice(0, 1)[0].value;
+                }
+                return {
+                    date: n,
+                    value: value
+                };
+            });
+            if (tempData.length) {
+                timeScaleData[timeScaleData.length - 1].value = tempData[0].value;
+            }
+        }
+
         this.timeScalePath
-            .datum(data)
+            .datum(timeScaleData)
             .attr("d", this.area);
         this.resizeElements();
     }
