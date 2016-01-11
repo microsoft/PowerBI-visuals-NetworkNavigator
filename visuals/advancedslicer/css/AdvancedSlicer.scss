@@ -166,29 +166,35 @@
     display: block;
 }
 
+.boxsized {
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+
 .category-container {
-    width: -moz-calc(100% - 15px);
-    width: -webkit-calc(100% - 15px);
-    width: calc(100% - 15px);
+    @extend .boxsized;
+    width: 100%;
+    padding-right: 15px;
     margin-right: 10px;
 }
 
 .value-container {
-    width: -moz-calc(100% - 25px);
-    width: -webkit-calc(100% - 25px);
-    width: calc(100% - 25px);
+    @extend .boxsized;
+    width: 100%;
+    padding-right: 25px;
     display: none;
 }
 
 .has-values .category-container {
-    width: -moz-calc(50% - 15px);
-    width: -webkit-calc(50% - 15px);
-    width: calc(50% - 15px);
+    @extend .boxsized;
+    width: 50%;
+    padding-right: 15px;
 }
 .has-values .value-container {
-    width: -moz-calc(50% - 25px);
-    width: -webkit-calc(50% - 25px);
-    width: calc(50% - 25px);
+    @extend .boxsized;
+    width: 50%;
+    padding-right: 25px;
     display: inline-block;
 }
 
