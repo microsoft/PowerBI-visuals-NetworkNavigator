@@ -13,9 +13,34 @@ function Mixin(ctor: any) {
 }
 
 /**
+ * Registers a visual in the power bi system
+ */
+export function Visual(config) {
+    return function(ctor: any) {
+        (function (powerbi) {
+            var visuals;
+            (function (visuals) {
+                var plugins;
+                (function (plugins) {
+                    var name = config.mainVisual + config.projectId;
+                    plugins[name] = {
+                        name: name,
+                        class: name,
+                        capabilities: ctor.capabilities,
+                        custom: true,
+                        create: function () { return new ctor(); }
+                    };
+                })(plugins = visuals.plugins || (visuals.plugins = {}));
+            })(visuals = powerbi.visuals || (powerbi.visuals = {}));
+        })(window['powerbi'] || (window['powerbi'] = {}));
+    };
+}
+
+
+/**
  * A collection of utils
  */
-class Utils {
+export default class Utils {
 
     /**
      * Returns if there is any more or less data in the new data

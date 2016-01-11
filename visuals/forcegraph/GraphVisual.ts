@@ -1,421 +1,445 @@
 /// <reference path="../../base/references.d.ts"/>
-/// <reference path="./ForceGraph.ts"/>
+import { default as ForceGraph, IForceGraphData, IForceGraphLink, IForceGraphNode } from "./ForceGraph";
+import { ExternalCssResource, VisualBase } from "../../base/VisualBase";
+import { default as Utils, Visual } from "../../base/Utils";
+import IVisual = powerbi.IVisual;
+import DataViewTable = powerbi.DataViewTable;
+import IVisualHostServices = powerbi.IVisualHostServices;
+import VisualCapabilities = powerbi.VisualCapabilities;
+import VisualInitOptions = powerbi.VisualInitOptions;
+import VisualUpdateOptions = powerbi.VisualUpdateOptions;
+import IInteractivityService = powerbi.visuals.IInteractivityService;
+import InteractivityService = powerbi.visuals.InteractivityService;
+import DataViewMetadataColumn = powerbi.DataViewMetadataColumn;
+import VisualObjectInstance = powerbi.VisualObjectInstance;
+import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
+import DataView = powerbi.DataView;
+import SelectionId = powerbi.visuals.SelectionId;
+import SelectionManager = powerbi.visuals.utility.SelectionManager;
+import VisualDataRoleKind = powerbi.VisualDataRoleKind;
+import utility = powerbi.visuals.utility;
 
 declare var _;
 
-module powerbi.visuals {
-    export class GraphVisual extends VisualBase implements IVisual {
-        private dataViewTable: DataViewTable;
-        private myGraph: ForceGraph;
-        private _selectedNode : IForceGraphNode;
-        private host : IVisualHostServices;
-        private interactivityService : IInteractivityService;
+@Visual(JSON.parse(require("./visualconfig.json")))
+export default class GraphVisual extends VisualBase implements IVisual {
+    private dataViewTable: DataViewTable;
+    private myGraph: ForceGraph;
+    private _selectedNode : IForceGraphNode;
+    private host : IVisualHostServices;
+    private interactivityService : IInteractivityService;
 
-        private listener : { destroy: Function; };
-
-        /**
-         * The selection manager
-         */
-        private selectionManager: utility.SelectionManager;
-
-        private static DEFAULT_SETTINGS: GraphVisualSettings = {
-            columnMappings: {
-                source: "source",
-                target: "target",
-                edgeValue: "value",
-                sourceColor: "sourceColor",
-                targetColor: "targetColor",
-                sourceGroup: "sourceGroup",
-                targetGroup: "targetGroup"
-            },
-            layout: {
-                linkDistance: 10,
-                linkStrength: 2,
-                gravity: .1,
-                charge: -120,
-                labels: false,
-                minZoom: .1,
-                maxZoom: 100
-            }
-        };
-
-        public static capabilities: VisualCapabilities = {
-            dataRoles: [{
-                name: "Edges",
-                displayName: "Edges",
-                kind: powerbi.VisualDataRoleKind.GroupingOrMeasure,
-            }],
-            dataViewMappings: [{
-                table: {
-                    rows: {
-                        for: { in: "Edges" }
-                    }
-                }
-            }],
-            objects: {
-                general: {
-                    displayName: data.createDisplayNameGetter('Visual_General'),
-                    properties: {
-                        filter: {
-                            type: { filter: {} },
-                            rule: {
-                                output: {
-                                    property: 'selected',
-                                    selector: ['Values'],
-                                }
-                            }
-                        },
-                    },
-                },
-                columnMappings: {
-                    displayName: "Column Bindings",
-                    properties: {
-                        source: {
-                            displayName: "Source Column",
-                            type: { text: true }
-                        },
-                        target: {
-                            displayName: "Target Column",
-                            type: { text: true }
-                        },
-                        edgeValue: {
-                            displayName: "Edge Weight Column",
-                            type: { text: true }
-                        },
-                        sourceColor: {
-                            displayName: "Source Node Color Column",
-                            type: { text: true }
-                        },
-                        targetColor: {
-                            displayName: "Target Node Color Column",
-                            type: { text: true }
-                        }
-                    },
-                },
-                layout: {
-                    displayName: "Layout",
-                    properties: {
-                        linkDistance: {
-                            displayName: "Link Distance",
-                            type: { numeric: true }
-                        },
-                        linkStrength: {
-                            displayName: "Link Strength",
-                            type: { numeric: true }
-                        },
-                        gravity: {
-                            displayName: "Gravity",
-                            type: { numeric: true }
-                        },
-                        charge: {
-                            displayName: "Charge",
-                            type: { numeric: true }
-                        },
-                        labels: {
-                            displayName: "Labels",
-                            description: "If labels on the nodes should be shown",
-                            type: { bool: true }
-                        },
-                        minZoom: {
-                            displayName: "Min Zoom",
-                            type: { numeric: true }
-                        },
-                        maxZoom: {
-                            displayName: "Max Zoom",
-                            type: { numeric: true }
-                        }
-                    }
-                }
-            }
-        };
-
-        private settings: GraphVisualSettings = $.extend(true, {}, GraphVisual.DEFAULT_SETTINGS);
-
-        // private template : string = `
-        //     <div class="load-container load5">
-        //         <div class="loader">Loading...</div>
-        //     </div>`;
-        private template: string = `
-            <div id="node_graph" style= "height: 100%;"> </div>
-        `;
-
-        /** This is called once when the visual is initialially created */
-        public init(options: VisualInitOptions): void {
-            super.init(options, this.template);
-            this.element.append(this.template);
-            this.myGraph = new ForceGraph(this.element.find("#node_graph"), 500, 500);
-            this.host = options.host;
-            this.interactivityService = new InteractivityService(this.host);
-            this.attachEvents();
-            this.selectionManager = new visuals.utility.SelectionManager({ hostServices: this.host });
-        }
-
-        /** Update is called for data updates, resizes & formatting changes */
-        public update(options: VisualUpdateOptions) {
-            super.update(options);
-
-            var dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
-            var dataViewTable = dataView && dataView.table;
-            var forceDataReload = this.updateSettings(options);
-
-            if (dataViewTable) {
-                if ((forceDataReload || this.hasDataChanged(this.dataViewTable, dataViewTable))) {
-                    var parsedData = GraphVisual.converter(dataView, this.settings);
-                    this.myGraph.setData(parsedData);
-                }
-                var selectedIds = this.selectionManager.getSelectionIds();
-                var data = this.myGraph.getData();
-                if (data && data.nodes && data.nodes.length) {
-                    var updated = false;
-                    data.nodes.forEach((n) => {
-                        var isSelected = !!_.find(selectedIds, (id : SelectionId) => id.equals((<ForceGraphSelectableNode>n).identity));
-                        if (isSelected !== n.selected) {
-                            n.selected = isSelected;
-                            updated = true;
-                        }
-                    });
-
-                    if (updated) {
-                        this.myGraph.redrawSelection();
-                    }
-                }
-            }
-
-
-            this.dataViewTable = dataViewTable;
-
-            var currentDimensions = this.myGraph.dimensions;
-            if (currentDimensions.width !== options.viewport.width ||
-                currentDimensions.height !== options.viewport.height) {
-                this.myGraph.dimensions = { width: options.viewport.width, height: options.viewport.height };
-                this.element.css({ width: options.viewport.width, height: options.viewport.height });
-            }
-        }
-
-        /**
-         * Enumerates the instances for the objects that appear in the power bi panel
-         */
-        public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
-            return [{
-                selector: null,
-                objectName: options.objectName,
-                properties: $.extend(true, {}, this.settings[options.objectName])
-            }];
-        }
-
-        /**
-         * Converts the data view into an internal data structure
-         */
-        public static converter(dataView: DataView, settings: GraphVisualSettings): IForceGraphData<ForceGraphSelectableNode> {
-            var nodeList = [];
-            var nodeMap : { [name: string] : ForceGraphSelectableNode } = {};
-            var linkList = [];
-            var table = dataView.table;
-
-            var colMap = {};
-            table.columns.forEach((n, i) => {
-                colMap[n.displayName.toLocaleLowerCase()] = i;
-            });
-
-            // group defines the bundle basically
-            // name, user friendly name,
-            // num, size of circle, probably meant to be the number of matches
-            // source - array index into nodes
-            // target - array index into node
-            // value - The number of times that the link has been made, ie, I emailed bob@gmail.com 10 times, so value would be 10
-
-            var sourceIdx = colMap[settings.columnMappings.source.toLocaleLowerCase()];
-            var sourceColorIdx = colMap[settings.columnMappings.sourceColor.toLocaleLowerCase()];
-            var sourceGroup = colMap[settings.columnMappings.sourceGroup.toLocaleLowerCase()];
-            var targetGroupIdx = colMap[settings.columnMappings.targetGroup.toLocaleLowerCase()];
-            var targetColorIdx = colMap[settings.columnMappings.targetColor.toLocaleLowerCase()];
-            var targetIdx = colMap[settings.columnMappings.target.toLocaleLowerCase()];
-            var edgeValueIdx = colMap[settings.columnMappings.edgeValue.toLocaleLowerCase()];
-
-            var sourceField = dataView.categorical.categories[0].identityFields[sourceIdx];
-            var targetField = dataView.categorical.categories[0].identityFields[targetIdx];
-
-            function getNode(id: string, identity: DataViewScopeIdentity, isSource: boolean, color: string = "gray", group: number = 0) : ForceGraphSelectableNode {
-                var node = nodeMap[id];
-                // var expr = identity.expr;
-                var expr = powerbi.data.SQExprBuilder.equal(isSource ? sourceField : targetField, powerbi.data.SQExprBuilder.text(id));
-
-                if (!nodeMap[id]) {
-                    node = nodeMap[id] = {
-                        name: id,
-                        color: color || "gray",
-                        index: nodeList.length,
-                        filterExpr: expr,
-                        num: 1,
-                        selected: false,
-                        identity: SelectionId.createWithId(data.createDataViewScopeIdentity(expr))
-                    };
-                    nodeList.push(node);
-                }
-                return node;
-            }
-
-            table.rows.forEach((row, idx) => {
-                var identity = table.identity[idx];
-                if (row[sourceIdx] && row[targetIdx]) {
-                    /** These need to be strings to work properly */
-                    var sourceId = row[sourceIdx] + "";
-                    var targetId = row[targetIdx] + "";
-                    var edge = {
-                        source: getNode(sourceId, identity, true, row[sourceColorIdx], row[sourceGroup]).index,
-                        target: getNode(targetId, identity, false, row[targetColorIdx], row[targetGroupIdx]).index,
-                        value: row[edgeValueIdx]
-                    };
-                    nodeList[edge.source].num += 1;
-                    nodeList[edge.target].num += 1;
-                    linkList.push(edge);
-                }
-            });
-
-            return {
-                nodes: nodeList,
-                links: linkList
-            };
-        }
-
-        /**
-         * Handles updating of the settings
-         */
-        private updateSettings (options: VisualUpdateOptions) : boolean {
-            // There are some changes to the options
-            var dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
-            if (dataView && dataView.metadata) {
-                var oldSettings = $.extend(true, {}, this.settings);
-                var newObjects = dataView.metadata.objects;
-
-                // Merge in the settings
-                $.extend(true, this.settings, newObjects ? newObjects : GraphVisual.DEFAULT_SETTINGS);
-
-                // There were some changes to the layout
-                if (!_.isEqual(oldSettings.layout, this.settings.layout)) {
-                    this.myGraph.configuration = $.extend(true, {}, this.settings.layout);
-                }
-
-                if (!_.isEqual(oldSettings.columnMappings, this.settings.columnMappings)) {
-                    // This is necessary because some of the settings affect how the data is loaded
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /**
-         * Returns if all the properties in the first object are present and equal to the ones in the super set
-         */
-        private objectIsSubset(set, superSet) {
-            if (_.isObject(set)) {
-                return _.any(_.keys(set), (key) => !this.objectIsSubset(set[key], superSet[key]));
-            }
-            return set === superSet;
-        }
-
-        /**
-         * Determines if the old data is different from the new data.
-         */
-        private hasDataChanged(oldData: DataViewTable, newData: DataViewTable): boolean {
-            if (!oldData || !newData || oldData.rows.length !== newData.rows.length) {
-                return true;
-            }
-
-            // If there are any elements in newdata that arent in the old data
-            return _.any(newData.identity, n => !_.any(oldData.identity, m => m.key.indexOf(n.key) === 0));
-        }
-
-        /**
-         * Attaches the line up events to lineup
-         */
-        private attachEvents() {
-            if (this.myGraph) {
-                // Cleans up events
-                if (this.listener) {
-                    this.listener.destroy();
-                }
-                this.listener = this.myGraph.events.on("nodeClicked", (node) => this.onNodeSelected(node));
-            }
-        }
-
-        /**
-         * Gets called when a node is selected
-         */
-        private onNodeSelected(node: ForceGraphSelectableNode) {
-            var filter;
-            if (node && node !== this._selectedNode) {
-                node.selected = true;
-                filter = powerbi.data.SemanticFilter.fromSQExpr(node.filterExpr);
-                this._selectedNode = <IForceGraphNode>node;
-            } else {
-                if (this._selectedNode) {
-                    this._selectedNode.selected = false;
-                }
-                this._selectedNode = undefined;
-            }
-
-            this.selectionManager.select(node.identity, false);
-
-            var objects: VisualObjectInstancesToPersist = {
-                merge: [
-                    <VisualObjectInstance>{
-                        objectName: "general",
-                        selector: undefined,
-                        properties: {
-                            "filter": filter
-                        }
-                    }
-                ]
-            };
-
-            this.host.persistProperties(objects);
-            this.myGraph.redrawSelection();
-        }
-    }
+    private listener : { destroy: Function; };
 
     /**
-     * Represents the settings for this visual
+     * The selection manager
      */
-    interface GraphVisualSettings {
-        columnMappings?: {
-            source?: string;
-            target?: string;
-            edgeValue?: string;
-            sourceColor?: string;
-            targetColor?: string;
-            sourceGroup?: string;
-            targetGroup?: string;
-        };
-        layout?: {
-            linkDistance?: number;
-            linkStrength?: number;
-            gravity?: number;
-            charge?: number;
-            labels?: boolean;
-            minZoom?: number;
-            maxZoom?: number;
-        };
+    private selectionManager: utility.SelectionManager;
+
+    private static DEFAULT_SETTINGS: GraphVisualSettings = {
+        columnMappings: {
+            source: "source",
+            target: "target",
+            edgeValue: "value",
+            sourceColor: "sourceColor",
+            targetColor: "targetColor",
+            sourceGroup: "sourceGroup",
+            targetGroup: "targetGroup"
+        },
+        layout: {
+            linkDistance: 10,
+            linkStrength: 2,
+            gravity: .1,
+            charge: -120,
+            labels: false,
+            minZoom: .1,
+            maxZoom: 100
+        }
     };
 
-    /**
-     * The lineup data
-     */
-    interface ForceGraphSelectableNode extends SelectableDataPoint, IForceGraphNode {
+    public static capabilities: VisualCapabilities = {
+        dataRoles: [{
+            name: "Edges",
+            displayName: "Edges",
+            kind: powerbi.VisualDataRoleKind.GroupingOrMeasure,
+        }],
+        dataViewMappings: [{
+            table: {
+                rows: {
+                    for: { in: "Edges" }
+                }
+            }
+        }],
+        objects: {
+            general: {
+                displayName: powerbi.data.createDisplayNameGetter('Visual_General'),
+                properties: {
+                    filter: {
+                        type: { filter: {} },
+                        rule: {
+                            output: {
+                                property: 'selected',
+                                selector: ['Values'],
+                            }
+                        }
+                    },
+                },
+            },
+            columnMappings: {
+                displayName: "Column Bindings",
+                properties: {
+                    source: {
+                        displayName: "Source Column",
+                        type: { text: true }
+                    },
+                    target: {
+                        displayName: "Target Column",
+                        type: { text: true }
+                    },
+                    edgeValue: {
+                        displayName: "Edge Weight Column",
+                        type: { text: true }
+                    },
+                    sourceColor: {
+                        displayName: "Source Node Color Column",
+                        type: { text: true }
+                    },
+                    targetColor: {
+                        displayName: "Target Node Color Column",
+                        type: { text: true }
+                    }
+                },
+            },
+            layout: {
+                displayName: "Layout",
+                properties: {
+                    linkDistance: {
+                        displayName: "Link Distance",
+                        type: { numeric: true }
+                    },
+                    linkStrength: {
+                        displayName: "Link Strength",
+                        type: { numeric: true }
+                    },
+                    gravity: {
+                        displayName: "Gravity",
+                        type: { numeric: true }
+                    },
+                    charge: {
+                        displayName: "Charge",
+                        type: { numeric: true }
+                    },
+                    labels: {
+                        displayName: "Labels",
+                        description: "If labels on the nodes should be shown",
+                        type: { bool: true }
+                    },
+                    minZoom: {
+                        displayName: "Min Zoom",
+                        type: { numeric: true }
+                    },
+                    maxZoom: {
+                        displayName: "Max Zoom",
+                        type: { numeric: true }
+                    }
+                }
+            }
+        }
+    };
 
-        /**
-         * The nodes index into the node list
-         */
-        index: number;
+    private settings: GraphVisualSettings = $.extend(true, {}, GraphVisual.DEFAULT_SETTINGS);
 
-        /**
-         * Represents the number of edges that this node is connected to
-         */
-        num: number;
+    // private template : string = `
+    //     <div class="load-container load5">
+    //         <div class="loader">Loading...</div>
+    //     </div>`;
+    private template: string = `
+        <div id="node_graph" style= "height: 100%;"> </div>
+    `;
 
-        /**
-         * The expression that will exactly match this row
-         */
-        filterExpr : data.SQExpr;
+    /** This is called once when the visual is initialially created */
+    public init(options: VisualInitOptions): void {
+        super.init(options, this.template);
+        this.element.append(this.template);
+        this.myGraph = new ForceGraph(this.element.find("#node_graph"), 500, 500);
+        this.host = options.host;
+        this.interactivityService = new InteractivityService(this.host);
+        this.attachEvents();
+        this.selectionManager = new utility.SelectionManager({ hostServices: this.host });
     }
+
+    /** Update is called for data updates, resizes & formatting changes */
+    public update(options: VisualUpdateOptions) {
+        super.update(options);
+
+        var dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
+        var dataViewTable = dataView && dataView.table;
+        var forceDataReload = this.updateSettings(options);
+
+        if (dataViewTable) {
+            if ((forceDataReload || this.hasDataChanged(this.dataViewTable, dataViewTable))) {
+                var parsedData = GraphVisual.converter(dataView, this.settings);
+                this.myGraph.setData(parsedData);
+            }
+            var selectedIds = this.selectionManager.getSelectionIds();
+            var data = this.myGraph.getData();
+            if (data && data.nodes && data.nodes.length) {
+                var updated = false;
+                data.nodes.forEach((n) => {
+                    var isSelected = !!_.find(selectedIds, (id : SelectionId) => id.equals((<ForceGraphSelectableNode>n).identity));
+                    if (isSelected !== n.selected) {
+                        n.selected = isSelected;
+                        updated = true;
+                    }
+                });
+
+                if (updated) {
+                    this.myGraph.redrawSelection();
+                }
+            }
+        }
+
+
+        this.dataViewTable = dataViewTable;
+
+        var currentDimensions = this.myGraph.dimensions;
+        if (currentDimensions.width !== options.viewport.width ||
+            currentDimensions.height !== options.viewport.height) {
+            this.myGraph.dimensions = { width: options.viewport.width, height: options.viewport.height };
+            this.element.css({ width: options.viewport.width, height: options.viewport.height });
+        }
+    }
+
+    /**
+     * Enumerates the instances for the objects that appear in the power bi panel
+     */
+    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
+        return [{
+            selector: null,
+            objectName: options.objectName,
+            properties: $.extend(true, {}, this.settings[options.objectName])
+        }];
+    }
+
+    /**
+     * Converts the data view into an internal data structure
+     */
+    public static converter(dataView: DataView, settings: GraphVisualSettings): IForceGraphData<ForceGraphSelectableNode> {
+        var nodeList = [];
+        var nodeMap : { [name: string] : ForceGraphSelectableNode } = {};
+        var linkList = [];
+        var table = dataView.table;
+
+        var colMap = {};
+        table.columns.forEach((n, i) => {
+            colMap[n.displayName.toLocaleLowerCase()] = i;
+        });
+
+        // group defines the bundle basically
+        // name, user friendly name,
+        // num, size of circle, probably meant to be the number of matches
+        // source - array index into nodes
+        // target - array index into node
+        // value - The number of times that the link has been made, ie, I emailed bob@gmail.com 10 times, so value would be 10
+
+        var sourceIdx = colMap[settings.columnMappings.source.toLocaleLowerCase()];
+        var sourceColorIdx = colMap[settings.columnMappings.sourceColor.toLocaleLowerCase()];
+        var sourceGroup = colMap[settings.columnMappings.sourceGroup.toLocaleLowerCase()];
+        var targetGroupIdx = colMap[settings.columnMappings.targetGroup.toLocaleLowerCase()];
+        var targetColorIdx = colMap[settings.columnMappings.targetColor.toLocaleLowerCase()];
+        var targetIdx = colMap[settings.columnMappings.target.toLocaleLowerCase()];
+        var edgeValueIdx = colMap[settings.columnMappings.edgeValue.toLocaleLowerCase()];
+
+        var sourceField = dataView.categorical.categories[0].identityFields[sourceIdx];
+        var targetField = dataView.categorical.categories[0].identityFields[targetIdx];
+
+        function getNode(id: string, identity: powerbi.DataViewScopeIdentity, isSource: boolean, color: string = "gray", group: number = 0) : ForceGraphSelectableNode {
+            var node = nodeMap[id];
+            // var expr = identity.expr;
+            var expr = powerbi.data.SQExprBuilder.equal(isSource ? sourceField : targetField, powerbi.data.SQExprBuilder.text(id));
+
+            if (!nodeMap[id]) {
+                node = nodeMap[id] = {
+                    name: id,
+                    color: color || "gray",
+                    index: nodeList.length,
+                    filterExpr: expr,
+                    num: 1,
+                    selected: false,
+                    identity: SelectionId.createWithId(powerbi.data.createDataViewScopeIdentity(expr))
+                };
+                nodeList.push(node);
+            }
+            return node;
+        }
+
+        table.rows.forEach((row, idx) => {
+            var identity = table.identity[idx];
+            if (row[sourceIdx] && row[targetIdx]) {
+                /** These need to be strings to work properly */
+                var sourceId = row[sourceIdx] + "";
+                var targetId = row[targetIdx] + "";
+                var edge = {
+                    source: getNode(sourceId, identity, true, row[sourceColorIdx], row[sourceGroup]).index,
+                    target: getNode(targetId, identity, false, row[targetColorIdx], row[targetGroupIdx]).index,
+                    value: row[edgeValueIdx]
+                };
+                nodeList[edge.source].num += 1;
+                nodeList[edge.target].num += 1;
+                linkList.push(edge);
+            }
+        });
+
+        return {
+            nodes: nodeList,
+            links: linkList
+        };
+    }
+
+    /**
+     * Gets the inline css used for this element
+     */
+    protected getCss() : string[] {
+        return super.getCss().concat([require("!css!sass!./css/GraphVisual.scss")]);
+    }
+
+    /**
+     * Handles updating of the settings
+     */
+    private updateSettings (options: VisualUpdateOptions) : boolean {
+        // There are some changes to the options
+        var dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
+        if (dataView && dataView.metadata) {
+            var oldSettings = $.extend(true, {}, this.settings);
+            var newObjects = dataView.metadata.objects;
+
+            // Merge in the settings
+            $.extend(true, this.settings, newObjects ? newObjects : GraphVisual.DEFAULT_SETTINGS);
+
+            // There were some changes to the layout
+            if (!_.isEqual(oldSettings.layout, this.settings.layout)) {
+                this.myGraph.configuration = $.extend(true, {}, this.settings.layout);
+            }
+
+            if (!_.isEqual(oldSettings.columnMappings, this.settings.columnMappings)) {
+                // This is necessary because some of the settings affect how the data is loaded
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns if all the properties in the first object are present and equal to the ones in the super set
+     */
+    private objectIsSubset(set, superSet) {
+        if (_.isObject(set)) {
+            return _.any(_.keys(set), (key) => !this.objectIsSubset(set[key], superSet[key]));
+        }
+        return set === superSet;
+    }
+
+    /**
+     * Determines if the old data is different from the new data.
+     */
+    private hasDataChanged(oldData: DataViewTable, newData: DataViewTable): boolean {
+        if (!oldData || !newData || oldData.rows.length !== newData.rows.length) {
+            return true;
+        }
+
+        // If there are any elements in newdata that arent in the old data
+        return _.any(newData.identity, n => !_.any(oldData.identity, m => m.key.indexOf(n.key) === 0));
+    }
+
+    /**
+     * Attaches the line up events to lineup
+     */
+    private attachEvents() {
+        if (this.myGraph) {
+            // Cleans up events
+            if (this.listener) {
+                this.listener.destroy();
+            }
+            this.listener = this.myGraph.events.on("nodeClicked", (node) => this.onNodeSelected(node));
+        }
+    }
+
+    /**
+     * Gets called when a node is selected
+     */
+    private onNodeSelected(node: ForceGraphSelectableNode) {
+        var filter;
+        if (node && node !== this._selectedNode) {
+            node.selected = true;
+            filter = powerbi.data.SemanticFilter.fromSQExpr(node.filterExpr);
+            this._selectedNode = <IForceGraphNode>node;
+        } else {
+            if (this._selectedNode) {
+                this._selectedNode.selected = false;
+            }
+            this._selectedNode = undefined;
+        }
+
+        this.selectionManager.select(node.identity, false);
+
+        var objects: powerbi.VisualObjectInstancesToPersist = {
+            merge: [
+                <VisualObjectInstance>{
+                    objectName: "general",
+                    selector: undefined,
+                    properties: {
+                        "filter": filter
+                    }
+                }
+            ]
+        };
+
+        this.host.persistProperties(objects);
+        this.myGraph.redrawSelection();
+    }
+}
+
+/**
+ * Represents the settings for this visual
+ */
+interface GraphVisualSettings {
+    columnMappings?: {
+        source?: string;
+        target?: string;
+        edgeValue?: string;
+        sourceColor?: string;
+        targetColor?: string;
+        sourceGroup?: string;
+        targetGroup?: string;
+    };
+    layout?: {
+        linkDistance?: number;
+        linkStrength?: number;
+        gravity?: number;
+        charge?: number;
+        labels?: boolean;
+        minZoom?: number;
+        maxZoom?: number;
+    };
+};
+
+/**
+ * The lineup data
+ */
+interface ForceGraphSelectableNode extends powerbi.visuals.SelectableDataPoint, IForceGraphNode {
+
+    /**
+     * The nodes index into the node list
+     */
+    index: number;
+
+    /**
+     * Represents the number of edges that this node is connected to
+     */
+    num: number;
+
+    /**
+     * The expression that will exactly match this row
+     */
+    filterExpr : powerbi.data.SQExpr;
 }

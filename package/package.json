@@ -7,17 +7,17 @@
         {
             "resourceId": "rId0",
             "sourceType": 5,
-            "file": "resources/%PROJECT_NAME%.ts"
+            "file": "resources/project.ts"
         },
         {
             "resourceId": "rId1",
             "sourceType": 0,
-            "file": "resources/%PROJECT_NAME%.js"
+            "file": "resources/project.js"
         },
         {
             "resourceId": "rId2",
             "sourceType": 1,
-            "file": "resources/%PROJECT_NAME%.css"
+            "file": "resources/project.css"
         }
     ],
     "visual": {

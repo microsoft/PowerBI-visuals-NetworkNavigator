@@ -1,5 +1,6 @@
 {
     "mainVisual": "AdvancedSlicerVisual",
     "projectId": "1652434005853",
-    "lintFiles": ["AdvancedSlicerVisual.ts"]
+    "lintFiles": ["AdvancedSlicerVisual.ts"],
+    "icon": "icon.png"
 }

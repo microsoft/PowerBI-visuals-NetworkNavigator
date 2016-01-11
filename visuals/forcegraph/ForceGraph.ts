@@ -1,10 +1,11 @@
 /// <reference path="../../base/references.d.ts"/>
+import EventEmitter from '../../base/EventEmitter';
 
 /**
  * Class which represents the force graph
  */
 /* @Mixin(EventEmitter) */
-class ForceGraph {
+export default class ForceGraph {
     private element: JQuery;
     private svg: D3.Selection;
     private vis: D3.Selection;
@@ -285,7 +286,7 @@ class ForceGraph {
 /**
  * The node in a force graph
  */
-interface IForceGraphNode {
+export interface IForceGraphNode {
     /**
      * The name of the node
      */
@@ -305,7 +306,7 @@ interface IForceGraphNode {
 /**
  * Represents a link in the force graph
  */
-interface IForceGraphLink {
+export interface IForceGraphLink {
     /**
      * The source node, index into the nodes list
      */
@@ -325,7 +326,7 @@ interface IForceGraphLink {
 /**
  * The data for the force graph
  */
-interface IForceGraphData<NodeType> {
+export interface IForceGraphData<NodeType> {
 
     /**
      * The list of the nodes in the force graph

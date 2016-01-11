@@ -1,22 +1,11 @@
 /// <reference path="../../base/references.d.ts"/>
-
-interface TimeScaleDataItem {
-    /**
-     * The date of the time scale item
-     */
-    date: Date;
-
-    /**
-     * The value on the given date
-     */
-    value: number;
-}
+import EventEmitter from '../../base/EventEmitter.ts';
 
 /**
-    * Represents a timescale
-    */
+* Represents a timescale
+*/
 /* @Mixin(EventEmitter)*/
-class TimeScale {
+export default class TimeScale {
     private element : JQuery;
     private svg : D3.Selection;
     private x : D3.Scale.TimeScale;
@@ -200,4 +189,19 @@ class TimeScale {
             .attr("fill", "lightgray")
             .attr("height", 30);
     }
+}
+
+/**
+ * Represents a data item on a timescale
+ */
+export interface TimeScaleDataItem {
+    /**
+     * The date of the time scale item
+     */
+    date: Date;
+
+    /**
+     * The value on the given date
+     */
+    value: number;
 }

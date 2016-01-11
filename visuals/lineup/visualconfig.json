@@ -1,5 +1,6 @@
 {
     "mainVisual": "LineUpVisual",
     "projectId": "1450434005853",
+    "icon": "icon.png",
     "lintFiles": ["LineUpVisual.ts"]
 }

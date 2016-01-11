@@ -1,7 +1,7 @@
 /**
  * A mixin that adds support for event emitting
  */
-class EventEmitter {
+export default class EventEmitter {
     private listeners: { [id: string]: Function[]; } = {};
 
     /**

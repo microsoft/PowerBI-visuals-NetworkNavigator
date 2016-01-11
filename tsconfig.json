@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "sourceMap": true,
+    "module": "commonjs",
+    "moduleResolution": "classic",
+    "experimentalDecorators": true
+  },
+  "exclude": [
+    "power-bi",
+    "node_modules",
+    "build"
+  ],
+  "files":[]
+}

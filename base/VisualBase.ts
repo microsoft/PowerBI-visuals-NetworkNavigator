@@ -1,6 +1,7 @@
 /// <reference path="./references.d.ts"/>
+const css = require("!css!sass!./css/base.scss");
 
-class VisualBase implements powerbi.IVisual {
+export class VisualBase implements powerbi.IVisual {
     protected element: JQuery;
     protected container: JQuery;
     private iframe : JQuery;
@@ -17,10 +18,10 @@ class VisualBase implements powerbi.IVisual {
         $.when.apply($, promises).then((...styles) => this.element.append(styles.map((s)=> $(s))));
 
         if (addCssToParent) {
-            this.container.append("<st" + "yle>" + this.getCss() + "</st" + "yle>");
+            this.container.append(this.getCss().map((css) => $("<st" + "yle>" + css + "</st" + "yle>")));
         }
+        this.element.append(this.getCss().map((css) => $("<st" + "yle>" + css + "</st" + "yle>")));
 
-        this.element.append("<st" + "yle>" + this.getCss() + "</st" + "yle>");
         if (template) {
             this.element = this.element.append($(template));
         }
@@ -37,7 +38,7 @@ class VisualBase implements powerbi.IVisual {
      * Gets the inline css used for this element
      */
     protected getCss() : string[] {
-        return [`/*INLINE_CSS*/`];
+        return [css];
     }
 
     /**
@@ -65,7 +66,7 @@ class VisualBase implements powerbi.IVisual {
 /**
  * Specifies an external css resource
  */
-interface ExternalCssResource {
+export interface ExternalCssResource {
     /**
      * The url of the resource
      */
