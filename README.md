@@ -62,6 +62,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
 ```
 * Create an index.ts that does `require('./MyVisual.ts')`
 * Create a file called visualconfig.json, and put two values: The `projectName` and `projectId` fields, which are your visual's name, and a random id (13 digits) respectively
+    * If your project includes an icon for the visual, put it in the top level directory of your visual, and then add another field into the config file called `icon`, which contains your icons file name.
 * Review the Power BI [Visuals Getting Started](https://github.com/Microsoft/PowerBI-visuals/wiki).
 
 #Building
