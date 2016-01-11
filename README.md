@@ -7,7 +7,7 @@ This is a base project for developing Power BI visuals.  It is hopefully a tempo
 * Create a new class file, and name it the name of your visual, and put this in it
 
 ```
-import {  VisualBase } from "../../base/VisualBase"; // Provides some base functionality
+import { VisualBase } from "../../base/VisualBase"; // Provides some base functionality
 import { Visual } from "../../base/Utils";
 
 @Visual(JSON.parse(require("./visualconfig.json"))) // This line will register the class as a visual in power bi
@@ -60,6 +60,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
 }
 
 ```
+* Create an index.ts that does `require('./MyVisual.ts')`
 * Create a file called visualconfig.json, and put two values: The `projectName` and `projectId` fields, which are your visual's name, and a random id (13 digits) respectively
 * Review the Power BI [Visuals Getting Started](https://github.com/Microsoft/PowerBI-visuals/wiki).
 
