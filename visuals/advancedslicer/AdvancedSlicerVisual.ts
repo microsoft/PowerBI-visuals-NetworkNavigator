@@ -125,9 +125,9 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
         this.dataView = options.dataViews && options.dataViews[0];
         if (this.dataView) {
             var categorical = this.dataView && this.dataView.categorical;
-            this.element.toggleClass("has-values", !!categorical && !!categorical.values && categorical.values.length > 0);
             var newData = AdvancedSlicerVisual.converter(this.dataView, this.selectionManager);
             this.mySlicer.data = newData;
+            this.mySlicer.showValues = !!categorical && !!categorical.values && categorical.values.length > 0;
 
             var sortedColumns = this.dataView.metadata.columns.filter((c) => !!c.sort);
             if (sortedColumns.length) {

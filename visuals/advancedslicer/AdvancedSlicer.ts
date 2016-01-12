@@ -178,6 +178,13 @@ export default class AdvancedSlicer {
     }
 
     /**
+     * Setter for showing the values column
+     */
+    public set showValues(show: boolean) {
+        this.element.toggleClass("has-values", show);
+    }
+
+    /**
      * Sorts the slicer
      */
     public sort(toSort: string, desc?: boolean) {
