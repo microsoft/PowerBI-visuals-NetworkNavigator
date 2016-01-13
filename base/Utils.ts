@@ -46,7 +46,7 @@ export default class Utils {
      * Returns if there is any more or less data in the new data
      * @param idEquality Returns true if a and b are referring to the same object, not necessarily if it has changed
      */
-    static hasDataChanged<T>(newData: T[], oldData: T[], idEquality: (a : T, b : T) => boolean) {
+    static hasDataChanged<T>(newData: T[], oldData: T[], equality: (a : T, b : T) => boolean) {
         // If the are identical, either same array or undefined, nothing has changed
         if (oldData === newData) {
             return false;
@@ -58,7 +58,7 @@ export default class Utils {
         }
 
         // If there are any elements in newdata that arent in the old data
-        return _.any(newData, n => !_.any(oldData, m => m.identity.equals(n.identity) && _.isEqual(m, n)));
+        return _.any(newData, n => !_.any(oldData, m => equality(m, n)));
     }
 
 
