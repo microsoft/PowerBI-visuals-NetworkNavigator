@@ -1,7 +1,5 @@
-/// <reference path="./ILineUpVisualRow.ts"/>
 /// <reference path="../../base/references.d.ts"/>
 import { ExternalCssResource, VisualBase } from "../../base/VisualBase";
-import LineUp from "./lineup";
 import { default as Utils, Visual } from "../../base/Utils";
 import IVisual = powerbi.IVisual;
 import DataViewTable = powerbi.DataViewTable;
@@ -16,85 +14,15 @@ import DataView = powerbi.DataView;
 import SelectionId = powerbi.visuals.SelectionId;
 import SelectionManager = powerbi.visuals.utility.SelectionManager;
 import VisualDataRoleKind = powerbi.VisualDataRoleKind;
+import { LineUp, ILineUpRow, ILineUpSettings } from "./LineUp";
 
-@Visual(JSON.parse(require("./visualconfig.json")))
+@Visual(JSON.parse(require("./build.json")).output.PowerBI)
 export default class LineUpVisual extends VisualBase implements IVisual {
     private dataViewTable: DataViewTable;
     private dataView: powerbi.DataView;
     private host : IVisualHostServices;
-    private lineup: any;
-    private loadingMoreData = false;
-    private selectionEnabled : boolean;
-    private isMultiSelection : boolean;
+    private lineup: LineUp;
     private selectionManager : SelectionManager;
-
-    /**
-     * Represents the settings
-     */
-    private static DEFAULT_SETTINGS : ILineUpVisualSettings = {
-        selection: {
-            displayName: "Selection",
-            properties: {
-                singleSelect: {
-                    displayName: "Single Select",
-                    description: "If true, when a row is selected, other data is filtered",
-                    type: { bool: true },
-                    value: true
-                },
-                multiSelect: {
-                    displayName: "Multi Select",
-                    description: "If true, multiple rows can be selected",
-                    type: { bool: true },
-                    value: true
-                }
-            }
-        },
-        data: {
-            displayName: "Data",
-            properties: {
-                inferColumnTypes: {
-                    displayName: "Infer Column Types",
-                    description: "Infer the coulmn types from the data, vs using the PowerBI defined column types",
-                    type: { bool: true },
-                    value: false
-                }
-            }
-        },
-        presentation: {
-            displayName: "Presentation",
-            properties: {
-                stacked: {
-                    displayName: "Stacked",
-                    description: "If true, when columns are combined, the all columns will be displayed stacked",
-                    type: { bool: true },
-                    value: true,
-                },
-                values: {
-                    displayName: "Values",
-                    description: "If the actual values should be displayed under the bars",
-                    type: { bool: true },
-                    value: false,
-                },
-                histograms: {
-                    displayName: "Histograms",
-                    description: "Show histograms in the column headers",
-                    type: { bool: true },
-                    value: true,
-                },
-                animation: {
-                    displayName: "Animation",
-                    description: "Should the grid be animated when sorting",
-                    type: { bool: true },
-                    value: true,
-                }
-            },
-        }
-    };
-
-    /**
-     * The current set of settings
-     */
-    private settings : ILineUpVisualSettings = $.extend(true, {}, LineUpVisual.DEFAULT_SETTINGS);
 
     /**
      * The set of capabilities for the visual
@@ -113,7 +41,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 rowCount: { preferred: { min: 1 } }
             }
         }],
-        objects: $.extend({
+        objects: {
             general: {
                 displayName: powerbi.data.createDisplayNameGetter('Visual_General'),
                 properties: {
@@ -137,35 +65,57 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                         }
                     },
                 },
-            }
-        }, <any>LineUpVisual.DEFAULT_SETTINGS)
-    };
-
-    /**
-     * The configuration for the lineup viewer
-     */
-    private lineUpConfig = {
-        svgLayout: {
-            mode: 'separate',
-            addPlusSigns: true,
-            plusSigns: {
-                addStackedColumn: {
-                    name: "Add a new Stacked Column",
-                    action: "addNewEmptyStackedColumn",
-                    x: 0, y: 2,
-                    w: 21, h: 21 // LineUpGlobal.htmlLayout.headerHeight/2-4
-                },
-
-                addColumn: {
-                    title: "Add a Column",
-                    action: () => this.lineup.addNewSingleColumnDialog(),
-                    x: 0, y: 2,
-                    w: 21, h: 21 // LineUpGlobal.htmlLayout.headerHeight/2-4
+            },
+            selection: {
+                displayName: "Selection",
+                properties: {
+                    singleSelect: {
+                        displayName: "Single Select",
+                        description: "If true, when a row is selected, other data is filtered",
+                        type: { bool: true }
+                    },
+                    multiSelect: {
+                        displayName: "Multi Select",
+                        description: "If true, multiple rows can be selected",
+                        type: { bool: true }
+                    }
                 }
+            },
+            data: {
+                displayName: "Data",
+                properties: {
+                    inferColumnTypes: {
+                        displayName: "Infer Column Types",
+                        description: "Infer the coulmn types from the data, vs using the PowerBI defined column types",
+                        type: { bool: true }
+                    }
+                }
+            },
+            presentation: {
+                displayName: "Presentation",
+                properties: {
+                    stacked: {
+                        displayName: "Stacked",
+                        description: "If true, when columns are combined, the all columns will be displayed stacked",
+                        type: { bool: true }
+                    },
+                    values: {
+                        displayName: "Values",
+                        description: "If the actual values should be displayed under the bars",
+                        type: { bool: true }
+                    },
+                    histograms: {
+                        displayName: "Histograms",
+                        description: "Show histograms in the column headers",
+                        type: { bool: true }
+                    },
+                    animation: {
+                        displayName: "Animation",
+                        description: "Should the grid be animated when sorting",
+                        type: { bool: true }
+                    }
+                },
             }
-        },
-        interaction: {
-            multiselect: (evt) => this.settings.selection.properties.multiSelect.value
         }
     };
 
@@ -179,18 +129,9 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         crossorigin: "anonymous"
     };
 
-    /**
-     * The template for the grid
-     */
-    private template: string = `
-        <div>
-            <div class="grid"></div>
-        </div>
-    `.trim();
-
     /** This is called once when the visual is initialially created */
     public init(options: VisualInitOptions): void {
-        super.init(options, this.template, true);
+        super.init(options, '<div></div>', true);
         this.host = options.host;
 
         // Temporary, because the popups will load outside of the iframe for some reason
@@ -200,22 +141,25 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         this.selectionManager = new SelectionManager({
             hostServices: options.host
         });
+        this.lineup = new LineUp(this.element);
+        this.lineup.events.on("selectionChanged", (rows) => this.onSelectionChanged(rows));
+        this.lineup.events.on("canLoadMoreData", (info) => info.result = !!this.dataView && !!this.dataView.metadata.segment);
+        this.lineup.events.on("loadMoreData", (info) => this.host.loadMoreData());
     }
 
     /** Update is called for data updates, resizes & formatting changes */
     public update(options: VisualUpdateOptions) {
         super.update(options);
 
-        var forceReloadLineup = false;
         this.dataView = options.dataViews[0];
         this.dataViewTable = this.dataView && this.dataView.table;
-        if (this.dataViewTable) {
+        if (this.dataView) {
 
             // Store this to compare
-            var oldSettings : ILineUpVisualSettings = $.extend(true, {}, this.settings);
+            var oldSettings : ILineUpSettings = $.extend(true, {}, this.lineup.settings);
 
             // Make sure we have the default values
-            $.extend(true, this.settings, LineUpVisual.DEFAULT_SETTINGS);
+            var updatedSettings : ILineUpSettings = $.extend(true, this.lineup.settings, LineUp.DEFAULT_SETTINGS);
 
             // Copy over new values
             var newObjs = this.dataView.metadata.objects;
@@ -223,22 +167,20 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 for (var section in newObjs) {
                     var values = newObjs[section];
                     for (var prop in values) {
-                        // Only save properties that we know about.
-                        if (this.settings[section] &&
-                            this.settings[section].properties[prop]) {
-                            this.settings[section].properties[prop].value = values[prop];
-                        }
+                        updatedSettings[section][prop] = values[prop];
                     }
                 }
             }
+            this.lineup.settings = newObjs;
+        }
 
-            // If the infer types setting has changed
-            if (oldSettings.data.properties.inferColumnTypes.value !==
-                this.settings.data.properties.inferColumnTypes.value) {
-                forceReloadLineup = true;
-            }
-
-            var colArr = this.dataViewTable.columns.slice(0);
+        if (this.dataViewTable) {
+            var colArr = this.dataViewTable.columns.slice(0).map((c) => {
+                return {
+                    displayName: c.displayName,
+                    type: c.type
+                };
+            });
             var data : ILineUpVisualRow[] = [];
             var selectedIds = this.selectionManager.getSelectionIds();
             this.dataViewTable.rows.forEach((row, rowIndex) => {
@@ -248,6 +190,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 //var identity = SelectionId.createWithId(this.dataViewTable.identity[rowIndex]);
                 var result : ILineUpVisualRow = {
                     identity: newId,
+                    equals: (b) => (<ILineUpVisualRow>b).identity.equals(newId),
                     filterExpr: identity.expr,
                     selected: !!_.find(selectedIds, (id : SelectionId) => id.equals(newId))
                 };
@@ -257,8 +200,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 data.push(result);
             });
 
-            this.loadData(colArr, data, forceReloadLineup);
-            this.loadingMoreData = false;
+            this.lineup.loadData(colArr, data);
         }
     }
 
@@ -266,15 +208,10 @@ export default class LineUpVisual extends VisualBase implements IVisual {
      * Enumerates the instances for the objects that appear in the power bi panel
      */
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
-        var outProps : { [name: string] : boolean; } = {};
-        var inProps = (this.settings[options.objectName] && this.settings[options.objectName].properties) || {};
-        for (var key in inProps) {
-            outProps[key] = inProps[key].value;
-        }
         return [{
             selector: null,
             objectName: options.objectName,
-            properties: outProps
+            properties: $.extend(true, {}, this.lineup.settings[options.objectName])
         }];
     }
 
@@ -293,169 +230,16 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     }
 
     /**
-     * Returns true if the given object is numeric
-     */
-    private isNumeric = (obj) => (obj - parseFloat(obj) + 1) >= 0;
-
-    /**
-     * Derives the desciption for the given column
-     */
-    private deriveDesc(columns: DataViewMetadataColumn[], data : ILineUpVisualRow[], separator? : string) {
-        var cols = columns.map((col) => {
-            var r: any = {
-                column: col.displayName,
-                type: 'string'
-            };
-            if (this.settings.data.properties.inferColumnTypes.value) {
-                var allNumeric = true;
-                var minMax = { min: Number.MAX_VALUE, max: 0 };
-                for (var i = 0; i < data.length; i++) {
-                    var value = data[i][r.column];
-                    if (value !== 0 && !!value && !this.isNumeric(value)) {
-                        allNumeric = false;
-                        break;
-                    } else {
-                        if (+value > minMax.max) {
-                            minMax.max = value;
-                        } else if (+value < minMax.min) {
-                            minMax.min = +value;
-                        }
-                    }
-                }
-                if (allNumeric) {
-                    r.type = 'number';
-                    r.domain = [minMax.min, minMax.max];
-                }
-            } else {
-                if (col.type.numeric) {
-                    r.type = 'number';
-                    r.domain = d3.extent(data, (row) => row[col.displayName] && row[col.displayName].length === 0 ? undefined : +(row[col.displayName]));
-                }
-            }
-
-            // If is a string, try to see if it is a category
-            if (r.type === 'string') {
-                var sset = d3.set(data.map((row) => row[col.displayName]));
-                if (sset.size() <= Math.max(20, data.length * 0.2)) { //at most 20 percent unique values
-                    r.type = 'categorical';
-                    r.categories = sset.values().sort();
-                }
-            }
-            return r;
-        });
-        return {
-            separator: separator,
-            primaryKey: columns[0].displayName,
-            columns: cols
-        };
-    }
-
-    /**
-     * Loads the data into the lineup view
-     */
-    private loadData(columns: DataViewMetadataColumn[], rows : ILineUpVisualRow[], force : boolean = false) {
-        //derive a description file
-        var desc = this.deriveDesc(columns, rows);
-        var name = 'data';
-        this.loadDataImpl(name, desc, rows, force);
-    }
-
-    /**
-     * Loads the data into the lineup view
-     */
-    private loadDataImpl(name: string, desc, _data : ILineUpVisualRow[], force : boolean = false) {
-
-        // Update the rendering options
-        if (this.lineup) {
-            var presProps = this.settings.presentation.properties;
-            for (var key in presProps) {
-                if (presProps.hasOwnProperty(key)) {
-                    this.lineup.changeRenderingOption(key, presProps[key].value);
-                }
-            }
-        }
-
-        /* Only reload lineup if we are forced to, if we haven't loaded lineup in the first place, or if the data has changed */
-        if (force || !this.lineup || Utils.hasDataChanged(this.lineup.storage.getData(), _data)) {
-            var spec: any = {};
-            spec.name = name;
-            spec.dataspec = desc;
-            delete spec.dataspec.file;
-            delete spec.dataspec.separator;
-            spec.dataspec.data = _data;
-            spec.storage = LineUp.createLocalStorage(_data, desc.columns, desc.layout, desc.primaryKey);
-
-            if (this.lineup) {
-                this.lineup.changeDataStorage(spec);
-            } else {
-                var finalOptions = $.extend(this.lineUpConfig, { renderingOptions: this.settings.presentation });
-                this.lineup = LineUp.create(spec, d3.select(this.element.find('.grid')[0]), finalOptions);
-                var scrolled = this.lineup.scrolled;
-                var me = this;
-
-                // The use of `function` is intentional here, we need to pass along the correct scope
-                this.lineup.scrolled = function(...args) {
-                    me.onLineUpScrolled.apply(me, args);
-                    return scrolled.apply(this, args);
-                };
-            }
-        }
-
-        this.lineup.select(_data.filter((n) => n.selected));
-
-        var singleSelect = this.settings.selection.properties.singleSelect.value;
-        var multiSelect = this.settings.selection.properties.multiSelect.value;
-        this.selectionEnabled = singleSelect || multiSelect;
-
-        this.isMultiSelection = multiSelect;
-        this.attachEvents();
-    }
-
-    /**
-     * Listener for when the lineup viewer is scrolled
-     */
-    private onLineUpScrolled() {
-        // truthy this.dataView.metadata.segment means there is more data to be loaded
-        if (!this.loadingMoreData && this.dataView.metadata.segment) {
-            var scrollElement = $(this.lineup.$container.node()).find('div.lu-wrapper')[0];
-            var scrollHeight = scrollElement.scrollHeight;
-            var top = scrollElement.scrollTop;
-            if (scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200) {
-                this.loadingMoreData = true;
-                this.host.loadMoreData();
-            }
-        }
-    }
-
-
-    /**
-     * Attaches the line up events to lineup
-     */
-    private attachEvents() {
-        if (this.lineup) {
-            // Cleans up events
-            this.lineup.listeners.on("multiselected.lineup", null);
-            this.lineup.listeners.on("selected.lineup", null);
-
-            if (this.isMultiSelection) {
-                this.lineup.listeners.on("multiselected.lineup", (rows : ILineUpVisualRow[]) => this.onRowSelected(rows));
-            } else {
-                this.lineup.listeners.on("selected.lineup", (row : ILineUpVisualRow) => this.onRowSelected(row ? [row] : []));
-            }
-        }
-    }
-
-    /**
      * Selects the given rows
      */
-    private onRowSelected(rows : ILineUpVisualRow[]) {
+    private onSelectionChanged(rows : ILineUpVisualRow[]) {
         var filter;
-        if (this.selectionEnabled) {
+        if (this.lineup.selectionEnabled) {
             if (rows && rows.length) {
                 var expr = rows[0].filterExpr;
 
                 // If we are allowing multiSelect
-                if (rows.length > 0 && this.isMultiSelection) {
+                if (rows.length > 0 && this.lineup.isMultiSelect) {
                     rows.slice(1).forEach((r) => {
                     expr = powerbi.data.SQExprBuilder.or(expr, r.filterExpr);
                     });
@@ -508,42 +292,12 @@ interface IVisualBaseSettingWithValue<T> extends powerbi.data.DataViewObjectProp
 }
 
 /**
- * Represents the settings for this visual
+ * The lineup data
  */
-interface ILineUpVisualSettings /* extends powerbi.data.DataViewObjectDescriptor */ {
-    selection?: {
-        displayName?: string;
-        properties?: {
-            singleSelect?: IVisualBaseSettingWithValue<boolean>;
-            multiSelect?: IVisualBaseSettingWithValue<boolean>;
-            [propName2 : string] : IVisualBaseSettingWithValue<boolean>;
-        }
+interface ILineUpVisualRow extends ILineUpRow, powerbi.visuals.SelectableDataPoint {
 
-
-    };
-    data?: {
-        displayName?: string;
-        properties?: {
-            inferColumnTypes?: IVisualBaseSettingWithValue<boolean>;
-            [propName2 : string] : IVisualBaseSettingWithValue<boolean>;
-        }
-    };
-    presentation?: {
-        displayName?: string;
-        properties?: {
-            values?: IVisualBaseSettingWithValue<boolean>;
-            stacked?: IVisualBaseSettingWithValue<boolean>;
-            histograms?: IVisualBaseSettingWithValue<boolean>;
-            animation?: IVisualBaseSettingWithValue<boolean>;
-            [propName2 : string] : IVisualBaseSettingWithValue<boolean>;
-        }
-    };
-
-    // For ease of lookup
-    [propName : string ] : {
-        displayName?: string;
-        properties?: {
-            [propName2 : string] : IVisualBaseSettingWithValue<any>;
-        }
-    };
+    /**
+     * The expression that will exactly match this row
+     */
+    filterExpr: powerbi.data.SQExpr;
 }

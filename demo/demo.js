@@ -68,8 +68,28 @@ $(function() {
         });
     }
 
+    function loadLineUp() {
+        var lineUpEle = $('#line-up');
+        var LineUp = require("../dist/lineup/component/lineup").LineUp;
+        var lineup = new LineUp(lineUpEle);
+        $.getJSON('lineupdata.json', function(data) {
+            var columns = [];
+            for (var col in data[0]) {
+                columns.push({
+                    displayName: col,
+                    type: {
+                        numeric: $.isNumeric(data[0][col]),
+                        text: true
+                    }
+                })
+            }
+            lineup.loadData(columns, data);
+        });
+    }
+
     loadSlicer();
     loadTimescale();
     loadDocumentViewer();
     loadForceGraph();
+    loadLineUp();
 });

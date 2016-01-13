@@ -1,5 +1,6 @@
 <html>
     <head>
+        <!-- Jquery, D3, and underscore required for most of this visuals -->
         <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.12/d3.min.js"></script>
         <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
@@ -8,6 +9,9 @@
         <link rel="stylesheet" type="text/css" href="../dist/timescale/component/css/TimeScale.css">
         <link rel="stylesheet" type="text/css" href="../dist/documentviewer/component/css/DocumentViewer.css">
         <link rel="stylesheet" type="text/css" href="../dist/forcegraph/component/css/GraphVisual.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="../dist/lineup/component/css/LineUp.css">
+        <link rel="stylesheet" type="text/css" href="../dist/lineup/component/css/LineUpVisual.css">
         <style>
             html {
                 overflow-y: scroll;
@@ -27,6 +31,9 @@
         </div>
         <div id="force-graph" style="width: 500px;height:500px;margin-top:70px">
             <h2>Force Graph <span style="display:inline-block;margin-left:20px;font-size:.5em;vertical-align:middle;font-weight:normal">Selected Nodes:<span id="selected-node"></span></span></h2>
+        </div>
+        <div id="line-up" style="height:500px;margin-top:70px">
+            <h2>LineUp</h2>
         </div>
     </body>
 </html>
