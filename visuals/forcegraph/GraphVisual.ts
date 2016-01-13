@@ -1,5 +1,5 @@
 /// <reference path="../../base/references.d.ts"/>
-import { default as ForceGraph, IForceGraphData, IForceGraphLink, IForceGraphNode } from "./ForceGraph";
+import { ForceGraph, IForceGraphData, IForceGraphLink, IForceGraphNode } from "./ForceGraph";
 import { ExternalCssResource, VisualBase } from "../../base/VisualBase";
 import { default as Utils, Visual } from "../../base/Utils";
 import IVisual = powerbi.IVisual;
@@ -21,7 +21,7 @@ import utility = powerbi.visuals.utility;
 
 declare var _;
 
-@Visual(JSON.parse(require("./visualconfig.json")))
+@Visual(JSON.parse(require("./build.json")).output.PowerBI)
 export default class GraphVisual extends VisualBase implements IVisual {
     private dataViewTable: DataViewTable;
     private myGraph: ForceGraph;

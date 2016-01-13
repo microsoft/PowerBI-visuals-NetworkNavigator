@@ -1,0 +1,13 @@
+{
+    "output": {
+        "PowerBI": {
+            "visualName": "GraphVisual",
+            "projectId": "1550434005853",
+            "icon": "icon.png",
+            "entry": "GraphVisual.ts"
+        },
+        "component": {
+            "entry": "ForceGraph.ts"
+        }
+    }
+}

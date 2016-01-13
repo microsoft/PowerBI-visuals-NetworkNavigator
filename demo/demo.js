@@ -50,7 +50,17 @@ $(function() {
         }];
     }
 
+    function loadForceGraph() {
+        var forceGraphEle = $('#force-graph');
+        var ForceGraph = require("../dist/forcegraph/component/forcegraph").ForceGraph;
+        var forcegraph = new ForceGraph(forceGraphEle, forceGraphEle.width(), forceGraphEle.height());
+        $.getJSON('forcegraphdata.json', function(data) {
+            forcegraph.data = data;
+        });
+    }
+
     loadSlicer();
     loadTimescale();
     loadDocumentViewer();
+    loadForceGraph();
 });

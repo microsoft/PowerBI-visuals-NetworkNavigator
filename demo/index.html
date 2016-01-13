@@ -7,6 +7,12 @@
         <link rel="stylesheet" type="text/css" href="../dist/advancedslicer/component/css/AdvancedSlicer.css">
         <link rel="stylesheet" type="text/css" href="../dist/timescale/component/css/TimeScale.css">
         <link rel="stylesheet" type="text/css" href="../dist/documentviewer/component/css/DocumentViewer.css">
+        <link rel="stylesheet" type="text/css" href="../dist/forcegraph/component/css/GraphVisual.css">
+        <style>
+            html {
+                overflow-y: scroll;
+            }
+        </style>
     </head>
     <body>
         <h2>Advanced Slicer</h2>
@@ -16,8 +22,11 @@
             <h2>TimeScale <span style="display:inline-block;margin-left:20px;font-size:.5em;vertical-align:middle;font-weight:normal">Selected Range:<span id="selected-range"></span></span></h2>
         </div>
 
-        <div id="document-viewer" style="width: 500px;height:500px;margin-top:70px">
+        <div id="document-viewer" style="width: 500px;margin-top:70px">
             <h2>DocumentViewer</h2>
+        </div>
+        <div id="force-graph" style="width: 500px;height:500px;margin-top:70px">
+            <h2>Force Graph</h2>
         </div>
     </body>
 </html>

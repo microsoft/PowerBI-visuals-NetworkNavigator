@@ -5,7 +5,7 @@ import EventEmitter from '../../base/EventEmitter';
  * Class which represents the force graph
  */
 /* @Mixin(EventEmitter) */
-export default class ForceGraph {
+export class ForceGraph {
     private element: JQuery;
     private svg: D3.Selection;
     private vis: D3.Selection;
@@ -119,6 +119,20 @@ export default class ForceGraph {
     }
 
     /**
+     * Alias for getData
+     */
+    public get data() : IForceGraphData<IForceGraphNode> {
+        return this.getData();
+    }
+
+    /**
+     * Alias for setData
+     */
+    public set data(graph: IForceGraphData<IForceGraphNode>) {
+        this.setData(graph);
+    }
+
+    /**
      * Redraws the force graph
      */
     public redraw() {
@@ -223,7 +237,7 @@ export default class ForceGraph {
             .attr("class", "node");
 
         node.append("svg:circle")
-            .attr("r", (d) => Math.log((d.num * 100)))
+            .attr("r", (d) => Math.log(((d.num || 1) * 100)))
             .style("fill", (d) => d.color)
             .style("stroke", "red")
             .style("stroke-width", (d) => d.selected ? 1 : 0)
@@ -296,6 +310,11 @@ export interface IForceGraphNode {
      * The color of the node
      */
     color?: string;
+
+    /**
+     * The size of the node
+     */
+    num?: number;
 
     /**
      * Whether or not the given node is selected
