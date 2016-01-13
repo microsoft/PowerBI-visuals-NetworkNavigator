@@ -6,7 +6,6 @@ var tslint = require('gulp-tslint');
 var typescript = require('gulp-typescript');
 var sequence = require('gulp-sequence');
 var zip = require('gulp-zip');
-var args = require('yargs').argv;
 var modify = require('gulp-modify');
 var sourcemaps = require('gulp-sourcemaps');
 var webpack = require('gulp-webpack');
@@ -14,11 +13,16 @@ var path = require("path");
 var replace = require("gulp-replace");
 var gutil = require("gulp-util");
 var sass = require("gulp-sass");
+var webserver = require('gulp-webserver');
+
+var args = require('yargs')
+    .usage('Usage: $0 --project [name of the visual\'s folder]')
+    .alias('p', 'project')
+    .choices('project', fs.readdirSync('visuals'))
+    .demand(['project'])
+    .argv;
 
 var project = args.project;
-if (!project) {
-    throw new Error("A project is required to build, use --project <project name> to specify the project");
-}
 
 var paths = {
     projectDir: 'visuals/' + project,
@@ -198,6 +202,24 @@ gulp.task('build:powerbi', function(cb) {
  */
 gulp.task('build', function(cb) {
     sequence('clean', 'build:powerbi', 'build:component', cb);
+});
+
+/**
+ * Starts the demo server
+ */
+gulp.task('demo-server', function() {
+    gulp.src('./')
+        .pipe(webserver({
+            livereload: true,
+            open: '/demo'
+        }));
+});
+
+/**
+ * Starts the demo
+ */
+gulp.task('demo', function(cb) {
+    sequence('clean', 'build:component', 'demo-server', cb);
 });
 
 function string_src(filename, string) {

@@ -29,6 +29,28 @@ $(function() {
         });
     }
 
+    function loadDocumentViewer() {
+        var documentViewerEle = $('#document-viewer');
+        var DocumentViewer = require("../dist/documentviewer/component/documentviewer").DocumentViewer;
+        var documentviewer = new DocumentViewer(documentViewerEle, { height: documentViewerEle.height(), width: documentViewerEle.width() });
+        documentviewer.data = [{
+            items: [{
+                name: "From",
+                type: { text: {} },
+                value: "bill@microsoft.com"
+            }, {
+                name: "To",
+                type: { text: {} },
+                value: "steve.jobs@apple.com"
+            }, {
+                name: "Body",
+                type: { html: {} },
+                value: "I am <strong>Super</strong> excited about owning an <a target=\"_blank\" href=\"http://www.apple.com/iphone/\">Apple IPhone 5</a>"
+            }]
+        }];
+    }
+
     loadSlicer();
     loadTimescale();
+    loadDocumentViewer();
 });

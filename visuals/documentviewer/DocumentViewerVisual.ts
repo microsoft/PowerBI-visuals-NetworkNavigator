@@ -1,7 +1,7 @@
 /// <reference path="./references.d.ts"/>
 import { ExternalCssResource, VisualBase } from "../../base/VisualBase";
 import { Visual } from "../../base/Utils";
-const DOMPurify = require("./purify");
+import { DocumentViewer, IDocumentViewerData, IDocumentViewerDocument } from "./DocumentViewer";
 
 import IVisual = powerbi.IVisual;
 import DataView = powerbi.DataView;
@@ -10,7 +10,7 @@ import VisualInitOptions = powerbi.VisualInitOptions;
 import VisualUpdateOptions = powerbi.VisualUpdateOptions;
 import VisualDataRoleKind = powerbi.VisualDataRoleKind;
 
-@Visual(JSON.parse(require("./visualconfig.json")))
+@Visual(JSON.parse(require("./build.json")).output.PowerBI)
 export default class DocumentViewerVisual extends VisualBase implements IVisual {
 
     /**
@@ -41,19 +41,9 @@ export default class DocumentViewerVisual extends VisualBase implements IVisual 
     };
 
     /**
-     * The html string template for this visual
+     * My Document Viewer
      */
-    private static template = `
-        <div>
-            <div class="table"></div>
-            <div class="error"></div>
-        </div>
-    `.trim();
-
-    /**
-     * Our table element
-     */
-    private tableElement: JQuery;
+    private myDocumentViewer : DocumentViewer;
 
     /**
      * Initializes an instance of the IVisual.
@@ -61,8 +51,8 @@ export default class DocumentViewerVisual extends VisualBase implements IVisual 
         * @param options Initialization options for the visual.
         */
     public init(options: VisualInitOptions) {
-        super.init(options, DocumentViewerVisual.template);
-        this.tableElement = this.element.find(".table");
+        super.init(options, '<div></div>');
+        this.myDocumentViewer = new DocumentViewer(this.element);
     }
 
     /**
@@ -70,51 +60,12 @@ export default class DocumentViewerVisual extends VisualBase implements IVisual 
      */
     public update(options: VisualUpdateOptions) {
         super.update(options);
-
-        var error;
+        this.myDocumentViewer.dimensions = options.viewport;
         if (options.dataViews && options.dataViews.length > 0) {
             var table = options.dataViews[0].table;
-            if (table.rows.length === 1) {
-                var data = DocumentViewerVisual.converter(options.dataViews[0]);
-                this.tableElement.empty();
-                this.tableElement.css({ height: options.viewport.height - 10 });
-
-                var eles = data.map((doc) => {
-                    var docEle = $(`
-                        <div class="document">
-                        </div>
-                    `.trim());
-
-                    docEle.append(
-                        doc.items.map((item) => {
-                            var newEle = $(`
-                                <div>
-                                    <div class="column-label">${item.name}:&nbsp;</div>
-                                    <div class="contents ${item.type.html ? "html" : "text"}"></div>
-                                </div>
-                            `);
-
-                            var contents = newEle.find('.contents');
-                            if (item.type.html) {
-                                contents.append(`<div>${DOMPurify.sanitize(item.value, { SAFE_FOR_JQUERY: true })}</div>`);
-                            } else {
-                                contents.text(item.value);
-                            }
-                            return newEle;
-                        })
-                    );
-
-                    return docEle;
-                });
-                this.tableElement.append(eles);
-            } else if (table.rows.length > 1) {
-                error = "Too many documents, please select a filter to limit the number of documents to a single document.";
-            } else {
-                error = "No Results";
-            }
+            var data = DocumentViewerVisual.converter(options.dataViews[0]);
+            this.myDocumentViewer.data = data;
         }
-        this.tableElement.toggle(!error);
-        this.element.find(".error").text(error || "").toggle(!!error);
     }
 
     /**
@@ -129,10 +80,10 @@ export default class DocumentViewerVisual extends VisualBase implements IVisual 
      */
     public static converter(dataView: DataView): IDocumentViewerDocument[] {
         var data: IDocumentViewerDocument[] = [];
-        if (dataView && dataView.table && /*dataView.table.rows.length > 0 */ dataView.table.rows.length === 1) {
+        if (dataView && dataView.table && dataView.table.rows.length > 0) {
             var table = dataView.table;
             var columns = table.columns;
-            // table.rows.forEach((row, i) => {
+            table.rows.forEach((row, i) => {
                 var row = table.rows[0];
                 data.push({
                     items: row.map((value, colNum) => ({
@@ -141,40 +92,8 @@ export default class DocumentViewerVisual extends VisualBase implements IVisual 
                         value: value
                     }))
                 });
-            // });
+            });
         }
         return data;
     }
-}
-
-/**
- * The document
- */
-interface IDocumentViewerDocument {
-
-    /**
-     * The items of the document
-     */
-    items: IDocumentViewerData[]
-}
-
-/**
- * Represents the data for the document viewer to display
- */
-interface IDocumentViewerData {
-
-    /**
-     * The name of the piece of data
-     */
-    name: string;
-
-    /**
-     * Represents the data type of the given field
-     */
-    type?: { text?: {}; html?: {} };
-
-    /**
-     * The actual value of the data field
-     */
-    value: string;
 }
