@@ -1,5 +1,5 @@
 /// <reference path="../../base/references.d.ts"/>
-import { default as AdvancedSlicer, SlicerItem } from "./AdvancedSlicer";
+import { AdvancedSlicer, SlicerItem } from "./AdvancedSlicer";
 import { VisualBase } from "../../base/VisualBase";
 import { default as Utils, Visual } from "../../base/Utils";
 import IVisual = powerbi.IVisual;
@@ -12,7 +12,7 @@ import data = powerbi.data;
 import SelectableDataPoint = powerbi.visuals.SelectableDataPoint;
 import SelectionManager = powerbi.visuals.utility.SelectionManager;
 
-@Visual(JSON.parse(require("./visualconfig.json")))
+@Visual(JSON.parse(require("./build.json")).output.PowerBI)
 export default class AdvancedSlicerVisual extends VisualBase implements IVisual {
 
     /**

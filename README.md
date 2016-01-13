@@ -10,7 +10,7 @@ This is a base project for developing Power BI visuals.  It is hopefully a tempo
 import { VisualBase } from "../../base/VisualBase"; // Provides some base functionality
 import { Visual } from "../../base/Utils";
 
-@Visual(JSON.parse(require("./visualconfig.json"))) // This line will register the class as a visual in power bi
+@Visual(JSON.parse(require("./build.json").output.PowerBI)) // This line will register the class as a visual in power bi
 export default class LineUpVisual extends VisualBase implements IVisual {
 
     /**
@@ -61,8 +61,25 @@ export default class LineUpVisual extends VisualBase implements IVisual {
 
 ```
 * Create an index.ts that does `require('./MyVisual.ts')`
-* Create a file called visualconfig.json, and put two values: The `projectName` and `projectId` fields, which are your visual's name, and a random id (13 digits) respectively
-    * If your project includes an icon for the visual, put it in the top level directory of your visual, and then add another field into the config file called `icon`, which contains your icons file name.
+* Create a file called build.json, and put the following values in it
+
+```
+{
+    "output": {
+        "PowerBI": { // If the component can be output to powerbi
+            "visualName": "<Class Name of the Visual >",
+            "projectId": "<Random Id: (13 digits)>",
+            "icon": "<File name of icon>",
+            "entry": "<The entry point file name, i.e The main class name for the visual>"
+        },
+        "component": { // The actual component to be used outside power bi
+            "entry": "<The entry point file name, i.e The main class name for the individual component>"
+        }
+    },
+    "lintFiles": [<List of files to lint>]
+}
+```
+
 * Review the Power BI [Visuals Getting Started](https://github.com/Microsoft/PowerBI-visuals/wiki).
 
 #Building

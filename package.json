@@ -16,6 +16,7 @@
     "gulp-order": "^1.1.1",
     "gulp-replace": "^0.5.4",
     "gulp-uglify": "^1.5.1",
+    "ts-node": "^0.5.5",
     "typescript": "^1.7.5"
   },
   "devDependencies": {
@@ -23,6 +24,7 @@
     "css-loader": "^0.23.1",
     "gulp-filter": "^3.0.1",
     "gulp-modify": "^0.1.1",
+    "gulp-sass": "^2.1.1",
     "gulp-sequence": "^0.4.1",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-tslint": "^4.2.1",

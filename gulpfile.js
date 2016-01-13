@@ -13,6 +13,7 @@ var webpack = require('gulp-webpack');
 var path = require("path");
 var replace = require("gulp-replace");
 var gutil = require("gulp-util");
+var sass = require("gulp-sass");
 
 var project = args.project;
 if (!project) {
@@ -21,19 +22,24 @@ if (!project) {
 
 var paths = {
     projectDir: 'visuals/' + project,
-    scripts: ['visuals/' + project + '/**/*.ts'],
-    buildDir: 'build/' + project,
-    buildResourcesDir: 'build/' + project + '/resources',
+    scripts: ['visuals/' + project + '/**/*\.ts'],
+    styles: ['visuals/' + project + '/**/*\.{scss,sass}'],
+    buildDir:  'dist/' + project,
+    buildDirComponentCSS:  'dist/' + project + "/component",
+    buildDirComponentJS:  'dist/' + project + "/component",
+    buildDirPowerBI: 'dist/' + project + '/powerbi',
+    buildDirPowerBiResources: 'dist/' + project + '/powerbi/resources',
     packageDir: ['package']
 };
 
-var projectConfig = JSON.parse(fs.readFileSync('visuals/' + project + '/visualconfig.json').toString());
+var projectConfig = JSON.parse(fs.readFileSync('visuals/' + project + '/build.json').toString());
 
 // Not all tasks need to use streams
 // A gulpfile is just another node program and you can use any package available on npm
-gulp.task('clean', function() {
+gulp.task('clean', function(cb) {
     // You can use multiple globbing patterns as you would with `gulp.src`
-    return del.sync([paths.buildDir]);
+    del.sync([paths.buildDir]);
+    cb();
 });
 
 gulp.task('tslint', function() {
@@ -48,47 +54,76 @@ gulp.task('tslint', function() {
         .pipe(tslint.report('verbose'))
 });
 
+/**
+ * Builds the css
+ */
 gulp.task('build:css', function() {
-    if (projectConfig.icon) {
-        var base64Contents = new Buffer(fs.readFileSync(paths.projectDir + '/' + projectConfig.icon), 'binary').toString('base64');
+    return gulp.src(paths.styles)
+        .pipe(sass())
+        .pipe(gulp.dest(paths.buildDirComponentCSS));
+});
+
+/**
+ * Builds the bare component
+ */
+gulp.task('build:component', ['build:css'], function() {
+    var output = projectConfig.output.component;
+    var config = require('./webpack.config.dev.js');
+    config.output = {
+        libraryTarget: "commonjs2"
+    };
+    config.entry = path.join(__dirname, 'visuals', project, output.entry);
+    return gulp.src(paths.scripts)
+        // .pipe(sourcemaps.init())
+        .pipe(webpack(config))
+        // .pipe(sourcemaps.write())
+        .pipe(concat(project + '.js'))
+        .pipe(gulp.dest(paths.buildDirComponentJS));
+});
+
+/**
+ * Builds the css for the visual
+ */
+gulp.task('build:powerbi:css', ['build:css'], function() {
+    var output = projectConfig.output.PowerBI;
+    if (output && output.icon) {
+        var base64Contents = new Buffer(fs.readFileSync(paths.projectDir + '/' + output.icon), 'binary').toString('base64');
         return string_src('project.css', `
-        .visual-icon.${projectConfig.mainVisual + projectConfig.projectId}{
+        .visual-icon.${output.visualName + output.projectId}{
             background-image: url(data:image/png;base64,${base64Contents});
         }
         `.trim())
-            .pipe(gulp.dest(paths.buildResourcesDir));
+            .pipe(gulp.dest(paths.buildDirPowerBiResources));
 
     }
 });
 
-gulp.task('build:ts', ['build:css'], function() {
+/**
+ * Builds the scripts for use for with powerbi
+ */
+gulp.task('build:powerbi:scripts', ['build:powerbi:css'], function() {
+    var output = projectConfig.output.PowerBI;
     var config = require('./webpack.config.dev.js');
-    config.entry = path.join(__dirname, 'visuals', project);
+    config.entry = path.join(__dirname, 'visuals', project, output.entry);
     return gulp.src(paths.scripts)
         // .pipe(sourcemaps.init())
         .pipe(webpack(config))
         // .pipe(sourcemaps.write())
         .pipe(concat('project.js'))
-        .pipe(gulp.dest(paths.buildResourcesDir));
+        .pipe(gulp.dest(paths.buildDirPowerBiResources));
 });
 
-gulp.task('build', function(cb) {
-    sequence('clean', 'build:ts', cb);
-});
-
-// The default task (called when you run `gulp` from cli)
 /**
- * By default just build the dev build
+ * Creates the package.json
  */
-gulp.task('default', ['tslint', 'build']);
-
-gulp.task('package:package_json', function() {
+gulp.task('build:powerbi:package_json', function() {
+    var output = projectConfig.output.PowerBI;
     return gulp.src([paths.packageDir + "/package.json"])
-        .pipe(replace("%PROJECT_NAME%", projectConfig.mainVisual))
-        .pipe(replace("%PROJECT_ID%", projectConfig.projectId))
+        .pipe(replace("%PROJECT_NAME%", output.visualName))
+        .pipe(replace("%PROJECT_ID%", output.projectId))
         .pipe(modify({
             fileModifier: function(file, contents) {
-                if (projectConfig.icon) {
+                if (output.icon) {
                     var package = JSON.parse(contents.toString());
                     package.images = {
                         icon: {
@@ -98,9 +133,9 @@ gulp.task('package:package_json', function() {
                     package.resources.push({
                         resourceId: "rId3",
                         sourceType: 3,
-                        file: "resources/" + projectConfig.icon
+                        file: "resources/" + output.icon
                     });
-                    var uniqueProjName = projectConfig.mainVisual + projectConfig.projectId;
+                    var uniqueProjName = output.visualName + output.projectId;
                     /**
                      * What the below is doing is basically removing the define/require calls, to remove the AMD load logic from some libraries
                      * and then restoring it after the library is done loading
@@ -110,35 +145,59 @@ gulp.task('package:package_json', function() {
                 return `${contents}`.trim().replace("\n", "");
             }
         }))
-        .pipe(gulp.dest(paths.buildDir));
+        .pipe(gulp.dest(paths.buildDirPowerBI));
 });
 
-gulp.task('package:package_icon', function() {
-    if (projectConfig.icon) {
-        return gulp.src([paths.projectDir + '/' + projectConfig.icon])
-            .pipe(gulp.dest(paths.buildResourcesDir));
+/**
+ * Packages the icon
+ */
+gulp.task('build:powerbi:package_icon', function() {
+    var output = projectConfig.output.PowerBI;
+    if (output.icon) {
+        return gulp.src([paths.projectDir + '/' + output.icon])
+            .pipe(gulp.dest(paths.buildDirPowerBiResources));
     }
 });
 
-gulp.task('package:zip', function() {
-    return gulp.src([paths.buildDir + "/**/*"])
-        .pipe(zip(projectConfig.mainVisual + ".pbiviz"))
-        .pipe(gulp.dest(paths.buildDir));
+/**
+ * Zips up the visual
+ */
+gulp.task('build:powerbi:zip', function() {
+    var output = projectConfig.output.PowerBI;
+    return gulp.src([paths.buildDirPowerBI + "/**/*"])
+        .pipe(zip(output.visualName + ".pbiviz"))
+        .pipe(gulp.dest(paths.buildDirPowerBI));
 });
 
 /**
  * Task to create an empty ts file
  */
-gulp.task('package:create_empty_ts', function(cb) {
-    fs.writeFileSync(paths.buildResourcesDir + "/project.ts", "/** See project.js **/");
+gulp.task('build:powerbi:create_empty_ts', function(cb) {
+    fs.writeFileSync(paths.buildDirPowerBiResources + "/project.ts", "/** See project.js **/");
+    cb();
+});
+
+/**
+ * Task to create an empty ts file
+ */
+gulp.task('build:powerbi:clean', function(cb) {
+    // You can use multiple globbing patterns as you would with `gulp.src`
+    del.sync([paths.buildDirPowerBI + "/package.json", paths.buildDirPowerBiResources]);
     cb();
 });
 
 /**
  * Packages the visualization in a pbiviz
  */
-gulp.task('package', function(cb) {
-    sequence('build', 'package:package_json', 'package:package_icon', 'package:create_empty_ts', 'package:zip', cb);
+gulp.task('build:powerbi', function(cb) {
+    sequence('build:powerbi:scripts', 'build:powerbi:package_json', 'build:powerbi:package_icon', 'build:powerbi:create_empty_ts', 'build:powerbi:zip', 'build:powerbi:clean', cb);
+});
+
+/**
+ * Builds everything
+ */
+gulp.task('build', function(cb) {
+    sequence('clean', 'build:powerbi', 'build:component', cb);
 });
 
 function string_src(filename, string) {
@@ -147,5 +206,5 @@ function string_src(filename, string) {
     this.push(new gutil.File({ cwd: "", base: "", path: filename, contents: new Buffer(string) }))
     this.push(null)
   }
-  return src
+  return src;
 }

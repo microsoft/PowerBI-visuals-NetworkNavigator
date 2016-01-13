@@ -1,11 +1,12 @@
-import { List } from './List';
+/// <reference path="../../base/references.d.ts"/>
 import EventEmitter from '../../base/EventEmitter';
 import Utils from '../../base/Utils';
+const List = require('./List');
 
 /**
  * Represents an advanced slicer to help slice through data
  */
-export default class AdvancedSlicer {
+export class AdvancedSlicer {
 
     /**
      * The template for this visual
@@ -259,12 +260,16 @@ export default class AdvancedSlicer {
             setTimeout(() => this.loadMoreDataBasedOnSearch(), 10);
         });
         this.listEle.on("click", (evt) => {
-            var target = $(evt.target);
+            var checkbox = $(evt.target);
             var ele = $((<HTMLElement>evt.target)).parents(".item");
-            if (ele.length > 0 && target.attr("type") === "checkbox") {
+            if (ele.length > 0 && checkbox.attr("type") === "checkbox") {
                 let oldSelectedItems = this.selectedItems.slice(0);
                 let item : any = ele.data("item");
-                this.selectedItems.push(item);
+                if (checkbox.prop('checked') === true) {
+                    this.selectedItems.push(item);
+                } else {
+                    this.selectedItems.splice(this.selectedItems.indexOf(item), 1);
+                }
                 this.raiseSelectionChanged(this.selectedItems, oldSelectedItems);
 
                 this.updateSelectAllButtonState();
