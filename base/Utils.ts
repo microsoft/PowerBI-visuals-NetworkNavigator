@@ -42,23 +42,24 @@ export function Visual(config) {
  */
 export default class Utils {
 
-    // /**
-    //  * Returns if there is any more or less data in the new data
-    //  */
-    // static hasDataChanged(newData: { identity: powerbi.visuals.SelectionId }[], oldData: { identity: powerbi.visuals.SelectionId }[]) {
-    //     // If the are identical, either same array or undefined, nothing has changed
-    //     if (oldData === newData) {
-    //         return false;
-    //     }
+    /**
+     * Returns if there is any more or less data in the new data
+     * @param idEquality Returns true if a and b are referring to the same object, not necessarily if it has changed
+     */
+    static hasDataChanged<T>(newData: T[], oldData: T[], idEquality: (a : T, b : T) => boolean) {
+        // If the are identical, either same array or undefined, nothing has changed
+        if (oldData === newData) {
+            return false;
+        }
 
-    //     // If only one of them is undefined or if they differ in length, then its changed
-    //     if (!oldData || !newData || oldData.length !== newData.length) {
-    //         return true;
-    //     }
+        // If only one of them is undefined or if they differ in length, then its changed
+        if (!oldData || !newData || oldData.length !== newData.length) {
+            return true;
+        }
 
-    //     // If there are any elements in newdata that arent in the old data
-    //     return _.any(newData, n => !_.any(oldData, m => m.identity.equals(n.identity) && _.isEqual(m, n)));
-    // }
+        // If there are any elements in newdata that arent in the old data
+        return _.any(newData, n => !_.any(oldData, m => m.identity.equals(n.identity) && _.isEqual(m, n)));
+    }
 
 
     /**

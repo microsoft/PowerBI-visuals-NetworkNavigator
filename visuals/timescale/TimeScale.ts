@@ -5,7 +5,7 @@ import EventEmitter from '../../base/EventEmitter.ts';
 * Represents a timescale
 */
 /* @Mixin(EventEmitter)*/
-export default class TimeScale {
+export class TimeScale {
     private element : JQuery;
     private svg : D3.Selection;
     private x : D3.Scale.TimeScale;

@@ -1,7 +1,7 @@
 /// <reference path="../../base/references.d.ts"/>
 declare var _;
 
-import { default as TimeScale, TimeScaleDataItem } from "./TimeScale";
+import { TimeScale, TimeScaleDataItem } from "./TimeScale";
 
 import { VisualBase } from "../../base/VisualBase";
 import { default as Utils, Visual } from "../../base/Utils";
@@ -20,7 +20,7 @@ import SelectionManager = powerbi.visuals.utility.SelectionManager;
 import VisualDataRoleKind = powerbi.VisualDataRoleKind;
 import SQExpr = powerbi.data.SQExpr;
 
-@Visual(JSON.parse(require("./visualconfig.json")))
+@Visual(JSON.parse(require("./build.json")).output.PowerBI)
 export default class TimeScaleVisual extends VisualBase implements IVisual {
 
     private host : IVisualHostServices;
@@ -81,6 +81,11 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
         </div>
     `;
 
+    /**
+     * Compares the ids of the two given items
+     */
+    private idCompare = (a : TimeScaleVisualDataItem, b: TimeScaleVisualDataItem) => a.identity.equals(b.identity);
+
     /** This is called once when the visual is initialially created */
     public init(options: VisualInitOptions): void {
         super.init(options);
@@ -124,7 +129,7 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
             }
 
             // If the data has changed at all, then update the timeScale
-            if (Utils.hasDataChanged(data, <TimeScaleVisualDataItem[]>this.timeScale.data)) {
+            if (Utils.hasDataChanged(data, <TimeScaleVisualDataItem[]>this.timeScale.data, this.idCompare)) {
                 this.timeScale.data = data;
             }
 
