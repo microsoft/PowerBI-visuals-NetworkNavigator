@@ -2,10 +2,12 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { LineUp, ILineUpRow, ILineUpColumn, ILineUpSettings } from "./LineUp";
 
+export interface LineUpStore {
+    getData() : PromiseLike<{ cols: ILineUpColumn[], rows: ILineUpRow[] }>;
+}
+
 export interface LineUpProps {
-    dataStore: {
-        getData() : PromiseLike<{ cols: ILineUpColumn[], rows: ILineUpRow[] }>;
-    },
+    dataStore: LineUpStore;
     onSelectionChanged: (selectedRows: ILineUpRow[]) => void;
 };
 
