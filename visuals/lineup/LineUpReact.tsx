@@ -5,6 +5,14 @@ import { LineUp as LineUpImpl, ILineUpRow, ILineUpColumn, ILineUpSettings } from
 export interface LineUpProps {
     cols: ILineUpColumn[],
     rows: ILineUpRow[],
+    multiSelect: boolean;
+    singleSelect: boolean;
+    selectable: boolean;
+    inferColumnTypes: boolean;
+    showHistograms: boolean;
+    showValues: boolean;
+    showAnimations: boolean;
+    showStacked: boolean;
     onSelectionChanged: (selectedRows: ILineUpRow[]) => void;
 };
 
@@ -42,6 +50,8 @@ export class LineUp extends React.Component<LineUpProps, LineUpState> {
         // props, otherwise use what we already have.
         props = props || this.props;
 
+        this.lineup.settings = this.getSettingsFromProps(props);
+        this.lineup.selectionEnabled = !!props.selectable;
         if (props.rows && props.cols) {
             this.lineup.loadData(props.cols, props.rows);
         }
@@ -53,6 +63,27 @@ export class LineUp extends React.Component<LineUpProps, LineUpState> {
         if (props.onSelectionChanged) {
             this.selectionListener = this.lineup.events.on("selectionChanged", (rows) => this.onSelectionChanged(rows));
         }
+    }
+
+    /**
+     * Converts the lineup props to settings
+     */
+    private getSettingsFromProps(props: LineUpProps) : ILineUpSettings {
+        return {
+            selection: {
+                singleSelect: props.singleSelect,
+                multiSelect: props.multiSelect,
+            },
+            data: {
+                inferColumnTypes: props.inferColumnTypes
+            },
+            presentation: {
+                values: props.showValues,
+                stacked: props.showStacked,
+                histograms: props.showHistograms,
+                animation: props.showAnimations,
+            },
+        };
     }
 
     /**
