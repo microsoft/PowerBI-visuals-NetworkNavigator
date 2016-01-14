@@ -24,6 +24,11 @@ export class LineUp {
     private rows: ILineUpRow[];
 
     /**
+     * Sets the sort information
+     */
+    private sortInfo: { column: any; asc: boolean };
+
+    /**
      * Represents the settings
      */
     public static DEFAULT_SETTINGS : ILineUpSettings = {
@@ -213,6 +218,12 @@ export class LineUp {
             }
         }
 
+        if (this.sortInfo) {
+            this.lineup.sortBy(this.sortInfo.column, this.sortInfo.asc);
+        }
+
+        this.attachEvents();
+
         this.lineup.select(_data.filter((n) => n.selected));
     }
 
@@ -300,11 +311,20 @@ export class LineUp {
             // Cleans up events
             this.lineup.listeners.on("multiselected.lineup", null);
             this.lineup.listeners.on("selected.lineup", null);
+            this.lineup.listeners.on('change-sortcriteria.lineup', null);
+            this.lineup.listeners.on('change-sortcriteria.lineup', (ele, column, asc) => {
+                this.sortInfo = {
+                    column: column.getLabel(),
+                    asc: asc
+                };
+            });
 
-            if (this.isMultiSelect) {
-                this.lineup.listeners.on("multiselected.lineup", (rows: ILineUpRow[]) => this.raiseSelectionChanged(rows));
-            } else {
-                this.lineup.listeners.on("selected.lineup", (row: ILineUpRow) => this.raiseSelectionChanged(row ? [row] : []));
+            if (this.selectionEnabled) {
+                if (this.isMultiSelect) {
+                    this.lineup.listeners.on("multiselected.lineup", (rows: ILineUpRow[]) => this.raiseSelectionChanged(rows));
+                } else {
+                    this.lineup.listeners.on("selected.lineup", (row: ILineUpRow) => this.raiseSelectionChanged(row ? [row] : []));
+                }
             }
         }
     }

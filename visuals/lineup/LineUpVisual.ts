@@ -167,7 +167,9 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 for (var section in newObjs) {
                     var values = newObjs[section];
                     for (var prop in values) {
-                        updatedSettings[section][prop] = values[prop];
+                        if (updatedSettings[section] && typeof(updatedSettings[section][prop]) !== "undefined") {
+                            updatedSettings[section][prop] = values[prop];
+                        }
                     }
                 }
             }

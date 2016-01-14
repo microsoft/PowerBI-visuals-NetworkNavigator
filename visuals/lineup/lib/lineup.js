@@ -2949,7 +2949,8 @@ var LineUp;
     if (Array.isArray(row)) {
       this.storage.setSelection(row);
       row = row.map(function(d) { return d[primaryKey]; });
-      $rows.classed('selected', function(d) { return row.indexOf(d[primaryKey]) > 0; });
+      // ATS: Made this >= 0 instead of > 0, cause it could be at index 0
+      $rows.classed('selected', function(d) { return row.indexOf(d[primaryKey]) >= 0; });
     } else if (row) {
       this.storage.setSelection([row]);
       $rows.classed('selected',function(d) { return d[primaryKey] === row[primaryKey]; });
