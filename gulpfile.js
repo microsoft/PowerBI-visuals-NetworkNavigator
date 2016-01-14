@@ -91,9 +91,12 @@ gulp.task('build:component', ['build:css'], function() {
  * Builds the css
  */
 gulp.task('build:react:css', function() {
-    return gulp.src(paths.styles)
-        .pipe(sass())
-        .pipe(gulp.dest(paths.buildDirReactCSS));
+    var output = projectConfig.output.react;
+    if (output) {
+        return gulp.src(paths.styles)
+            .pipe(sass())
+            .pipe(gulp.dest(paths.buildDirReactCSS));
+    }
 });
 
 /**
@@ -101,17 +104,19 @@ gulp.task('build:react:css', function() {
  */
 gulp.task('build:react', ['build:react:css'], function() {
     var output = projectConfig.output.react;
-    var config = require('./webpack.config.dev.js');
-    config.output = {
-        libraryTarget: "umd"
-    };
-    config.entry = path.join(__dirname, 'visuals', project, output.entry);
-    return gulp.src([config.entry])
-        // .pipe(sourcemaps.init())
-        .pipe(webpack(config))
-        // .pipe(sourcemaps.write())
-        .pipe(concat(project + '.js'))
-        .pipe(gulp.dest(paths.buildDirReactJS));
+    if (output) {
+        var config = require('./webpack.config.dev.js');
+        config.output = {
+            libraryTarget: "umd"
+        };
+        config.entry = path.join(__dirname, 'visuals', project, output.entry);
+        return gulp.src([config.entry])
+            // .pipe(sourcemaps.init())
+            .pipe(webpack(config))
+            // .pipe(sourcemaps.write())
+            .pipe(concat(project + '.js'))
+            .pipe(gulp.dest(paths.buildDirReactJS));
+    }
 });
 
 /**

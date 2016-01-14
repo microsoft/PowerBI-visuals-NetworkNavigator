@@ -1,4 +1,3 @@
-/// <reference path="../../base/references.d.ts"/>
 import EventEmitter from '../../base/EventEmitter';
 import Utils from '../../base/Utils';
 const List = require('./List');

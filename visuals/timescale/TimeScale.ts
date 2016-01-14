@@ -1,4 +1,3 @@
-/// <reference path="../../base/references.d.ts"/>
 import EventEmitter from '../../base/EventEmitter.ts';
 
 /**

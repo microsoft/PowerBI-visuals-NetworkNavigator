@@ -1,4 +1,3 @@
-/// <reference path="../../base/references.d.ts"/>
 import { default as EventEmitter } from "../../base/EventEmitter";
 import { default as Utils } from "../../base/Utils";
 const LineUpLib = require("./lib/lineup");

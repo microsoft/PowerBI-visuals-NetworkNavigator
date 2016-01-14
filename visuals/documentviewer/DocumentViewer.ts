@@ -1,4 +1,3 @@
-/// <reference path="./references.d.ts"/>
 const DOMPurify = require("./purify");
 
 /**
