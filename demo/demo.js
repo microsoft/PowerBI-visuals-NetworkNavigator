@@ -2,13 +2,9 @@ $(function() {
 
     function loadSlicer() {
         try {
-            var AdvancedSlicer = require("../dist/advancedslicer/component/advancedslicer").AdvancedSlicer;
             var slicerEle = $('#advanced-slicer');
             var slicer = new AdvancedSlicer(slicerEle);
             slicer.events.on('canLoadMoreData', function() { return false; });
-            // slicer.on('loadMoreData', function() {
-
-            // });
             slicer.dimensions = { height: slicerEle.height(), width: slicerEle.width() };
             $.getJSON('slicerdata.json', function(data) {
                 slicer.data = data;
@@ -21,7 +17,6 @@ $(function() {
     function loadTimescale() {
         try {
             var timescaleEle = $('#time-scale');
-            var TimeScale = require("../dist/timescale/component/timescale").TimeScale;
             var timeScale = new TimeScale(timescaleEle, { height: timescaleEle.height(), width: timescaleEle.width() });
             $.getJSON('timescaledata.json', function(data) {
                 data.forEach(function (item) {
@@ -40,7 +35,6 @@ $(function() {
     function loadDocumentViewer() {
         try {
             var documentViewerEle = $('#document-viewer');
-            var DocumentViewer = require("../dist/documentviewer/component/documentviewer").DocumentViewer;
             var documentviewer = new DocumentViewer(documentViewerEle, { height: documentViewerEle.height(), width: documentViewerEle.width() });
             documentviewer.data = [{
                 items: [{
@@ -65,7 +59,6 @@ $(function() {
     function loadForceGraph() {
         try {
             var forceGraphEle = $('#force-graph');
-            var ForceGraph = require("../dist/forcegraph/component/forcegraph").ForceGraph;
             var forcegraph = new ForceGraph(forceGraphEle, forceGraphEle.width(), forceGraphEle.height());
             $.getJSON('forcegraphdata.json', function(data) {
                 forcegraph.data = data;
@@ -87,7 +80,6 @@ $(function() {
     function loadLineUp() {
         try {
             var lineUpEle = $('#line-up');
-            var LineUp = require("../dist/lineup/component/lineup").LineUp;
             var lineup = new LineUp(lineUpEle);
             $.getJSON('lineupdata.json', function(data) {
                 var columns = [];

@@ -25,6 +25,11 @@ module.exports = {
             }
         ],
     },
+    externals: {
+        jquery: "jQuery",
+        d3: "d3",
+        underscore: "_"
+    },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.NoErrorsPlugin()

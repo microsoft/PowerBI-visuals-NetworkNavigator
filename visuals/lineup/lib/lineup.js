@@ -3812,13 +3812,13 @@ var LineUp;
 
 return LineUp;
   }
+  if (typeof define === "function" && define.amd) {
+    define(['jquery','d3','underscore'], LineUpLoader);
+  } else if (typeof module === "object" && module.exports) {
+    module.exports = LineUpLoader(require('jquery'), require('d3'), require('underscore'));
+  } else {
+    this.LineUp = LineUpLoader(jQuery, d3, _);
+  }
   // ATS: Didn't want this, cause I don't want to bundle jquery/d3/underscore with it
-//   if (typeof define === "function" && define.amd) {
-//     define(['jquery','d3','underscore'], LineUpLoader);
-//   } else if (typeof module === "object" && module.exports) {
-//     module.exports = LineUpLoader(require('jquery'), require('d3'), require('underscore'));
-//   } else {
-    //this.LineUp = LineUpLoader(jQuery, d3, _);
-//   }
-    module.exports = LineUpLoader(jQuery, d3, _);
+    //module.exports = LineUpLoader(jQuery, d3, _);
 }.call(this));

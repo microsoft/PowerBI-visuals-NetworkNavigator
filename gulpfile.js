@@ -74,7 +74,7 @@ gulp.task('build:component', ['build:css'], function() {
     var output = projectConfig.output.component;
     var config = require('./webpack.config.dev.js');
     config.output = {
-        libraryTarget: "commonjs2"
+        libraryTarget: "umd"
     };
     config.entry = path.join(__dirname, 'visuals', project, output.entry);
     return gulp.src(paths.scripts)
