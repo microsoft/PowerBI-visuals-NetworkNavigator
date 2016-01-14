@@ -3,13 +3,15 @@
     "target": "es5",
     "sourceMap": true,
     "module": "commonjs",
-    "moduleResolution": "classic",
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "jsx": "react"
   },
   "exclude": [
     "power-bi",
     "node_modules",
     "build"
   ],
-  "files":[]
+  "include": [
+      "typings"
+  ]
 }

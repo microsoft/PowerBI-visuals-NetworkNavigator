@@ -1,3 +1,4 @@
+require("ts-node/register");
 module.exports = {
     TimeScale: require('./visuals/timescale/TimeScale').TimeScale,
     LineUp: require('./visuals/lineup/LineUp').LineUp,

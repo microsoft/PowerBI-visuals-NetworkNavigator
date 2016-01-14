@@ -31,6 +31,8 @@ var paths = {
     buildDir:  'dist/' + project,
     buildDirComponentCSS:  'dist/' + project + "/component",
     buildDirComponentJS:  'dist/' + project + "/component",
+    buildDirReactCSS:  'dist/' + project + "/react",
+    buildDirReactJS:  'dist/' + project + "/react",
     buildDirPowerBI: 'dist/' + project + '/powerbi',
     buildDirPowerBiResources: 'dist/' + project + '/powerbi/resources',
     packageDir: ['package']
@@ -83,6 +85,33 @@ gulp.task('build:component', ['build:css'], function() {
         // .pipe(sourcemaps.write())
         .pipe(concat(project + '.js'))
         .pipe(gulp.dest(paths.buildDirComponentJS));
+});
+
+/**
+ * Builds the css
+ */
+gulp.task('build:react:css', function() {
+    return gulp.src(paths.styles)
+        .pipe(sass())
+        .pipe(gulp.dest(paths.buildDirReactCSS));
+});
+
+/**
+ * Builds the react component
+ */
+gulp.task('build:react', ['build:react:css'], function() {
+    var output = projectConfig.output.react;
+    var config = require('./webpack.config.dev.js');
+    config.output = {
+        libraryTarget: "umd"
+    };
+    config.entry = path.join(__dirname, 'visuals', project, output.entry);
+    return gulp.src([config.entry])
+        // .pipe(sourcemaps.init())
+        .pipe(webpack(config))
+        // .pipe(sourcemaps.write())
+        .pipe(concat(project + '.js'))
+        .pipe(gulp.dest(paths.buildDirReactJS));
 });
 
 /**
@@ -201,7 +230,7 @@ gulp.task('build:powerbi', function(cb) {
  * Builds everything
  */
 gulp.task('build', function(cb) {
-    sequence('clean', 'build:powerbi', 'build:component', cb);
+    sequence('clean', 'build:powerbi', 'build:component', 'build:react', cb);
 });
 
 /**

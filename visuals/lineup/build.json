@@ -8,6 +8,9 @@
         },
         "component": {
             "entry": "LineUp"
+        },
+        "react": {
+            "entry": "LineUpReact"
         }
     },
     "lintFiles": ["LineUpVisual.ts", "LineUp.ts"]
