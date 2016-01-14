@@ -1,13 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { LineUp, ILineUpRow, ILineUpColumn, ILineUpSettings } from "./LineUp";
-
-export interface LineUpStore {
-    getData() : PromiseLike<{ cols: ILineUpColumn[], rows: ILineUpRow[] }>;
-}
+import { LineUp as LineUpImpl, ILineUpRow, ILineUpColumn, ILineUpSettings } from "./LineUp";
 
 export interface LineUpProps {
-    dataStore: LineUpStore;
+    cols: ILineUpColumn[],
+    rows: ILineUpRow[],
     onSelectionChanged: (selectedRows: ILineUpRow[]) => void;
 };
 
@@ -16,17 +13,16 @@ export interface LineUpState { }
 /**
  * Thin wrapper around LineUp
  */
-export class LineUpComponent extends React.Component<LineUpProps, LineUpState> {
-    private lineup: LineUp;
+export class LineUp extends React.Component<LineUpProps, LineUpState> {
+    private lineup: LineUpImpl;
     private node: any;
     private selectionListener : any;
     public props : any;
 
     componentDidMount() {
         this.node = ReactDOM.findDOMNode(this);
-        this.lineup = new LineUp($(this.node));
+        this.lineup = new LineUpImpl($(this.node));
         this.lineup.events.on("canLoadMoreData", (info) => false);
-        // this.lineup.events.on("loadMoreData", (info) => this.host.loadMoreData());
         this.renderContent();
     }
 
@@ -46,12 +42,8 @@ export class LineUpComponent extends React.Component<LineUpProps, LineUpState> {
         // props, otherwise use what we already have.
         props = props || this.props;
 
-        // the code that used to be in `componentDidMount`
-        // ReactDOM.render(<div>{props.children}</div>, this.node);
-        if (props.dataStore) {
-            props.dataStore.getData().then((value) => {
-                this.lineup.loadData(value.cols, value.rows);
-            });
+        if (props.rows && props.cols) {
+            this.lineup.loadData(props.cols, props.rows);
         }
 
         if (this.selectionListener) {
