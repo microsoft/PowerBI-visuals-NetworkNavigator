@@ -10,8 +10,5 @@
     "power-bi",
     "node_modules",
     "build"
-  ],
-  "include": [
-      "typings"
   ]
 }

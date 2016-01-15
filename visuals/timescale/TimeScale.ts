@@ -6,17 +6,17 @@ import EventEmitter from '../../base/EventEmitter.ts';
 /* @Mixin(EventEmitter)*/
 export class TimeScale {
     private element : JQuery;
-    private svg : D3.Selection;
-    private x : D3.Scale.TimeScale;
-    private y : D3.Scale.LinearScale;
-    private timeScalePath : D3.Selection;
-    private area : D3.Svg.Area;
-    private brush : D3.Svg.Brush;
-    private clip : D3.Selection;
-    private brushGrip : D3.Selection;
-    private context : D3.Selection;
-    private brushEle : D3.Selection;
-    private xAxis : D3.Selection;
+    private svg : d3.Selection<any>;
+    private x : d3.time.Scale<Date, any>;
+    private y : d3.scale.Linear<any, any>;
+    private timeScalePath : d3.Selection<any>;
+    private area : d3.svg.Area<any>;
+    private brush : d3.svg.Brush<Date>;
+    private clip : d3.Selection<any>;
+    private brushGrip : d3.Selection<any>;
+    private context : d3.Selection<any>;
+    private brushEle : d3.Selection<any>;
+    private xAxis : d3.Selection<any>;
     private _dimensions : { width: number; height: number; } = { width: 500, height: 500 };
     private _eventEmitter = new EventEmitter();
     private _data : TimeScaleDataItem[];
@@ -26,7 +26,7 @@ export class TimeScale {
      */
     constructor(element: JQuery, dimensions?: any) {
         this.element = element;
-        this.x = d3.time.scale();
+        this.x = d3.time.scale<Date>();
         this.y = d3.scale.linear();
         this.buildTimeScale();
         if (!this.dimensions) {
@@ -81,7 +81,7 @@ export class TimeScale {
      */
     public set selectedRange(dates : Date[]) {
         if (dates && dates.length) {
-            this.brush.extent(dates);
+            this.brush.extent(<any>dates);
 
             this.brush(d3.select(this.element.find(".brush")[0]));
 
@@ -91,7 +91,7 @@ export class TimeScale {
         }
     }
 
-    private bars : D3.Selection;
+    private bars : d3.Selection<any>;
 
     /**
      * Builds the initial timescale
@@ -129,7 +129,7 @@ export class TimeScale {
             width = this._dimensions.width - margin.left - margin.right,
             height = this._dimensions.height - margin.top - margin.bottom;
 
-        this.x.range([0, width])
+        this.x.range([0, <any>width])
         this.y.range([0, height]);
 
         if (this.bars && this._data) {
@@ -167,7 +167,7 @@ export class TimeScale {
         this.context
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        this.brush.x(this.x);
+        this.brush.x(<any>this.x);
 
         // Need to recreate the brush element for some reason
         d3.selectAll(this.element.find(".x.brush").toArray()).remove();

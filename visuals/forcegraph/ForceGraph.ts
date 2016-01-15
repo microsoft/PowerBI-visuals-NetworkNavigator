@@ -6,10 +6,10 @@ import EventEmitter from '../../base/EventEmitter';
 /* @Mixin(EventEmitter) */
 export class ForceGraph {
     private element: JQuery;
-    private svg: D3.Selection;
-    private vis: D3.Selection;
-    private force: D3.Layout.ForceLayout;
-    private zoom: D3.Behavior.Zoom;
+    private svg: any;
+    private vis: any;
+    private force: any;
+    private zoom: any;
     private graph: IForceGraphData<IForceGraphNode>;
     private _dimensions: { width: number; height: number; };
     private _selectedNode : IForceGraphNode;
@@ -27,7 +27,6 @@ export class ForceGraph {
      * The event emitter for this graph
      */
     public events = new EventEmitter();
-    // private listeners: { [id: string]: Function[]; } = {};
 
     /**
      * Constructor for the force graph
@@ -137,7 +136,8 @@ export class ForceGraph {
      */
     public redraw() {
         if (this.vis && d3.event) {
-            this.vis.attr("transform", `translate(${d3.event.translate}) scale(${d3.event.scale})`);
+            var zoomEvt = <any>d3.event;
+            this.vis.attr("transform", `translate(${zoomEvt.translate}) scale(${zoomEvt.scale})`);
         }
     }
 
@@ -160,15 +160,16 @@ export class ForceGraph {
             .on("zoom", () => this.redraw());
 
         var drag = d3.behavior.drag()
-            .origin(function(d) { return d; })
+            .origin(function(d) { return <any>d; })
         // Function is important here
             .on("dragstart", function(d) {
-                d3.event.sourceEvent.stopPropagation();
+                (<any>d3.event).sourceEvent.stopPropagation();
                 d3.select(this).classed("dragging", true);
                 me.force.start();
             })
-            .on("drag", function(d) {
-                d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+            .on("drag", function(d : any) {
+                var evt = <any>d3.event;
+                d3.select(this).attr("cx", d.x = evt.x).attr("cy", d.y = evt.y);
             })
             .on("dragend", function(d) {
                 d3.select(this).classed("dragging", false);

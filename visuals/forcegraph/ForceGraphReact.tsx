@@ -28,6 +28,7 @@ export class ForceGraph extends React.Component<IForceGraphProps, IForceGraphSta
             }
         });
         this.forcegraph.dimensions = { width: $(this.node).width(), height: $(this.node).height() };
+        this.renderContent();
     }
 
     componentWillReceiveProps(newProps : IForceGraphProps) {
@@ -48,6 +49,8 @@ export class ForceGraph extends React.Component<IForceGraphProps, IForceGraphSta
         if (this.selectionListener) {
             this.selectionListener.destroy();
         }
+
+        this.forcegraph.data = props.graph;
 
         if (props.onSelectionChanged) {
             this.selectionListener = this.forcegraph.events.on("selectionChanged", (rows) => props.onSelectionChanged(rows));
