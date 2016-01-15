@@ -8,6 +8,9 @@
         },
         "component": {
             "entry": "ForceGraph.ts"
+        },
+        "react": {
+            "entry": "ForceGraphReact.tsx"
         }
     }
 }

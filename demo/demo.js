@@ -64,13 +64,8 @@ $(function() {
                 forcegraph.data = data;
             });
             var selectedNodeEle = $('#selected-node');
-            forcegraph.events.on("nodeClicked", function (node) {
-                node.selected = !node.selected;
-                var selectedNodes = forcegraph.data.nodes.filter(function (eNode) {
-                    return !!eNode.selected;
-                }).map(function (eNode) { return eNode.name; });
-                selectedNodeEle.text(selectedNodes.join(", "));
-                forcegraph.redrawSelection();
+            forcegraph.events.on("selectionChanged", function (node) {
+                selectedNodeEle.text(node ? node.name : "");
             });
         } catch (e) {
             console.error(e);

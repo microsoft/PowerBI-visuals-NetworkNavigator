@@ -25,7 +25,6 @@ declare var _;
 export default class GraphVisual extends VisualBase implements IVisual {
     private dataViewTable: DataViewTable;
     private myGraph: ForceGraph;
-    private _selectedNode : IForceGraphNode;
     private host : IVisualHostServices;
     private interactivityService : IInteractivityService;
 
@@ -360,7 +359,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
             if (this.listener) {
                 this.listener.destroy();
             }
-            this.listener = this.myGraph.events.on("nodeClicked", (node) => this.onNodeSelected(node));
+            this.listener = this.myGraph.events.on("selectionChanged", (node) => this.onNodeSelected(node));
         }
     }
 
@@ -369,18 +368,12 @@ export default class GraphVisual extends VisualBase implements IVisual {
      */
     private onNodeSelected(node: ForceGraphSelectableNode) {
         var filter;
-        if (node && node !== this._selectedNode) {
-            node.selected = true;
+        if (node) {
             filter = powerbi.data.SemanticFilter.fromSQExpr(node.filterExpr);
-            this._selectedNode = <IForceGraphNode>node;
+            this.selectionManager.select(node.identity, false);
         } else {
-            if (this._selectedNode) {
-                this._selectedNode.selected = false;
-            }
-            this._selectedNode = undefined;
+            this.selectionManager.clear();
         }
-
-        this.selectionManager.select(node.identity, false);
 
         var objects: powerbi.VisualObjectInstancesToPersist = {
             merge: [
@@ -395,7 +388,6 @@ export default class GraphVisual extends VisualBase implements IVisual {
         };
 
         this.host.persistProperties(objects);
-        this.myGraph.redrawSelection();
     }
 }
 

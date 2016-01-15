@@ -14,6 +14,7 @@ export interface LineUpProps {
     showAnimations: boolean;
     showStacked: boolean;
     onSelectionChanged: (selectedRows: ILineUpRow[]) => void;
+    onCanLoadMoreData: (options: { result: boolean;}) => void;
 };
 
 export interface LineUpState { }
@@ -25,12 +26,12 @@ export class LineUp extends React.Component<LineUpProps, LineUpState> {
     private lineup: LineUpImpl;
     private node: any;
     private selectionListener : any;
+    private canLoadListener : any;
     public props : any;
 
     componentDidMount() {
         this.node = ReactDOM.findDOMNode(this);
         this.lineup = new LineUpImpl($(this.node));
-        this.lineup.events.on("canLoadMoreData", (info) => false);
         this.renderContent();
     }
 
@@ -61,7 +62,15 @@ export class LineUp extends React.Component<LineUpProps, LineUpState> {
         }
 
         if (props.onSelectionChanged) {
-            this.selectionListener = this.lineup.events.on("selectionChanged", (rows) => this.onSelectionChanged(rows));
+            this.selectionListener = this.lineup.events.on("selectionChanged", (rows) => props.onSelectionChanged(rows));
+        } else if (this.selectionListener) {
+            this.selectionListener.destroy();
+        }
+
+        if (props.onCanLoadMoreData) {
+            this.canLoadListener = this.lineup.events.on("canLoadMoreData", (options) => props.onCanLoadMoreData(options));
+        } else if (this.canLoadListener) {
+            this.canLoadListener.destroy();
         }
     }
 
@@ -84,11 +93,5 @@ export class LineUp extends React.Component<LineUpProps, LineUpState> {
                 animation: props.showAnimations,
             },
         };
-    }
-
-    /**
-     * Selects the given rows
-     */
-    private onSelectionChanged(rows) {
     }
 }

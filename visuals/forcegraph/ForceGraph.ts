@@ -12,6 +12,7 @@ export class ForceGraph {
     private zoom: D3.Behavior.Zoom;
     private graph: IForceGraphData<IForceGraphNode>;
     private _dimensions: { width: number; height: number; };
+    private _selectedNode : IForceGraphNode;
     private _configuration = {
         linkDistance: 10,
         linkStrength: 2,
@@ -244,6 +245,7 @@ export class ForceGraph {
 
         node.on("click", (n) => {
             this.events.raiseEvent("nodeClicked", n);
+            this.updateSelection(n);
         });
 
         node.on("mouseover", () => {
@@ -293,6 +295,26 @@ export class ForceGraph {
     public redrawSelection() {
         this.vis.selectAll(".node circle")
             .style("stroke-width", (d) => d.selected ? 1 : 0);
+    }
+
+    /**
+     * Updates the selection based on the given node
+     */
+    private updateSelection(n : IForceGraphNode) {
+        if (n !== this._selectedNode) {
+            if (this._selectedNode) {
+                this._selectedNode.selected = false;
+            }
+            n.selected = true;
+            this._selectedNode = n;
+        } else {
+            if (this._selectedNode) {
+                this._selectedNode.selected = false;
+            }
+            this._selectedNode = undefined;
+        }
+        this.events.raiseEvent('selectionChanged', this._selectedNode);
+        this.redrawSelection();
     }
 }
 
