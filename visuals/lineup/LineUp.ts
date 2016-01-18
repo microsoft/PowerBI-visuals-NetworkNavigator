@@ -149,7 +149,7 @@ export class LineUp {
             this.lineup = LineUpLib.create(spec, d3.select(this.element.find('.grid')[0]), finalOptions);
             this.lineup.listeners.on('change-sortcriteria.lineup', (ele, column, asc) => {
                 // This only works for single columns and not grouped columns
-                this.onLineUpSorted(column && column.column.id, asc);
+                this.onLineUpSorted(column && column.column && column.column.id, asc);
             });
             this.lineup.listeners.on('change-filter.lineup', (x, column) => this.onLineUpFiltered(column));
             var scrolled = this.lineup.scrolled;
