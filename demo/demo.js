@@ -77,17 +77,17 @@ $(function() {
             var lineUpEle = $('#line-up');
             var lineup = new LineUp(lineUpEle);
             $.getJSON('lineupdata.json', function(data) {
-                var columns = [];
-                for (var col in data[0]) {
-                    columns.push({
-                        displayName: col,
-                        type: {
-                            numeric: $.isNumeric(data[0][col]),
-                            text: true
-                        }
-                    })
-                }
-                lineup.loadData(columns, data);
+                // var columns = [];
+                // for (var col in data[0]) {
+                //     columns.push({
+                //         displayName: col,
+                //         type: {
+                //             numeric: $.isNumeric(data[0][col]),
+                //             text: true
+                //         }
+                //     })
+                // }
+                lineup.setData(data);
             });
         } catch (e) {
             console.error(e);

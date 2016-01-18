@@ -283,7 +283,12 @@ var LineUp;
     bundle.sortedColumn = d;
 
     this.listeners['change-sortcriteria'](this, d, bundle.sortingOrderAsc);
-    this.storage.resortData({column: d, asc: bundle.sortingOrderAsc});
+
+    // ATS: Updates for external
+    if (!this.config.sorting || !this.config.sorting.external) {
+        this.storage.resortData({column: d, asc: bundle.sortingOrderAsc});
+    }
+
     this.updateAll(false, d.columnBundle);
   };
 
@@ -334,8 +339,12 @@ var LineUp;
     column.updateWeights(weights);
     //trigger resort
     if (column === this.config.columnBundles[bundle].sortedColumn) {
-      this.listeners['change-sortcriteria'](this, column, this.config.columnBundles[bundle]);
-      this.storage.resortData({ key: bundle });
+        this.listeners['change-sortcriteria'](this, column, this.config.columnBundles[bundle]);
+
+        // ATS: Updates for external
+        if (!this.config.sorting || !this.config.sorting.external) {
+            this.storage.resortData({ key: bundle });
+        }
     }
     this.updateAll(false, bundle);
     return true;
@@ -1914,8 +1923,13 @@ var LineUp;
       d3.select(this).classed('dragging', false);
 
       if (that.config.columnBundles.primary.sortedColumn instanceof LineUp.LayoutStackedColumn) {
-        that.listeners['change-sortcriteria'](that, that.config.columnBundles.primary.sortedColumn);
-        that.storage.resortData({column: that.config.columnBundles.primary.sortedColumn});
+            that.listeners['change-sortcriteria'](that, that.config.columnBundles.primary.sortedColumn);
+
+            // ATS: Updates for external
+            if (!that.config.sorting || !that.config.sorting.external) {
+                that.storage.resortData({column: that.config.columnBundles.primary.sortedColumn});
+            }
+
         that.updateBody(that.storage.getColumnLayout(), that.storage.getData(), false);
       }
 //        that.updateBody(that.storage.getColumnLayout(), that.storage.getData())
@@ -3387,8 +3401,13 @@ var LineUp;
         }
 
         bundle.sortedColumn = d;
+
         that.listeners['change-sortcriteria'](this, d, bundle.sortingOrderAsc);
-		that.storage.resortData({column: d, asc: bundle.sortingOrderAsc});
+
+        // ATS: Updates for external
+        if (!that.config.sorting || !that.config.sorting.external) {
+		  that.storage.resortData({column: d, asc: bundle.sortingOrderAsc});
+        }
         that.updateAll(false);
       });
 

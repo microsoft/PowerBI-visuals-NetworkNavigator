@@ -54,7 +54,7 @@ export class LineUp extends React.Component<LineUpProps, LineUpState> {
         this.lineup.settings = this.getSettingsFromProps(props);
         this.lineup.selectionEnabled = !!props.selectable;
         if (props.rows && props.cols) {
-            this.lineup.loadData(props.cols, props.rows);
+            this.lineup.setData(/*props.cols, */props.rows);
         }
 
         if (this.selectionListener) {
@@ -82,9 +82,6 @@ export class LineUp extends React.Component<LineUpProps, LineUpState> {
             selection: {
                 singleSelect: props.singleSelect,
                 multiSelect: props.multiSelect,
-            },
-            data: {
-                inferColumnTypes: props.inferColumnTypes
             },
             presentation: {
                 values: props.showValues,

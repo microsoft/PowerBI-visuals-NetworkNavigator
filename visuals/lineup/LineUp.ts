@@ -14,9 +14,19 @@ export class LineUp {
     private lineup : any;
 
     /**
+     * THe current set of data in this lineup
+     */
+    private _data : ILineUpRow[];
+
+    /**
      * The list of columns
      */
     private columns: ILineUpColumn[];
+
+    /**
+     * The current configuration of the LineUp instance
+     */
+    private _configuration: ILineUpConfiguration;
 
     /**
      * The list of rows
@@ -24,9 +34,14 @@ export class LineUp {
     private rows: ILineUpRow[];
 
     /**
-     * Sets the sort information
+     * Whether or not we are currently saving the configuration
      */
-    private sortInfo: { column: any; asc: boolean };
+    private savingConfiguration : boolean;
+
+    /**
+     * True if we are currently sorting lineup per the grid
+     */
+    private sortingFromConfig: boolean;
 
     /**
      * Represents the settings
@@ -35,9 +50,6 @@ export class LineUp {
         selection: {
             singleSelect: true,
             multiSelect: true
-        },
-        data: {
-            inferColumnTypes: false
         },
         presentation: {
             stacked: true,
@@ -61,6 +73,7 @@ export class LineUp {
      */
     private loadingMoreData = false;
 
+    private _selectedRows : ILineUpRow[];
     private _selectionEnabled: boolean;
     private _isMultiSelect: boolean;
     private _eventEmitter: EventEmitter;
@@ -91,7 +104,10 @@ export class LineUp {
         },
         interaction: {
             multiselect: () => this.isMultiSelect
-        }
+        },
+      /*  sort: {
+            external: true
+        }*/
     };
 
     /**
@@ -104,14 +120,64 @@ export class LineUp {
     }
 
     /**
+     * Gets the data contained in lineup
+     */
+    public getData() {
+        return this._data;
+    }
+
+    /**
      * Loads the data into the lineup view
      */
-    public loadData(columns: ILineUpColumn[], rows: ILineUpRow[], force: boolean = false) {
+    public setData(rows: ILineUpRow[]) {
+        this._data = rows;
+
         //derive a description file
-        var desc = this.deriveDesc(columns, rows);
-        var name = 'data';
-        this.loadDataImpl(name, desc, rows, force);
+        var desc = this.configuration || LineUp.createConfigurationFromData(rows);
+        var spec: any = {};
+        spec.name = name;
+        spec.dataspec = desc;
+        delete spec.dataspec.file;
+        delete spec.dataspec.separator;
+        spec.dataspec.data = rows;
+        spec.storage = LineUpLib.createLocalStorage(rows, desc.columns, desc.layout, desc.primaryKey);
+
+        if (this.lineup) {
+            this.lineup.changeDataStorage(spec);
+        } else {
+            var finalOptions = $.extend(true, this.lineUpConfig, { renderingOptions: $.extend(true, {}, this.settings.presentation) });
+            this.lineup = LineUpLib.create(spec, d3.select(this.element.find('.grid')[0]), finalOptions);
+            this.lineup.listeners.on('change-sortcriteria.lineup', (ele, column, asc) => {
+                // This only works for single columns and not grouped columns
+                this.onLineUpSorted(column && column.column.id, asc);
+            });
+            this.lineup.listeners.on('change-filter.lineup', (x, column) => this.onLineUpFiltered(column));
+            var scrolled = this.lineup.scrolled;
+            var me = this;
+
+            // The use of `function` here is intentional, we need to pass along the correct scope
+            this.lineup.scrolled = function(...args) {
+                me.onLineUpScrolled.apply(me, args);
+                return scrolled.apply(this, args);
+            };
+        }
+
+        this.selection = rows.filter((n) => n.selected);
+
+        this.applyConfigurationToLineup();
+
+        // Store the configuration after it was possibly changed by load data
+        this.saveConfiguration();
+
         this.loadingMoreData = false;
+    }
+
+    /**
+     * Appends data to the end
+     */
+    public appendData(rows: ILineUpRow[]) {
+        // Hack for now
+        this.setData((this._data || []).concat(rows))
     }
 
     /**
@@ -129,6 +195,24 @@ export class LineUp {
     }
 
     /**
+     * Gets the current selection
+     */
+    public get selection() {
+        return this._selectedRows;
+    }
+
+    /**
+     * Sets the selection of lineup
+     */
+    public set selection(value: ILineUpRow[]) {
+        this._data.forEach((d) => d.selected = false);
+        if (value && value.length) {
+            value.forEach((d) => d.selected = true);
+        }
+        this.lineup.select(value);
+    }
+
+    /**
      * Sets the settings
      */
     public set settings(value: ILineUpSettings) {
@@ -139,11 +223,34 @@ export class LineUp {
         this.selectionEnabled = singleSelect || multiSelect;
         this.isMultiSelect = multiSelect;
 
-        var loadData = newSettings.data.inferColumnTypes !== this.settings.data.inferColumnTypes;
-        this._settings = newSettings;
-        if (loadData && this.rows && this.rows.length) {
-            this.loadData(this.columns, this.rows, true);
+        /** Apply the settings to lineup */
+        if (this.lineup) {
+            this.attachSelectionEvents();
+
+            var presProps = this.settings.presentation;
+            for (var key in presProps) {
+                if (presProps.hasOwnProperty(key)) {
+                    this.lineup.changeRenderingOption(key, presProps[key]);
+                }
+            }
         }
+        this._settings = newSettings;
+    }
+
+    /**
+     * Gets this configuration
+     */
+    public get configuration() : ILineUpConfiguration {
+        return this._configuration;
+    }
+
+    /**
+     * Sets the column configuration that is used
+     */
+    public set configuration (value: ILineUpConfiguration) {
+        this._configuration = value;
+
+        this.applyConfigurationToLineup();
     }
 
     /**
@@ -158,7 +265,7 @@ export class LineUp {
      */
     public set selectionEnabled(value: boolean) {
         this._selectionEnabled = value;
-        this.attachEvents();
+        this.attachSelectionEvents();
     }
 
 
@@ -174,79 +281,30 @@ export class LineUp {
      */
     public set isMultiSelect(value: boolean) {
         this._isMultiSelect = value;
-        this.attachEvents();
+        this.attachSelectionEvents();
     }
-
-    /**
-     * Loads the data into the lineup view
-     */
-    private loadDataImpl(name: string, desc, _data: ILineUpRow[], force: boolean = false) {
-
-        // Update the rendering options
-        if (this.lineup) {
-            var presProps = this.settings.presentation;
-            for (var key in presProps) {
-                if (presProps.hasOwnProperty(key)) {
-                    this.lineup.changeRenderingOption(key, presProps[key]);
-                }
-            }
-        }
-
-        /* Only reload lineup if we are forced to, if we haven't loaded lineup in the first place, or if the data has changed */
-        if (force || !this.lineup || Utils.hasDataChanged(this.lineup.storage.getData(), _data, (a, b) => a.equals(b))) {
-            var spec: any = {};
-            spec.name = name;
-            spec.dataspec = desc;
-            delete spec.dataspec.file;
-            delete spec.dataspec.separator;
-            spec.dataspec.data = _data;
-            spec.storage = LineUpLib.createLocalStorage(_data, desc.columns, desc.layout, desc.primaryKey);
-
-            if (this.lineup) {
-                this.lineup.changeDataStorage(spec);
-            } else {
-                var finalOptions = $.extend(true, this.lineUpConfig, { renderingOptions: this.settings.presentation });
-                this.lineup = LineUpLib.create(spec, d3.select(this.element.find('.grid')[0]), finalOptions);
-                var scrolled = this.lineup.scrolled;
-                var me = this;
-
-                // The use of `function` is intentional here, we need to pass along the correct scope
-                this.lineup.scrolled = function(...args) {
-                    me.onLineUpScrolled.apply(me, args);
-                    return scrolled.apply(this, args);
-                };
-            }
-        }
-
-        if (this.sortInfo) {
-            this.lineup.sortBy(this.sortInfo.column, this.sortInfo.asc);
-        }
-
-        this.attachEvents();
-
-        this.lineup.select(_data.filter((n) => n.selected));
-    }
-
-    /**
-     * Returns true if the given object is numeric
-     */
-    private isNumeric = (obj) => (obj - parseFloat(obj) + 1) >= 0;
 
     /**
      * Derives the desciption for the given column
      */
-    private deriveDesc(columns: ILineUpColumn[], data: ILineUpRow[], separator?: string) {
-        var cols = columns.map((col) => {
-            var r: any = {
-                column: col.displayName,
+    public static createConfigurationFromData(data: ILineUpRow[]) : ILineUpConfiguration {
+        let dataCols : string[] = [];
+        if (data && data.length) {
+            for (var key in data[0]) {
+                dataCols.push(key);
+            }
+        }
+        var cols = dataCols.map((col) => {
+            var r: ILineUpColumn = {
+                column: col,
                 type: 'string'
             };
-            if (this.settings.data.inferColumnTypes) {
+            // if (this.settings.data.inferColumnTypes) {
                 var allNumeric = true;
                 var minMax = { min: Number.MAX_VALUE, max: 0 };
                 for (var i = 0; i < data.length; i++) {
                     var value = data[i][r.column];
-                    if (value !== 0 && !!value && !this.isNumeric(value)) {
+                    if (value !== 0 && !!value && !LineUp.isNumeric(value)) {
                         allNumeric = false;
                         break;
                     } else {
@@ -261,16 +319,17 @@ export class LineUp {
                     r.type = 'number';
                     r.domain = [minMax.min, minMax.max];
                 }
-            } else {
+            // }
+            /*else {
                 if (col.type.numeric) {
                     r.type = 'number';
-                    r.domain = d3.extent(data, (row) => row[col.displayName] && row[col.displayName].length === 0 ? undefined : +(row[col.displayName]));
+                    r.domain = d3.extent(data, (row) => row[col.label] && row[col.label].length === 0 ? undefined : +(row[col.label]));
                 }
-            }
+            }*/
 
             // If is a string, try to see if it is a category
             if (r.type === 'string') {
-                var sset = d3.set(data.map((row) => row[col.displayName]));
+                var sset = d3.set(data.map((row) => row[col]));
                 if (sset.size() <= Math.max(20, data.length * 0.2)) { //at most 20 percent unique values
                     r.type = 'categorical';
                     r.categories = sset.values().sort();
@@ -279,11 +338,67 @@ export class LineUp {
             return r;
         });
         return {
-            separator: separator,
-            primaryKey: columns[0].displayName,
+            primaryKey: dataCols[0],
             columns: cols
         };
     }
+
+    /**
+     * Saves the current layout
+     */
+    private saveConfiguration() {
+        if (!this.savingConfiguration) {
+            this.savingConfiguration = true;
+            //full spec
+            var s : ILineUpConfiguration = $.extend({}, {}, this.lineup.spec.dataspec);
+            //create current layout
+            var descs = this.lineup.storage.getColumnLayout()
+            .map(((d) => d.description()));
+            s.layout = _.groupBy(descs, (d) => d.columnBundle || "primary");
+            s.sort = this.getSortFromLineUp();
+            this.configuration = s;
+            delete s['data'];
+            this.raiseConfigurationChanged(this.configuration);
+            this.savingConfiguration = false;
+        }
+    }
+
+    /**
+     * Gets the sort from lineup
+     */
+    private getSortFromLineUp() {
+        if (this.lineup && this.lineup.storage) {
+            var primary = this.lineup.storage.config.columnBundles.primary;
+            var col = primary.sortedColumn;
+            if (col) {
+                return {
+                    column: col.column.column,
+                    asc: primary.sortingOrderAsc
+                };
+            }
+        }
+    }
+
+    /**
+     * Applies our external config to lineup
+     */
+    private applyConfigurationToLineup() {
+        if (this.lineup) {
+            var currentSort = this.getSortFromLineUp();
+            if (this.configuration && this.configuration.sort && (!currentSort || !_.isEqual(currentSort, this.configuration.sort))) {
+                this.sortingFromConfig = true;
+                this.lineup.sortBy(this.configuration.sort.column, this.configuration.sort.asc);
+                this.sortingFromConfig = false;
+            }
+
+            this.attachSelectionEvents();
+        }
+    }
+
+    /**
+     * Returns true if the given object is numeric
+     */
+    private static isNumeric = (obj) => (obj - parseFloat(obj) + 1) >= 0;
 
     /**
      * Listener for when the lineup viewer is scrolled
@@ -297,7 +412,6 @@ export class LineUp {
             if (scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200) {
                 this.loadingMoreData = true;
                 this.raiseLoadMoreData();
-                // this.host.loadMoreData();
             }
         }
     }
@@ -306,18 +420,11 @@ export class LineUp {
     /**
      * Attaches the line up events to lineup
      */
-    private attachEvents() {
+    private attachSelectionEvents() {
         if (this.lineup) {
             // Cleans up events
             this.lineup.listeners.on("multiselected.lineup", null);
             this.lineup.listeners.on("selected.lineup", null);
-            this.lineup.listeners.on('change-sortcriteria.lineup', null);
-            this.lineup.listeners.on('change-sortcriteria.lineup', (ele, column, asc) => {
-                this.sortInfo = {
-                    column: column.getLabel(),
-                    asc: asc
-                };
-            });
 
             if (this.selectionEnabled) {
                 if (this.isMultiSelect) {
@@ -327,6 +434,62 @@ export class LineUp {
                 }
             }
         }
+    }
+
+    /**
+     * Listener for line up being sorted
+     */
+    private onLineUpSorted(column : string, asc : boolean) {
+        if (!this.sortingFromConfig) {
+            this.saveConfiguration();
+            this.raiseSortChanged(column, asc);
+        }
+    }
+
+    /**
+     * Listener for lineup being filtered
+     */
+    private onLineUpFiltered(column) {
+        var colName = column.getLabel();
+        var ourColumn = this.configuration.columns.filter(n => n.label === colName)[0];
+        var filter;
+        if (ourColumn.type === "number") {
+            filter = {
+                column: colName,
+                value: {
+                    domain: column.scale.domain(),
+                    range: column.scale.range()
+                }
+            };
+        } else {
+            filter = {
+                column: colName,
+                value: column.filter
+            };
+        }
+        this.raiseFilterChanged(filter);
+        this.saveConfiguration();
+    }
+
+    /**
+     * Raises the configuration changed event
+     */
+    private raiseConfigurationChanged(configuration: ILineUpConfiguration) {
+        this.events.raiseEvent("configurationChanged", configuration);
+    }
+
+    /**
+     * Raises the filter changed event
+     */
+    private raiseSortChanged(column: string, asc: boolean) {
+        this.events.raiseEvent("sortChanged", column, asc);
+    }
+
+    /**
+     * Raises the filter changed event
+     */
+    private raiseFilterChanged(filter: any) {
+        this.events.raiseEvent("filterChanged", filter);
     }
 
     /**
@@ -381,15 +544,74 @@ export interface ILineUpRow {
  */
 export interface ILineUpColumn {
     /**
+     * The field name of the column
+     */
+    column: string;
+
+    /**
      * The displayName for the column
      */
-    displayName: string;
+    label?: string;
 
     /**
      * The type of column it is
+     * values: string|number
      */
-    type: {
-        numeric: boolean;
+    type: string;
+
+    /**
+     * The categories of this column
+     */
+    categories?: string[];
+
+    /**
+     * The domain of the column, only for number based columns
+     */
+    domain?: [number, number]
+}
+
+interface ILineUpLayoutColumn {
+    width: number;
+    column: string;
+    type: string;
+    filter?: string; // The filter applied to string based columns
+    range?: [number, number]; // The range applied to number based columns
+    weight?: number;
+    label?: string;
+    sort?: boolean; // If defined, sorted. True asc, false desc
+    children?: ILineUpLayoutColumn[]
+}
+
+/**
+ * Represents the configuration of a lineup instance
+ */
+export interface ILineUpConfiguration {
+    /**
+     * The primary key of the layout
+     */
+    primaryKey: string;
+
+    /**
+     * The list of columns for lineup
+     */
+    columns: ILineUpColumn[];
+
+    /**
+     * The layout of the columns
+     */
+    layout?: {
+        /**
+         * The layout name
+         */
+        [name: string]: ILineUpLayoutColumn[]
+    }
+
+    /**
+     * The sort of the lineup
+     */
+    sort? : {
+        column: string;
+        asc: boolean;
     }
 }
 
@@ -400,9 +622,6 @@ export interface ILineUpSettings {
     selection?: {
         singleSelect?: boolean;
         multiSelect?: boolean;
-    };
-    data?: {
-        inferColumnTypes?: boolean;
     };
     presentation?: {
         values?: boolean;

@@ -218,7 +218,17 @@ gulp.task('build:powerbi:create_empty_ts', function(cb) {
 /**
  * Task to create an empty ts file
  */
-gulp.task('build:powerbi:clean', function(cb) {
+gulp.task('build:powerbi:pre_clean', function(cb) {
+    // You can use multiple globbing patterns as you would with `gulp.src`
+    del.sync([paths.buildDirPowerBI]);
+    cb();
+});
+
+
+/**
+ * Task to create an empty ts file
+ */
+gulp.task('build:powerbi:post_clean', function(cb) {
     // You can use multiple globbing patterns as you would with `gulp.src`
     del.sync([paths.buildDirPowerBI + "/package.json", paths.buildDirPowerBiResources]);
     cb();
@@ -228,7 +238,7 @@ gulp.task('build:powerbi:clean', function(cb) {
  * Packages the visualization in a pbiviz
  */
 gulp.task('build:powerbi', function(cb) {
-    sequence('build:powerbi:scripts', 'build:powerbi:package_json', 'build:powerbi:package_icon', 'build:powerbi:create_empty_ts', 'build:powerbi:zip', 'build:powerbi:clean', cb);
+    sequence('build:powerbi:pre_clean', 'build:powerbi:scripts', 'build:powerbi:package_json', 'build:powerbi:package_icon', 'build:powerbi:create_empty_ts', 'build:powerbi:zip', 'build:powerbi:post_clean', cb);
 });
 
 /**
