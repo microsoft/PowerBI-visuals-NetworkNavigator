@@ -29,7 +29,7 @@ var project = args.project;
 
 var paths = {
     projectDir: 'visuals/' + project,
-    scripts: ['visuals/' + project + '/**/*\.ts'],
+    scripts: ['visuals/' + project + '/**/*\.{js,ts}'],
     styles: ['visuals/' + project + '/**/*\.{scss,sass}'],
     test: ['visuals/' + project + '/**/*\.spec\.{ts,js}'],
     buildDir:  'dist/' + project,
@@ -266,7 +266,15 @@ gulp.task('build', function(cb) {
 gulp.task('demo-server', function() {
     gulp.src('./')
         .pipe(webserver({
-            livereload: true,
+            livereload: {
+                enable: true, // need this set to true to enable livereload
+                filter: function(fileName) {
+                    if (fileName.match(/dist\//) || fileName.match(/demo/)) { // exclude all source maps from livereload
+                        return false;
+                    }
+                    return true;
+                }
+            },
             open: '/demo'
         }));
 });
@@ -275,6 +283,7 @@ gulp.task('demo-server', function() {
  * Starts the demo
  */
 gulp.task('demo', function(cb) {
+    gulp.watch([paths.scripts, paths.styles], ['build:component']);
     sequence('clean', 'build:component', 'demo-server', cb);
 });
 

@@ -1190,17 +1190,20 @@ var LineUp;
    * @param options optional options like the dimension of the popup
    * @returns {{popup: *, table: *, remove: remove, onOK: onOK}}
    */
-  function createPopup(title, label, options) {
+  function createPopup(container, title, label, options) {
     options = $.extend({}, options, {
-      x: +(window.innerWidth) / 2 - 100,
+      x: +(container.node().clientWidth) / 2 - 100,
       y: 100,
       width: 400,
       height: 200
     });
-    var popupBG = d3.select("body")
-      .append("div").attr("class", "lu-popupBG");
+    // ATS: Was d3.select('body').appe...
+    var popupBG = container.append('div')
+    // var popupBG = d3.select("body").append("div")
+        .attr("class", "lu-popupBG");
 
-    var popup = d3.select("body").append("div")
+    // ATS: Was d3.select('body').appe...
+    var popup = container.append('div')
       .attr({
         "class": "lu-popup"
       }).style({
@@ -1243,7 +1246,7 @@ var LineUp;
   LineUp.prototype.addNewStackedColumnDialog = function () {
     var that = this;
 
-    var popup = createPopup('add stacked column:', 'Stacked');
+    var popup = createPopup(this.$container, 'add stacked column:', 'Stacked');
     // list all data rows !
     var trData = that.storage.getRawColumns().filter(function (d) {
       return (d instanceof LineUp.LineUpNumberColumn);
@@ -1290,8 +1293,12 @@ var LineUp;
     redraw();
 
 
+    function getElementById(id) {
+        return $(that.$container.node()).find("#" + id)[0];
+    }
+
     popup.onOK(function () {
-      var name = document.getElementById("popupInputText").value;
+      var name = getElementById("popupInputText").value;
       if (name.length < 1) {
         window.alert("name must not be empty");
         return;
@@ -1321,7 +1328,7 @@ var LineUp;
 
   LineUp.prototype.addNewSingleColumnDialog = function () {
     var that = this;
-    var popup = createPopup('add single columns', undefined);
+    var popup = createPopup(this.$container, 'add single columns', undefined);
     // list all data rows !
     var trData = that.storage.getRawColumns()
 //        .filter(function(d){return (d instanceof LineUpNumberColumn);})
@@ -1431,7 +1438,7 @@ var LineUp;
 
   LineUp.prototype.reweightStackedColumnDialog = function (col) {
     var that = this;
-    var popup = createPopup('re-weight column "' + col.label + '"', undefined);
+    var popup = createPopup(this.$container, 're-weight column "' + col.label + '"', undefined);
 
     //console.log(col.childrenWeights);
     // list all data rows !
@@ -1462,14 +1469,18 @@ var LineUp;
     var act = bak;
 
 
-    var popup = d3.select("body").append("div")
+
+    var containerHeight = this.$container.node().clientHeight;
+    var height = Math.max(270, Math.min(containerHeight / 2, 470));
+    // ATS: Was d3.select('body').appe...
+    var popup = this.$container.append('div')
       .attr({
         "class": "lu-popup"
       }).style({
-        left: +(window.innerWidth) / 2 - 100 + "px",
+        left: +(this.$container.node().clientWidth) / 2 - 100 + "px",
         top: 100 + "px",
-        width: "420px",
-        height: "470px"
+        width: (height - 50) + "px",
+        height: height + "px"
       })
       .html(
         '<div style="font-weight: bold"> change mapping: </div>' +
@@ -1505,7 +1516,9 @@ var LineUp;
 
     var editorOptions = {
       callback: applyMapping,
-      triggerCallback : 'dragend'
+      triggerCallback : 'dragend',
+      width: height - 50,
+      height: height - 50
     };
     var editor = LineUp.mappingEditor(bak, original.domain(), that.storage.rawdata, access, editorOptions);
     popup.select('.mappingArea').call(editor);
@@ -1561,7 +1574,8 @@ var LineUp;
       var x = +(window.innerWidth) / 2 - 100;
       var y = +100;
 
-      var popup = d3.select('body').append('div')
+    // ATS: Was d3.select('body').appe...
+    var popup = this.$container.append('div')
         .attr({
           'class': 'lu-popup'
         }).style({
@@ -1654,7 +1668,8 @@ var LineUp;
       return;
     }
     var bak = column.filter || [];
-    var popup = d3.select('body').append('div')
+    // ATS: Was d3.select('body').appe...
+    var popup = this.$container.append('div')
       .attr({
         'class': 'lu-popup'
       }).style({
@@ -1745,12 +1760,17 @@ var LineUp;
       //can't filter other than string columns
       return;
     }
-    var pos = $(this.$header.node()).offset();
-    pos.left += column.offsetX;
-    pos.top += column.offsetY;
+    // var pos = $(this.$header.node()).offset();
+    // pos.left += column.offsetX;
+    // // pos.top += column.offsetY;
+    var pos = {
+        left: column.offsetX,
+        top: column.offsetY
+    };
     var bak = column.filter || '';
 
-    var popup = d3.select('body').append('div')
+    // ATS: Was d3.select('body').appe...
+    var popup = this.$container.append('div')
       .attr({
         'class': 'lu-popup2'
       }).style({
@@ -1774,17 +1794,21 @@ var LineUp;
       that.updateBody();
     }
 
+    function getElementById(id) {
+        return $(that.$container.node()).find("#" + id)[0];
+    }
+
     popup.select('.cancel').on('click', function () {
-      document.getElementById('popupInputText').value = bak;
+      getElementById('popupInputText').value = bak;
       updateData(bak);
       popup.remove();
     });
     popup.select('.reset').on('click', function () {
-      document.getElementById('popupInputText').value = '';
+      getElementById('popupInputText').value = '';
       updateData(null);
     });
     popup.select('.ok').on('click', function () {
-      updateData(document.getElementById('popupInputText').value);
+      updateData(getElementById('popupInputText').value);
       popup.remove();
     });
   };

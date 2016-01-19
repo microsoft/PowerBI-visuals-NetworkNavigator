@@ -482,7 +482,7 @@ export class LineUp {
      */
     private onLineUpFiltered(column) {
         var colName = column.getLabel();
-        var ourColumn = this.configuration.columns.filter(n => n.label === colName)[0];
+        var ourColumn = this.configuration.columns.filter(n => n.column === colName)[0];
         var filter;
         if (ourColumn.type === "number") {
             filter = {
