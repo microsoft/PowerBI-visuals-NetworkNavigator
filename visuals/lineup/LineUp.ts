@@ -413,7 +413,6 @@ export class LineUp {
             var scrollElement = $(this.lineupImpl.$container.node()).find('div.lu-wrapper')[0];
             var scrollHeight = scrollElement.scrollHeight;
             var top = scrollElement.scrollTop;
-            console.log("HERE:" + $(scrollElement).height());
             if (scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200) {
                 this.loadingMoreData = true;
                 this.raiseLoadMoreData();
