@@ -29,6 +29,12 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     private dimensions: { width: number; height: number };
     private loadingData : boolean;
 
+    private static VISUAL_DEFAULT_SETTINGS : ILineUpVisualSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS, {
+        experimental: {
+            serverSideSorting: false
+        }
+    });
+
     /**
      * The set of capabilities for the visual
      */
@@ -72,6 +78,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 },
             },
             layout: {
+                displayName: "",
                 properties: {
                     // formatString: {
                     //     type: {
@@ -103,16 +110,6 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                     }
                 }
             },
-            data: {
-                displayName: "Data",
-                properties: {
-                    inferColumnTypes: {
-                        displayName: "Infer Column Types",
-                        description: "Infer the coulmn types from the data, vs using the PowerBI defined column types",
-                        type: { bool: true }
-                    }
-                }
-            },
             presentation: {
                 displayName: "Presentation",
                 properties: {
@@ -137,6 +134,16 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                         type: { bool: true }
                     }
                 },
+            },
+            experimental: {
+                displayName: "Experimental",
+                properties: {
+                    serverSideSorting: {
+                        displayName: "Server Side Sorting",
+                        description: "If true, lineup will use PowerBI services to sort the data, rather than doing it client side",
+                        type: { bool: true }
+                    }
+                }
             }
         },
         sorting: {
@@ -415,13 +422,13 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     private checkSettingsChanged() {
         if (this.dataView) {
             // Store this to compare
-            var oldSettings : ILineUpSettings = $.extend(true, {}, this.lineup.settings);
+            var oldSettings : ILineUpVisualSettings = $.extend(true, {}, this.lineup.settings);
 
             // Make sure we have the default values
-            var updatedSettings : ILineUpSettings = $.extend(true, {}, this.lineup.settings, LineUp.DEFAULT_SETTINGS);
+            var updatedSettings : ILineUpVisualSettings = $.extend(true, {}, this.lineup.settings, LineUpVisual.VISUAL_DEFAULT_SETTINGS);
 
             // Copy over new values
-            var newObjs = $.extend(true, {}, <ILineUpSettings>this.dataView.metadata.objects, { sorting: { external: true } });
+            var newObjs = $.extend(true, {}, <ILineUpVisualSettings>this.dataView.metadata.objects);
             if (newObjs) {
                 for (var section in newObjs) {
                     var values = newObjs[section];
@@ -432,7 +439,10 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                     }
                 }
             }
-            this.lineup.settings = newObjs;
+            updatedSettings.sorting = {
+                external: updatedSettings.experimental.serverSideSorting
+            };
+            this.lineup.settings = updatedSettings;
         }
     }
 
@@ -440,17 +450,19 @@ export default class LineUpVisual extends VisualBase implements IVisual {
      * Listens for lineup to be sorted
      */
     private onSorted(column: string, asc: boolean) {
-        let pbiCol = this.dataViewTable.columns.filter((c) => c.displayName === column)[0];
-        let sortDescriptors: powerbi.SortableFieldDescriptor[] = [{
-            queryName: pbiCol.queryName,
-            sortDirection: asc ? powerbi.SortDirection.Ascending : powerbi.SortDirection.Descending
-        }];
-        let args: powerbi.CustomSortEventArgs = {
-            sortDescriptors: sortDescriptors
-        };
-        this.waitingForSort = true;
-        this.loading = true;
-        this.host.onCustomSort(args);
+        if (this.lineup.settings.sorting && this.lineup.settings.sorting.external) {
+            let pbiCol = this.dataViewTable.columns.filter((c) => c.displayName === column)[0];
+            let sortDescriptors: powerbi.SortableFieldDescriptor[] = [{
+                queryName: pbiCol.queryName,
+                sortDirection: asc ? powerbi.SortDirection.Ascending : powerbi.SortDirection.Descending
+            }];
+            let args: powerbi.CustomSortEventArgs = {
+                sortDescriptors: sortDescriptors
+            };
+            this.waitingForSort = true;
+            this.loading = true;
+            this.host.onCustomSort(args);
+        }
     }
 
     /**
@@ -524,4 +536,13 @@ interface ILineUpVisualRow extends ILineUpRow, powerbi.visuals.SelectableDataPoi
      * The expression that will exactly match this row
      */
     filterExpr: powerbi.data.SQExpr;
+}
+
+/**
+ * Has some extra settings for the visual
+ */
+interface ILineUpVisualSettings extends ILineUpSettings {
+    experimental?: {
+        serverSideSorting?: boolean;
+    }
 }

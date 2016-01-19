@@ -236,7 +236,7 @@ export class LineUp {
                     this.lineup.changeRenderingOption(key, presProps[key]);
                 }
             }
-            this.lineup.config.sorting = { external: value.sorting.external };
+            this.lineup.config.sorting = { external: !!value && !!value.sorting && !!value.sorting.external };
         }
         this._settings = newSettings;
     }
