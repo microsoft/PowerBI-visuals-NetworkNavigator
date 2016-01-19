@@ -230,7 +230,7 @@ export class LineUp {
         if (this.lineup) {
             this.attachSelectionEvents();
 
-            var presProps = this.settings.presentation;
+            var presProps = newSettings.presentation;
             for (var key in presProps) {
                 if (presProps.hasOwnProperty(key)) {
                     this.lineup.changeRenderingOption(key, presProps[key]);
