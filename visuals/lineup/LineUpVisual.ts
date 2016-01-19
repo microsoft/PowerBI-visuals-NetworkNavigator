@@ -29,6 +29,9 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     private dimensions: { width: number; height: number };
     private loadingData : boolean;
 
+    /**
+     * The default settings for the visual
+     */
     private static VISUAL_DEFAULT_SETTINGS : ILineUpVisualSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS, {
         experimental: {
             serverSideSorting: false

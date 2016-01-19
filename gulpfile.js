@@ -1,3 +1,5 @@
+require("ts-node/register");
+
 var gulp = require('gulp');
 var del = require('del');
 var concat = require('gulp-concat');
@@ -14,6 +16,7 @@ var replace = require("gulp-replace");
 var gutil = require("gulp-util");
 var sass = require("gulp-sass");
 var webserver = require('gulp-webserver');
+var mocha = require('gulp-mocha');
 
 var args = require('yargs')
     .usage('Usage: $0 --project [name of the visual\'s folder]')
@@ -28,6 +31,7 @@ var paths = {
     projectDir: 'visuals/' + project,
     scripts: ['visuals/' + project + '/**/*\.ts'],
     styles: ['visuals/' + project + '/**/*\.{scss,sass}'],
+    test: ['visuals/' + project + '/**/*\.spec\.{ts,js}'],
     buildDir:  'dist/' + project,
     buildDirComponentCSS:  'dist/' + project + "/component",
     buildDirComponentJS:  'dist/' + project + "/component",
@@ -46,6 +50,14 @@ gulp.task('clean', function(cb) {
     // You can use multiple globbing patterns as you would with `gulp.src`
     del.sync([paths.buildDir]);
     cb();
+});
+
+/**
+ * Runs the tests
+ */
+gulp.task('test', function() {
+    return gulp.src(paths.test)
+        .pipe(mocha({ reporter: 'nyan' }));
 });
 
 gulp.task('tslint', function() {
@@ -245,7 +257,7 @@ gulp.task('build:powerbi', function(cb) {
  * Builds everything
  */
 gulp.task('build', function(cb) {
-    sequence('clean', 'build:powerbi', 'build:component', 'build:react', cb);
+    sequence('clean', 'test', 'build:powerbi', 'build:component', 'build:react', cb);
 });
 
 /**

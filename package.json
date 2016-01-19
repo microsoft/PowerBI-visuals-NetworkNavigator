@@ -21,8 +21,11 @@
   },
   "devDependencies": {
     "babel-loader": "^5.1.2",
+    "chai": "^3.4.1",
     "css-loader": "^0.23.1",
+    "d3": "^3.5.12",
     "gulp-filter": "^3.0.1",
+    "gulp-mocha": "^2.2.0",
     "gulp-modify": "^0.1.1",
     "gulp-sass": "^2.1.1",
     "gulp-sequence": "^0.4.1",
@@ -33,7 +36,11 @@
     "gulp-webpack": "^1.5.0",
     "gulp-webserver": "^0.9.1",
     "gulp-zip": "^3.0.2",
+    "jquery": "^2.2.0",
+    "jsdom": "^7.2.2",
     "json-loader": "^0.5.4",
+    "mocha": "^2.3.4",
+    "mocha-jsdom": "^1.0.0",
     "node-sass": "^3.4.2",
     "raw-loader": "^0.5.1",
     "react": "^0.14.6",
@@ -42,6 +49,7 @@
     "style-loader": "^0.13.0",
     "ts-loader": "^0.7.2",
     "tslint": "^3.2.1",
+    "underscore": "^1.8.3",
     "webpack": "^1.12.9",
     "yargs": "^3.31.0"
   }

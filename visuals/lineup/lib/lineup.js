@@ -3835,7 +3835,9 @@ return LineUp;
   if (typeof define === "function" && define.amd) {
     define(['jquery','d3','underscore'], LineUpLoader);
   } else if (typeof module === "object" && module.exports) {
-    module.exports = LineUpLoader(require('jquery'), require('d3'), require('underscore'));
+      // ATS: newer versions of jquery expect to be called with a window object
+    var __jq = require('jquery');
+    module.exports = LineUpLoader(__jq.extend ? __jq : __jq(window), require('d3'), require('underscore'));
   } else {
     this.LineUp = LineUpLoader(jQuery, d3, _);
   }

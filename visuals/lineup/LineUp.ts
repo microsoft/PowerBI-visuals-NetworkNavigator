@@ -11,7 +11,7 @@ export class LineUp {
     /**
      * My lineup instance
      */
-    private lineup : any;
+    public lineupImpl : any;
 
     /**
      * THe current set of data in this lineup
@@ -99,7 +99,7 @@ export class LineUp {
 
                 addColumn: {
                     title: "Add a Column",
-                    action: () => this.lineup.addNewSingleColumnDialog(),
+                    action: () => this.lineupImpl.addNewSingleColumnDialog(),
                     x: 0, y: 2,
                     w: 21, h: 21 // LineUpGlobal.htmlLayout.headerHeight/2-4
                 }
@@ -138,28 +138,28 @@ export class LineUp {
         //derive a description file
         var desc = this.configuration || LineUp.createConfigurationFromData(rows);
         var spec: any = {};
-        spec.name = name;
+        // spec.name = name;
         spec.dataspec = desc;
         delete spec.dataspec.file;
         delete spec.dataspec.separator;
         spec.dataspec.data = rows;
         spec.storage = LineUpLib.createLocalStorage(rows, desc.columns, desc.layout, desc.primaryKey);
 
-        if (this.lineup) {
-            this.lineup.changeDataStorage(spec);
+        if (this.lineupImpl) {
+            this.lineupImpl.changeDataStorage(spec);
         } else {
             var finalOptions = $.extend(true, this.lineUpConfig, { renderingOptions: $.extend(true, {}, this.settings.presentation) });
-            this.lineup = LineUpLib.create(spec, d3.select(this.element.find('.grid')[0]), finalOptions);
-            this.lineup.listeners.on('change-sortcriteria.lineup', (ele, column, asc) => {
+            this.lineupImpl = LineUpLib.create(spec, d3.select(this.element.find('.grid')[0]), finalOptions);
+            this.lineupImpl.listeners.on('change-sortcriteria.lineup', (ele, column, asc) => {
                 // This only works for single columns and not grouped columns
                 this.onLineUpSorted(column && column.column && column.column.id, asc);
             });
-            this.lineup.listeners.on('change-filter.lineup', (x, column) => this.onLineUpFiltered(column));
-            var scrolled = this.lineup.scrolled;
+            this.lineupImpl.listeners.on('change-filter.lineup', (x, column) => this.onLineUpFiltered(column));
+            var scrolled = this.lineupImpl.scrolled;
             var me = this;
 
             // The use of `function` here is intentional, we need to pass along the correct scope
-            this.lineup.scrolled = function(...args) {
+            this.lineupImpl.scrolled = function(...args) {
                 me.onLineUpScrolled.apply(me, args);
                 return scrolled.apply(this, args);
             };
@@ -212,7 +212,7 @@ export class LineUp {
         if (value && value.length) {
             value.forEach((d) => d.selected = true);
         }
-        this.lineup.select(value);
+        this.lineupImpl.select(value);
     }
 
     /**
@@ -227,16 +227,16 @@ export class LineUp {
         this.isMultiSelect = multiSelect;
 
         /** Apply the settings to lineup */
-        if (this.lineup) {
+        if (this.lineupImpl) {
             this.attachSelectionEvents();
 
             var presProps = newSettings.presentation;
             for (var key in presProps) {
                 if (presProps.hasOwnProperty(key)) {
-                    this.lineup.changeRenderingOption(key, presProps[key]);
+                    this.lineupImpl.changeRenderingOption(key, presProps[key]);
                 }
             }
-            this.lineup.config.sorting = { external: !!value && !!value.sorting && !!value.sorting.external };
+            this.lineupImpl.config.sorting = { external: !!value && !!value.sorting && !!value.sorting.external };
         }
         this._settings = newSettings;
     }
@@ -354,9 +354,9 @@ export class LineUp {
         if (!this.savingConfiguration) {
             this.savingConfiguration = true;
             //full spec
-            var s : ILineUpConfiguration = $.extend({}, {}, this.lineup.spec.dataspec);
+            var s : ILineUpConfiguration = $.extend({}, {}, this.lineupImpl.spec.dataspec);
             //create current layout
-            var descs = this.lineup.storage.getColumnLayout()
+            var descs = this.lineupImpl.storage.getColumnLayout()
             .map(((d) => d.description()));
             s.layout = _.groupBy(descs, (d) => d.columnBundle || "primary");
             s.sort = this.getSortFromLineUp();
@@ -371,8 +371,8 @@ export class LineUp {
      * Gets the sort from lineup
      */
     private getSortFromLineUp() {
-        if (this.lineup && this.lineup.storage) {
-            var primary = this.lineup.storage.config.columnBundles.primary;
+        if (this.lineupImpl && this.lineupImpl.storage) {
+            var primary = this.lineupImpl.storage.config.columnBundles.primary;
             var col = primary.sortedColumn;
             if (col) {
                 return {
@@ -387,11 +387,11 @@ export class LineUp {
      * Applies our external config to lineup
      */
     private applyConfigurationToLineup() {
-        if (this.lineup) {
+        if (this.lineupImpl) {
             var currentSort = this.getSortFromLineUp();
             if (this.configuration && this.configuration.sort && (!currentSort || !_.isEqual(currentSort, this.configuration.sort))) {
                 this.sortingFromConfig = true;
-                this.lineup.sortBy(this.configuration.sort.column, this.configuration.sort.asc);
+                this.lineupImpl.sortBy(this.configuration.sort.column, this.configuration.sort.asc);
                 this.sortingFromConfig = false;
             }
 
@@ -410,9 +410,10 @@ export class LineUp {
     private onLineUpScrolled() {
         // truthy this.dataView.metadata.segment means there is more data to be loaded
         if (!this.loadingMoreData && this.raiseCanLoadMoreData()) {
-            var scrollElement = $(this.lineup.$container.node()).find('div.lu-wrapper')[0];
+            var scrollElement = $(this.lineupImpl.$container.node()).find('div.lu-wrapper')[0];
             var scrollHeight = scrollElement.scrollHeight;
             var top = scrollElement.scrollTop;
+            console.log("HERE:" + $(scrollElement).height());
             if (scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200) {
                 this.loadingMoreData = true;
                 this.raiseLoadMoreData();
@@ -425,16 +426,16 @@ export class LineUp {
      * Attaches the line up events to lineup
      */
     private attachSelectionEvents() {
-        if (this.lineup) {
+        if (this.lineupImpl) {
             // Cleans up events
-            this.lineup.listeners.on("multiselected.lineup", null);
-            this.lineup.listeners.on("selected.lineup", null);
+            this.lineupImpl.listeners.on("multiselected.lineup", null);
+            this.lineupImpl.listeners.on("selected.lineup", null);
 
             if (this.selectionEnabled) {
                 if (this.isMultiSelect) {
-                    this.lineup.listeners.on("multiselected.lineup", (rows: ILineUpRow[]) => this.raiseSelectionChanged(rows));
+                    this.lineupImpl.listeners.on("multiselected.lineup", (rows: ILineUpRow[]) => this.raiseSelectionChanged(rows));
                 } else {
-                    this.lineup.listeners.on("selected.lineup", (row: ILineUpRow) => this.raiseSelectionChanged(row ? [row] : []));
+                    this.lineupImpl.listeners.on("selected.lineup", (row: ILineUpRow) => this.raiseSelectionChanged(row ? [row] : []));
                 }
             }
         }
