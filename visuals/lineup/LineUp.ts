@@ -6,12 +6,28 @@ const LineUpLib = require("./lib/lineup");
  * Thin wrapper around the lineup library
  */
 export class LineUp {
-    private element: JQuery;
 
     /**
      * My lineup instance
      */
     public lineupImpl : any;
+
+    /**
+     * The list of events that we expose
+     */
+    public static EVENTS = {
+        SORT_CHANGED: "sortChanged",
+        FILTER_CHANGED: "filterChanged",
+        CONFIG_CHANGED: "configurationChanged",
+        SELECTION_CHANGED: "selectionChanged",
+        LOAD_MORE_DATA: "loadMoreData",
+        CAN_LOAD_MORE_DATA: "canLoadMoreData"
+    };
+
+    /**
+     * My element
+     */
+    private element: JQuery;
 
     /**
      * THe current set of data in this lineup
@@ -48,7 +64,7 @@ export class LineUp {
      */
     public static DEFAULT_SETTINGS : ILineUpSettings = {
         selection: {
-            singleSelect: true,
+            singleSelect: false,
             multiSelect: true
         },
         sorting: {
@@ -76,9 +92,9 @@ export class LineUp {
      */
     private loadingMoreData = false;
 
-    private _selectedRows : ILineUpRow[];
-    private _selectionEnabled: boolean;
-    private _isMultiSelect: boolean;
+    private _selectedRows : ILineUpRow[] = [];
+    private _selectionEnabled: boolean = true;
+    private _isMultiSelect: boolean = true;
     private _eventEmitter: EventEmitter;
     private _settings : ILineUpSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS);
 
@@ -208,10 +224,7 @@ export class LineUp {
      * Sets the selection of lineup
      */
     public set selection(value: ILineUpRow[]) {
-        this._data.forEach((d) => d.selected = false);
-        if (value && value.length) {
-            value.forEach((d) => d.selected = true);
-        }
+        this._selectedRows = this.updateRowSelection(value);
         this.lineupImpl.select(value);
     }
 
@@ -348,6 +361,14 @@ export class LineUp {
     }
 
     /**
+     * Updates the selected state of each row, and returns all the selected rows
+     */
+    private updateRowSelection(sels : ILineUpRow[]) {
+        this._data.forEach((d) => d.selected = false);
+        return sels && sels.length ? sels.filter((d) => d.selected = true) : [];
+    }
+
+    /**
      * Saves the current layout
      */
     private saveConfiguration() {
@@ -432,9 +453,15 @@ export class LineUp {
 
             if (this.selectionEnabled) {
                 if (this.isMultiSelect) {
-                    this.lineupImpl.listeners.on("multiselected.lineup", (rows: ILineUpRow[]) => this.raiseSelectionChanged(rows));
+                    this.lineupImpl.listeners.on("multiselected.lineup", (rows: ILineUpRow[]) => {
+                        this._selectedRows = this.updateRowSelection(rows);
+                        this.raiseSelectionChanged(rows);
+                    });
                 } else {
-                    this.lineupImpl.listeners.on("selected.lineup", (row: ILineUpRow) => this.raiseSelectionChanged(row ? [row] : []));
+                    this.lineupImpl.listeners.on("selected.lineup", (row: ILineUpRow) => {
+                        this._selectedRows = this.updateRowSelection(row ? [row] : []);
+                        this.raiseSelectionChanged(this.selection)
+                    });
                 }
             }
         }
@@ -479,35 +506,35 @@ export class LineUp {
      * Raises the configuration changed event
      */
     private raiseConfigurationChanged(configuration: ILineUpConfiguration) {
-        this.events.raiseEvent("configurationChanged", configuration);
+        this.events.raiseEvent(LineUp.EVENTS.CONFIG_CHANGED, configuration);
     }
 
     /**
      * Raises the filter changed event
      */
     private raiseSortChanged(column: string, asc: boolean) {
-        this.events.raiseEvent("sortChanged", column, asc);
+        this.events.raiseEvent(LineUp.EVENTS.SORT_CHANGED, column, asc);
     }
 
     /**
      * Raises the filter changed event
      */
     private raiseFilterChanged(filter: any) {
-        this.events.raiseEvent("filterChanged", filter);
+        this.events.raiseEvent(LineUp.EVENTS.FILTER_CHANGED, filter);
     }
 
     /**
      * Raises the selection changed event
      */
     private raiseSelectionChanged(rows: ILineUpRow[]) {
-        this.events.raiseEvent('selectionChanged', rows);
+        this.events.raiseEvent(LineUp.EVENTS.SELECTION_CHANGED, rows);
     }
 
     /**
      * Raises the load more data event
      */
     private raiseLoadMoreData() {
-        this.events.raiseEvent('loadMoreData');
+        this.events.raiseEvent(LineUp.EVENTS.LOAD_MORE_DATA);
     }
 
     /**
@@ -517,7 +544,7 @@ export class LineUp {
         var result = {
             result: false
         };
-        this.events.raiseEvent('canLoadMoreData', result);
+        this.events.raiseEvent(LineUp.EVENTS.CAN_LOAD_MORE_DATA, result);
         return result.result;
     }
 }
