@@ -51,6 +51,9 @@ export class LineUp {
             singleSelect: true,
             multiSelect: true
         },
+        sorting: {
+            external: false
+        },
         presentation: {
             stacked: true,
             values: false,
@@ -105,9 +108,9 @@ export class LineUp {
         interaction: {
             multiselect: () => this.isMultiSelect
         },
-      /*  sort: {
+        sorting: {
             external: true
-        }*/
+        }
     };
 
     /**
@@ -233,6 +236,7 @@ export class LineUp {
                     this.lineup.changeRenderingOption(key, presProps[key]);
                 }
             }
+            this.lineup.config.sorting = { external: value.sorting.external };
         }
         this._settings = newSettings;
     }
@@ -622,6 +626,9 @@ export interface ILineUpSettings {
     selection?: {
         singleSelect?: boolean;
         multiSelect?: boolean;
+    };
+    sorting?: {
+        external?: boolean;
     };
     presentation?: {
         values?: boolean;

@@ -24,10 +24,10 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     private host : IVisualHostServices;
     private lineup: LineUp;
     private selectionManager : SelectionManager;
-    private loadingMoreData : boolean;
+    private waitingForMoreData : boolean;
     private waitingForSort : boolean;
     private dimensions: { width: number; height: number };
-    private loading : boolean;
+    private loadingData : boolean;
 
     /**
      * The set of capabilities for the visual
@@ -154,9 +154,17 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         crossorigin: "anonymous"
     };
 
+    private template : string = `
+        <div>
+            <div class="lineup"></div>
+            <div class='load-spinner' style='transform:scale(0.6);'><div>
+        </div>
+    `.trim().replace(/\n/g, '');
+
+
     /** This is called once when the visual is initialially created */
     public init(options: VisualInitOptions): void {
-        super.init(options, '<div></div>', true);
+        super.init(options, this.template, true);
         this.host = options.host;
 
         // Temporary, because the popups will load outside of the iframe for some reason
@@ -166,16 +174,17 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         this.selectionManager = new SelectionManager({
             hostServices: options.host
         });
-        this.lineup = new LineUp(this.element);
+        this.lineup = new LineUp(this.element.find(".lineup"));
         this.lineup.events.on("selectionChanged", (rows) => this.onSelectionChanged(rows));
         this.lineup.events.on("canLoadMoreData", (info) => info.result = !!this.dataView && !!this.dataView.metadata.segment);
         this.lineup.events.on("sortChanged", (column, asc) => this.onSorted(column, asc));
         this.lineup.events.on("loadMoreData", (info) => {
-            this.loadingMoreData = true;
+            this.waitingForMoreData = true;
+            this.loading = true;
             this.host.loadMoreData();
         });
         this.lineup.events.on("configurationChanged", (config) => {
-            if (!this.loading) {
+            if (!this.loadingData) {
 
                 var objects: powerbi.VisualObjectInstancesToPersist = {
                     merge: [
@@ -195,7 +204,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
 
     /** Update is called for data updates, resizes & formatting changes */
     public update(options: VisualUpdateOptions) {
-        this.loading = true;
+        this.loadingData = true;
         super.update(options);
 
         // Assume that data updates won't happen when resizing
@@ -205,7 +214,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         } else {
 
             // If we explicitly are loading more data OR If we had no data before, then data has been loaded
-            this.loadingMoreData = false;
+            this.waitingForMoreData = false;
             this.waitingForSort = false;
 
             this.dataView = options.dataViews[0];
@@ -213,10 +222,10 @@ export default class LineUpVisual extends VisualBase implements IVisual {
 
             this.checkSettingsChanged();
             this.checkDataChanged();
-
         }
 
         this.loading = false;
+        this.loadingData = false;
     }
 
     /**
@@ -237,6 +246,22 @@ export default class LineUpVisual extends VisualBase implements IVisual {
             objectName: options.objectName,
             properties: $.extend(true, {}, this.lineup.settings[options.objectName])
         }];
+    }
+
+    /**
+     * Gets the loading flag
+     */
+    private _loading : boolean;
+    public get loading() {
+        return this._loading;
+    }
+
+    /**
+     * Sets the loading flag
+     */
+    public set loading(value: boolean) {
+        this.element.toggleClass('loading', value);
+        this._loading = value;
     }
 
     /**
@@ -393,10 +418,10 @@ export default class LineUpVisual extends VisualBase implements IVisual {
             var oldSettings : ILineUpSettings = $.extend(true, {}, this.lineup.settings);
 
             // Make sure we have the default values
-            var updatedSettings : ILineUpSettings = $.extend(true, this.lineup.settings, LineUp.DEFAULT_SETTINGS);
+            var updatedSettings : ILineUpSettings = $.extend(true, {}, this.lineup.settings, LineUp.DEFAULT_SETTINGS);
 
             // Copy over new values
-            var newObjs = this.dataView.metadata.objects;
+            var newObjs = $.extend(true, {}, <ILineUpSettings>this.dataView.metadata.objects, { sorting: { external: true } });
             if (newObjs) {
                 for (var section in newObjs) {
                     var values = newObjs[section];
@@ -415,16 +440,17 @@ export default class LineUpVisual extends VisualBase implements IVisual {
      * Listens for lineup to be sorted
      */
     private onSorted(column: string, asc: boolean) {
-        // let pbiCol = this.dataViewTable.columns.filter((c) => c.displayName === column)[0];
-        // let sortDescriptors: powerbi.SortableFieldDescriptor[] = [{
-        //     queryName: pbiCol.queryName,
-        //     sortDirection: asc ? powerbi.SortDirection.Ascending : powerbi.SortDirection.Descending
-        // }];
-        // let args: powerbi.CustomSortEventArgs = {
-        //     sortDescriptors: sortDescriptors
-        // };
-        // this.waitingForSort = true;
-        // this.host.onCustomSort(args);
+        let pbiCol = this.dataViewTable.columns.filter((c) => c.displayName === column)[0];
+        let sortDescriptors: powerbi.SortableFieldDescriptor[] = [{
+            queryName: pbiCol.queryName,
+            sortDirection: asc ? powerbi.SortDirection.Ascending : powerbi.SortDirection.Descending
+        }];
+        let args: powerbi.CustomSortEventArgs = {
+            sortDescriptors: sortDescriptors
+        };
+        this.waitingForSort = true;
+        this.loading = true;
+        this.host.onCustomSort(args);
     }
 
     /**

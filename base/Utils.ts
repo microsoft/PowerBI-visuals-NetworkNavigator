@@ -101,7 +101,7 @@ export default class Utils {
         existing = undefined;
 
         // Go through the existing ones and add the missing ones
-        for (var i = newItems.length - 1; i >= 0; i--) {
+        for (var i = 0; i < newItems.length; i++) {
             curr = newItems[i];
             foundItem = undefined;
 
