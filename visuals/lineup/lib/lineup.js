@@ -3027,7 +3027,9 @@ var LineUp;
     var datLength = data.length, rawData = data;
     var rowScale = d3.scale.ordinal()
         .domain(data.map(function (d) {
-          return d[primaryKey];
+            var value = d[primaryKey];
+
+            return (value === null || typeof value === 'undefined') ? '' : value;
         }))
         .rangeBands([0, (datLength * that.config.svgLayout.rowHeight)], 0, that.config.svgLayout.rowPadding),
       prevRowScale = bundle.prevRowScale || rowScale;
@@ -3057,7 +3059,12 @@ var LineUp;
       transform: function (d) { //init with its previous position
         var prev = prevRowScale(d[primaryKey]);
         if (typeof prev === 'undefined') { //if not defined from the bottom
-          prev = rowScale.range()[1];
+            var range = rowScale.range();
+            if (range && range.length > 0) {
+                prev = range[range.length - 1];
+            } else {
+                prev = 0;
+            }
         }
         return 'translate(' + 0 + ',' + prev + ')';
       }
@@ -3071,7 +3078,9 @@ var LineUp;
     //    //--- update ---
     (this.config.renderingOptions.animation ? allRowsSuper.transition().duration(this.config.svgLayout.animationDuration) : allRowsSuper).attr({
       'transform': function (d) {
-        return  'translate(' + 0 + ',' + rowScale(d[primaryKey]) + ')';
+          var value = d[primaryKey];
+
+        return  'translate(' + 0 + ',' + (value === null || typeof value === 'undefined' ? 0 : rowScale(value)) + ')';
       }
     });
     var asStacked = showStacked(this.config);
