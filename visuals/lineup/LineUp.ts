@@ -361,6 +361,26 @@ export class LineUp {
     }
 
     /**
+     * Gets the sort from lineup
+     */
+    public getSortFromLineUp() {
+        if (this.lineupImpl && this.lineupImpl.storage) {
+            var primary = this.lineupImpl.storage.config.columnBundles.primary;
+            var col = primary.sortedColumn;
+            if (col) {
+                if (col.column) {
+                    return {
+                        column: col.column.column,
+                        asc: primary.sortingOrderAsc
+                    };
+                } else {
+                    // Stacked
+                }
+            }
+        }
+    }
+
+    /**
      * Updates the selected state of each row, and returns all the selected rows
      */
     private updateRowSelection(sels : ILineUpRow[]) {
@@ -389,22 +409,6 @@ export class LineUp {
     }
 
     /**
-     * Gets the sort from lineup
-     */
-    private getSortFromLineUp() {
-        if (this.lineupImpl && this.lineupImpl.storage) {
-            var primary = this.lineupImpl.storage.config.columnBundles.primary;
-            var col = primary.sortedColumn;
-            if (col) {
-                return {
-                    column: col.column.column,
-                    asc: primary.sortingOrderAsc
-                };
-            }
-        }
-    }
-
-    /**
      * Applies our external config to lineup
      */
     private applyConfigurationToLineup() {
@@ -415,7 +419,6 @@ export class LineUp {
                 this.lineupImpl.sortBy(this.configuration.sort.column, this.configuration.sort.asc);
                 this.sortingFromConfig = false;
             }
-
             this.attachSelectionEvents();
         }
     }

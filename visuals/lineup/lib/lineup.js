@@ -2957,7 +2957,7 @@ var LineUp;
   function createRepr(col, row) {
     var r =col.getValue(row, 'raw');
     if (col instanceof LineUp.LayoutNumberColumn || col instanceof LineUp.LayoutStackedColumn) {
-      r = isNaN(r) || r.toString() === '' ? '' : +r;
+      r = (r === null || typeof r === 'undefined' ? 0 : isNaN(r) || r.toString() === '' ? '' : +r);
     }
     return r;
   }

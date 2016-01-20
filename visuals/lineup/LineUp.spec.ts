@@ -35,6 +35,7 @@ describe('LineUp', () => {
             (function(myId) {
                 rows.push({
                     col1: myId,
+                    col2: i * (Math.random() * 100),
                     selected: false,
                     equals: (other) => (myId) === other['col1']
                 });
@@ -362,6 +363,32 @@ describe('LineUp', () => {
                    instance.selection = [data[0]];
                    expect(instance.selection[0]['col1']).to.be.equal(data[0]['col1']);
                });
+           });
+       });
+
+       describe("getSortFromLineUp", () => {
+           it("does not crash when sorting a stacked column", () => {
+                let { instance, element } = createInstance();
+                let { data } = createFakeData();
+
+                instance.setData(data);
+
+                var desc = {
+                    label: "STACKED_COLUMN",
+                    width: 10,
+                    children: [
+                        {column: 'col2', type: 'number', weight: 100 }
+                    ]
+                };
+                var inst = instance.lineupImpl;
+                inst.storage.addStackedColumn(desc);
+                inst.headerUpdateRequired = true;
+                inst.updateAll();
+
+                let headerEle = element.find(".header:contains('STACKED_COLUMN')").find(".labelBG");
+                headerEle.click();
+
+                expect(instance.getSortFromLineUp()).not.to.throw;
            });
        });
     });

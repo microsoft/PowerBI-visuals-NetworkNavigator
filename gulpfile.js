@@ -60,6 +60,13 @@ gulp.task('test', function() {
         .pipe(mocha({ reporter: 'nyan' }));
 });
 
+/**
+ * Starts the test:watch
+ */
+gulp.task('test:watch', function(cb) {
+    gulp.watch([paths.scripts, paths.test], ['test']);
+});
+
 gulp.task('tslint', function() {
     var toLint = paths.scripts;
     if (projectConfig.lintFiles) {
