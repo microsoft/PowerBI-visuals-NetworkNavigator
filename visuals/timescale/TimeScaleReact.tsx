@@ -11,9 +11,9 @@ export interface TimeScaleProps {
 export interface TimeScaleState { }
 
 /**
- * Thin wrapper around LineUp
+ * Thin wrapper around TimeScale
  */
-export class LineUp extends React.Component<TimeScaleProps, TimeScaleState> {
+export class TimeScale extends React.Component<TimeScaleProps, TimeScaleState> {
     private timescale: TimeScaleImpl;
     private node: any;
     public props : TimeScaleProps;
