@@ -674,7 +674,9 @@ var LineUp;
       });
       var max = d3.max(this.hist, function(d) { return d.y; });
       this.hist.forEach(function (d) {
-        d.y /= max;
+          if (max > 0) {
+            d.y /= max;
+          }
       });
     },
     binOf : function (row) {
