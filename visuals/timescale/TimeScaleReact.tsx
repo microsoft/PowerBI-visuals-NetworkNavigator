@@ -16,12 +16,16 @@ export interface TimeScaleState { }
 export class LineUp extends React.Component<TimeScaleProps, TimeScaleState> {
     private timescale: TimeScaleImpl;
     private node: any;
-    private selectionListener : any;
     public props : TimeScaleProps;
 
     componentDidMount() {
         this.node = ReactDOM.findDOMNode(this);
-        this.timescale = new TimeScaleImpl($(this.node));
+        this.timescale = new TimeScaleImpl($(this.node));+
+        this.timescale.events.on("rangeSelected", (range) => {
+            if (this.props) {
+                this.props.onSelectedRangeChanged(range);
+            }
+        });
         this.renderContent();
     }
 
@@ -41,18 +45,6 @@ export class LineUp extends React.Component<TimeScaleProps, TimeScaleState> {
         // props, otherwise use what we already have.
         props = props || this.props;
 
-        if (props.data) {
-            this.timescale.data = props.data;
-        }
-
-        if (this.selectionListener) {
-            this.selectionListener.destroy();
-        }
-
-        if (props.onSelectedRangeChanged) {
-            this.selectionListener = this.timescale.events.on("rangeSelected", (range) => props.onSelectedRangeChanged(range));
-        } else if (this.selectionListener) {
-            this.selectionListener.destroy();
-        }
+        this.timescale.data = props.data || [];
     }
 }
