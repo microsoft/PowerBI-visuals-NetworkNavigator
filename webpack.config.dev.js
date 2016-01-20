@@ -30,6 +30,7 @@ module.exports = {
         d3: "d3",
         underscore: "_",
         react: 'React',
+        "lodash": "_",
         "react-dom": 'ReactDOM'
     },
     plugins: [

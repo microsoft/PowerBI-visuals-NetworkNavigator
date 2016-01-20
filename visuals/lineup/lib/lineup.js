@@ -676,6 +676,8 @@ var LineUp;
       this.hist.forEach(function (d) {
           if (max > 0) {
             d.y /= max;
+          } else {
+              d.y = 0;
           }
       });
     },

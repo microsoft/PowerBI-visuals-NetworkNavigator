@@ -313,7 +313,7 @@ export class LineUp {
             min?: number;
             max?: number;
         }
-        
+
         const EXCLUDED_DATA_COLS = {
             selected: true,
             equals: true,
@@ -325,7 +325,7 @@ export class LineUp {
             }
             return [];
         }
-        
+
         function updateMinMax(minMax: IMinMax, value: number) {
             if (+value > minMax.max) {
                 minMax.max = value;
@@ -333,9 +333,10 @@ export class LineUp {
                 minMax.min = +value;
             }
         }
-        
+
         function isNumeric(v) {
-            return v === 0 || LineUp.isNumeric(v);
+            // Assume that if null or undefined, it is numeric
+            return v === 0 || v === null || v === undefined || LineUp.isNumeric(v);
         }
 
         function analyzeColumn(columnName: string) {
@@ -350,7 +351,7 @@ export class LineUp {
         function createLineUpColumn(colName: string): ILineUpColumn {
             const result: ILineUpColumn = { column: colName, type: 'string' };
             let { allNumeric, minMax } = analyzeColumn(colName);
-            
+
             if (allNumeric) {
                 result.type = 'number';
                 result.domain = [minMax.min, minMax.max];
