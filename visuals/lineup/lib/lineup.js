@@ -3189,7 +3189,7 @@ var LineUp;
         }
         if (that.config.interaction.tooltips) {
           that.tooltip.show(generateTooltip(row, allHeaders, that.config), {
-            x: d3.event.x + 10,
+            x: d3.mouse(that.$container.node())[0] + 10,
             y: absoluteRowPos(this),
             height: that.config.svgLayout.rowHeight
           });
@@ -3200,7 +3200,7 @@ var LineUp;
       mousemove: function () {
         if (that.config.interaction.tooltips) {
           that.tooltip.move({
-            x: d3.event.x
+            x: d3.mouse(that.$container.node())[0]
           });
         }
       },
