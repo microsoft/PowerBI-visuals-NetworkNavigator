@@ -1,5 +1,6 @@
 import { default as EventEmitter } from "../../base/EventEmitter";
 import { default as Utils } from "../../base/Utils";
+import * as _  from "lodash";
 const LineUpLib = require("./lib/lineup");
 
 /**
@@ -10,7 +11,7 @@ export class LineUp {
     /**
      * My lineup instance
      */
-    public lineupImpl : any;
+    public lineupImpl: any;
 
     /**
      * The list of events that we expose
@@ -32,7 +33,7 @@ export class LineUp {
     /**
      * THe current set of data in this lineup
      */
-    private _data : ILineUpRow[];
+    private _data: ILineUpRow[];
 
     /**
      * The list of columns
@@ -52,7 +53,7 @@ export class LineUp {
     /**
      * Whether or not we are currently saving the configuration
      */
-    private savingConfiguration : boolean;
+    private savingConfiguration: boolean;
 
     /**
      * True if we are currently sorting lineup per the grid
@@ -62,7 +63,7 @@ export class LineUp {
     /**
      * Represents the settings
      */
-    public static DEFAULT_SETTINGS : ILineUpSettings = {
+    public static DEFAULT_SETTINGS: ILineUpSettings = {
         selection: {
             singleSelect: false,
             multiSelect: true
@@ -92,11 +93,11 @@ export class LineUp {
      */
     private loadingMoreData = false;
 
-    private _selectedRows : ILineUpRow[] = [];
+    private _selectedRows: ILineUpRow[] = [];
     private _selectionEnabled: boolean = true;
     private _isMultiSelect: boolean = true;
     private _eventEmitter: EventEmitter;
-    private _settings : ILineUpSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS);
+    private _settings: ILineUpSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS);
 
     /**
      * The configuration for the lineup viewer
@@ -232,7 +233,7 @@ export class LineUp {
      * Sets the settings
      */
     public set settings(value: ILineUpSettings) {
-        var newSettings : ILineUpSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS, value);
+        var newSettings: ILineUpSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS, value);
 
         var singleSelect = newSettings.selection.singleSelect;
         var multiSelect = newSettings.selection.multiSelect;
@@ -257,14 +258,14 @@ export class LineUp {
     /**
      * Gets this configuration
      */
-    public get configuration() : ILineUpConfiguration {
+    public get configuration(): ILineUpConfiguration {
         return this._configuration;
     }
 
     /**
      * Sets the column configuration that is used
      */
-    public set configuration (value: ILineUpConfiguration) {
+    public set configuration(value: ILineUpConfiguration) {
         this._configuration = value;
 
         this.applyConfigurationToLineup();
@@ -304,59 +305,70 @@ export class LineUp {
     /**
      * Derives the desciption for the given column
      */
-    public static createConfigurationFromData(data: ILineUpRow[]) : ILineUpConfiguration {
-        let dataCols : string[] = [];
-        if (data && data.length) {
-            for (var key in data[0]) {
-                dataCols.push(key);
+    public static createConfigurationFromData(data: ILineUpRow[]): ILineUpConfiguration {
+        interface IMinMax {
+            min?: number;
+            max?: number;
+        }
+        
+        const EXCLUDED_DATA_COLS = {
+            selected: true,
+            equals: true,
+        };
+
+        function getDataColumnNames(): string[] {
+            if (data && data.length) {
+                return Object.keys(data[0]).filter((k) => !EXCLUDED_DATA_COLS[k]);
+            }
+            return [];
+        }
+        
+        function updateMinMax(minMax: IMinMax, value: number) {
+            if (+value > minMax.max) {
+                minMax.max = value;
+            } else if (+value < minMax.min) {
+                minMax.min = +value;
             }
         }
-        var cols = dataCols.map((col) => {
-            var r: ILineUpColumn = {
-                column: col,
-                type: 'string'
-            };
-            // if (this.settings.data.inferColumnTypes) {
-                var allNumeric = true;
-                var minMax = { min: Number.MAX_VALUE, max: 0 };
-                for (var i = 0; i < data.length; i++) {
-                    var value = data[i][r.column];
-                    if (value !== 0 && !!value && !LineUp.isNumeric(value)) {
-                        allNumeric = false;
-                        break;
-                    } else {
-                        if (+value > minMax.max) {
-                            minMax.max = value;
-                        } else if (+value < minMax.min) {
-                            minMax.min = +value;
-                        }
-                    }
-                }
-                if (allNumeric) {
-                    r.type = 'number';
-                    r.domain = [minMax.min, minMax.max];
-                }
-            // }
-            /*else {
-                if (col.type.numeric) {
-                    r.type = 'number';
-                    r.domain = d3.extent(data, (row) => row[col.label] && row[col.label].length === 0 ? undefined : +(row[col.label]));
-                }
-            }*/
+        
+        function isNumeric(v) {
+            return v === 0 || LineUp.isNumeric(v);
+        }
+
+        function analyzeColumn(columnName: string) {
+            const minMax: IMinMax = { min: Number.MAX_VALUE, max: 0 };
+            const allNumeric = data.every((row) => isNumeric(row[columnName]));
+            if (allNumeric) {
+                data.forEach((row) => updateMinMax(minMax, row[columnName]));
+            }
+            return {allNumeric, minMax};
+        }
+
+        function createLineUpColumn(colName: string): ILineUpColumn {
+            const result: ILineUpColumn = { column: colName, type: 'string' };
+            let { allNumeric, minMax } = analyzeColumn(colName);
+            
+            if (allNumeric) {
+                result.type = 'number';
+                result.domain = [minMax.min, minMax.max];
+            }
 
             // If is a string, try to see if it is a category
-            if (r.type === 'string') {
-                var sset = d3.set(data.map((row) => row[col]));
+            if (result.type === 'string') {
+                var sset = d3.set(data.map((row) => row[colName]));
                 if (sset.size() <= Math.max(20, data.length * 0.2)) { //at most 20 percent unique values
-                    r.type = 'categorical';
-                    r.categories = sset.values().sort();
+                    result.type = 'categorical';
+                    result.categories = sset.values().sort();
                 }
             }
-            return r;
-        });
+            return result;
+        }
+
+        const dataColNames = getDataColumnNames();
+        const columns: ILineUpColumn[] = getDataColumnNames().map(createLineUpColumn);
         return {
-            primaryKey: dataCols[0],
-            columns: cols
+            primaryKey: dataColNames[0],
+            columns
         };
     }
 
@@ -383,7 +395,7 @@ export class LineUp {
     /**
      * Updates the selected state of each row, and returns all the selected rows
      */
-    private updateRowSelection(sels : ILineUpRow[]) {
+    private updateRowSelection(sels: ILineUpRow[]) {
         this._data.forEach((d) => d.selected = false);
         return sels && sels.length ? sels.filter((d) => d.selected = true) : [];
     }
@@ -395,11 +407,11 @@ export class LineUp {
         if (!this.savingConfiguration) {
             this.savingConfiguration = true;
             //full spec
-            var s : ILineUpConfiguration = $.extend({}, {}, this.lineupImpl.spec.dataspec);
+            var s: ILineUpConfiguration = $.extend({}, {}, this.lineupImpl.spec.dataspec);
             //create current layout
             var descs = this.lineupImpl.storage.getColumnLayout()
-            .map(((d) => d.description()));
-            s.layout = _.groupBy(descs, (d) => d.columnBundle || "primary");
+                .map(((d) => d.description()));
+            s.layout = _.groupBy(descs, (d: any) => d.columnBundle || "primary");
             s.sort = this.getSortFromLineUp();
             this.configuration = s;
             delete s['data'];
@@ -473,7 +485,7 @@ export class LineUp {
     /**
      * Listener for line up being sorted
      */
-    private onLineUpSorted(column : string, asc : boolean) {
+    private onLineUpSorted(column: string, asc: boolean) {
         if (!this.sortingFromConfig) {
             this.saveConfiguration();
             this.raiseSortChanged(column, asc);
@@ -643,7 +655,7 @@ export interface ILineUpConfiguration {
     /**
      * The sort of the lineup
      */
-    sort? : {
+    sort?: {
         column: string;
         asc: boolean;
     }
