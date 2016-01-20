@@ -60,7 +60,6 @@ export default class DocumentViewerVisual extends VisualBase implements IVisual 
      */
     public update(options: VisualUpdateOptions) {
         super.update(options);
-        this.myDocumentViewer.dimensions = options.viewport;
         if (options.dataViews && options.dataViews.length > 0) {
             var table = options.dataViews[0].table;
             var data = DocumentViewerVisual.converter(options.dataViews[0]);

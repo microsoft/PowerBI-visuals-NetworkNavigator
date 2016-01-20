@@ -35,7 +35,8 @@ $(function() {
     function loadDocumentViewer() {
         try {
             var documentViewerEle = $('#document-viewer');
-            var documentviewer = new DocumentViewer(documentViewerEle, { height: documentViewerEle.height(), width: documentViewerEle.width() });
+            documentViewerEle.css({ width: 500, height: 200 });
+            var documentviewer = new DocumentViewer(documentViewerEle);
             documentviewer.data = [{
                 items: [{
                     name: "From",

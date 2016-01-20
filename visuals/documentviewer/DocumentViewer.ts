@@ -35,13 +35,6 @@ export class DocumentViewer {
     }
 
     /**
-     * Sets the dimensions of the document viewer
-     */
-    public set dimensions(dims: { width: number|string; height: number|string }) {
-        this.tableElement.css({ width: dims.width, height: dims.height });
-    }
-
-    /**
      * Sets the data o
      */
     public set data(data: IDocumentViewerDocument[]) {

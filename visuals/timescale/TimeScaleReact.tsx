@@ -3,9 +3,9 @@ import * as ReactDOM from "react-dom";
 import { TimeScale as TimeScaleImpl, TimeScaleDataItem } from "./TimeScale";
 
 export interface TimeScaleProps {
-    selectedRange: [Date, Date];
-    onSelectedRangeChanged: (range: [Date, Date]) => void;
-    data: TimeScaleDataItem[]
+    selectedRange?: [Date, Date];
+    onSelectedRangeChanged?: (range: [Date, Date]) => void;
+    data?: TimeScaleDataItem[]
 };
 
 export interface TimeScaleState { }
@@ -16,7 +16,7 @@ export interface TimeScaleState { }
 export class TimeScale extends React.Component<TimeScaleProps, TimeScaleState> {
     private timescale: TimeScaleImpl;
     private node: any;
-    public props : TimeScaleProps;
+    public props : TimeScaleProps = {};
 
     componentDidMount() {
         this.node = ReactDOM.findDOMNode(this);

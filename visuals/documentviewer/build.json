@@ -8,6 +8,9 @@
         },
         "component": {
             "entry": "DocumentViewer.ts"
+        },
+        "react": {
+            "entry": "DocumentViewerReact.tsx"
         }
     }
 }
