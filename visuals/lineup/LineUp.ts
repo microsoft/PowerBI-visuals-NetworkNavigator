@@ -498,8 +498,8 @@ export class LineUp {
                 value: column.filter
             };
         }
-        this.raiseFilterChanged(filter);
         this.saveConfiguration();
+        this.raiseFilterChanged(filter);
     }
 
     /**

@@ -81,7 +81,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 },
             },
             layout: {
-                displayName: "",
+                displayName: "Layout",
                 properties: {
                     // formatString: {
                     //     type: {
@@ -94,6 +94,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                     //     type: { bool: true }
                     // },
                     layout: {
+                        displayName: "JSON Configuration",
                         type: { text: {} }
                     }
                 }
