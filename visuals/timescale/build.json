@@ -8,6 +8,9 @@
         },
         "component": {
             "entry": "TimeScale"
+        },
+        "react": {
+            "entry": "TimeScaleReact"
         }
     }
 }
