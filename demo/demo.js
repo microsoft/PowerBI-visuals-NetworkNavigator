@@ -88,6 +88,13 @@ $(function() {
                 //         }
                 //     })
                 // }
+                data = data.map(function (item) {
+                    item.equals = function (otherItem) {
+                        return item.schoolname === otherItem.schoolname;
+                    };
+                    item.selected = false;
+                    return item;
+                });
                 lineup.setData(data);
             });
         } catch (e) {

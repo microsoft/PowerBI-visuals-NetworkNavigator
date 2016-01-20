@@ -23,10 +23,16 @@ describe('LineUp', () => {
     var createInstance = () => {
         let ele = $('<div>');
         parentEle.append(ele);
-        return {
+        var result = {
             instance: new LineUp(ele),
             element: ele
         };
+        result.instance.settings = {
+            sorting: {
+                external: true
+            }
+        };
+        return result;
     };
 
     var createFakeData = () => {
@@ -114,11 +120,11 @@ describe('LineUp', () => {
         it('should pass sorting settings to lineupimpl', () => {
             let { instance } = loadInstanceWithSettings({
                 sorting: {
-                    external: true
+                    external: false
                 }
             });
 
-            expect(instance.lineupImpl.config.sorting.external).to.be.true;
+            expect(instance.lineupImpl.config.sorting.external).to.be.false;
         });
     });
 

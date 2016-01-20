@@ -1,5 +1,5 @@
 /// <reference path="./powerbi.d.ts"/>
-declare var _;
+// declare var _;
 
 /**
  * Necessary to pull in scss resources

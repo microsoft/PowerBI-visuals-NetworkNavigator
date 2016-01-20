@@ -126,7 +126,7 @@ export class LineUp {
             multiselect: () => this.isMultiSelect
         },
         sorting: {
-            external: true
+            external: false
         }
     };
 
@@ -241,6 +241,7 @@ export class LineUp {
         this.isMultiSelect = multiSelect;
 
         /** Apply the settings to lineup */
+        let externalSort = !!value && !!value.sorting && !!value.sorting.external;
         if (this.lineupImpl) {
             this.attachSelectionEvents();
 
@@ -250,8 +251,10 @@ export class LineUp {
                     this.lineupImpl.changeRenderingOption(key, presProps[key]);
                 }
             }
-            this.lineupImpl.config.sorting = { external: !!value && !!value.sorting && !!value.sorting.external };
+            this.lineupImpl.config.sorting = { external: externalSort };
         }
+        this.lineUpConfig.sorting.external = externalSort;
+
         this._settings = newSettings;
     }
 
