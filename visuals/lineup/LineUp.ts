@@ -379,7 +379,7 @@ export class LineUp {
     /**
      * Gets the sort from lineup
      */
-    public getSortFromLineUp() {
+    public getSortFromLineUp() : ILineUpSort {
         if (this.lineupImpl && this.lineupImpl.storage) {
             var primary = this.lineupImpl.storage.config.columnBundles.primary;
             var col = primary.sortedColumn;
@@ -389,9 +389,11 @@ export class LineUp {
                         column: col.column.column,
                         asc: primary.sortingOrderAsc
                     };
-                } else {
-                    // Stacked
                 }
+                return {
+                    stack: col.label,
+                    asc: primary.sortingOrderAsc
+                };
             }
         }
     }
@@ -432,7 +434,8 @@ export class LineUp {
             var currentSort = this.getSortFromLineUp();
             if (this.configuration && this.configuration.sort && (!currentSort || !_.isEqual(currentSort, this.configuration.sort))) {
                 this.sortingFromConfig = true;
-                this.lineupImpl.sortBy(this.configuration.sort.column, this.configuration.sort.asc);
+                let sort = this.configuration.sort;
+                this.lineupImpl.sortBy(sort.stack || sort.column, sort.asc);
                 this.sortingFromConfig = false;
             }
             this.attachSelectionEvents();
@@ -589,6 +592,23 @@ export interface ILineUpRow {
     equals(b: ILineUpRow): boolean;
 }
 
+export interface ILineUpSort {
+    /**
+     * The column that was sorted
+     */
+    column?: string;
+
+    /**
+     * The stack that was sorted
+     */
+    stack?: string;
+
+    /**
+     * If the sort was ascending
+     */
+    asc: boolean;
+}
+
 /**
  * Rerepents a column in lineup
  */
@@ -659,10 +679,7 @@ export interface ILineUpConfiguration {
     /**
      * The sort of the lineup
      */
-    sort?: {
-        column: string;
-        asc: boolean;
-    }
+    sort?: ILineUpSort;
 }
 
 /**
