@@ -1,6 +1,7 @@
 import { default as EventEmitter } from "../../base/EventEmitter";
 import { default as Utils } from "../../base/Utils";
 import * as _  from "lodash";
+import * as $ from "jquery";
 const LineUpLib = require("./lib/lineup");
 
 /**

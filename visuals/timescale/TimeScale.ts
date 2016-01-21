@@ -1,4 +1,6 @@
 import EventEmitter from '../../base/EventEmitter.ts';
+import * as $ from "jquery";
+import * as _ from "lodash";
 
 /**
 * Represents a timescale

@@ -1,4 +1,6 @@
 import EventEmitter from '../../base/EventEmitter';
+import * as $ from "jquery";
+import * as _ from "lodash";
 
 /**
  * Class which represents the force graph

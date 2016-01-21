@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import * as $ from "jquery";
 import { TimeScale as TimeScaleImpl, TimeScaleDataItem } from "./TimeScale";
 
 export interface TimeScaleProps {
