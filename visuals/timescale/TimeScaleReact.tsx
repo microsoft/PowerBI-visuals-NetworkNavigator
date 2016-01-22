@@ -47,5 +47,6 @@ export class TimeScale extends React.Component<TimeScaleProps, TimeScaleState> {
         props = props || this.props;
 
         this.timescale.data = props.data || [];
+        this.timescale.selectedRange = props.selectedRange || null;
     }
 }

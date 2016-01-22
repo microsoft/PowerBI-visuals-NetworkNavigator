@@ -1,27 +1,29 @@
 import EventEmitter from '../../base/EventEmitter.ts';
 import * as $ from "jquery";
 import * as _ from "lodash";
+import * as d3 from "d3";
 
 /**
 * Represents a timescale
 */
 /* @Mixin(EventEmitter)*/
 export class TimeScale {
-    private element : JQuery;
-    private svg : d3.Selection<any>;
-    private x : d3.time.Scale<Date, any>;
-    private y : d3.scale.Linear<any, any>;
-    private timeScalePath : d3.Selection<any>;
-    private area : d3.svg.Area<any>;
-    private brush : d3.svg.Brush<Date>;
-    private clip : d3.Selection<any>;
-    private brushGrip : d3.Selection<any>;
-    private context : d3.Selection<any>;
-    private brushEle : d3.Selection<any>;
-    private xAxis : d3.Selection<any>;
-    private _dimensions : { width: number; height: number; } = { width: 500, height: 500 };
+    private element: JQuery;
+    private svg: d3.Selection<any>;
+    private x: d3.time.Scale<Date, any>;
+    private y: d3.scale.Linear<any, any>;
+    private timeScalePath: d3.Selection<any>;
+    private area: d3.svg.Area<any>;
+    private brush: d3.svg.Brush<Date>;
+    private clip: d3.Selection<any>;
+    private brushGrip: d3.Selection<any>;
+    private context: d3.Selection<any>;
+    private brushEle: d3.Selection<any>;
+    private xAxis: d3.Selection<any>;
+    private _dimensions: { width: number; height: number; } = { width: 500, height: 500 };
     private _eventEmitter = new EventEmitter();
-    private _data : TimeScaleDataItem[];
+    private _data: TimeScaleDataItem[];
+    private _range: [Date, Date];
 
     /**
      * Constructor for the timescale
@@ -36,6 +38,7 @@ export class TimeScale {
         } else {
             this.dimensions = dimensions;
         }
+        console.log("I AM ", this);
     }
 
     /**
@@ -59,7 +62,7 @@ export class TimeScale {
      * Gets an event emitter by which events can be listened to
      * Note: Would be nice if we could mixin EventEmitter
      */
-    public get events () {
+    public get events() {
         return this._eventEmitter;
     }
 
@@ -81,19 +84,46 @@ export class TimeScale {
     /**
      * Sets the currently selected range of dates
      */
-    public set selectedRange(dates : Date[]) {
-        if (dates && dates.length) {
-            this.brush.extent(<any>dates);
+    public set selectedRange(range: [Date, Date]) {
+        function selectedRangeChanged(): boolean {
+            // One is set, other is unset
+            if ((!range || !this._range) && (range || this._range)) {
+                return true;
+            }
 
+            if (range && this._range) {
+                // Length of Array Changed
+                if (range.length !== this._range.length) {
+                    return true;
+                } else {
+                    // Check each date
+                    range.forEach((v, i) => {
+                        if (v !== this._range[i]) {
+                            return true;
+                        }
+                    });
+                }
+            }
+            return false;
+        }
+
+        function redrawRange() {            
+            this.brush.extent(<any>range);
             this.brush(d3.select(this.element.find(".brush")[0]));
-
             // now fire the brushstart, brushmove, and brushend events
             // remove transition so just d3.select(".brush") to just draw
             this.brush["event"](d3.select(this.element.find(".brush")[0]).transition().delay(1000))
         }
+
+        if (selectedRangeChanged()) {
+            this._range = range;
+            if (range && range.length) {
+                redrawRange.bind(this)();
+            }
+        }
     }
 
-    private bars : d3.Selection<any>;
+    private bars: d3.Selection<any>;
 
     /**
      * Builds the initial timescale
@@ -137,14 +167,14 @@ export class TimeScale {
         if (this.bars && this._data) {
             var tmp = this.bars
                 .selectAll("rect")
-                    .data(this._data);
+                .data(this._data);
             tmp
                 .enter().append("rect");
 
             tmp
                 .attr("transform", (d, i) => {
                     var rectHeight = this.y(d.value);
-                    return  `translate(${this.x(d.date)},${height - rectHeight})`;
+                    return `translate(${this.x(d.date)},${height - rectHeight})`;
                 })
                 .style({ "width": 2 })
                 .style("height", (d) => {
