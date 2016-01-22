@@ -3,6 +3,8 @@ import * as $ from "jquery";
 import * as _ from "lodash";
 import * as d3 from "d3";
 
+const DEBOUNCE_TIME = 1000;
+
 /**
 * Represents a timescale
 */
@@ -24,7 +26,6 @@ export class TimeScale {
     private _eventEmitter = new EventEmitter();
     private _data: TimeScaleDataItem[];
     private _range: [Date, Date];
-    private _isRangeChanging: boolean;
 
     /**
      * Constructor for the timescale
@@ -39,7 +40,6 @@ export class TimeScale {
         } else {
             this.dimensions = dimensions;
         }
-        console.log("I AM ", this);
     }
 
     /**
@@ -99,7 +99,7 @@ export class TimeScale {
                 } else {
                     // Check each date
                     range.forEach((v, i) => {
-                        if (v !== this._range[i]) {
+                        if (v.getTime() !== this._range[i].getTime()) {
                             return true;
                         }
                     });
@@ -108,22 +108,17 @@ export class TimeScale {
             return false;
         }
 
-        function redrawRange() {            
+        function redrawRange() {
             this.brush.extent(<any>range);
             this.brush(d3.select(this.element.find(".brush")[0]));
-            // now fire the brushstart, brushmove, and brushend events
-            // remove transition so just d3.select(".brush") to just draw
-            this.brush["event"](d3.select(this.element.find(".brush")[0]).transition().delay(1000))
         }
 
-        this._isRangeChanging = true;
-        if (selectedRangeChanged()) {
+        if (selectedRangeChanged.bind(this)()) {
             this._range = range;
             if (range && range.length) {
                 redrawRange.bind(this)();
             }
         }
-        this._isRangeChanging = false;
     }
 
     private bars: d3.Selection<any>;
@@ -149,10 +144,8 @@ export class TimeScale {
             .attr("class", "x axis");
 
         var brushed = _.debounce(() => {
-            if (!this._isRangeChanging) {
-                this.events.raiseEvent("rangeSelected", this.brush.empty() ? [] : this.brush.extent());
-            }
-        }, 200);
+            this.events.raiseEvent("rangeSelected", this.brush.empty() ? [] : this.brush.extent());
+        }, DEBOUNCE_TIME);
 
         this.brush = d3.svg.brush().on("brush", brushed);
     }

@@ -22,7 +22,7 @@ export class TimeScale extends React.Component<TimeScaleProps, TimeScaleState> {
     componentDidMount() {
         this.node = ReactDOM.findDOMNode(this);
         this.timescale = new TimeScaleImpl($(this.node));+
-        this.timescale.events.on("rangeSelected", (range) => {
+        this.timescale.events.on("rangeSelected", (range) => {            
             if (this.props) {
                 this.props.onSelectedRangeChanged(range);
             }
