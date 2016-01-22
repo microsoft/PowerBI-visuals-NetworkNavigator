@@ -21,7 +21,7 @@ var LineUp;
     this.$container = $container;
     this.tooltip = LineUp.createTooltip($container.node());
     //trigger hover event
-    this.listeners = d3.dispatch('hover','change-sortcriteria','change-filter', 'selected','multiselected');
+    this.listeners = d3.dispatch('hover','change-sortcriteria','change-filter', 'columns-changed', 'selected','multiselected');
 
     this.config = $.extend(true, {}, LineUp.defaultConfig, config, {
       //TODO internal stuff, should to be extracted
@@ -1325,6 +1325,7 @@ var LineUp;
       that.storage.addStackedColumn(desc);
       popup.remove();
       that.headerUpdateRequired = true;
+      that.listeners['columns-changed'](that);
       that.updateAll();
     });
 
@@ -1382,6 +1383,11 @@ var LineUp;
       });
 
       popup.remove();
+
+      if (allChecked.length) {
+        that.listeners['columns-changed'](that);
+      }
+
       that.headerUpdateRequired = true;
       that.updateAll();
     });
@@ -1570,6 +1576,9 @@ var LineUp;
 
     function removeStackedColumn(col) {
       that.storage.removeColumn(col);
+
+      that.listeners['columns-changed'](that);
+
       that.headerUpdateRequired = true;
       that.updateAll();
     }
@@ -3588,6 +3597,7 @@ var LineUp;
           },
           action: function (d) {
             that.storage.removeColumn(d);
+            that.listeners['columns-changed'](that);
             that.headerUpdateRequired = true;
             that.updateAll();
           }
@@ -3826,6 +3836,7 @@ var LineUp;
           that.storage.moveColumn(this.__data__, hitted.column, hitted.insert);
         }
 
+        that.listeners['columns-changed'](that);
 //            that.layoutHeaders(that.storage.getColumnLayout());
         that.headerUpdateRequired = true;
         that.updateAll();
@@ -3835,6 +3846,9 @@ var LineUp;
       if (hitted == null && moved) {
         that.headerUpdateRequired = true;
         that.storage.removeColumn(this.__data__);
+
+        that.listeners['columns-changed'](that);
+
         that.updateAll();
       }
     }
@@ -3849,6 +3863,7 @@ var LineUp;
   LineUp.prototype.addNewEmptyStackedColumn = function () {
     this.storage.addStackedColumn(null, -1);
     this.headerUpdateRequired = true;
+    this.listeners['columns-changed'](this);
     this.updateAll();
   };
 

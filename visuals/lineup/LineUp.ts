@@ -172,6 +172,7 @@ export class LineUp {
                 // This only works for single columns and not grouped columns
                 this.onLineUpSorted(column && column.column && column.column.id, asc);
             });
+            this.lineupImpl.listeners.on('columns-changed.lineup', () => this.onLineUpColumnsChanged());
             this.lineupImpl.listeners.on('change-filter.lineup', (x, column) => this.onLineUpFiltered(column));
             var scrolled = this.lineupImpl.scrolled;
             var me = this;
@@ -488,6 +489,13 @@ export class LineUp {
                 }
             }
         }
+    }
+
+    /**
+     * Listener for when the lineup columns are changed.
+     */
+    private onLineUpColumnsChanged() {
+        this.saveConfiguration();
     }
 
     /**

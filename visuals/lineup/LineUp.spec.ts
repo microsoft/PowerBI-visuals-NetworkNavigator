@@ -424,11 +424,23 @@ describe('LineUp', () => {
         });
 
         describe("integration", () => {
-            it("saves the configuration when a stacked column is cliked on", () => {
+            it("saves the configuration when a stacked column is sorted", () => {
                 let {instance} = loadInstanceWithStackedColumnsAndClick();
                 expect(instance.configuration.sort).to.not.be.undefined;
                 expect(instance.configuration.sort.stack).to.be.equal("STACKED_COLUMN");
                 expect(instance.configuration.sort.column).to.be.undefined;
+            });
+            it("saves the configuration when the column layout has been changed", () => {
+                let {instance, data } = loadInstanceWithStackedColumns();
+                let called = false;
+                instance.events.on(LineUp.EVENTS.CONFIG_CHANGED, () => {
+                    called = true;
+                });
+
+                // Ghetto: Manually say that the columns have changed, usually happens if you drag/drop add columns
+                instance.lineupImpl.listeners['columns-changed']();
+
+                expect(called).to.be.true;
             });
             it("loads lineup with a sorted stacked column", () => {
                 let {instance, data } = loadInstanceWithStackedColumns();
