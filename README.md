@@ -1,3 +1,5 @@
+[![wercker status](https://app.wercker.com/status/650d0e3d9f6085dde6626c5cd59e6c85/s/master "wercker status")](https://app.wercker.com/project/bykey/650d0e3d9f6085dde6626c5cd59e6c85)
+
 #Power VI Visuals
 This is a base project for developing Power BI visuals.  It is hopefully a temporary thing until the PowerBI folks come out with something better.
 
