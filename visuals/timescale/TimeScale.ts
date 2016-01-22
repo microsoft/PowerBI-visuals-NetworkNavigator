@@ -24,6 +24,7 @@ export class TimeScale {
     private _eventEmitter = new EventEmitter();
     private _data: TimeScaleDataItem[];
     private _range: [Date, Date];
+    private _isRangeChanging: boolean;
 
     /**
      * Constructor for the timescale
@@ -115,12 +116,14 @@ export class TimeScale {
             this.brush["event"](d3.select(this.element.find(".brush")[0]).transition().delay(1000))
         }
 
+        this._isRangeChanging = true;
         if (selectedRangeChanged()) {
             this._range = range;
             if (range && range.length) {
                 redrawRange.bind(this)();
             }
         }
+        this._isRangeChanging = false;
     }
 
     private bars: d3.Selection<any>;
@@ -146,11 +149,12 @@ export class TimeScale {
             .attr("class", "x axis");
 
         var brushed = _.debounce(() => {
-            this.events.raiseEvent("rangeSelected", this.brush.empty() ? [] : this.brush.extent());
+            if (!this._isRangeChanging) {
+                this.events.raiseEvent("rangeSelected", this.brush.empty() ? [] : this.brush.extent());
+            }
         }, 200);
 
-        this.brush = d3.svg.brush()
-            .on("brush", brushed);
+        this.brush = d3.svg.brush().on("brush", brushed);
     }
 
     /**
