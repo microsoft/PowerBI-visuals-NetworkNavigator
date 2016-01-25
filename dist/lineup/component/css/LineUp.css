@@ -259,3 +259,66 @@
   height: calc(100% - 50px);
   overflow-x: visible;
   overflow-y: auto; }
+
+.lineup-component {
+  font-size: 12px; }
+
+.nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: #aaa; }
+
+.nav li {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2em;
+  border-bottom: 1px solid #888; }
+  .nav li:first-of-type a {
+    border-radius: 5px 0px 0px 5px; }
+  .nav li:last-of-type a {
+    border-radius: 0px 5px 5px 0px; }
+
+.nav a {
+  text-decoration: none;
+  color: #888;
+  display: block;
+  transition: .3s color;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  padding: 5px; }
+  .nav a .fa-stack {
+    font-size: .5em; }
+
+.add-column .fa-plus-circle, .add-stacked-column .fa-plus-circle {
+  margin: .5em;
+  color: green; }
+
+.nav a:hover {
+  color: #444; }
+
+.nav a.active {
+  background-color: #444;
+  cursor: default; }
+
+.nav li {
+  border-bottom: none;
+  font-size: 1.4em; }
+
+/* Option 1 - Display Inline */
+.nav li {
+  display: inline-block;
+  margin-right: -4px; }
+
+/* Options 2 - Float
+  .nav li {
+    float: left;
+  }
+  .nav ul {
+    overflow: auto;
+    width: 600px;
+    margin: 0 auto;
+  }
+  .nav {
+    background-color: #444;
+  }
+  */

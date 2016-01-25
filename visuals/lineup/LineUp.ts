@@ -23,7 +23,8 @@ export class LineUp {
         CONFIG_CHANGED: "configurationChanged",
         SELECTION_CHANGED: "selectionChanged",
         LOAD_MORE_DATA: "loadMoreData",
-        CAN_LOAD_MORE_DATA: "canLoadMoreData"
+        CAN_LOAD_MORE_DATA: "canLoadMoreData",
+        CLEAR_SELECTION: "clearSelection"
     };
 
     /**
@@ -84,7 +85,36 @@ export class LineUp {
      * The template for the grid
      */
     private template: string = `
-        <div>
+        <div class="lineup-component">
+            <div class="nav">
+                <ul>
+                    <li class="clear-selection" title="Clear Selection">
+                        <a>
+                            <span class="fa-stack">
+                                <i class="fa fa-check fa-stack-1x"></i>
+                                <i class="fa fa-ban fa-stack-2x"></i>
+                            </span>
+                        </a>
+                    </li>
+                    <li class="add-column" title="Add Column">
+                        <a>
+                            <span class="fa-stack">
+                                <i class="fa fa-columns fa-stack-2x"></i>
+                                <i class="fa fa-plus-circle fa-stack-1x"></i>
+                            </span>
+                        </a>
+                    </li>
+                    <li class="add-stacked-column" title="Add Stacked Column">
+                        <a>
+                            <span class="fa-stack">
+                                <i class="fa fa-bars fa-stack-2x"></i>
+                                <i class="fa fa-plus-circle fa-stack-1x"></i>
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <hr/>
             <div class="grid"></div>
         </div>
     `.trim();
@@ -105,23 +135,7 @@ export class LineUp {
      */
     private lineUpConfig = {
         svgLayout: {
-            mode: 'separate',
-            addPlusSigns: true,
-            plusSigns: {
-                addStackedColumn: {
-                    name: "Add a new Stacked Column",
-                    action: "addNewEmptyStackedColumn",
-                    x: 0, y: 2,
-                    w: 21, h: 21 // LineUpGlobal.htmlLayout.headerHeight/2-4
-                },
-
-                addColumn: {
-                    title: "Add a Column",
-                    action: () => this.lineupImpl.addNewSingleColumnDialog(),
-                    x: 0, y: 2,
-                    w: 21, h: 21 // LineUpGlobal.htmlLayout.headerHeight/2-4
-                }
-            }
+            mode: 'separate'
         },
         interaction: {
             multiselect: () => this.isMultiSelect
@@ -136,6 +150,16 @@ export class LineUp {
      */
     constructor(element: JQuery) {
         this.element = $(this.template);
+        this.element.find('.clear-selection').on('click', () => {
+            this.lineupImpl.clearSelection();
+            this.raiseClearSelection();
+        });
+        this.element.find('.add-column').on('click', () => {
+            this.lineupImpl.addNewSingleColumnDialog();
+        });
+        this.element.find('.add-stacked-column').on('click', () => {
+            this.lineupImpl.addNewStackedColumnDialog();
+        });
         this._eventEmitter = new EventEmitter();
         element.append(this.element);
     }
@@ -566,6 +590,13 @@ export class LineUp {
      */
     private raiseLoadMoreData() {
         this.events.raiseEvent(LineUp.EVENTS.LOAD_MORE_DATA);
+    }
+
+    /**
+     * Raises the load more data event
+     */
+    private raiseClearSelection() {
+        this.events.raiseEvent(LineUp.EVENTS.CLEAR_SELECTION);
     }
 
     /**

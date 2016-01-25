@@ -148,7 +148,7 @@ var LineUp;
       addPlusSigns:false,
       plusSigns: {
         addStackedColumn: {
-         title: 'add stacked column',
+         title: 'Add stacked column',
          action: 'addNewEmptyStackedColumn',
          x: 0, y: 2,
          w: 21, h: 21 // LineUpGlobal.htmlLayout.headerHeight/2-4
@@ -1250,7 +1250,7 @@ var LineUp;
   LineUp.prototype.addNewStackedColumnDialog = function () {
     var that = this;
 
-    var popup = createPopup(this.$container, 'add stacked column:', 'Stacked');
+    var popup = createPopup(this.$container, 'Add stacked column:', 'Stacked');
     // list all data rows !
     var trData = that.storage.getRawColumns().filter(function (d) {
       return (d instanceof LineUp.LineUpNumberColumn);
@@ -3658,35 +3658,57 @@ var LineUp;
       }
     });
 
-    addColumnButtonEnter.append('rect').attr({
-      x: 0,
-      y: 0,
-      rx: 5,
-      ry: 5,
-      width: function (d) {
-        return d.w;
-      },
-      height: function (d) {
-        return d.h;
-      }
-    }).on('click', function (d) {
-      if ($.isFunction(d.action)) {
-        d.action.call(that, d);
-      } else {
-        that[d.action](d);
-      }
-    });
+    addColumnButtonEnter.append("title").text(function(d) { return d.title; });
 
-    addColumnButtonEnter.append('text').attr({
-      x: function (d) {
-        return d.w / 2;
-      },
-      y: function (d) {
-        return d.h / 2;
-      }
-    }).text('\uf067');
+    addColumnButtonEnter
+        .filter(function(d) { return !d.render; })
+        .append('rect').attr({
+            x: 0,
+            y: 0,
+            rx: 5,
+            ry: 5,
+            width: function (d) {
+                return d.w;
+            },
+            height: function (d) {
+                return d.h;
+            }
+        })
+        .on('click', function (d) {
+            if ($.isFunction(d.action)) {
+                d.action.call(that, d);
+            } else {
+                that[d.action](d);
+            }
+        });
+
+        addColumnButtonEnter
+        .filter(function(d) { return !d.render; })
+        .append('text').attr({
+            x: function (d) {
+                return d.w / 2;
+            },
+            y: function (d) {
+                return d.h / 2;
+            }
+        })
+        .text(function(d) {
+            return d.text || '\uf067';
+        });
 
 
+    addColumnButtonEnter
+        .filter(function(d) { return !!d.render; })
+        .append(function(d) {
+            return d.render.call(that, d);
+        })
+        .on('click', function (d) {
+            if ($.isFunction(d.action)) {
+                d.action.call(that, d);
+            } else {
+                that[d.action](d);
+            }
+        });
   };
 
   LineUp.prototype.hoverHistogramBin = function (row) {
@@ -3865,6 +3887,11 @@ var LineUp;
     this.headerUpdateRequired = true;
     this.listeners['columns-changed'](this);
     this.updateAll();
+  };
+
+
+  LineUp.prototype.clearSelection = function () {
+      this.select();
   };
 
 

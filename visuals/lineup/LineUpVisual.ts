@@ -194,6 +194,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
             this.loading = true;
             this.host.loadMoreData();
         });
+        this.lineup.events.on(LineUp.EVENTS.CLEAR_SELECTION, () => this.onSelectionChanged());
         this.lineup.events.on("configurationChanged", (config) => {
             if (!this.loadingData) {
 
@@ -472,7 +473,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     /**
      * Selects the given rows
      */
-    private onSelectionChanged(rows : ILineUpVisualRow[]) {
+    private onSelectionChanged(rows? : ILineUpVisualRow[]) {
         var filter;
         if (this.lineup.selectionEnabled) {
             if (rows && rows.length) {
