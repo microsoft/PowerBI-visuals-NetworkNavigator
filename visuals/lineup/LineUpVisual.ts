@@ -381,43 +381,54 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     private checkDataChanged() {
         if (this.dataViewTable) {
             let config = this.getConfigFromDataView();
-            var append = true;
-            var finalData = [];
+            var addedData = [];
+            var updatedData = [];
             var selectedRows = [];
-            var addedRemoved = false;
+            var whatHappend = {
+                added: false,
+                removed: false,
+                updated: false
+            };
             var newData = LineUpVisual.converter(this.dataView, config, this.selectionManager.getSelectionIds());
             Utils.listDiff<ILineUpRow>((this.lineup.getData() || []).slice(0), newData, {
                 equals: (a, b) => a.equals(b),
                 onAdd: (item) => {
-                    addedRemoved = true;
-                    finalData.push(item);
+                    whatHappend.added = true;
+                    addedData.push(item);
                     if (item.selected) {
                         selectedRows.push(item);
                     }
                 },
                 onRemove: (item) => {
-                    addedRemoved = true;
-                    // If any were removed, we're dealing with a different set of data, just set the data
-                    append = false;
+                    whatHappend.removed = true;
                 },
                 onUpdate(existing, newitem) {
+                    whatHappend.updated = true;
                     existing.selected = newitem.selected;
                     if (existing.selected) {
                         selectedRows.push(existing);
                     }
+                    updatedData.push(existing);
                 }
             });
             this.lineup.configuration = config;
-            if (addedRemoved) {
-                // appendData/setData will deal with selection
-                if (append) {
-                    this.lineup.appendData(finalData);
+
+            // If something was added or removed
+            if (whatHappend.added || whatHappend.removed) {
+
+                // If nothing was removed, and everything was added
+                if (!whatHappend.removed) {
+
+                    // Then we really only need to the new data, cause the updated data is already in lineup
+                    this.lineup.appendData(addedData);
                 } else {
-                    this.lineup.setData(finalData);
+
+                    // We've got different data, then just set the data
+                    this.lineup.setData(addedData.concat(updatedData));
                 }
-            } else {
-                this.lineup.selection = selectedRows;
             }
+
+            this.lineup.selection = selectedRows;
         }
     }
 
