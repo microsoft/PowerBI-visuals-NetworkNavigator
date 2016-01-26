@@ -276,10 +276,19 @@ gulp.task('demo-server', function() {
             livereload: {
                 enable: true, // need this set to true to enable livereload
                 filter: function(fileName) {
-                    if (fileName.match(/dist\//) || fileName.match(/demo/)) { // exclude all source maps from livereload
-                        return false;
+                    // This has to match both folders and file names, otherwise it doesn't do anything
+                    // if (fileName.match(/dist$/) || fileName.match(/dist[^\.]+$/) || /*fileName.match(/dist.*\.js$/)*/
+                    //     fileName.match(/demo/) || fileName.match(/demo[^\.]+$/)/* || fileName.match(/demo.*\.js$/)*/) {
+                    //     return true;
+                    // }
+                    if (fileName.match(/dist.*/) || fileName.match(/demo.*/)) {
+                        return true;
                     }
-                    return true;
+                    // if ((fileName.match(/demo\//) || fileName.match(/dist\//)) && fileName.match(/\.js$/)) {
+                    //     console.log(fileName);
+                    //     return true;
+                    // }
+                    return false;
                 }
             },
             open: '/demo'

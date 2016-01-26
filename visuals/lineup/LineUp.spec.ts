@@ -157,11 +157,20 @@ describe('LineUp', () => {
         it('should pass sorting settings to lineupimpl', () => {
             let { instance } = loadInstanceWithSettings({
                 sorting: {
-                    external: false
+                    external: true
                 }
             });
 
-            expect(instance.lineupImpl.config.sorting.external).to.be.false;
+            expect(instance.lineupImpl.config.sorting.external).to.be.true;
+        });
+        it('should pass filtering settings to lineupimpl', () => {
+            let { instance } = loadInstanceWithSettings({
+                filtering: {
+                    external: true
+                }
+            });
+
+            expect(instance.lineupImpl.config.filtering.external).to.be.true;
         });
     });
 

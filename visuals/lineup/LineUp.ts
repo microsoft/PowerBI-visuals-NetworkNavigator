@@ -142,6 +142,9 @@ export class LineUp {
         },
         sorting: {
             external: false
+        },
+        filtering: {
+            external: false
         }
     };
 
@@ -268,6 +271,7 @@ export class LineUp {
 
         /** Apply the settings to lineup */
         let externalSort = !!value && !!value.sorting && !!value.sorting.external;
+        let externalFilter = !!value && !!value.filtering && !!value.filtering.external;
         if (this.lineupImpl) {
             this.attachSelectionEvents();
 
@@ -278,8 +282,10 @@ export class LineUp {
                 }
             }
             this.lineupImpl.config.sorting = { external: externalSort };
+            this.lineupImpl.config.filtering = { external: externalFilter };
         }
         this.lineUpConfig.sorting.external = externalSort;
+        this.lineUpConfig.filtering.external = externalFilter;
 
         this._settings = newSettings;
     }
@@ -731,6 +737,9 @@ export interface ILineUpSettings {
         multiSelect?: boolean;
     };
     sorting?: {
+        external?: boolean;
+    };
+    filtering?: {
         external?: boolean;
     };
     presentation?: {
