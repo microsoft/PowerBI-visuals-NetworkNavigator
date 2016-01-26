@@ -1,5 +1,5 @@
 import EventEmitter from '../../base/EventEmitter';
-import * as $ from "jquery";
+const $ = require("jquery");
 import * as _ from "lodash";
 
 /**

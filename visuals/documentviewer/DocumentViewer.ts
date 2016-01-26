@@ -1,5 +1,5 @@
 const DOMPurify = require("./purify");
-import * as $ from "jquery";
+const $ = require("jquery");
 
 /**
  * A simple document viewer which maps field names to values

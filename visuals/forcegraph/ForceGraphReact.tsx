@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import * as $ from "jquery";
+const $ = require("jquery");
 import { ForceGraph as ForceGraphImpl, IForceGraphData, IForceGraphNode } from "./ForceGraph";
 
 export interface IForceGraphProps {

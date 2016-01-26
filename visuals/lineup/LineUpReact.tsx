@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import * as $ from 'jquery';
+const $ = require("jquery");
 import { LineUp as LineUpImpl, ILineUpRow, ILineUpColumn, ILineUpSettings } from "./LineUp";
 
 export interface LineUpProps {
