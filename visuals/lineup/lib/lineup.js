@@ -1912,6 +1912,7 @@ var LineUp;
       container = $container[0],
       rowHeight = this.config.svgLayout.rowHeight,
       prevScrollTop = container.scrollTop,
+    //   lastRowIdx = 0,
       jbody = $(this.$table.node()),
       backupRows = this.config.svgLayout.backupScrollRows,
       shift;
@@ -1921,10 +1922,15 @@ var LineUp;
       var left = container.scrollLeft;
       //at least one row changed
       that.scrolled(act, left);
-      if (Math.abs(prevScrollTop - act) >= rowHeight * backupRows) {
+      if (Math.abs(prevScrollTop - act) >= rowHeight * (backupRows / 2)) {
         prevScrollTop = act;
         that.updateBody();
       }
+        // var currRowIndex = Math.ceil(container.scrollTop / rowHeight);
+        // if (Math.abs(lastRowIdx - currRowIndex) >= (backupRows / 2)) {
+        //     lastRowIdx = currRowIndex;
+        //     that.updateBody();
+        // }
     }
 
     $container.on('scroll', onScroll);
