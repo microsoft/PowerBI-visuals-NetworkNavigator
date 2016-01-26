@@ -150,19 +150,28 @@ export class LineUp {
             external: false
         },
         histograms: {
-            generator: undefined
-            /*
-            generator: (column, callback) => {
-                setTimeout(() => {
+            generator: (columnImpl, callback) => {
+                var column = this.getColumnByName(columnImpl.column.id);
+                var data : any = this._data;
+                if (column && column.histogram) {
+                    var perc = 1 / column.histogram.values.length;
+                    var values = column.histogram.values.map((v, i) => ({
+                        x: perc * i,
+                        y: v,
+                        dx: perc
+                    }));
+                    callback(values);
+                } else {
                     var histgenerator = d3.layout.histogram();
-                    histgenerator.range(column.scale.range());
-                    histgenerator.value(function (row) { return column.getValue(row) ;});
+                    histgenerator.range(columnImpl.scale.range());
+                    histgenerator.value(function (row) { return columnImpl.getValue(row) ;});
+
                     //remove all the direct values to save space
-                    var hist = histgenerator(<any>this._data).map(function (bin) {
+                    var hist = histgenerator(data).map(function (bin) {
                         return {
-                        x : bin.x,
-                        dx : bin.dx,
-                        y: bin.y
+                            x : bin.x,
+                            dx : bin.dx,
+                            y: bin.y
                         };
                     });
                     var max = d3.max(hist, function(d) { return d.y; });
@@ -174,9 +183,8 @@ export class LineUp {
                         }
                     });
                     callback(hist);
-                }, 2000);
-                // callback([]);
-            }*/
+                }
+            }
         }
     };
 
@@ -468,6 +476,13 @@ export class LineUp {
     }
 
     /**
+     * Retrieves our columns by name
+     */
+    private getColumnByName(colName: string) {
+        return this.configuration && this.configuration.columns && this.configuration.columns.filter(c => c.column === colName)[0];
+    }
+
+    /**
      * Updates the selected state of each row, and returns all the selected rows
      */
     private updateRowSelection(sels: ILineUpRow[]) {
@@ -716,6 +731,15 @@ export interface ILineUpColumn {
      * The categories of this column
      */
     categories?: string[];
+
+    /**
+     * The histogram of the column
+     */
+    histogram?: {
+        min?: number;
+        max?: number;
+        values: number[];
+    };
 
     /**
      * The domain of the column, only for number based columns

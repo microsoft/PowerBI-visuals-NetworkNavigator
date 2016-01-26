@@ -664,10 +664,12 @@ var LineUp;
     getHist: function(callback) {
         var that = this;
         if (this.histogramGetter) {
-            this.histogramGetter(this, callback);
+            this.histogramGetter(this, function(hist) {
+                callback.call(that, hist);
+            });
         } else {
             setTimeout(function() {
-                callback(that._hist);
+                callback.call(that, that._hist);
             }, 0);
         }
     },
@@ -702,14 +704,14 @@ var LineUp;
             var v = that.getValue(row), i;
             if (hist) {
                 for(i = hist.length -1 ; i>= 0; --i) {
-                    var bin = that._hist[i];
+                    var bin = hist[i];
                     if (bin.x <= v && v <= (bin.x+bin.dx)) {
-                        callback(i);
+                        callback.call(that, i);
                         return;
                     }
                 }
             }
-            callback(-1);
+            callback.call(that, -1);
         });
     },
     setColumnWidth: function (newWidth, ignoreParent) {
@@ -3751,11 +3753,12 @@ var LineUp;
     if (row) {
       this.$header.selectAll('g.hist').each(function(d) {
         if (d instanceof LineUp.LayoutNumberColumn) {
+            var that = this;
             d.getHist(function (hist) {
                 if (hist) {
                     d.binOf(row, function(bin) {
                         if (bin >= 0) {
-                            d3.select(this).select('rect:nth-child('+(bin+1)+')').classed('hover',true);
+                            d3.select(that).select('rect:nth-child('+(bin+1)+')').classed('hover',true);
                         }
                     });
                 }
