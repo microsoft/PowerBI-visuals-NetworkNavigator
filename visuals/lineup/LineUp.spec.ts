@@ -175,11 +175,11 @@ describe('LineUp', () => {
         it('should pass histogram settings to lineupimpl', () => {
             let { instance } = loadInstanceWithSettings({
                 histograms: {
-                    external: true
+                    generator: (column) => []
                 }
             });
 
-            expect(instance.lineupImpl.config.histograms.external).to.be.true;
+            expect(instance.lineupImpl.config.histograms.generator).to.not.be.undefined;
         });
     });
 

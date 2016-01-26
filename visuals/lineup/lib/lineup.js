@@ -647,7 +647,6 @@ var LineUp;
     this.histgenerator.range(this.scale.range());
     this.histgenerator.value(function (row) { return that.getValue(row) ;});
     this._hist = [];
-    this.externalHistograms = false;
   }
   LineUp.LayoutNumberColumn = LayoutNumberColumn;
 
@@ -664,23 +663,20 @@ var LineUp;
     },
     getHist: function(callback) {
         var that = this;
-        if (this.externalHistograms) {
-            that.listeners['generate-histogram'](that, callback);
+        if (this.histogramGetter) {
+            this.histogramGetter(this, callback);
         } else {
             setTimeout(function() {
                 callback(that._hist);
             }, 0);
         }
     },
-    prepare: function(data, showHistograms, externalHistograms) {
-      this.externalHistograms = !!externalHistograms;
+    prepare: function(data, showHistograms, histogramGetter) {
+      this.histogramGetter = histogramGetter;
 
-      if (!showHistograms) {
+      if (!showHistograms || histogramGetter) {
         this._hist = [];
         return;
-      } else if (externalHistograms) {
-          this._hist = [];
-          return;
       }
 
       //remove all the direct values to save space
@@ -2462,8 +2458,9 @@ var LineUp;
           cols.forEach(function (d) {
             d.flattenMe(flat);
           });
+          var generator = that.config.histograms && that.config.histograms.generator;
           flat.forEach(function (col) {
-            col.prepare(bundle.data, that.config.renderingOptions.histograms, that.config.histograms && that.config.histograms.external);
+            col.prepare(bundle.data, that.config.renderingOptions.histograms, generator);
           });
           bundle.initialSort = false;
         }

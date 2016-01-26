@@ -73,6 +73,9 @@ export class LineUp {
         sorting: {
             external: false
         },
+        filtering: {
+            external: false
+        },
         presentation: {
             stacked: true,
             values: false,
@@ -133,7 +136,7 @@ export class LineUp {
     /**
      * The configuration for the lineup viewer
      */
-    private lineUpConfig = {
+    private lineUpConfig : ILineUpSettings = <any>{
         svgLayout: {
             mode: 'separate'
         },
@@ -143,11 +146,37 @@ export class LineUp {
         sorting: {
             external: false
         },
-        histograms: {
-            external: false
-        },
         filtering: {
             external: false
+        },
+        histograms: {
+            generator: undefined
+            /*
+            generator: (column, callback) => {
+                setTimeout(() => {
+                    var histgenerator = d3.layout.histogram();
+                    histgenerator.range(column.scale.range());
+                    histgenerator.value(function (row) { return column.getValue(row) ;});
+                    //remove all the direct values to save space
+                    var hist = histgenerator(<any>this._data).map(function (bin) {
+                        return {
+                        x : bin.x,
+                        dx : bin.dx,
+                        y: bin.y
+                        };
+                    });
+                    var max = d3.max(hist, function(d) { return d.y; });
+                    hist.forEach(function (d) {
+                        if (max > 0) {
+                            d.y /= max;
+                        } else {
+                            d.y = 0;
+                        }
+                    });
+                    callback(hist);
+                }, 2000);
+                // callback([]);
+            }*/
         }
     };
 
@@ -202,6 +231,8 @@ export class LineUp {
                 // This only works for single columns and not grouped columns
                 this.onLineUpSorted(column && column.column && column.column.id, asc);
             });
+
+
             this.lineupImpl.listeners.on('columns-changed.lineup', () => this.onLineUpColumnsChanged());
             this.lineupImpl.listeners.on('change-filter.lineup', (x, column) => this.onLineUpFiltered(column));
             var scrolled = this.lineupImpl.scrolled;
@@ -275,7 +306,7 @@ export class LineUp {
         /** Apply the settings to lineup */
         let externalSort = !!value && !!value.sorting && !!value.sorting.external;
         let externalFilter = !!value && !!value.filtering && !!value.filtering.external;
-        let externalHistograms = !!value && !!value.histograms && !!value.histograms.external;
+        let histgenerator = !!value && !!value.histograms && value.histograms.generator;
         if (this.lineupImpl) {
             this.attachSelectionEvents();
 
@@ -287,12 +318,11 @@ export class LineUp {
             }
             this.lineupImpl.config.sorting = { external: externalSort };
             this.lineupImpl.config.filtering = { external: externalFilter };
-            this.lineupImpl.config.histograms = { external: externalHistograms };
+            this.lineupImpl.config.histograms = { generator: histgenerator };
         }
         this.lineUpConfig.sorting.external = externalSort;
         this.lineUpConfig.filtering.external = externalFilter;
-        this.lineUpConfig.histograms.external = externalHistograms;
-
+        this.lineUpConfig.histograms.generator = histgenerator;
 
         this._settings = newSettings;
     }
@@ -750,7 +780,7 @@ export interface ILineUpSettings {
         external?: boolean;
     };
     histograms?: {
-        external?: boolean;
+        generator?: (column, callback) => any;
     };
     presentation?: {
         values?: boolean;
