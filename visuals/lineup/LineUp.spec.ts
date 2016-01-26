@@ -172,6 +172,15 @@ describe('LineUp', () => {
 
             expect(instance.lineupImpl.config.filtering.external).to.be.true;
         });
+        it('should pass histogram settings to lineupimpl', () => {
+            let { instance } = loadInstanceWithSettings({
+                histograms: {
+                    external: true
+                }
+            });
+
+            expect(instance.lineupImpl.config.histograms.external).to.be.true;
+        });
     });
 
     describe("setData", () => {
