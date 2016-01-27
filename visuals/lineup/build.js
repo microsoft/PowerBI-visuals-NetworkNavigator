@@ -1,4 +1,4 @@
-{
+module.exports = {
     "output": {
         "PowerBI": {
             "visualName": "LineUpVisual",
@@ -14,4 +14,4 @@
         }
     },
     "lintFiles": ["LineUpVisual.ts", "LineUp.ts"]
-}
+};

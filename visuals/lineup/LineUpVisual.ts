@@ -1,7 +1,7 @@
 /// <reference path="../../base/references.d.ts"/>
 import { ExternalCssResource, VisualBase } from "../../base/VisualBase";
 import { default as Utils, Visual } from "../../base/Utils";
-import { LineUp, ILineUpRow, ILineUpSettings, ILineUpColumn, ILineUpConfiguration } from "./LineUp";
+import { LineUp, ILineUpRow, ILineUpSettings, ILineUpColumn, ILineUpConfiguration, ILineUpLayoutColumn } from "./LineUp";
 
 import IVisual = powerbi.IVisual;
 import DataViewTable = powerbi.DataViewTable;
@@ -17,12 +17,12 @@ import SelectionId = powerbi.visuals.SelectionId;
 import SelectionManager = powerbi.visuals.utility.SelectionManager;
 import VisualDataRoleKind = powerbi.VisualDataRoleKind;
 
-@Visual(JSON.parse(require("./build.json")).output.PowerBI)
+@Visual(require("./build.js").output.PowerBI)
 export default class LineUpVisual extends VisualBase implements IVisual {
     private dataViewTable: DataViewTable;
     private dataView: powerbi.DataView;
     private host : IVisualHostServices;
-    private lineup: LineUp;
+    public lineup: LineUp;
     private selectionManager : SelectionManager;
     private waitingForMoreData : boolean;
     private waitingForSort : boolean;
@@ -172,6 +172,18 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         </div>
     `.trim().replace(/\n/g, '');
 
+    /**
+     * If css should be loaded or not
+     */
+    private noCss : boolean = false;
+
+    /**
+     * The constructor for the visual
+     */
+    public constructor(noCss: boolean = false) {
+        super();
+        this.noCss = noCss;
+    }
 
     /** This is called once when the visual is initialially created */
     public init(options: VisualInitOptions): void {
@@ -212,6 +224,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 this.host.persistProperties(objects);
             }
         });
+        this.dimensions = { width: options.viewport.width, height: options.viewport.height };
     }
 
     /** Update is called for data updates, resizes & formatting changes */
@@ -224,7 +237,6 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         if (!_.isEqual(newDims, this.dimensions)) {
             this.dimensions = newDims;
         } else {
-
             // If we explicitly are loading more data OR If we had no data before, then data has been loaded
             this.waitingForMoreData = false;
             this.waitingForSort = false;
@@ -280,7 +292,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
      * Gets the css used for this element
      */
     protected getCss() : string[] {
-        return super.getCss().concat([require("!css!sass!./css/LineUp.scss"), require("!css!sass!./css/LineUpVisual.scss")]);
+        return this.noCss ? [] : super.getCss().concat([require("!css!sass!./css/LineUp.scss"), require("!css!sass!./css/LineUpVisual.scss")]);
     }
 
     /**
@@ -294,7 +306,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
      * Gets a lineup config from the data view
      */
     private getConfigFromDataView() : ILineUpConfiguration {
-        var colArr : ILineUpColumn[] = this.dataViewTable.columns.slice(0).map((c) => {
+        var newColArr : ILineUpColumn[] = this.dataViewTable.columns.slice(0).map((c) => {
             return {
                 label: c.displayName,
                 column: c.displayName,
@@ -310,11 +322,35 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         }
         if (!config) {
             config = {
-                primaryKey: colArr[0].label,
-                columns: colArr
+                primaryKey: newColArr[0].label,
+                columns: newColArr
             };
         } else {
-            Utils.listDiff<ILineUpColumn>(config.columns, colArr, {
+            var newColNames = newColArr.map(c => c.column);
+
+            // Filter out any columns that don't exist anymore
+            config.columns = config.columns.filter(c =>
+                newColNames.indexOf(c.column) >= 0
+            );
+
+            // Sort contains a missing column
+            if (config.sort && newColNames.indexOf(config.sort.column) < 0) {
+                config.sort = undefined;
+            }
+
+            if (config.layout && config.layout['primary']) {
+                let removedColumnFilter = (c : ILineUpLayoutColumn) => {
+                    if (newColNames.indexOf(c.column) >= 0) {
+                        return true;
+                    }
+                    if (c.children) {
+                        c.children = c.children.filter(removedColumnFilter);
+                    }
+                    return false;
+                };
+                config.layout['primary'] = config.layout['primary'].filter(removedColumnFilter);
+            }
+            Utils.listDiff<ILineUpColumn>(config.columns, newColArr, {
                 /**
                  * Returns true if item one equals item two
                  */
@@ -356,14 +392,21 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         if (view && view.table) {
             var table = view.table;
             table.rows.forEach((row, rowIndex) => {
-                var identity = view.categorical.categories[0].identity[rowIndex];
-                var newId = SelectionId.createWithId(identity);
+                var identity;
+                var newId;
+                if (view.categorical && view.categorical.categories.length) {
+                    identity = view.categorical.categories[0].identity[rowIndex];
+                    newId = SelectionId.createWithId(identity);
+                } else {
+                    newId = SelectionId.createNull();
+                }
+
                 // The below is busted > 100
                 //var identity = SelectionId.createWithId(this.dataViewTable.identity[rowIndex]);
                 var result : ILineUpVisualRow = {
                     identity: newId,
                     equals: (b) => (<ILineUpVisualRow>b).identity.equals(newId),
-                    filterExpr: identity.expr,
+                    filterExpr: identity && identity.expr,
                     selected: !!_.find(selectedIds, (id : SelectionId) => id.equals(newId))
                 };
                 row.forEach((colInRow, i) => {

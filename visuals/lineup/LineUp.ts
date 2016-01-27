@@ -747,7 +747,7 @@ export interface ILineUpColumn {
     domain?: [number, number]
 }
 
-interface ILineUpLayoutColumn {
+export interface ILineUpLayoutColumn {
     width: number;
     column: string;
     type: string;

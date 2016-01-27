@@ -42,7 +42,12 @@ var paths = {
     packageDir: ['package']
 };
 
-var projectConfig = JSON.parse(fs.readFileSync('visuals/' + project + '/build.json').toString());
+var projectConfig;
+if (fs.existsSync('visuals/' + project + '/build.json')) {
+    projectConfig = JSON.parse(fs.readFileSync('visuals/' + project + '/build.json'));
+} else {
+    projectConfig = require('./visuals/' + project + '/build.js');
+}
 
 // Not all tasks need to use streams
 // A gulpfile is just another node program and you can use any package available on npm

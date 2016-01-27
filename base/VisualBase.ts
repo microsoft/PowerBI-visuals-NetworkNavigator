@@ -1,6 +1,4 @@
 /// <reference path="./references.d.ts"/>
-const css = require("!css!sass!./css/base.scss");
-
 export class VisualBase implements powerbi.IVisual {
     protected element: JQuery;
     protected container: JQuery;
@@ -38,7 +36,7 @@ export class VisualBase implements powerbi.IVisual {
      * Gets the inline css used for this element
      */
     protected getCss() : string[] {
-        return [css];
+        return [require("!css!sass!./css/base.scss")];
     }
 
     /**
@@ -84,17 +82,19 @@ export interface ExternalCssResource {
 }
 
 /* HACK FIXES */
-powerbi.visuals.utility.SelectionManager.prototype['selectInternal'] = function(selectionId: powerbi.visuals.SelectionId, multiSelect: boolean) {
-    if (powerbi.visuals.utility.SelectionManager.containsSelection(this.selectedIds, selectionId)) {
-        this.selectedIds = multiSelect
-            ? this.selectedIds.filter(d => !powerbi.data.Selector.equals(d.getSelector(), selectionId.getSelector()))
-            : this.selectedIds.length > 1
-                ? [selectionId] : [];
-    } else {
-        if (multiSelect)
-            this.selectedIds.push(selectionId);
-        else
-            this.selectedIds = [selectionId];
-    }
-};
-console.warn("Monkey Patched: powerbi.visuals.utility.SelectionManager.prototype.selectInternal");
+if (powerbi.visuals.utility.SelectionManager.prototype['selectInternal'] ) {
+    powerbi.visuals.utility.SelectionManager.prototype['selectInternal'] = function(selectionId: powerbi.visuals.SelectionId, multiSelect: boolean) {
+        if (powerbi.visuals.utility.SelectionManager.containsSelection(this.selectedIds, selectionId)) {
+            this.selectedIds = multiSelect
+                ? this.selectedIds.filter(d => !powerbi.data.Selector.equals(d.getSelector(), selectionId.getSelector()))
+                : this.selectedIds.length > 1
+                    ? [selectionId] : [];
+        } else {
+            if (multiSelect)
+                this.selectedIds.push(selectionId);
+            else
+                this.selectedIds = [selectionId];
+        }
+    };
+    console.warn("Monkey Patched: powerbi.visuals.utility.SelectionManager.prototype.selectInternal");
+}
