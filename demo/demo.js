@@ -4,6 +4,7 @@ $(function() {
         try {
             var slicerEle = $('#advanced-slicer');
             var slicer = new AdvancedSlicer(slicerEle);
+            slicer.serverSideSearch = false;
             slicer.events.on('canLoadMoreData', function() { return false; });
             slicer.dimensions = { height: slicerEle.height(), width: slicerEle.width() };
             $.getJSON('slicerdata.json', function(data) {
@@ -138,9 +139,30 @@ $(function() {
         }
     }
 
+    function loadFreeText() {
+        try {
+            var freeTextEle = $('#free-text');
+            var Azure = FreeTextSearch.DEFAULT_PROVIDERS.AzureSearchProvider;
+
+            var provider = new Azure([{
+                name: Azure.API_KEY_PARAM,
+                value: "D435209835B1F7131400F302936A4CCA"
+            }, {
+                name: Azure.URL_PARAM,
+                value: "https://essex.search.windows.net/indexes/jebsmall/docs"
+            }]);
+
+            var fts = new FreeTextSearch(freeTextEle, provider);
+            fts.dimensions = { height: freeTextEle.height(), width: freeTextEle.width() };
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     loadSlicer();
     loadTimescale();
     loadDocumentViewer();
     loadForceGraph();
     loadLineUp();
+    loadFreeText();
 });

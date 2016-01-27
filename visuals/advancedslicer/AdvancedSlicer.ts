@@ -8,12 +8,17 @@ const List = require('./List');
 export class AdvancedSlicer {
 
     /**
+     * The number of milliseconds before running the search, after a user stops typing.
+     */
+    private static SEARCH_DEBOUNCE = 500;
+
+    /**
      * The template for this visual
      */
     private static template = `
         <div id='slicer-list'>
             <div class="slicer-options">
-                <input class="search" placeholder="Search" />
+                <input class="searchbox" placeholder="Search" />
                 <div style="margin:0;padding:0;margin-top:5px;">
                 <label style="vertical-align:middle"><input class="check-all" type="checkbox" style="margin-right:5px;vertical-align:middle"/>&nbsp;Select All</label>
                 </div>
@@ -90,7 +95,7 @@ export class AdvancedSlicer {
         this.element = element;
         this.listContainer = element.append($(AdvancedSlicer.template)).find("#slicer-list");
         this.listEle = this.listContainer.find(".list");
-        this.listEle.scroll(() => this.onListScroll());
+        this.listEle.scroll(() => this.checkLoadMoreData());
         this.myList = new List(this.listContainer[0], {
             valueName: ['category'],
             item: AdvancedSlicer.listItemTemplate,
@@ -101,6 +106,21 @@ export class AdvancedSlicer {
 
         // These two are here because the devtools call init more than once
         this.loadingMoreData = true;
+    }
+
+    /**
+     * Setter for server side search
+     */
+    private _serverSideSearch = true;
+    public set serverSideSearch(value: boolean) {
+        this._serverSideSearch = value;
+    }
+
+    /**
+     * Getter for server side search
+     */
+    public get serverSideSearch() {
+        return this._serverSideSearch;
     }
 
     /**
@@ -129,52 +149,34 @@ export class AdvancedSlicer {
      * Sets the slicer data
      */
     public set data(newData: SlicerItem[]) {
+        this.myList.clear();
+
+        // If some one sets the data, then clearly we are no longer loading data
+        this.loadingMoreData = false;
+
         if (newData && newData.length) {
-            Utils.listDiff<SlicerItem>(this._data, newData, {
-                // BUG: below should work, but once it passes 100, its busted
-                //    equals: (one, two) => one.identity.equals(two.identity),
-                equals: (one, two) => one.category === two.category,
-                onAdd: (item) => {
-                    this.myList.add(item);
-                    var ele = this.element.find(".item").last();
-                    var renderedValue = item.renderedValue;
-                    if (renderedValue) {
-                        ele.find(".value-display").css({ width: (renderedValue + "%") });
-                    }
-                    ele.find("input").prop('checked', item.selected);
-                    ele.data("item", item);
-                },
-                onRemove: (item) => this.myList.remove("category", item.category),
-                onUpdate: (existing, newItem) => {
-                    $.extend(existing, newItem);
-                    var item = this.myList.get("category", existing.category)[0];
-                    var ele = $(item.elm);
-                    item.values({ selected: existing.selected });
-                    var renderedValue = existing.renderedValue;
-                    if (renderedValue) {
-                        ele.find(".value-display").css({ width: (renderedValue + "%") });
-                    }
-                    ele.find("input").prop('checked', existing.selected);
-                    ele.data("item", existing);
+            newData.forEach((item) => {
+                this.myList.add(item);
+                var ele = this.element.find(".item").last();
+                var renderedValue = item.renderedValue;
+                if (renderedValue) {
+                    ele.find(".value-display").css({ width: (renderedValue + "%") });
                 }
-            });
+                ele.find("input").prop('checked', item.selected);
+                ele.data("item", item);
+            })
 
             this._data = newData;
 
             this.updateSelectAllButtonState();
-
-            var searchString = this.element.find(".search").val();
-            if (searchString) {
-                this.myList.search(searchString);
-
-                // If we have a search, then load more data as necessary
-                setTimeout(() => this.loadMoreDataBasedOnSearch(true), 10);
-            } else {
-                this.loadingMoreData = false;
-            }
-        } else {
-            this.loadingMoreData = false;
         }
+    }
+
+    /**
+     * Gets the current serch value
+     */
+    public get searchString() {
+        return this.element.find(".searchbox").val();
     }
 
     /**
@@ -197,30 +199,16 @@ export class AdvancedSlicer {
      * A boolean indicating whether or not the list is loading more data
      */
     private _loadingMoreData = false; // Don't use this directly
-    private get loadingMoreData() {
+    protected get loadingMoreData() {
         return this._loadingMoreData;
     }
 
     /**
      * Setter for loadingMoreData
      */
-    private set loadingMoreData(value: boolean) {
+    protected set loadingMoreData(value: boolean) {
         this._loadingMoreData = value;
         this.element.toggleClass("loading", value);
-    }
-
-    /**
-     * Listener for the list scrolling
-     */
-    private onListScroll() {
-        if (this.raiseCanLoadMoreData() && !this.loadingMoreData) {
-            var scrollElement = this.listEle[0];
-            var scrollHeight = scrollElement.scrollHeight;
-            var top = scrollElement.scrollTop;
-            if (scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200) {
-                this.raiseLoadMoreData();
-            }
-        }
     }
 
     /**
@@ -255,9 +243,14 @@ export class AdvancedSlicer {
      * Attaches all the necessary events
      */
     private attachEvents() {
-        this.myList.on("searchComplete", () => {
-            setTimeout(() => this.loadMoreDataBasedOnSearch(), 10);
-        });
+        this.element.find(".searchbox").on("input", _.debounce(() => {
+            if (this.serverSideSearch) {
+                setTimeout(() => this.checkLoadMoreDataBasedOnSearch(), 10);
+            } else {
+                this.myList.search(this.searchString);
+            }
+        }, AdvancedSlicer.SEARCH_DEBOUNCE));
+
         this.listEle.on("click", (evt) => {
             var checkbox = $(evt.target);
             var ele = $((<HTMLElement>evt.target)).parents(".item");
@@ -270,7 +263,6 @@ export class AdvancedSlicer {
                     this.selectedItems.splice(this.selectedItems.indexOf(item), 1);
                 }
                 this.raiseSelectionChanged(this.selectedItems, oldSelectedItems);
-
                 this.updateSelectAllButtonState();
             }
             evt.stopImmediatePropagation();
@@ -279,51 +271,68 @@ export class AdvancedSlicer {
     }
 
     /**
+     * Listener for the list scrolling
+     */
+    private checkLoadMoreData() {
+        var scrollElement = this.listEle[0];
+        var scrollHeight = scrollElement.scrollHeight;
+        if (this.raiseCanLoadMoreData() && !this.loadingMoreData) {
+            var top = scrollElement.scrollTop;
+            if (scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200) {
+                this.raiseLoadMoreData(false);
+            }
+        }
+    }
+
+    /**
      * Loads more data based on search
      * @param force Force the loading of new data, if it can
      */
-    private loadMoreDataBasedOnSearch (force: boolean = false) {
-        var scrollElement = this.listEle[0];
-        var scrollHeight = scrollElement.scrollHeight;
+    private checkLoadMoreDataBasedOnSearch() {
         // Only need to load if:
         // 1. There is more data. 2. There is not too much stuff on the screen (not causing a scroll)
-        if (this.raiseCanLoadMoreData() && scrollHeight <= scrollElement.clientHeight) {
-            // If we aren't already attempting to load more data, then do it
-            if (!this.loadingMoreData || force) {
-                this.raiseLoadMoreData();
-            }
-        } else {
-            // No need to load more data
-            this.loadingMoreData = false;
+        if (!this.loadingMoreData && this.raiseCanLoadMoreData(true)) {
+            this.raiseLoadMoreData(true);
         }
     }
 
     /**
      * Raises the event to load more data
      */
-    private raiseLoadMoreData() {
-        var item = {
-            result: false
-        };
-        this.events.raiseEvent("loadMoreData", item);
-        this.loadingMoreData = item.result;
+    protected raiseLoadMoreData(isNewSearch: boolean) : PromiseLike<SlicerItem[]> {
+        var item : { result?: PromiseLike<SlicerItem[]> } = { };
+        this.events.raiseEvent("loadMoreData", item, isNewSearch);
+        if (item.result) {
+            this.loadingMoreData = true;
+            return item.result.then((items) => {
+                this.loadingMoreData = false;
+                if (isNewSearch) {
+                    this.data = items;
+                } else {
+                    this.data = this.data.concat(items);
+                }
+                // Make sure we don't need to load more after this, in case it doesn't all fit on the screen
+                setTimeout(() => this.checkLoadMoreData(), 10);
+                return items;
+            }, () => this.loadingMoreData = false);
+        }
     }
 
     /**
      * Raises the event 'canLoadMoreData'
      */
-    private raiseCanLoadMoreData() : boolean {
+    protected raiseCanLoadMoreData(isSearch: boolean = false) : boolean {
         var item = {
             result: false
         };
-        this.events.raiseEvent('canLoadMoreData', item);
+        this.events.raiseEvent('canLoadMoreData', item, isSearch);
         return item.result;
     }
 
     /**
      * Raises the selectionChanged event
      */
-    private raiseSelectionChanged(newItems: SlicerItem[], oldItems: SlicerItem[]) {
+    protected raiseSelectionChanged(newItems: SlicerItem[], oldItems: SlicerItem[]) {
         this.events.raiseEvent('selectionChanged', newItems, oldItems);
     }
 }

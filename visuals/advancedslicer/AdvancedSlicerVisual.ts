@@ -101,6 +101,8 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
         }
     };
 
+    private loadDeferred : JQueryDeferred<SlicerItem[]>;
+
     /**
      * Called when the visual is being initialized
      */
@@ -108,9 +110,10 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
         super.init(options, '<div></div>');
         this.host = options.host;
         this.mySlicer = new AdvancedSlicer(this.element);
+        this.mySlicer.serverSideSearch = false;
         this.selectionManager = new SelectionManager({ hostServices: this.host });
-        this.mySlicer.events.on("loadMoreData", (item) => this.onLoadMoreData(item));
-        this.mySlicer.events.on("canLoadMoreData", (item) => item.result = !!this.dataView.metadata.segment);
+        this.mySlicer.events.on("loadMoreData", item => this.onLoadMoreData(item));
+        this.mySlicer.events.on("canLoadMoreData", (item, isSearch) => item.result = isSearch || !!this.dataView.metadata.segment);
         this.mySlicer.events.on("selectionChanged", (newItems, oldItems) => this.onSelectionChanged(newItems));
     }
 
@@ -126,7 +129,28 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
         if (this.dataView) {
             var categorical = this.dataView && this.dataView.categorical;
             var newData = AdvancedSlicerVisual.converter(this.dataView, this.selectionManager);
-            this.mySlicer.data = newData;
+            if (this.loadDeferred) {
+
+                let added = [];
+                let anyRemoved = false;
+                Utils.listDiff(this.mySlicer.data.slice(0), newData, {
+                    /**
+                     * Returns true if item one equals item two
+                     */
+                    equals: (one, two) => one.category === two.category,
+
+                    /**
+                     * Gets called when the given item was added
+                     */
+                    onAdd: (item) => added.push(item)
+                });
+
+                // We only need to give it the new items
+                this.loadDeferred.resolve(added);
+                delete this.loadDeferred;
+            } else {
+                this.mySlicer.data = newData;
+            }
             this.mySlicer.showValues = !!categorical && !!categorical.values && categorical.values.length > 0;
 
             var sortedColumns = this.dataView.metadata.columns.filter((c) => !!c.sort);
@@ -186,7 +210,13 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
      */
     private onLoadMoreData(item: any) {
         if (this.dataView.metadata.segment) {
-            item.result = true;
+            if (this.loadDeferred) {
+                this.loadDeferred.reject();
+            }
+
+            this.loadDeferred = $.Deferred();
+            item.result = this.loadDeferred.promise();
+
             this.host.loadMoreData();
         }
     }

@@ -269,7 +269,21 @@ gulp.task('build:powerbi', function(cb) {
  * Builds everything
  */
 gulp.task('build', function(cb) {
-    sequence('clean', 'test', 'build:powerbi', 'build:component', 'build:react', cb);
+    var toBuild = [
+        'clean',
+        'test'
+    ];
+    if (projectConfig.output.PowerBI) {
+        toBuild.push('build:powerbi');
+    }
+    if (projectConfig.output.component) {
+        toBuild.push("build:component");
+    }
+    if (projectConfig.output.react) {
+        toBuild.push("build:react");
+    }
+    toBuild.push(cb);
+    sequence.apply(this, toBuild);
 });
 
 /**
