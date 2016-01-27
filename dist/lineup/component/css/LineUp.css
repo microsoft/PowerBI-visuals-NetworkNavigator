@@ -254,9 +254,9 @@
   left: 0;
   top: 50px;
   width: 100%;
-  height: -moz-calc(100% - 50px);
-  height: -webkit-calc(100% - 50px);
-  height: calc(100% - 50px);
+  height: -moz-calc(100% - 100px);
+  height: -webkit-calc(100% - 100px);
+  height: calc(100% - 100px);
   overflow-x: visible;
   overflow-y: auto; }
 
