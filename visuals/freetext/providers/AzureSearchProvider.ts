@@ -1,4 +1,4 @@
-import { ISearchProvider, ISearchProviderParams, IQueryOptions, IQueryResult } from "./ISearchProvider";
+import { ISearchProvider, ISearchProviderParams, IQueryOptions, IQueryResult, IQueryResultItem } from "./ISearchProvider";
 
 /**
  * Represents an azure search provider
@@ -8,6 +8,11 @@ export default class AzureSearchProvider implements ISearchProvider {
      * The API Key param
      */
     public static API_KEY_PARAM = "API Key";
+
+    /**
+     * The field that uniquely identifies a given result
+     */
+    public static ID_FIELD_PARAM = "ID Field";
 
     /**
      * The URL param
@@ -23,7 +28,7 @@ export default class AzureSearchProvider implements ISearchProvider {
      * The parameters to call this service
      * for example - API Key, URL
      */
-    public static requiredParameters: ISearchProviderParams[] = [{
+    public static supportedParameters: ISearchProviderParams[] = [{
         name: AzureSearchProvider.URL_PARAM,
         description: "The URL to the Azure Search Instance",
         value: undefined,
@@ -32,6 +37,11 @@ export default class AzureSearchProvider implements ISearchProvider {
         name: AzureSearchProvider.API_KEY_PARAM,
         description: "The API Key",
         value: undefined,
+        required: true
+    }, {
+        name: AzureSearchProvider.ID_FIELD_PARAM,
+        description: "The field that uniquely identifies a given result",
+        value: "emailid",
         required: true
     }, {
         name: AzureSearchProvider.SEARCH_FIELDS,
@@ -73,6 +83,7 @@ export default class AzureSearchProvider implements ISearchProvider {
      */
     public query(options: IQueryOptions): PromiseLike<IQueryResult> {
         if (this.checkRequiredParams()) {
+            let idField = this.getParamValue(AzureSearchProvider.ID_FIELD_PARAM);
             return $.ajax({
                 dataType: "json",
                 url: this.buildQueryUrl(options),
@@ -86,9 +97,10 @@ export default class AzureSearchProvider implements ISearchProvider {
                 return <IQueryResult>{
                     results: results.value.map((r) => {
                         var prop = (this.getParamValue(AzureSearchProvider.SEARCH_FIELDS) || "body").split(',')[0];
-                        return {
-                            match: r[prop],
-                            data: r.value
+                        return <IQueryResultItem> {
+                            id: r[idField],
+                            textualMatch: r[prop],
+                            rawData: r.value
                         };
                     }),
                     total: results["@odata.count"],
@@ -105,7 +117,7 @@ export default class AzureSearchProvider implements ISearchProvider {
      */
     public checkRequiredParams(): boolean {
         if (this.params && this.params.length) {
-            var required = AzureSearchProvider.requiredParameters.filter(p => p.required).map((p) => p.name);
+            var required = AzureSearchProvider.supportedParameters.filter(p => p.required).map((p) => p.name);
             var toCheck = this.params.map((p) => p.name);
             // Make sure that we have all the required params
             return required.filter((p) => toCheck.indexOf(p) >= 0).length === required.length;

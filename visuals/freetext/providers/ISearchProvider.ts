@@ -33,10 +33,10 @@ export interface ISearchProvider {
  */
 export interface ISearchProviderStatic {
     /**
-     * The required parameters to call this service
+     * The supported parameters to call this service
      * for example - API Key, URL
      */
-    requiredParameters: ISearchProviderParams[];
+    supportedParameters: ISearchProviderParams[];
 
     /**
      * Constructor for the search provider
@@ -101,6 +101,27 @@ export interface IQuery {
     }
 }
 
+/**
+ * An individual item in a result
+ */
+export interface IQueryResultItem {
+
+    /**
+     * The unique identifier of the given result
+     */
+    id: any;
+
+    /**
+     * The text match of the result
+     */
+    textualMatch: string;
+
+    /**
+     * The raw data from the query
+     */
+    rawData: any;
+}
+
 export interface IQueryResult {
 
     // The total number of results
@@ -112,8 +133,5 @@ export interface IQueryResult {
     /**
      * The actual data
      */
-    results: {
-        match: string;
-        data: any;
-    }[];
+    results: IQueryResultItem[];
 }

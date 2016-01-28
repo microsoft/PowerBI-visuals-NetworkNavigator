@@ -1,9 +1,8 @@
 /// <reference path="../../base/references.d.ts"/>
 declare var _;
 
-import { FreeTextSearch } from "./FreeTextSearch";
-import { ISearchProvider, ISearchProviderStatic } from "./providers/ISearchProvider";
-import { SlicerItem } from "../advancedslicer/AdvancedSlicer";
+import { FreeTextSearch, SlicerItemWithId } from "./FreeTextSearch";
+import { ISearchProvider, ISearchProviderStatic, ISearchProviderParams } from "./providers/ISearchProvider";
 
 import { VisualBase } from "../../base/VisualBase";
 import { default as Utils, Visual } from "../../base/Utils";
@@ -37,6 +36,8 @@ export default class FreeTextSearchVisual extends VisualBase implements IVisual 
      * The selection manager
      */
     private selectionManager: utility.SelectionManager;
+
+
 
     /**
      * The set of capabilities for the visual
@@ -93,6 +94,41 @@ export default class FreeTextSearchVisual extends VisualBase implements IVisual 
      */
     private textSearch : FreeTextSearch;
 
+    /**
+     * The settings for the providers, flattens providers supported parameters into key value pairs
+     */
+    private providerSettings : { [providerKey: string] : any } = {};
+
+    /**
+     * The mapping of the keys in the capabilities object to a provider
+     */
+    private propKeyToProvider : { [name: string] : ISearchProviderStatic } = {};
+
+    /**
+     * The constructor for the visual
+     */
+    public constructor() {
+        super();
+
+        Object.keys(FreeTextSearch.DEFAULT_PROVIDERS).forEach((pName) => {
+            let key = pName.replace(/ /g, "").toLowerCase();
+            this.propKeyToProvider[key] = FreeTextSearch.DEFAULT_PROVIDERS[pName];
+        });
+
+        let props = FreeTextSearchVisual.buildProviderProps();
+        let propKeys = Object.keys(props);
+        propKeys.forEach((k) => {
+            let settings = this.providerSettings[k] = {
+                enabled: false
+            };
+            let providerKeys = Object.keys(props[k].properties);
+            providerKeys.forEach((p) => {
+                settings[p] = "";
+            });
+
+        });
+    }
+
     /** This is called once when the visual is initialially created */
     public init(options: VisualInitOptions): void {
         super.init(options, this.template);
@@ -100,14 +136,50 @@ export default class FreeTextSearchVisual extends VisualBase implements IVisual 
         this.selectionManager = new SelectionManager({
             hostServices: options.host
         });
+        this.host = options.host;
     }
 
     /** Update is called for data updates, resizes & formatting changes */
     public update(options: VisualUpdateOptions) {
         super.update(options);
 
-        this.dataView = options.dataViews && options.dataViews[0];
+        this.textSearch.dimensions = $.extend(true, {}, options.viewport);
 
+        this.dataView = options.dataViews && options.dataViews[0];
+        let objects = this.dataView && this.dataView.metadata && this.dataView.metadata.objects;
+        if (objects) {
+            Object.keys(objects).forEach((k) => {
+                if (this.providerSettings[k]) {
+                    $.extend(true, this.providerSettings[k], objects[k]);
+                }
+            });
+
+            let ppKeys = Object.keys(this.providerSettings);
+            let enabledPPKey = ppKeys.filter((k) => this.providerSettings[k].enabled)[0];
+
+            // We have something enabled
+            if (enabledPPKey) {
+                let enabledProvider = this.propKeyToProvider[enabledPPKey];
+                let newParams : ISearchProviderParams[]  = enabledProvider.supportedParameters.map((p) => {
+                    return {
+                        name: p.name,
+                        value: this.providerSettings[enabledPPKey][p.name.replace(/ /g, "_")]
+                    };
+                });
+
+                // Were changing providers
+                if (!(this.textSearch.searchProvider instanceof enabledProvider)) {
+                    this.textSearch.searchProvider = new enabledProvider(newParams);
+
+                // Same provider, different params
+                } else if (this.textSearch.searchProvider) {
+                    this.textSearch.searchProvider.params = newParams;
+                }
+            } else {
+                this.textSearch.searchProvider = undefined;
+            }
+
+        }
         this.textSearch.events.on("loadMoreData", (item) => {
             if (item.result && item.result.then) {
                 item.result.then((newItems) => {
@@ -115,7 +187,12 @@ export default class FreeTextSearchVisual extends VisualBase implements IVisual 
                 });
             }
         });
-        this.applySelectionToSlicerItems(this.textSearch.data);
+        this.textSearch.events.on("selectionChanged", () => {
+            this.selectionManager.clear();
+            this.textSearch.selectedItems.map(n => this.getIdFromItem(<SlicerItemWithId>n)).forEach(i => this.selectionManager.select(i, true));
+            this.updateSelectionFilter();
+        });
+        this.applySelectionToSlicerItems(<SlicerItemWithId[]>this.textSearch.data);
     }
 
     /**
@@ -126,6 +203,9 @@ export default class FreeTextSearchVisual extends VisualBase implements IVisual 
         let providerNames = Object.keys(allProviders);
         let final : { [name: string] : DataViewObjectDescriptor } = { };
         providerNames.forEach((n) => {
+            let providerKey = n.toLowerCase().replace(/ /g, "_");
+
+            // Add an enabled flag
             let props = {
                 enabled: {
                     displayName: "Enabled",
@@ -134,14 +214,17 @@ export default class FreeTextSearchVisual extends VisualBase implements IVisual 
                 }
             };
 
-            let provider = allProviders[n];
-            provider.requiredParameters.forEach(p => {
-                props[p.name.toLowerCase().replace(/ /g, "_")] = {
+            // Go through all the properties of the providers, and add it as a PBI property
+            let provider : ISearchProviderStatic = allProviders[n];
+            provider.supportedParameters.forEach(p => {
+                props[p.name.replace(/ /g, "_")] = {
                     displayName: p.name,
                     description: p.description,
                     type: { text: {} }
                 };
             });
+
+            // Add this providers props to the top level
             final[n.toLowerCase().replace(/ /g, "_")] = {
                 displayName: n,
                 properties: <any>props
@@ -154,39 +237,15 @@ export default class FreeTextSearchVisual extends VisualBase implements IVisual 
      * Enumerates the instances for the objects that appear in the power bi panel
      */
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
-        let allProviders = FreeTextSearch.DEFAULT_PROVIDERS;
-
-        let providerMap : { [name: string] : ISearchProviderStatic } = {};
-        let providerPropKeys = [];
-        Object.keys(allProviders).forEach((pName) => {
-            let key = pName.replace(/ /g, "").toLowerCase();
-            providerPropKeys.push(key);
-            providerMap[key] = allProviders[pName];
-        });
         let result = <any>{};
-        if (providerPropKeys.indexOf(options.objectName) >= 0) {
-            let provider = providerMap[options.objectName];
-            let paramsToAdd = provider.requiredParameters;
 
-            result.enabled = this.textSearch.searchProvider instanceof provider;
-            if(result.enabled) {
-                paramsToAdd = paramsToAdd.map((p) => {
-                    let matching = this.textSearch.searchProvider.params.filter(m => m.name === p.name)[0];
-                    let mapped = {
-                        name: p.name,
-                        value: undefined
-                    };
-                    if (matching) {
-                        mapped.value = p.value;
-                    }
-                    return mapped;
-                });
-            } else {
-                result.enabled = false;
-                provider.requiredParameters.forEach(p => {
-                    result[p.name.toLowerCase().replace(/ /g, "_")] = p.value || "";
-                });
-            }
+        // If the properties requested are one of the providers props
+        if (this.providerSettings[options.objectName]) {
+            return [{
+                selector: null,
+                objectName: options.objectName,
+                properties: $.extend(true, {}, this.providerSettings[options.objectName])
+            }];
         }
         return [{
             selector: null,
@@ -198,14 +257,14 @@ export default class FreeTextSearchVisual extends VisualBase implements IVisual 
     /**
      * Gets an id from an item
      */
-    private getIdFromItem(item: SlicerItem) {
-        return SelectionId.createWithMeasure(item.match);
+    private getIdFromItem(item: SlicerItemWithId) : SelectionId {
+        return SelectionId.createWithMeasure(item.id);
     }
 
     /**
      * Applies the selection to the given items
      */
-    private applySelectionToSlicerItems(items: SlicerItem[]) {
+    private applySelectionToSlicerItems(items: SlicerItemWithId[]) {
         var selectedIds = this.selectionManager.getSelectionIds();
         items.forEach((d) => {
             var id = this.getIdFromItem(d);
@@ -226,7 +285,7 @@ export default class FreeTextSearchVisual extends VisualBase implements IVisual 
                     fieldsToCheck.forEach((field) => {
                         expressions.push(data.SQExprBuilder.contains(field, data.SQExprBuilder.text(<any>id.getSelector().metadata)));
                     })
-                });
+                });;
 
             var expression = expressions[0];
 

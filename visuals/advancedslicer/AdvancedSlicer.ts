@@ -76,11 +76,6 @@ export class AdvancedSlicer {
     private element: JQuery;
 
     /**
-     * The list of selected items
-     */
-    private selectedItems : SlicerItem[] = [];
-
-    /**
      * The data contained in this slicer
      */
     private _data : SlicerItem[] = [];
@@ -172,6 +167,14 @@ export class AdvancedSlicer {
 
             this.updateSelectAllButtonState();
         }
+    }
+
+    /**
+     * The list of selected items
+     */
+    private _selectedItems : SlicerItem[] = [];
+    public get selectedItems() : SlicerItem[] {
+        return this._selectedItems;
     }
 
     /**

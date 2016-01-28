@@ -76,7 +76,7 @@ export class FreeTextSearch extends AdvancedSlicer {
     /**
      * Loads the data from the services
      */
-    public loadData(offset: number) : PromiseLike<SlicerItem[]> {
+    public loadData(offset: number) : PromiseLike<SlicerItemWithId[]> {
         this.offset = undefined;
         this.total = undefined;
 
@@ -88,7 +88,7 @@ export class FreeTextSearch extends AdvancedSlicer {
             this.offset = results.offset;
             this.total = results.total;
             return results.results.map((d) => {
-                var textResult = d.match;
+                var textResult = d.textualMatch;
                 let searchString = this.searchString;
                 if (this.searchString) {
                     var cols = Object.keys(query.where.eq);
@@ -107,7 +107,8 @@ export class FreeTextSearch extends AdvancedSlicer {
                     suffix = match.substring(0, 20);
                     match = "";
                 }
-                var item : SlicerItem = {
+                var item : SlicerItemWithId = {
+                    id: d.id,
                     match: match,
                     matchPrefix: prefix,
                     matchSuffix: suffix,
@@ -144,4 +145,15 @@ export class FreeTextSearch extends AdvancedSlicer {
             }
         };
     }
+}
+
+
+/**
+ * A slicer item that has an id
+ */
+export interface SlicerItemWithId extends SlicerItem {
+    /**
+     * The unique identifier for this item
+     */
+    id: any;
 }
