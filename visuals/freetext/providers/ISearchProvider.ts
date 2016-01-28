@@ -17,11 +17,31 @@ export interface ISearchProvider {
      */
     name: string;
 
+    // /**
+    //  * The required parameters to call this service
+    //  * for example - API Key, URL
+    //  */
+    // requiredParameters: ISearchProviderParams[]
+    /**
+     * The current set of params used
+     */
+    params: ISearchProviderParams[];
+}
+
+/**
+ * Represents the static interface of a search provider
+ */
+export interface ISearchProviderStatic {
     /**
      * The required parameters to call this service
      * for example - API Key, URL
      */
-    parameters: ISearchProviderParams[]
+    requiredParameters: ISearchProviderParams[];
+
+    /**
+     * Constructor for the search provider
+     */
+    new(params?: ISearchProviderParams[]) : ISearchProvider;
 }
 
 /**
@@ -92,5 +112,8 @@ export interface IQueryResult {
     /**
      * The actual data
      */
-    data: any[];
+    results: {
+        match: string;
+        data: any;
+    }[];
 }

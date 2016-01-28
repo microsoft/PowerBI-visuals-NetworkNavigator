@@ -137,7 +137,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
                     /**
                      * Returns true if item one equals item two
                      */
-                    equals: (one, two) => one.category === two.category,
+                    equals: (one, two) => one.match === two.match,
 
                     /**
                      * Gets called when the given item was added
@@ -179,7 +179,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
             converted = categorical.categories[0].values.map((category, i) => {
                 var id = SelectionId.createWithId(categorical.categories[0].identity[i]);
                 var item = {
-                    category: category,
+                    match: category,
                     identity: id,
                     selected: !!_.find(selectedIds, (oId) => oId.equals(id)),
                     value: values[i] || 0,

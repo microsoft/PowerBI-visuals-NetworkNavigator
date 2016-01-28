@@ -1,11 +1,11 @@
 module.exports = {
     "output": {
-        /*"PowerBI": {
+        "PowerBI": {
             "visualName": "FreeTextSearch",
-            "projectId": "1450434005853",
+            "projectId": "1450434005843",
             "icon": "icon.png",
             "entry": "FreeTextSearchVisual"
-        },*/
+        },
         "component": {
             "entry": "FreeTextSearch"
         }/*,

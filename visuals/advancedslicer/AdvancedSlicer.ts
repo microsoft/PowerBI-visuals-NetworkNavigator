@@ -38,7 +38,9 @@ export class AdvancedSlicer {
                 <input style="vertical-align:middle;cursor:pointer" type="checkbox">
                 <span style="margin-left: 5px;vertical-align:middle" class="display-container">
                     <span style="display:inline-block;overflow:hidden" class="category-container">
-                        <span class="category"></span>
+                        <span class="matchPrefix"></span>
+                        <span class="match" style="background-color: yellow"></span>
+                        <span class="matchSuffix"></span>
                     </span>
                     <span style="display:inline-block" class="value-container">
                         <span style="display:inline-block;background-color:blue;width:0px" class="value-display">&nbsp;</span>
@@ -97,7 +99,7 @@ export class AdvancedSlicer {
         this.listEle = this.listContainer.find(".list");
         this.listEle.scroll(() => this.checkLoadMoreData());
         this.myList = new List(this.listContainer[0], {
-            valueName: ['category'],
+            valueName: ['match', 'matchPrefix', 'matchSuffix'],
             item: AdvancedSlicer.listItemTemplate,
             page: 20000 // Hack
         });
@@ -276,11 +278,10 @@ export class AdvancedSlicer {
     private checkLoadMoreData() {
         var scrollElement = this.listEle[0];
         var scrollHeight = scrollElement.scrollHeight;
-        if (this.raiseCanLoadMoreData() && !this.loadingMoreData) {
-            var top = scrollElement.scrollTop;
-            if (scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200) {
-                this.raiseLoadMoreData(false);
-            }
+        var top = scrollElement.scrollTop;
+        var shouldScrollLoad = scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200;
+        if (shouldScrollLoad && !this.loadingMoreData && this.raiseCanLoadMoreData()) {
+            this.raiseLoadMoreData(false);
         }
     }
 
@@ -341,7 +342,14 @@ export class AdvancedSlicer {
  * Represents an item in the slicer
  */
 export interface SlicerItem {
-    category: any;
+    /**
+     * The actual match
+     */
+    match: any;
+
+    matchPrefix?: any;
+    matchSuffix?: any;
+
     value: any;
     selected: boolean;
 

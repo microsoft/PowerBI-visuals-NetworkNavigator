@@ -1,4 +1,4 @@
-import { ISearchProvider, IQuery, IQueryResult } from "./providers/ISearchProvider";
+import { ISearchProvider, ISearchProviderStatic, IQuery, IQueryResult } from "./providers/ISearchProvider";
 import { AdvancedSlicer, SlicerItem } from "../advancedslicer/AdvancedSlicer";
 
 /**
@@ -13,7 +13,7 @@ export class FreeTextSearch extends AdvancedSlicer {
     /**
      * A static list of providers
      */
-    public static DEFAULT_PROVIDERS = require('./providers');
+    public static DEFAULT_PROVIDERS = <ISearchProviderStatic[]>require('./providers');
 
     /**
      * The skip amount
@@ -80,18 +80,43 @@ export class FreeTextSearch extends AdvancedSlicer {
         this.offset = undefined;
         this.total = undefined;
 
+        let query = this.buildQuery(this.searchString);
         return this.searchProvider.query({
             offset: offset || 0,
-            query: this.buildQuery(this.searchString)
+            query: query
         }).then((results) => {
             this.offset = results.offset;
             this.total = results.total;
-            return results.data.map((d) => {
-                return <SlicerItem>{
-                    category: d.body.substring(0, 20),
+            return results.results.map((d) => {
+                var textResult = d.match;
+                let searchString = this.searchString;
+                if (this.searchString) {
+                    var cols = Object.keys(query.where.eq);
+                    searchString = query.where.eq[cols[0]];
+                }
+                var idx = textResult.search(new RegExp(searchString, "i"));
+                var match = textResult;
+                var prefix = "";
+                var suffix = "";
+                if (idx) {
+                    var firstIdx = Math.max(0, idx - 10);
+                    prefix = match.substring(firstIdx, idx);
+                    suffix = match.substring(idx + searchString.length , idx + searchString.length + 10);
+                    match = match.substring(idx, idx + searchString.length);
+                } else {
+                    suffix = match.substring(0, 20);
+                    match = "";
+                }
+                var item : SlicerItem = {
+                    match: match,
+                    matchPrefix: prefix,
+                    matchSuffix: suffix,
+                    selected: false,
                     value: 0,
-                    renderedValue: 0
+                    renderedValue: undefined
                 };
+
+                return item;
             });
         });
     }
@@ -99,11 +124,22 @@ export class FreeTextSearch extends AdvancedSlicer {
     /**
      * Builds the query
      */
-    private buildQuery(text: string) : IQuery {
+    private buildQuery(searchText: string) : IQuery {
+        let column = "*";
+
+        // If searchString looks like "emailId::5432", then use everything before it as a column search
+        if (searchText) {
+            let parts = searchText.split("::");
+            if (parts.length === 2) {
+                column = parts[0];
+                searchText = parts[1];
+            }
+        }
+        searchText = searchText || "*";
         return {
             where: {
                 eq: {
-                    '*': text || '*'
+                    [column]: searchText
                 }
             }
         };

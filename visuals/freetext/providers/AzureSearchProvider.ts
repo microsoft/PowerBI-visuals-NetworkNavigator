@@ -23,7 +23,7 @@ export default class AzureSearchProvider implements ISearchProvider {
      * The parameters to call this service
      * for example - API Key, URL
      */
-    public parameters: ISearchProviderParams[] = [{
+    public static requiredParameters: ISearchProviderParams[] = [{
         name: AzureSearchProvider.URL_PARAM,
         description: "The URL to the Azure Search Instance",
         value: undefined,
@@ -56,7 +56,7 @@ export default class AzureSearchProvider implements ISearchProvider {
      * The parameters used to call the service
      */
     private _params: ISearchProviderParams[];
-    public get params() : ISearchProviderParams[] {
+    public get params(): ISearchProviderParams[] {
         return this._params;
     }
 
@@ -71,21 +71,27 @@ export default class AzureSearchProvider implements ISearchProvider {
     /**
      * Runs a query against the given search provider
      */
-    public query(options: IQueryOptions) : PromiseLike<IQueryResult> {
-        if(this.checkRequiredParams()) {
+    public query(options: IQueryOptions): PromiseLike<IQueryResult> {
+        if (this.checkRequiredParams()) {
             return $.ajax({
                 dataType: "json",
                 url: this.buildQueryUrl(options),
                 method: "GET",
-				crossDomain: true,
-			    beforeSend: (request) => {
-			        request.withCredentials = true;
-			        request.setRequestHeader("Api-Key", this.getParamValue(AzureSearchProvider.API_KEY_PARAM));
-			    }
-            }).then((result) => {
+                crossDomain: true,
+                beforeSend: (request) => {
+                    request.withCredentials = true;
+                    request.setRequestHeader("Api-Key", this.getParamValue(AzureSearchProvider.API_KEY_PARAM));
+                }
+            }).then((results) => {
                 return <IQueryResult>{
-                    data: result.value,
-                    total: result["@odata.count"],
+                    results: results.value.map((r) => {
+                        var prop = (this.getParamValue(AzureSearchProvider.SEARCH_FIELDS) || "body").split(',')[0];
+                        return {
+                            match: r[prop],
+                            data: r.value
+                        };
+                    }),
+                    total: results["@odata.count"],
                     offset: options.offset
                 };
             });
@@ -97,9 +103,9 @@ export default class AzureSearchProvider implements ISearchProvider {
     /**
      * Checks the list of require params
      */
-    public checkRequiredParams() : boolean {
+    public checkRequiredParams(): boolean {
         if (this.params && this.params.length) {
-            var required = this.parameters.filter(p => p.required).map((p) => p.name);
+            var required = AzureSearchProvider.requiredParameters.filter(p => p.required).map((p) => p.name);
             var toCheck = this.params.map((p) => p.name);
             // Make sure that we have all the required params
             return required.filter((p) => toCheck.indexOf(p) >= 0).length === required.length;
@@ -110,18 +116,18 @@ export default class AzureSearchProvider implements ISearchProvider {
     /**
      * Gets the parameter value by name
      */
-    public getParamValue(name: string) : any {
+    public getParamValue(name: string): any {
         return this.params.filter(p => p.name === name).map(p => p.value)[0];
     }
 
     /**
      * Builds a query url from query options
      */
-    public buildQueryUrl(options: IQueryOptions) : string {
+    public buildQueryUrl(options: IQueryOptions): string {
         let baseUrl = this.getParamValue(AzureSearchProvider.URL_PARAM);
-        let urlParams : { key: string; value: any; }[] = [
+        let urlParams: { key: string; value: any; }[] = [
             { key: "api-version", value: "2015-02-28" },
-            { key: "$count", value: true} // Returns the total number of results
+            { key: "$count", value: true } // Returns the total number of results
         ];
 
         if (options.offset >= 0) {
