@@ -99,7 +99,7 @@ export default class AzureSearchProvider implements ISearchProvider {
                         var prop = (this.getParamValue(AzureSearchProvider.SEARCH_FIELDS) || "body").split(',')[0];
                         return <IQueryResultItem> {
                             id: r[idField],
-                            textualMatch: r[prop],
+                            textualMatch: r[prop] || "",
                             rawData: r.value
                         };
                     }),
