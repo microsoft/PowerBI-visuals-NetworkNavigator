@@ -6,17 +6,17 @@ import { LineUp as LineUpImpl, ILineUpRow, ILineUpColumn, ILineUpSettings } from
 export interface LineUpProps {
     cols: ILineUpColumn[],
     rows: ILineUpRow[],
-    multiSelect: boolean;
-    singleSelect: boolean;
-    selectable: boolean;
-    inferColumnTypes: boolean;
-    showHistograms: boolean;
-    showValues: boolean;
-    showAnimations: boolean;
-    showStacked: boolean;
-    onSelectionChanged: (selectedRows: ILineUpRow[]) => void;
-    onCanLoadMoreData: (options: { result: boolean;}) => void;
-    onLoadMoreData: () => void;
+    multiSelect?: boolean;
+    singleSelect?: boolean;
+    selectable?: boolean;
+    inferColumnTypes?: boolean;
+    showHistograms?: boolean;
+    showValues?: boolean;
+    showAnimations?: boolean;
+    showStacked?: boolean;
+    onSelectionChanged?: (selectedRows: ILineUpRow[]) => void;
+    onCanLoadMoreData?: (options: { result: boolean;}) => void;
+    onLoadMoreData?: () => void;
 };
 
 export interface LineUpState { }
