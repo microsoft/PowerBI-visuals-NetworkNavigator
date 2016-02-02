@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 const $ = require("jquery");
-import { LineUp as LineUpImpl, ILineUpRow, ILineUpColumn, ILineUpSettings } from "./LineUp";
+import { LineUp as LineUpImpl, ILineUpRow, ILineUpColumn, ILineUpSettings, ILineUpConfiguration } from "./LineUp";
 
 export interface LineUpProps {
     cols: ILineUpColumn[],
@@ -73,7 +73,13 @@ export class LineUp extends React.Component<LineUpProps, LineUpState> {
         this.lineup.settings = this.getSettingsFromProps(props);
         this.lineup.selectionEnabled = !!props.selectable;
         if (props.rows && props.cols) {
-            this.lineup.setData(/*props.cols, */props.rows);
+            let config : ILineUpConfiguration = this.lineup.configuration || {
+                primaryKey: props.cols[0].column,
+                columns: []
+            };
+            config.columns = props.cols;
+            this.lineup.configuration = config;
+            this.lineup.setData(props.rows);
         }
     }
 
