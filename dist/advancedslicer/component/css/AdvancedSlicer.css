@@ -1,6 +1,10 @@
 #slicer-list {
   font-family: 'Segoe UI Semibold',wf_segoe-ui_semibold,helvetica,arial,sans-serif;
-  font-size: 12px; }
+  font-size: 12px;
+  position: relative; }
+
+.show-highlight.has-search .match {
+  background-color: yellow; }
 
 /** http://loading.io/ */
 @-webkit-keyframes uil-ring-anim {

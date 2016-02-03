@@ -8,7 +8,7 @@ export class FreeTextSearch extends AdvancedSlicer {
     /**
      * The default skip amount for free text search
      */
-    public static DEFAULT_SKIP_AMOUNT = 20;
+    public static DEFAULT_SKIP_AMOUNT = 100;
 
     /**
      * A static list of providers
@@ -42,12 +42,13 @@ export class FreeTextSearch extends AdvancedSlicer {
         });
         this.events.on("loadMoreData", (item, isNewSearch) => {
             if (isNewSearch) { // We're starting all over
-                this.offset = undefined;
+                this.offset = this.skip * -1; // Negate this so we don't add it, and start over
                 this.total = undefined;
             }
             item.result = this.loadData((this.offset || 0) + this.skip);
         });
         this.searchProvider = provider;
+        this.showHighlight = true;
     }
 
     /**
@@ -69,7 +70,12 @@ export class FreeTextSearch extends AdvancedSlicer {
         this.data = [];
 
         if (provider) {
-            this.raiseLoadMoreData(true);
+            this.loadingMoreData = true;
+            this.loadData(0).then(n => {
+                this.data = n;
+                this.loadingMoreData = false;
+                setTimeout(() => this.checkLoadMoreData(), 10);
+            });
         }
     }
 
@@ -83,6 +89,7 @@ export class FreeTextSearch extends AdvancedSlicer {
         let query = this.buildQuery(this.searchString);
         return this.searchProvider.query({
             offset: offset || 0,
+            count: this.skip,
             query: query
         }).then((results) => {
             this.offset = results.offset;
@@ -98,13 +105,13 @@ export class FreeTextSearch extends AdvancedSlicer {
                 var match = textResult;
                 var prefix = "";
                 var suffix = "";
-                if (idx) {
-                    var firstIdx = Math.max(0, idx - 10);
+                if (searchString && idx >= 0) {
+                    var firstIdx = Math.max(0, idx - Math.ceil(searchString.length / 2));
                     prefix = match.substring(firstIdx, idx);
-                    suffix = match.substring(idx + searchString.length , idx + searchString.length + 10);
+                    suffix = match.substring(idx + searchString.length , idx + searchString.length + Math.ceil(searchString.length / 2));
                     match = match.substring(idx, idx + searchString.length);
                 } else {
-                    suffix = match.substring(0, 20);
+                    suffix = match.substring(0, 30);
                     match = "";
                 }
                 var item : SlicerItemWithId = {

@@ -34,7 +34,8 @@ export default class LineUpVisual extends VisualBase implements IVisual {
      */
     private static VISUAL_DEFAULT_SETTINGS : ILineUpVisualSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS, {
         experimental: {
-            serverSideSorting: false
+            serverSideSorting: false,
+            serverSideFiltering: false
         }
     });
 
@@ -146,6 +147,11 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                         displayName: "Server Side Sorting",
                         description: "If true, lineup will use PowerBI services to sort the data, rather than doing it client side",
                         type: { bool: true }
+                    },
+                    serverSideFiltering: {
+                        displayName: "Server Side Filtering",
+                        description: "If true, lineup will use PowerBI services to filter the data, rather than doing it client side",
+                        type: { bool: true }
                     }
                 }
             }
@@ -201,6 +207,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         this.lineup.events.on("selectionChanged", (rows) => this.onSelectionChanged(rows));
         this.lineup.events.on("canLoadMoreData", (info) => info.result = !!this.dataView && !!this.dataView.metadata.segment);
         this.lineup.events.on("sortChanged", (column, asc) => this.onSorted(column, asc));
+        this.lineup.events.on(LineUp.EVENTS.FILTER_CHANGED, (filter) => this.onFilterChanged(filter));
         this.lineup.events.on("loadMoreData", (info) => {
             this.waitingForMoreData = true;
             this.loading = true;
@@ -501,8 +508,18 @@ export default class LineUpVisual extends VisualBase implements IVisual {
             updatedSettings.sorting = {
                 external: updatedSettings.experimental.serverSideSorting
             };
+            updatedSettings.filtering = {
+                external: updatedSettings.experimental.serverSideFiltering
+            };
             this.lineup.settings = updatedSettings;
         }
+    }
+
+    /**
+     * Gets called when a filter is changed.
+     */
+    private onFilterChanged(filter: any) {
+
     }
 
     /**
@@ -603,5 +620,6 @@ interface ILineUpVisualRow extends ILineUpRow, powerbi.visuals.SelectableDataPoi
 interface ILineUpVisualSettings extends ILineUpSettings {
     experimental?: {
         serverSideSorting?: boolean;
+        serverSideFiltering?: boolean;
     }
 }

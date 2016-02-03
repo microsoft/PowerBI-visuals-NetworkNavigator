@@ -38,9 +38,7 @@ export class AdvancedSlicer {
                 <input style="vertical-align:middle;cursor:pointer" type="checkbox">
                 <span style="margin-left: 5px;vertical-align:middle" class="display-container">
                     <span style="display:inline-block;overflow:hidden" class="category-container">
-                        <span class="matchPrefix"></span>
-                        <span class="match" style="background-color: yellow"></span>
-                        <span class="matchSuffix"></span>
+                        <span class="matchPrefix"></span><span class="match"></span><span class="matchSuffix"></span>
                     </span>
                     <span style="display:inline-block" class="value-container">
                         <span style="display:inline-block;background-color:blue;width:0px" class="value-display">&nbsp;</span>
@@ -133,6 +131,20 @@ export class AdvancedSlicer {
     public set dimensions(dims: { width: number; height: number }) {
         this.listEle.find(".display-container").css({ width: "100%" });
         this.listEle.css({ width: "100%", height: dims.height - this.element.find(".slicer-options").height()- 10 });
+    }
+
+    /**
+     * Gets whether or not we are showing the highlights
+     */
+    public get showHighlight() {
+        return this.element.hasClass("show-highlight");
+    }
+
+    /**
+     * Toggles whether or not to show highlights
+     */
+    public set showHighlight(highlight: boolean) {
+        this.element.toggleClass("show-highlight", !!highlight);
     }
 
     /**
@@ -254,6 +266,7 @@ export class AdvancedSlicer {
             } else {
                 this.myList.search(this.searchString);
             }
+            this.element.toggleClass("has-search", !!this.searchString);
         }, AdvancedSlicer.SEARCH_DEBOUNCE));
 
         this.listEle.on("click", (evt) => {
@@ -276,19 +289,6 @@ export class AdvancedSlicer {
     }
 
     /**
-     * Listener for the list scrolling
-     */
-    private checkLoadMoreData() {
-        var scrollElement = this.listEle[0];
-        var scrollHeight = scrollElement.scrollHeight;
-        var top = scrollElement.scrollTop;
-        var shouldScrollLoad = scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200;
-        if (shouldScrollLoad && !this.loadingMoreData && this.raiseCanLoadMoreData()) {
-            this.raiseLoadMoreData(false);
-        }
-    }
-
-    /**
      * Loads more data based on search
      * @param force Force the loading of new data, if it can
      */
@@ -297,6 +297,19 @@ export class AdvancedSlicer {
         // 1. There is more data. 2. There is not too much stuff on the screen (not causing a scroll)
         if (!this.loadingMoreData && this.raiseCanLoadMoreData(true)) {
             this.raiseLoadMoreData(true);
+        }
+    }
+
+    /**
+     * Listener for the list scrolling
+     */
+    protected checkLoadMoreData() {
+        var scrollElement = this.listEle[0];
+        var scrollHeight = scrollElement.scrollHeight;
+        var top = scrollElement.scrollTop;
+        var shouldScrollLoad = scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200;
+        if (shouldScrollLoad && !this.loadingMoreData && this.raiseCanLoadMoreData()) {
+            this.raiseLoadMoreData(false);
         }
     }
 
@@ -318,7 +331,10 @@ export class AdvancedSlicer {
                 // Make sure we don't need to load more after this, in case it doesn't all fit on the screen
                 setTimeout(() => this.checkLoadMoreData(), 10);
                 return items;
-            }, () => this.loadingMoreData = false);
+            }, () => {
+                this.data = [];
+                this.loadingMoreData = false;
+            });
         }
     }
 

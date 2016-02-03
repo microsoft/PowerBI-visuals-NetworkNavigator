@@ -140,18 +140,36 @@ $(function() {
     }
 
     function loadFreeText() {
-        try {
-            var freeTextEle = $('#free-text');
-            var Azure = FreeTextSearch.DEFAULT_PROVIDERS.AzureSearchProvider;
-
-            var provider = new Azure([{
-                name: Azure.API_KEY_PARAM,
+        function loadAzure() {
+            var ProviderConst = FreeTextSearch.DEFAULT_PROVIDERS.AzureSearchProvider;
+            var provider = new ProviderConst([{
+                name: ProviderConst.API_KEY_PARAM,
                 value: "D435209835B1F7131400F302936A4CCA"
             }, {
-                name: Azure.URL_PARAM,
+                name: ProviderConst.URL_PARAM,
                 value: "https://essex.search.windows.net/indexes/jebsmall/docs"
             }]);
+            return provider;
+        }
 
+        function loadElastic() {
+            var ProviderConst = FreeTextSearch.DEFAULT_PROVIDERS.ElasticSearchSearchProvider;
+            var provider = new ProviderConst([{
+                name: ProviderConst.URL_PARAM,
+                value: "http://localhost:32774/bank/account/_search"
+            }, {
+                name: ProviderConst.ID_FIELD_PARAM,
+                value: "email"
+            }, {
+                name: ProviderConst.SEARCH_FIELDS,
+                value: "email"
+            }]);
+            return provider;
+        }
+
+        try {
+            var freeTextEle = $('#free-text');
+            var provider = loadElastic();
             var fts = new FreeTextSearch(freeTextEle, provider);
             fts.dimensions = { height: freeTextEle.height(), width: freeTextEle.width() };
         } catch (e) {
