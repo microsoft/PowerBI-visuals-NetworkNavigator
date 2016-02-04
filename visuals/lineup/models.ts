@@ -136,6 +136,27 @@ export interface IDataProvider {
      * Generates a histogram for the values, each value must be between 0-1
      */
     generateHistogram(column: ILineUpColumn, options: IQueryOptions) : PromiseLike<number[]>;
+
+    /**
+     * Called when the data should be sorted
+     */
+    sort?: (sort: ILineUpSort) => void;
+
+    /**
+     * Called when the data is filtered
+     */
+    filter?: (filter: IFilter) => void;
+}
+
+/**
+ * Represents a filter
+ */
+export interface IFilter {
+    column: string;
+    value: string | {
+        domain: [number, number];
+        range: [number, number];
+    };
 }
 
 export interface IQueryOptions {
@@ -153,13 +174,7 @@ export interface IQueryOptions {
     /**
      * The query to run
      */
-    query?: {
-        column: string;
-        value: string | {
-            domain: [number, number];
-            range: [number, number];
-        };
-    }[];
+    query?: IFilter[];
 
     /**
      * The current sort

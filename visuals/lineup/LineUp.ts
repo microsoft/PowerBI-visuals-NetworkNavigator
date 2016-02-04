@@ -584,6 +584,10 @@ export class LineUp {
             // Set the new sort value
             this.queryOptions.sort = newSort ? [newSort] : undefined;
 
+            if (this.dataProvider && this.dataProvider.sort) {
+                this.dataProvider.sort(newSort);
+            }
+
             // We are starting over since we sorted
             this.runQuery(true);
         }
@@ -616,6 +620,10 @@ export class LineUp {
         // Set the new filter value
         console.error("This should support multiple filters");
         this.queryOptions.query = filter ? [filter] : undefined;
+
+        if (this.dataProvider && this.dataProvider.filter) {
+            this.dataProvider.filter(filter);
+        }
 
         // We are starting over since we filtered
         this.runQuery(true);

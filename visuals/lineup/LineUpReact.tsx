@@ -9,12 +9,14 @@ export interface LineUpProps {
     cols: ILineUpColumn[],
     provider: IDataProvider;
     multiSelect?: boolean;
+    count?: number;
     singleSelect?: boolean;
     inferColumnTypes?: boolean;
     showHistograms?: boolean;
     showValues?: boolean;
     showAnimations?: boolean;
     showStacked?: boolean;
+    onSortChanged?: (column: string, asc: boolean) => void;
     onSelectionChanged?: (selectedRows: ILineUpRow[]) => void;
     onFilterChanged?: (filter: { column: string; value: string|{ domain: [number,number];range:[number,number]}}) => void;
     onLoadMoreData?: () => void;
@@ -64,6 +66,7 @@ export class LineUp extends React.Component<LineUpProps, LineUpState> {
         this.lineup.events.on(LineUpImpl.EVENTS.SELECTION_CHANGED, guardedEventer('onSelectionChanged'));
         this.lineup.events.on(LineUpImpl.EVENTS.LOAD_MORE_DATA, guardedEventer('onLoadMoreData'));
         this.lineup.events.on(LineUpImpl.EVENTS.FILTER_CHANGED, guardedEventer('onFilterChanged'));
+        this.lineup.events.on(LineUpImpl.EVENTS.SORT_CHANGED, guardedEventer('onSortChanged'));
     }
 
     private renderContent(props? : LineUpProps) {
@@ -72,6 +75,7 @@ export class LineUp extends React.Component<LineUpProps, LineUpState> {
         props = props || this.props;
 
         this.lineup.settings = this.getSettingsFromProps(props);
+        this.lineup.count = props.count || 100;
         if (props.provider && props.cols) {
             let config : ILineUpConfiguration = this.lineup.configuration || {
                 primaryKey: props.cols[0].column,
