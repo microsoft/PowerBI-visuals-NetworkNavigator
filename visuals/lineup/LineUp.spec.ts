@@ -1,6 +1,5 @@
 require("../../base/testSetup");
 
-import * as Promise from "bluebird";
 import { expect } from "chai";
 import { LineUp } from "./LineUp";
 import { ILineUpSettings, ILineUpRow, ILineUpColumn, IDataProvider } from "./models";

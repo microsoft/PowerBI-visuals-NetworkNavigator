@@ -1,5 +1,4 @@
 import { IDataProvider, IQueryOptions, IQueryResult, ILineUpColumn } from "../models";
-import * as Promise from "bluebird";
 
 /**
  * A Data provider for a simple json array
