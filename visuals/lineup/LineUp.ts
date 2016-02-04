@@ -89,6 +89,11 @@ export class LineUp {
     private sortingFromConfig: boolean;
 
     /**
+     * Gets the last scroll position
+     */
+    private lastScrollPos: number;
+
+    /**
      * Represents the settings
      */
     public static DEFAULT_SETTINGS: ILineUpSettings = {
@@ -401,8 +406,8 @@ export class LineUp {
         // We should only attempt to load more data, if we don't already have data loaded, or there is more to be loaded
         if (this.total === undefined || this.queryOptions.offset < this.total) {
             this.dataProvider.canQuery(this.queryOptions).then((value) => {
-                this.loadingData = true;
                 if (value) {
+                    this.loadingData = true;
                     return this.dataProvider.query(this.queryOptions).then(r => {
                         this._data = this._data || [];
                         this._data = newQuery ? r.results : this._data.concat(r.results);
@@ -466,7 +471,7 @@ export class LineUp {
                         this.loadingData = false;
 
                         setTimeout(() => this.checkLoadMoreData(), 10);
-                    });
+                    }, () => this.loadingData = false);
                 }
             });
         }
@@ -551,9 +556,12 @@ export class LineUp {
         var scrollElement = $(this.lineupImpl.$container.node()).find('div.lu-wrapper')[0];
         var scrollHeight = scrollElement.scrollHeight;
         var top = scrollElement.scrollTop;
-        var shouldScrollLoad = scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200;
-        if (shouldScrollLoad && !this.loadingData) {
-            this.runQuery(false);
+        if (this.lastScrollPos !== top) {
+            this.lastScrollPos = top;
+            var shouldScrollLoad = scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200;
+            if (shouldScrollLoad && !this.loadingData) {
+                this.runQuery(false);
+            }
         }
     }
 
