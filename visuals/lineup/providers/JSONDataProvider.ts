@@ -1,4 +1,5 @@
 import { IDataProvider, IQueryOptions, IQueryResult, ILineUpColumn } from "../models";
+import * as Promise from "bluebird";
 
 /**
  * A Data provider for a simple json array
@@ -12,15 +13,15 @@ export class JSONDataProvider implements IDataProvider {
     /**
      * Determines if the dataset can be queried again
      */
-    public canQuery(options: IQueryOptions){
-        return $.Deferred().resolve(options.offset < this.data.length);
+    public canQuery(options: IQueryOptions) : Promise<boolean>{
+        return new Promise<boolean>((resolve) => resolve(options.offset < this.data.length));
     }
 
     /**
      * Runs a query against the server
      */
     public query(options: IQueryOptions) : Promise<IQueryResult> {
-        return new Promise((resolve, reject) => {
+        return new Promise<IQueryResult>((resolve, reject) => {
             var final = this.getFilteredData(options);
             var newData = final.slice(options.offset, options.offset + options.count);
             setTimeout(() => {
@@ -37,7 +38,7 @@ export class JSONDataProvider implements IDataProvider {
      * Generates a histogram for this data set
      */
     public generateHistogram(column: ILineUpColumn, options: IQueryOptions) : Promise<number[]> {
-        return new Promise((resolve) => {
+        return new Promise<number[]>((resolve) => {
             let final = this.getFilteredData(options);
             let values : number[] = final.map(n => n[column.column]);
             let max = d3.max(values);

@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Promise } from "es6-promise";
 const $ = require("jquery");
 import { LineUp as LineUpImpl } from "./LineUp";
 import { ILineUpRow, ILineUpColumn, ILineUpSettings, ILineUpConfiguration, IDataProvider, IQueryOptions, IQueryResult } from "./models";
