@@ -25,6 +25,7 @@
     "chai": "3.4.1",
     "css-loader": "0.23.1",
     "d3": "3.5.12",
+    "es6-promise": "^3.0.2",
     "gulp-filter": "3.0.1",
     "gulp-mocha": "2.2.0",
     "gulp-modify": "0.1.1",

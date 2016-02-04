@@ -127,12 +127,56 @@ $(function() {
                     }
                     return col;
                 });
-
+                lineup.count = 2;
+                lineup.settings = {
+                    sorting: {
+                        external: true
+                    },
+                    filtering: {
+                        external: true
+                    }
+                };
                 lineup.configuration = {
                     primaryKey: "schoolname",
                     columns: cols
                 };
-                lineup.setData(data);
+                lineup.dataProvider = {
+                    canQuery: function(options){
+                        return $.Deferred().resolve(options.offset < data.length);
+                    },
+                    query: function(options) {
+                        var defer = $.Deferred();
+                        var final = data.slice(0);
+                        if (options.sort && options.sort.length) {
+                            var sortItem = options.sort[0];
+                            final.sort(function (a, b) {
+                                var aValue = a[sortItem.column];
+                                var bValue = b[sortItem.column];
+                                var dir = sortItem.asc ? 1 : -1;
+                                if(aValue == bValue){
+                                    return 0;
+                                }
+                                return (aValue > bValue ? 1 : -1) * dir;
+                            });
+                        }
+                        if (options.query && options.query.length) {
+                            var filter = options.query[0];
+                            final = final.filter(function(n) {
+                                var toFilter = n[filter.column];
+                                return toFilter.match(new RegExp(filter.value));
+                            });
+                        }
+                        setTimeout(function() {
+                            var newData = final.slice(options.offset, options.offset + options.count);
+                            defer.resolve({
+                                total: final.length,
+                                results: newData,
+                                count: newData.length
+                            });
+                        }, 10);
+                        return defer.promise();
+                    }
+                };
             });
         } catch (e) {
             console.error(e);

@@ -1,7 +1,8 @@
 require("../../base/testSetup");
 
+import { Promise } from "es6-promise";
 import { expect } from "chai";
-import { LineUp, ILineUpSettings, ILineUpRow, ILineUpColumn } from "./LineUp";
+import { LineUp, ILineUpSettings, ILineUpRow, ILineUpColumn, IDataProvider } from "./LineUp";
 import * as $ from "jquery";
 
 describe('LineUp', () => {
@@ -69,53 +70,89 @@ describe('LineUp', () => {
         };
     };
 
+    var createProvider = (data) => {
+        var firstCall = true;
+        var resolver;
+        var fakeProvider = <IDataProvider>{
+            canQuery(options: any) {
+                return Promise.resolve(true);
+            },
+            query(options: any) {
+                return new Promise((resolve2) => {
+                    resolve2({
+                        total: data.length,
+                        results: data
+                    });
+                    setTimeout(function() {
+                        resolver();
+                    }, 0);
+                });
+            }
+        };
+        return {
+            dataLoaded : new Promise((resolve) => {
+                resolver = resolve;
+            }),
+            provider: fakeProvider
+        }
+    };
+
     var loadInstanceWithStackedColumns = () => {
         let { instance, element } = createInstance();
         let data = createFakeData();
-
-        instance.setData(data.data);
-
-        var desc = {
-            label: "STACKED_COLUMN",
-            width: 10,
-            children: [
-                { column: 'col2', type: 'number', weight: 100 }
-            ]
-        };
-        var inst = instance.lineupImpl;
-        inst.storage.addStackedColumn(desc);
-        inst.headerUpdateRequired = true;
-        inst.updateAll();
+        let providerInfo = createProvider(data.data);
+        instance.dataProvider = providerInfo.provider;
+        providerInfo.dataLoaded.then(() => {
+            var desc = {
+                label: "STACKED_COLUMN",
+                width: 10,
+                children: [
+                    { column: 'col2', type: 'number', weight: 100 }
+                ]
+            };
+            var inst = instance.lineupImpl;
+            inst.storage.addStackedColumn(desc);
+            inst.headerUpdateRequired = true;
+            inst.updateAll();
+        });
         return {
             instance,
             element,
-            data
+            data,
+            dataLoaded: providerInfo.dataLoaded
         };
     };
 
     var loadInstanceWithStackedColumnsAndClick = () => {
-        let { instance, element, data } = loadInstanceWithStackedColumns();
+        let { instance, element, data, dataLoaded } = loadInstanceWithStackedColumns();
 
-        let headerEle = element.find(".header:contains('STACKED_COLUMN')").find(".labelBG");
-        headerEle.click();
+        dataLoaded.then(() => {
+            let headerEle = element.find(".header:contains('STACKED_COLUMN')").find(".labelBG");
+            headerEle.click();
+        });
 
         return {
             instance,
             element,
-            data
+            data,
+            dataLoaded
         };
     };
 
     var loadInstanceWithSettings = (settings: ILineUpSettings) => {
         let { instance, element } = createInstance();
         let { data } = createFakeData();
-        instance.setData(data);
+
+        let { provider, dataLoaded } = createProvider(data);
+
+        instance.dataProvider = provider;
 
         // Set the settings
         instance.settings = settings;
         return {
             instance,
-            element
+            element,
+            dataLoaded
         };
     }
 
@@ -147,51 +184,56 @@ describe('LineUp', () => {
             expect(instance.settings.presentation.histograms).to.eq(false);
         });
         it('should pass rendering settings to lineupimpl', () => {
-            let { instance } = loadInstanceWithSettings({
+            let { instance, dataLoaded } = loadInstanceWithSettings({
                 presentation: {
                     histograms: false
                 }
             });
-            expect(instance.lineupImpl.config.renderingOptions.histograms).to.be.false;
+
+            return dataLoaded.then(() => {
+                expect(instance.lineupImpl.config.renderingOptions.histograms).to.be.false;
+            });
         });
         it('should pass sorting settings to lineupimpl', () => {
-            let { instance } = loadInstanceWithSettings({
+            let { instance, dataLoaded } = loadInstanceWithSettings({
                 sorting: {
                     external: true
                 }
             });
 
-            expect(instance.lineupImpl.config.sorting.external).to.be.true;
+
+            return dataLoaded.then(() => { expect(instance.lineupImpl.config.sorting.external).to.be.true; });
         });
         it('should pass filtering settings to lineupimpl', () => {
-            let { instance } = loadInstanceWithSettings({
+            let { instance, dataLoaded } = loadInstanceWithSettings({
                 filtering: {
                     external: true
                 }
             });
 
-            expect(instance.lineupImpl.config.filtering.external).to.be.true;
+
+            return dataLoaded.then(() => { expect(instance.lineupImpl.config.filtering.external).to.be.true; });
         });
         it('should pass histogram settings to lineupimpl', () => {
-            let { instance } = loadInstanceWithSettings({
+            let { instance, dataLoaded } = loadInstanceWithSettings({
                 histograms: {
                     generator: (column) => []
                 }
             });
 
-            expect(instance.lineupImpl.config.histograms.generator).to.not.be.undefined;
+            return dataLoaded.then(() => { expect(instance.lineupImpl.config.histograms.generator).to.not.be.undefined; });
         });
     });
 
-    describe("setData", () => {
-        it("should set the data property when setData is called", () => {
-            let { instance } = createInstance();
-            let { data } = createFakeData();
-            instance.setData(data);
+    // describe("setData", () => {
+    //     it("should set the data property when setData is called", () => {
+    //         let { instance, dataLoaded } = createInstance();
+    //         let { data } = createFakeData();
+    //         instance.dataProvider = createProvider(data);
 
-            expect(instance.getData()).to.deep.equal(data);
-        });
-    });
+    //         // expect(instance.getData()).to.deep.equal(data);
+    //     });
+    // });
 
     describe("selectionEnabled", () => {
         it("should be true by default", () => {
@@ -208,53 +250,53 @@ describe('LineUp', () => {
     });
 
     describe("events", () => {
-        describe("canLoadMoreData", () => {
-            it('should call the event after a scroll to implement virtual scrolling', () => {
-                let { instance, element } = createInstance();
-                let called = false;
-                instance.events.on(LineUp.EVENTS.CAN_LOAD_MORE_DATA, (item) => {
-                    called = true;
-                });
+        // describe("canLoadMoreData", () => {
+        //     it('should call the event after a scroll to implement virtual scrolling', () => {
+        //         let { instance, element } = createInstance();
+        //         let called = false;
+        //         instance.events.on(LineUp.EVENTS.CAN_LOAD_MORE_DATA, (item) => {
+        //             called = true;
+        //         });
 
-                let { data } = createFakeData();
-                instance.setData(data);
+        //         let { data } = createFakeData();
+        //         instance.dataProvider = createProvider(data);
 
-                // Pretend we scrolled
-                element.find(".lu-wrapper").trigger("scroll");
-                expect(called).to.be.true;
-            });
+        //         // Pretend we scrolled
+        //         element.find(".lu-wrapper").trigger("scroll");
+        //         expect(called).to.be.true;
+        //     });
 
-            it('if the listener returns false, the loadMoreData event should not be called', () => {
-                let { instance, element } = createInstance();
-                let called = false;
-                instance.events.on(LineUp.EVENTS.CAN_LOAD_MORE_DATA, (item) => item.result = false);
-                instance.events.on(LineUp.EVENTS.LOAD_MORE_DATA, () => called = true);
+        //     it('if the listener returns false, the loadMoreData event should not be called', () => {
+        //         let { instance, element } = createInstance();
+        //         let called = false;
+        //         instance.events.on(LineUp.EVENTS.CAN_LOAD_MORE_DATA, (item) => item.result = false);
+        //         instance.events.on(LineUp.EVENTS.LOAD_MORE_DATA, () => called = true);
 
-                let { data, columns } = createFakeData();
-                instance.configuration = { primaryKey: columns[0].column, columns: columns };
-                instance.setData(data);
+        //         let { data, columns } = createFakeData();
+        //         instance.configuration = { primaryKey: columns[0].column, columns: columns };
+        //         instance.dataProvider = createProvider(data);
 
-                // Pretend we scrolled
-                element.find(".lu-wrapper").trigger("scroll");
-                expect(called).to.be.false;
-            });
+        //         // Pretend we scrolled
+        //         element.find(".lu-wrapper").trigger("scroll");
+        //         expect(called).to.be.false;
+        //     });
 
-            xit('if the listener returns true, the loadMoreData event should be called', () => {
-                let { instance, element } = createInstance();
-                let called = false;
-                instance.events.on(LineUp.EVENTS.CAN_LOAD_MORE_DATA, (item) => item.result = true);
-                instance.events.on(LineUp.EVENTS.LOAD_MORE_DATA, () => called = true);
+        //     xit('if the listener returns true, the loadMoreData event should be called', () => {
+        //         let { instance, element } = createInstance();
+        //         let called = false;
+        //         instance.events.on(LineUp.EVENTS.CAN_LOAD_MORE_DATA, (item) => item.result = true);
+        //         instance.events.on(LineUp.EVENTS.LOAD_MORE_DATA, () => called = true);
 
-                let { data, columns } = createFakeData();
-                instance.configuration = { primaryKey: columns[0].column, columns: columns };
+        //         let { data, columns } = createFakeData();
+        //         instance.configuration = { primaryKey: columns[0].column, columns: columns };
 
-                instance.setData(data);
+        //         instance.dataProvider = createProvider(data);
 
-                // Pretend we scrolled
-                element.find(".lu-wrapper").trigger("scroll");
-                expect(called).to.be.true;
-            });
-        });
+        //         // Pretend we scrolled
+        //         element.find(".lu-wrapper").trigger("scroll");
+        //         expect(called).to.be.true;
+        //     });
+        // });
 
         describe("sortChanged", () => {
             it("should call the event when a column header is clicked", () => {
@@ -263,14 +305,15 @@ describe('LineUp', () => {
                 instance.events.on(LineUp.EVENTS.SORT_CHANGED, (item) => {
                     called = true;
                 });
+                let providerInfo = createProvider(createFakeData().data);
+                instance.dataProvider = providerInfo.provider;
+                return providerInfo.dataLoaded.then(() => {
+                    // Click on de header
+                    let headerEle = element.find(".header:contains('col1')").find(".labelBG");
+                    headerEle.click();
 
-                instance.setData(createFakeData().data);
-
-                // Click on de header
-                let headerEle = element.find(".header:contains('col1')").find(".labelBG");
-                headerEle.click();
-
-                expect(called).to.be.true;
+                    expect(called).to.be.true;
+                });
             });
 
             it("should call the event with the correct params", () => {
@@ -279,11 +322,13 @@ describe('LineUp', () => {
                     expect(colName).to.equal("col1");
                 });
 
-                instance.setData(createFakeData().data);
-
-                // Click on de header
-                let headerEle = element.find(".header:contains('col1')").find(".labelBG");
-                headerEle.click();
+                let providerInfo = createProvider(createFakeData().data);
+                instance.dataProvider = providerInfo.provider;
+                return providerInfo.dataLoaded.then(() => {
+                    // Click on de header
+                    let headerEle = element.find(".header:contains('col1')").find(".labelBG");
+                    headerEle.click();
+                });
             });
         });
 
@@ -297,29 +342,35 @@ describe('LineUp', () => {
                     expect(selection.col1).to.be.equal("FAKE_0"); // Very first row
                 });
 
-                instance.setData(createFakeData().data);
+                let providerInfo = createProvider(createFakeData().data);
+                instance.dataProvider = providerInfo.provider;
+                return providerInfo.dataLoaded.then(() => {
+                    let row = element.find(".row").first();
+                    row.click();
+                    expect(called).to.be.true;
+                });
 
-                let row = element.find(".row").first();
-                row.click();
-                expect(called).to.be.true;
             });
             it("should call the event when a row is clicked twice", () => {
                 let { instance, element } = createInstance();
 
-                instance.setData(createFakeData().data);
+                let providerInfo = createProvider(createFakeData().data);
+                instance.dataProvider = providerInfo.provider;
+                return providerInfo.dataLoaded.then(() => {
+                    let row = element.find(".row").first();
+                    row.click();
 
-                let row = element.find(".row").first();
-                row.click();
+                    let called = false;
+                    instance.events.on(LineUp.EVENTS.SELECTION_CHANGED, (selection) => {
+                        called = true;
+                        expect(selection.length).to.be.equal(0);
+                    });
 
-                let called = false;
-                instance.events.on(LineUp.EVENTS.SELECTION_CHANGED, (selection) => {
-                    called = true;
-                    expect(selection.length).to.be.equal(0);
+                    row.click();
+
+                    expect(called).to.be.true;
                 });
 
-                row.click();
-
-                expect(called).to.be.true;
             });
         });
 
@@ -329,45 +380,58 @@ describe('LineUp', () => {
                     let { instance, element } = createInstance();
                     let { data } = createFakeData();
 
-                    instance.setData(data);
+                    let providerInfo = createProvider(createFakeData().data);
+                    instance.dataProvider = providerInfo.provider;
+                    return providerInfo.dataLoaded.then(() => {
+                        let row = element.find(".row").first();
+                        row.click();
 
-                    let row = element.find(".row").first();
-                    row.click();
+                        expect(instance.selection[0]['col1']).to.be.equal(data[0]['col1']);
+                    });
 
-                    expect(instance.selection[0]['col1']).to.be.equal(data[0]['col1']);
                 });
 
                 it("should deselect a row that was selected twice", () => {
                     let { instance, element } = createInstance();
-                    instance.setData(createFakeData().data);
 
-                    let row = element.find(".row").first();
-                    row.click();
-                    row.click();
+                    let providerInfo = createProvider(createFakeData().data);
+                    instance.dataProvider = providerInfo.provider;
+                    return providerInfo.dataLoaded.then(() => {
+                        let row = element.find(".row").first();
+                        row.click();
+                        row.click();
 
-                    expect(instance.selection.length).to.be.equal(0);
+                        expect(instance.selection.length).to.be.equal(0);
+                    });
                 });
 
                 it("should select multiple rows", () => {
                     let { instance, element } = createInstance();
                     let { data } = createFakeData();
 
-                    instance.setData(data);
+                    let providerInfo = createProvider(createFakeData().data);
+                    instance.dataProvider = providerInfo.provider;
+                    return providerInfo.dataLoaded.then(() => {
+                        let rows = element.find(".row");
+                        $(rows[0]).click();
+                        $(rows[1]).click();
 
-                    let rows = element.find(".row");
-                    $(rows[0]).click();
-                    $(rows[1]).click();
+                        expect(instance.selection.length).to.be.equal(2);
+                        expect(instance.selection.map((row) => row['col1'])).to.be.deep.equal(data.slice(0, 2).map((r) => r['col1']));
+                    });
 
-                    expect(instance.selection.length).to.be.equal(2);
-                    expect(instance.selection.map((row) => row['col1'])).to.be.deep.equal(data.slice(0, 2).map((r) => r['col1']));
                 });
 
                 it('should retain selection when set', () => {
                     let { instance, element } = createInstance();
                     let { data } = createFakeData();
-                    instance.setData(data);
-                    instance.selection = [data[0]];
-                    expect(instance.selection[0]['col1']).to.be.equal(data[0]['col1']);
+
+                    let providerInfo = createProvider(createFakeData().data);
+                    instance.dataProvider = providerInfo.provider;
+                    return providerInfo.dataLoaded.then(() => {
+                        instance.selection = [data[0]];
+                        expect(instance.selection[0]['col1']).to.be.equal(data[0]['col1']);
+                    });
                 });
             });
 
@@ -384,95 +448,117 @@ describe('LineUp', () => {
                     let { instance, element } = createInstanceWithSingleSelect();
                     let { data } = createFakeData();
 
-                    instance.setData(data);
+                    let providerInfo = createProvider(createFakeData().data);
+                    instance.dataProvider = providerInfo.provider;
+                    return providerInfo.dataLoaded.then(() => {
+                        let row = element.find(".row").first();
+                        row.click();
 
-                    let row = element.find(".row").first();
-                    row.click();
-
-                    expect(instance.selection[0]['col1']).to.be.equal(data[0]['col1']);
+                        expect(instance.selection[0]['col1']).to.be.equal(data[0]['col1']);
+                    });
                 });
 
                 it("should deselect a row that was selected twice", () => {
                     let { instance, element } = createInstanceWithSingleSelect();
-                    instance.setData(createFakeData().data);
 
-                    let row = element.find(".row").first();
-                    row.click();
-                    row.click();
+                    let providerInfo = createProvider(createFakeData().data);
+                    instance.dataProvider = providerInfo.provider;
+                    return providerInfo.dataLoaded.then(() => {
+                        let row = element.find(".row").first();
+                        row.click();
+                        row.click();
 
-                    expect(instance.selection.length).to.be.equal(0);
+                        expect(instance.selection.length).to.be.equal(0);
+                    });
                 });
 
                 it("should select the last row when multiple rows are clicked", () => {
                     let { instance, element } = createInstanceWithSingleSelect();
                     let { data } = createFakeData();
 
-                    instance.setData(data);
+                    let providerInfo = createProvider(data);
+                    instance.dataProvider = providerInfo.provider;
+                    return providerInfo.dataLoaded.then(() => {
 
-                    let rows = element.find(".row");
-                    $(rows[0]).click();
-                    $(rows[1]).click();
+                        let rows = element.find(".row");
+                        $(rows[0]).click();
+                        $(rows[1]).click();
 
-                    expect(instance.selection.length).to.be.equal(1);
-                    expect(instance.selection[0]['col1']).to.be.deep.equal(data[1]['col1']);
+                        expect(instance.selection.length).to.be.equal(1);
+                        expect(instance.selection[0]['col1']).to.be.deep.equal(data[1]['col1']);
+                    });
                 });
 
                 it('should retain selection when set', () => {
                     let { instance, element } = createInstanceWithSingleSelect();
                     let { data } = createFakeData();
-                    instance.setData(data);
-                    instance.selection = [data[0]];
-                    expect(instance.selection[0]['col1']).to.be.equal(data[0]['col1']);
+
+                    let providerInfo = createProvider(data);
+                    instance.dataProvider = providerInfo.provider;
+                    return providerInfo.dataLoaded.then(() => {
+                        instance.selection = [data[0]];
+                        expect(instance.selection[0]['col1']).to.be.equal(data[0]['col1']);
+                    });
                 });
             });
         });
 
         describe("getSortFromLineUp", () => {
             it("does not crash when sorting a stacked column", () => {
-                let {instance} = loadInstanceWithStackedColumnsAndClick();
-                expect(instance.getSortFromLineUp()).not.to.throw;
+                let {instance, dataLoaded} = loadInstanceWithStackedColumnsAndClick();
+                return dataLoaded.then(() => {
+                    expect(instance.getSortFromLineUp()).not.to.throw;
+                });
             });
 
             it("returns a 'stack' property when a stack is cliked on", () => {
-                let {instance} = loadInstanceWithStackedColumnsAndClick();
-                let result = instance.getSortFromLineUp();
-                expect(result.stack).to.equal("STACKED_COLUMN");
-                expect(result.column).to.be.undefined;
+                let {instance, dataLoaded} = loadInstanceWithStackedColumnsAndClick();
+                return dataLoaded.then(() => {
+                    let result = instance.getSortFromLineUp();
+                    expect(result.stack).to.equal("STACKED_COLUMN");
+                    expect(result.column).to.be.undefined;
+                });
             });
         });
 
         describe("integration", () => {
             it("saves the configuration when a stacked column is sorted", () => {
-                let {instance} = loadInstanceWithStackedColumnsAndClick();
-                expect(instance.configuration.sort).to.not.be.undefined;
-                expect(instance.configuration.sort.stack).to.be.equal("STACKED_COLUMN");
-                expect(instance.configuration.sort.column).to.be.undefined;
+                let {instance, dataLoaded} = loadInstanceWithStackedColumnsAndClick();
+                return dataLoaded.then(() => {
+                    expect(instance.configuration.sort).to.not.be.undefined;
+                    expect(instance.configuration.sort.stack).to.be.equal("STACKED_COLUMN");
+                    expect(instance.configuration.sort.column).to.be.undefined;
+                });
             });
             it("saves the configuration when the column layout has been changed", () => {
-                let {instance, data } = loadInstanceWithStackedColumns();
-                let called = false;
-                instance.events.on(LineUp.EVENTS.CONFIG_CHANGED, () => {
-                    called = true;
+                let {instance, data, dataLoaded } = loadInstanceWithStackedColumns();
+                return dataLoaded.then(() => {
+                    let called = false;
+                    instance.events.on(LineUp.EVENTS.CONFIG_CHANGED, () => {
+                        called = true;
+                    });
+
+                    // Ghetto: Manually say that the columns have changed, usually happens if you drag/drop add columns
+                    instance.lineupImpl.listeners['columns-changed']();
+
+                    expect(called).to.be.true;
                 });
-
-                // Ghetto: Manually say that the columns have changed, usually happens if you drag/drop add columns
-                instance.lineupImpl.listeners['columns-changed']();
-
-                expect(called).to.be.true;
             });
             it("loads lineup with a sorted stacked column", () => {
-                let {instance, data } = loadInstanceWithStackedColumns();
-                instance.configuration = {
-                    primaryKey: "col1",
-                    columns: data.columns,
-                    sort: {
-                        stack: "STACKED_COLUMN",
-                        asc: true
-                    }
-                };
-                let result = instance.getSortFromLineUp();
-                expect(result.stack).to.equal("STACKED_COLUMN");
-                expect(result.column).to.be.undefined;
+                let {instance, data, dataLoaded } = loadInstanceWithStackedColumns();
+                return dataLoaded.then(() => {
+                    instance.configuration = {
+                        primaryKey: "col1",
+                        columns: data.columns,
+                        sort: {
+                            stack: "STACKED_COLUMN",
+                            asc: true
+                        }
+                    };
+                    let result = instance.getSortFromLineUp();
+                    expect(result.stack).to.equal("STACKED_COLUMN");
+                    expect(result.column).to.be.undefined;
+                });
             });
         });
     });

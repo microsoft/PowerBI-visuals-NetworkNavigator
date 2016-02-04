@@ -8,6 +8,10 @@ const LineUpLib = require("./lib/lineup");
  * Thin wrapper around the lineup library
  */
 export class LineUp {
+    /**
+     * The default count amount
+     */
+    private static DEFAULT_COUNT = 100;
 
     /**
      * My lineup instance
@@ -23,9 +27,21 @@ export class LineUp {
         CONFIG_CHANGED: "configurationChanged",
         SELECTION_CHANGED: "selectionChanged",
         LOAD_MORE_DATA: "loadMoreData",
-        CAN_LOAD_MORE_DATA: "canLoadMoreData",
         CLEAR_SELECTION: "clearSelection"
     };
+
+    /**
+     * The set of options used to query for new data
+     */
+    private queryOptions : IQueryOptions = {
+        offset: 0,
+        count: LineUp.DEFAULT_COUNT
+    };
+
+    /**
+     * Simple tracker for the total number of results
+     */
+    private total: number;
 
     /**
      * My element
@@ -125,7 +141,7 @@ export class LineUp {
     /**
      * A boolean indicating whehter or not we are currently loading more data
      */
-    private loadingMoreData = false;
+    private loadingData = false;
 
     private _selectedRows: ILineUpRow[] = [];
     private _selectionEnabled: boolean = true;
@@ -208,67 +224,32 @@ export class LineUp {
     }
 
     /**
-     * Gets the data contained in lineup
+     * The number of the results to return
      */
-    public getData() {
-        return this._data;
+    public get count(): number { return this.queryOptions.count || LineUp.DEFAULT_COUNT };
+    public set count(value: number) {
+        this.queryOptions.count = value || LineUp.DEFAULT_COUNT;
     }
 
     /**
-     * Loads the data into the lineup view
+     * Gets the data provider
      */
-    public setData(rows: ILineUpRow[]) {
-        this._data = rows;
+    private _dataProvider : IDataProvider;
+    public get dataProvider() {
+        return this._dataProvider;
+    }
 
-        //derive a description file
-        var desc = this.configuration || LineUp.createConfigurationFromData(rows);
-        var spec: any = {};
-        // spec.name = name;
-        spec.dataspec = desc;
-        delete spec.dataspec.file;
-        delete spec.dataspec.separator;
-        spec.dataspec.data = rows;
-        spec.storage = LineUpLib.createLocalStorage(rows, desc.columns, desc.layout, desc.primaryKey);
+    /**
+     * Sets the data provider to use
+     */
+    public set dataProvider(dataProvider: IDataProvider) {
+        // Reset query vars
+        this.queryOptions.offset = 0;
 
-        if (this.lineupImpl) {
-            this.lineupImpl.changeDataStorage(spec);
-        } else {
-            var finalOptions = $.extend(true, this.lineUpConfig, { renderingOptions: $.extend(true, {}, this.settings.presentation) });
-            this.lineupImpl = LineUpLib.create(spec, d3.select(this.element.find('.grid')[0]), finalOptions);
-            this.lineupImpl.listeners.on('change-sortcriteria.lineup', (ele, column, asc) => {
-                // This only works for single columns and not grouped columns
-                this.onLineUpSorted(column && column.column && column.column.id, asc);
-            });
-
-
-            this.lineupImpl.listeners.on('columns-changed.lineup', () => this.onLineUpColumnsChanged());
-            this.lineupImpl.listeners.on('change-filter.lineup', (x, column) => this.onLineUpFiltered(column));
-            var scrolled = this.lineupImpl.scrolled;
-            var me = this;
-
-            // The use of `function` here is intentional, we need to pass along the correct scope
-            this.lineupImpl.scrolled = function(...args) {
-                me.onLineUpScrolled.apply(me, args);
-                return scrolled.apply(this, args);
-            };
+        this._dataProvider = dataProvider;
+        if (this._dataProvider) {
+            this.runQuery(true);
         }
-
-        this.selection = rows.filter((n) => n.selected);
-
-        this.applyConfigurationToLineup();
-
-        // Store the configuration after it was possibly changed by load data
-        this.saveConfiguration();
-
-        this.loadingMoreData = false;
-    }
-
-    /**
-     * Appends data to the end
-     */
-    public appendData(rows: ILineUpRow[]) {
-        // Hack for now
-        this.setData((this._data || []).concat(rows))
     }
 
     /**
@@ -476,6 +457,85 @@ export class LineUp {
     }
 
     /**
+     * Runs the current query against the data provider
+     */
+    private runQuery(newQuery: boolean) {
+        if (newQuery) {
+            this.queryOptions.offset = 0;
+            this.total = undefined;
+        }
+        if (!this.dataProvider) {
+            return;
+        }
+
+        // Let everyone know we are loading more data
+        this.raiseLoadMoreData();
+
+        // We should only attempt to load more data, if we don't already have data loaded, or there is more to be loaded
+        if (this.total === undefined || this.queryOptions.offset < this.total) {
+            this.dataProvider.canQuery(this.queryOptions).then((value) => {
+                this.loadingData = true;
+                if (value) {
+                    return this.dataProvider.query(this.queryOptions).then(r => {
+                        this._data = this._data || [];
+                        this._data = newQuery ? r.results : this._data.concat(r.results);
+
+                        // We've moved the offset
+                        this.queryOptions.offset += r.count;
+                        this.total = r.total;
+
+                        //derive a description file
+                        var desc = this.configuration || LineUp.createConfigurationFromData(this._data);
+                        var spec: any = {};
+                        // spec.name = name;
+                        spec.dataspec = desc;
+                        delete spec.dataspec.file;
+                        delete spec.dataspec.separator;
+                        spec.dataspec.data = this._data;
+                        spec.storage = LineUpLib.createLocalStorage(this._data, desc.columns, desc.layout, desc.primaryKey);
+
+                        if (this.lineupImpl) {
+                            this.lineupImpl.changeDataStorage(spec);
+                        } else {
+                            var finalOptions = $.extend(true, this.lineUpConfig, { renderingOptions: $.extend(true, {}, this.settings.presentation) });
+                            this.lineupImpl = LineUpLib.create(spec, d3.select(this.element.find('.grid')[0]), finalOptions);
+                            this.lineupImpl.listeners.on('change-sortcriteria.lineup', (ele, column, asc) => {
+                                // This only works for single columns and not grouped columns
+                                this.onLineUpSorted(column && column.column && column.column.id, asc);
+                            });
+
+
+                            this.lineupImpl.listeners.on('columns-changed.lineup', () => this.onLineUpColumnsChanged());
+                            this.lineupImpl.listeners.on('change-filter.lineup', (x, column) => this.onLineUpFiltered(column));
+                            var scrolled = this.lineupImpl.scrolled;
+                            var me = this;
+
+                            // The use of `function` here is intentional, we need to pass along the correct scope
+                            this.lineupImpl.scrolled = function(...args) {
+                                me.checkLoadMoreData.apply(me, args);
+                                return scrolled.apply(this, args);
+                            };
+
+                            this.settings = this.settings;
+                        }
+
+                        this.selection = this._data.filter((n) => n.selected);
+
+                        this.applyConfigurationToLineup();
+
+                        // Store the configuration after it was possibly changed by load data
+                        this.saveConfiguration();
+
+                        this.loadingData = false;
+
+                        setTimeout(() => this.checkLoadMoreData(), 10);
+                    });
+                }
+            });
+        }
+    }
+
+    /**
      * Retrieves our columns by name
      */
     private getColumnByName(colName: string) {
@@ -532,18 +592,16 @@ export class LineUp {
     private static isNumeric = (obj) => (obj - parseFloat(obj) + 1) >= 0;
 
     /**
-     * Listener for when the lineup viewer is scrolled
+     * Checks to see if more data should be loaded based on the viewport
      */
-    private onLineUpScrolled() {
+    protected checkLoadMoreData() {
         // truthy this.dataView.metadata.segment means there is more data to be loaded
-        if (!this.loadingMoreData && this.raiseCanLoadMoreData()) {
-            var scrollElement = $(this.lineupImpl.$container.node()).find('div.lu-wrapper')[0];
-            var scrollHeight = scrollElement.scrollHeight;
-            var top = scrollElement.scrollTop;
-            if (scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200) {
-                this.loadingMoreData = true;
-                this.raiseLoadMoreData();
-            }
+        var scrollElement = $(this.lineupImpl.$container.node()).find('div.lu-wrapper')[0];
+        var scrollHeight = scrollElement.scrollHeight;
+        var top = scrollElement.scrollTop;
+        var shouldScrollLoad = scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200;
+        if (shouldScrollLoad && !this.loadingData) {
+            this.runQuery(false);
         }
     }
 
@@ -586,7 +644,18 @@ export class LineUp {
     private onLineUpSorted(column: string, asc: boolean) {
         if (!this.sortingFromConfig) {
             this.saveConfiguration();
+
             this.raiseSortChanged(column, asc);
+
+            if (this.settings.sorting.external) {
+                let newSort = this.getSortFromLineUp();
+
+                // Set the new sort value
+                this.queryOptions.sort = newSort ? [newSort] : undefined;
+
+                // We are starting over since we sorted
+                this.runQuery(true);
+            }
         }
     }
 
@@ -613,6 +682,15 @@ export class LineUp {
         }
         this.saveConfiguration();
         this.raiseFilterChanged(filter);
+
+        if (this.settings.filtering.external) {
+            // Set the new filter value
+            console.error("This should support multiple filters");
+            this.queryOptions.query = filter ? [filter] : undefined;
+
+            // We are starting over since we filtered
+            this.runQuery(true);
+        }
     }
 
     /**
@@ -655,17 +733,6 @@ export class LineUp {
      */
     private raiseClearSelection() {
         this.events.raiseEvent(LineUp.EVENTS.CLEAR_SELECTION);
-    }
-
-    /**
-     * Raises the can load more data event
-     */
-    private raiseCanLoadMoreData(): boolean {
-        var result = {
-            result: false
-        };
-        this.events.raiseEvent(LineUp.EVENTS.CAN_LOAD_MORE_DATA, result);
-        return result.result;
     }
 }
 
@@ -812,4 +879,69 @@ export interface ILineUpSettings {
         histograms?: boolean;
         animation?: boolean;
     };
+}
+
+/**
+ * Provides the data provider interface for lineup
+ */
+export interface IDataProvider {
+
+    /**
+     * Returns true if the data provider can be queried with the given set of options, this allows for data sources which don't know their total counts to query
+     */
+    canQuery(options: IQueryOptions) : PromiseLike<boolean>;
+
+    /**
+     * Asks the data provider to load more data
+     */
+    query(options: IQueryOptions): PromiseLike<IQueryResult>;
+}
+
+export interface IQueryOptions {
+
+    /**
+     * The offset into the dataset to retrieve
+     */
+    offset: number;
+
+    /**
+     * The number of objects to return
+     */
+    count: number;
+
+    /**
+     * The query to run
+     */
+    query?: {
+        column: string;
+        value: string | {
+            domain: number;
+            range: number;
+        };
+    }[];
+
+    /**
+     * The current sort
+     */
+    sort?: ILineUpSort[];
+}
+
+/**
+ * The query result interface
+ */
+export interface IQueryResult {
+    /**
+     * The total number of results
+     */
+    total?: number;
+
+    /**
+     * The number of returned results
+     */
+    count: number;
+
+    /**
+     * The matching results
+     */
+    results: ILineUpRow[];
 }

@@ -7,6 +7,9 @@
   "installed": {
     "lodash/lodash.d.ts": {
       "commit": "fab683ca77d0286b9d51aba6375deaceb41b22f5"
+    },
+    "es6-promise/es6-promise.d.ts": {
+      "commit": "e69fe60f2d6377ea4fae539493997b098f52cad1"
     }
   }
 }
