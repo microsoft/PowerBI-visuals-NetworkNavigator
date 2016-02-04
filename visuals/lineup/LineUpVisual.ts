@@ -1,7 +1,9 @@
 // /// <reference path="../../base/references.d.ts"/>
 // import { ExternalCssResource, VisualBase } from "../../base/VisualBase";
 // import { default as Utils, Visual } from "../../base/Utils";
-// import { LineUp, ILineUpRow, ILineUpSettings, ILineUpColumn, ILineUpConfiguration, ILineUpLayoutColumn } from "./LineUp";
+// import { LineUp  } from "./LineUp";
+// import { ILineUpRow, ILineUpSettings, ILineUpColumn, ILineUpConfiguration, ILineUpLayoutColumn } from "./models";
+
 
 // import IVisual = powerbi.IVisual;
 // import DataViewTable = powerbi.DataViewTable;

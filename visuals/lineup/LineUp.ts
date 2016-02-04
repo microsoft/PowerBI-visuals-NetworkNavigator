@@ -1,6 +1,8 @@
 import { default as EventEmitter } from "../../base/EventEmitter";
 import { default as Utils } from "../../base/Utils";
+import { JSONDataProvider } from "./providers/JSONDataProvider";
 import * as _  from "lodash";
+import { IQueryOptions, IQueryResult, IDataProvider, ILineUpColumn, ILineUpRow, ILineUpSettings, ILineUpConfiguration, ILineUpSort } from "./models";
 const $ = require("jquery");
 const LineUpLib = require("./lib/lineup");
 
@@ -8,6 +10,14 @@ const LineUpLib = require("./lib/lineup");
  * Thin wrapper around the lineup library
  */
 export class LineUp {
+
+    /**
+     * A quick reference for the providers
+     */
+    public static PROVIDERS = {
+        JSON: JSONDataProvider
+    };
+
     /**
      * The default count amount
      */
@@ -86,12 +96,6 @@ export class LineUp {
             singleSelect: false,
             multiSelect: true
         },
-        sorting: {
-            external: false
-        },
-        filtering: {
-            external: false
-        },
         presentation: {
             stacked: true,
             values: false,
@@ -144,8 +148,6 @@ export class LineUp {
     private loadingData = false;
 
     private _selectedRows: ILineUpRow[] = [];
-    private _selectionEnabled: boolean = true;
-    private _isMultiSelect: boolean = true;
     private _eventEmitter: EventEmitter;
     private _settings: ILineUpSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS);
 
@@ -157,50 +159,16 @@ export class LineUp {
             mode: 'separate'
         },
         interaction: {
-            multiselect: () => this.isMultiSelect
+            multiselect: () => this.settings.selection.multiSelect
         },
         sorting: {
-            external: false
+            external: true
         },
         filtering: {
-            external: false
+            external: true
         },
         histograms: {
-            generator: (columnImpl, callback) => {
-                var column = this.getColumnByName(columnImpl.column.id);
-                var data : any = this._data;
-                if (column && column.histogram) {
-                    var perc = 1 / column.histogram.values.length;
-                    var values = column.histogram.values.map((v, i) => ({
-                        x: perc * i,
-                        y: v,
-                        dx: perc
-                    }));
-                    callback(values);
-                } else {
-                    var histgenerator = d3.layout.histogram();
-                    histgenerator.range(columnImpl.scale.range());
-                    histgenerator.value(function (row) { return columnImpl.getValue(row) ;});
-
-                    //remove all the direct values to save space
-                    var hist = histgenerator(data).map(function (bin) {
-                        return {
-                            x : bin.x,
-                            dx : bin.dx,
-                            y: bin.y
-                        };
-                    });
-                    var max = d3.max(hist, function(d) { return d.y; });
-                    hist.forEach(function (d) {
-                        if (max > 0) {
-                            d.y /= max;
-                        } else {
-                            d.y = 0;
-                        }
-                    });
-                    callback(hist);
-                }
-            }
+            generator: (columnImpl, callback) => this.generateHistogram(columnImpl, callback)
         }
     };
 
@@ -249,6 +217,9 @@ export class LineUp {
         this._dataProvider = dataProvider;
         if (this._dataProvider) {
             this.runQuery(true);
+        } else if (this.lineupImpl) {
+            this.lineupImpl.destroy();
+            delete this.lineupImpl;
         }
     }
 
@@ -289,29 +260,16 @@ export class LineUp {
 
         var singleSelect = newSettings.selection.singleSelect;
         var multiSelect = newSettings.selection.multiSelect;
-        this.selectionEnabled = singleSelect || multiSelect;
-        this.isMultiSelect = multiSelect;
 
         /** Apply the settings to lineup */
-        let externalSort = !!value && !!value.sorting && !!value.sorting.external;
-        let externalFilter = !!value && !!value.filtering && !!value.filtering.external;
-        let histgenerator = !!value && !!value.histograms && value.histograms.generator;
         if (this.lineupImpl) {
-            this.attachSelectionEvents();
-
             var presProps = newSettings.presentation;
             for (var key in presProps) {
                 if (presProps.hasOwnProperty(key)) {
                     this.lineupImpl.changeRenderingOption(key, presProps[key]);
                 }
             }
-            this.lineupImpl.config.sorting = { external: externalSort };
-            this.lineupImpl.config.filtering = { external: externalFilter };
-            this.lineupImpl.config.histograms = { generator: histgenerator };
         }
-        this.lineUpConfig.sorting.external = externalSort;
-        this.lineUpConfig.filtering.external = externalFilter;
-        this.lineUpConfig.histograms.generator = histgenerator;
 
         this._settings = newSettings;
     }
@@ -330,37 +288,6 @@ export class LineUp {
         this._configuration = value;
 
         this.applyConfigurationToLineup();
-    }
-
-    /**
-     * Getter for selection enabled
-     */
-    public get selectionEnabled() {
-        return this._selectionEnabled;
-    }
-
-    /**
-     * Setter for selectionEnabled
-     */
-    public set selectionEnabled(value: boolean) {
-        this._selectionEnabled = value;
-        this.attachSelectionEvents();
-    }
-
-
-    /**
-     * Getter for isMultiSelect
-     */
-    public get isMultiSelect() {
-        return this._isMultiSelect;
-    }
-
-    /**
-     * Setter for isMultiSelect
-     */
-    public set isMultiSelect(value: boolean) {
-        this._isMultiSelect = value;
-        this.attachSelectionEvents();
     }
 
     /**
@@ -503,8 +430,18 @@ export class LineUp {
                                 // This only works for single columns and not grouped columns
                                 this.onLineUpSorted(column && column.column && column.column.id, asc);
                             });
-
-
+                            this.lineupImpl.listeners.on("multiselected.lineup", (rows: ILineUpRow[]) => {
+                                if (this.settings.selection.multiSelect) {
+                                    this._selectedRows = this.updateRowSelection(rows);
+                                    this.raiseSelectionChanged(rows);
+                                }
+                            });
+                            this.lineupImpl.listeners.on("selected.lineup", (row: ILineUpRow) => {
+                                if (this.settings.selection.singleSelect && !this.settings.selection.multiSelect) {
+                                    this._selectedRows = this.updateRowSelection(row ? [row] : []);
+                                    this.raiseSelectionChanged(this.selection)
+                                }
+                            });
                             this.lineupImpl.listeners.on('columns-changed.lineup', () => this.onLineUpColumnsChanged());
                             this.lineupImpl.listeners.on('change-filter.lineup', (x, column) => this.onLineUpFiltered(column));
                             var scrolled = this.lineupImpl.scrolled;
@@ -533,6 +470,22 @@ export class LineUp {
                 }
             });
         }
+    }
+
+    /**
+     * Generates the histogram for lineup
+     */
+    private generateHistogram(columnImpl, callback) {
+        var column = this.getColumnByName(columnImpl.column.id);
+        this.dataProvider.generateHistogram(column, this.queryOptions).then((h) => {
+            var perc = 1 / h.length;
+            var values = h.map((v, i) => ({
+                x: perc * i,
+                y: v,
+                dx: perc
+            }));
+            callback(values);
+        });
     }
 
     /**
@@ -582,7 +535,6 @@ export class LineUp {
                 this.lineupImpl.sortBy(sort.stack || sort.column, sort.asc);
                 this.sortingFromConfig = false;
             }
-            this.attachSelectionEvents();
         }
     }
 
@@ -605,32 +557,6 @@ export class LineUp {
         }
     }
 
-
-    /**
-     * Attaches the line up events to lineup
-     */
-    private attachSelectionEvents() {
-        if (this.lineupImpl) {
-            // Cleans up events
-            this.lineupImpl.listeners.on("multiselected.lineup", null);
-            this.lineupImpl.listeners.on("selected.lineup", null);
-
-            if (this.selectionEnabled) {
-                if (this.isMultiSelect) {
-                    this.lineupImpl.listeners.on("multiselected.lineup", (rows: ILineUpRow[]) => {
-                        this._selectedRows = this.updateRowSelection(rows);
-                        this.raiseSelectionChanged(rows);
-                    });
-                } else {
-                    this.lineupImpl.listeners.on("selected.lineup", (row: ILineUpRow) => {
-                        this._selectedRows = this.updateRowSelection(row ? [row] : []);
-                        this.raiseSelectionChanged(this.selection)
-                    });
-                }
-            }
-        }
-    }
-
     /**
      * Listener for when the lineup columns are changed.
      */
@@ -644,18 +570,14 @@ export class LineUp {
     private onLineUpSorted(column: string, asc: boolean) {
         if (!this.sortingFromConfig) {
             this.saveConfiguration();
-
             this.raiseSortChanged(column, asc);
+            let newSort = this.getSortFromLineUp();
 
-            if (this.settings.sorting.external) {
-                let newSort = this.getSortFromLineUp();
+            // Set the new sort value
+            this.queryOptions.sort = newSort ? [newSort] : undefined;
 
-                // Set the new sort value
-                this.queryOptions.sort = newSort ? [newSort] : undefined;
-
-                // We are starting over since we sorted
-                this.runQuery(true);
-            }
+            // We are starting over since we sorted
+            this.runQuery(true);
         }
     }
 
@@ -683,14 +605,12 @@ export class LineUp {
         this.saveConfiguration();
         this.raiseFilterChanged(filter);
 
-        if (this.settings.filtering.external) {
-            // Set the new filter value
-            console.error("This should support multiple filters");
-            this.queryOptions.query = filter ? [filter] : undefined;
+        // Set the new filter value
+        console.error("This should support multiple filters");
+        this.queryOptions.query = filter ? [filter] : undefined;
 
-            // We are starting over since we filtered
-            this.runQuery(true);
-        }
+        // We are starting over since we filtered
+        this.runQuery(true);
     }
 
     /**
@@ -734,214 +654,4 @@ export class LineUp {
     private raiseClearSelection() {
         this.events.raiseEvent(LineUp.EVENTS.CLEAR_SELECTION);
     }
-}
-
-/**
- * The line up row
- */
-export interface ILineUpRow {
-
-    /**
-     * Data for each column in the row
-     */
-    [columnName: string]: any;
-
-    /**
-     * Whether or not this row is selected
-     */
-    selected: boolean;
-
-    /**
-     * Returns true if this lineup row equals another
-     */
-    equals(b: ILineUpRow): boolean;
-}
-
-export interface ILineUpSort {
-    /**
-     * The column that was sorted
-     */
-    column?: string;
-
-    /**
-     * The stack that was sorted
-     */
-    stack?: string;
-
-    /**
-     * If the sort was ascending
-     */
-    asc: boolean;
-}
-
-/**
- * Rerepents a column in lineup
- */
-export interface ILineUpColumn {
-    /**
-     * The field name of the column
-     */
-    column: string;
-
-    /**
-     * The displayName for the column
-     */
-    label?: string;
-
-    /**
-     * The type of column it is
-     * values: string|number
-     */
-    type: string;
-
-    /**
-     * The categories of this column
-     */
-    categories?: string[];
-
-    /**
-     * The histogram of the column
-     */
-    histogram?: {
-        min?: number;
-        max?: number;
-        values: number[];
-    };
-
-    /**
-     * The domain of the column, only for number based columns
-     */
-    domain?: [number, number]
-}
-
-export interface ILineUpLayoutColumn {
-    width: number;
-    column: string;
-    type: string;
-    filter?: string; // The filter applied to string based columns
-    range?: [number, number]; // The range applied to number based columns
-    weight?: number;
-    label?: string;
-    sort?: boolean; // If defined, sorted. True asc, false desc
-    children?: ILineUpLayoutColumn[]
-}
-
-/**
- * Represents the configuration of a lineup instance
- */
-export interface ILineUpConfiguration {
-    /**
-     * The primary key of the layout
-     */
-    primaryKey: string;
-
-    /**
-     * The list of columns for lineup
-     */
-    columns: ILineUpColumn[];
-
-    /**
-     * The layout of the columns
-     */
-    layout?: {
-        /**
-         * The layout name
-         */
-        [name: string]: ILineUpLayoutColumn[]
-    }
-
-    /**
-     * The sort of the lineup
-     */
-    sort?: ILineUpSort;
-}
-
-/**
- * Represents settings in lineup
- */
-export interface ILineUpSettings {
-    selection?: {
-        singleSelect?: boolean;
-        multiSelect?: boolean;
-    };
-    sorting?: {
-        external?: boolean;
-    };
-    filtering?: {
-        external?: boolean;
-    };
-    histograms?: {
-        generator?: (column, callback) => any;
-    };
-    presentation?: {
-        values?: boolean;
-        stacked?: boolean;
-        histograms?: boolean;
-        animation?: boolean;
-    };
-}
-
-/**
- * Provides the data provider interface for lineup
- */
-export interface IDataProvider {
-
-    /**
-     * Returns true if the data provider can be queried with the given set of options, this allows for data sources which don't know their total counts to query
-     */
-    canQuery(options: IQueryOptions) : PromiseLike<boolean>;
-
-    /**
-     * Asks the data provider to load more data
-     */
-    query(options: IQueryOptions): PromiseLike<IQueryResult>;
-}
-
-export interface IQueryOptions {
-
-    /**
-     * The offset into the dataset to retrieve
-     */
-    offset: number;
-
-    /**
-     * The number of objects to return
-     */
-    count: number;
-
-    /**
-     * The query to run
-     */
-    query?: {
-        column: string;
-        value: string | {
-            domain: number;
-            range: number;
-        };
-    }[];
-
-    /**
-     * The current sort
-     */
-    sort?: ILineUpSort[];
-}
-
-/**
- * The query result interface
- */
-export interface IQueryResult {
-    /**
-     * The total number of results
-     */
-    total?: number;
-
-    /**
-     * The number of returned results
-     */
-    count: number;
-
-    /**
-     * The matching results
-     */
-    results: ILineUpRow[];
 }

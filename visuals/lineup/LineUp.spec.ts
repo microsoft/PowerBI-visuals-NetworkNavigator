@@ -2,7 +2,8 @@ require("../../base/testSetup");
 
 import { Promise } from "es6-promise";
 import { expect } from "chai";
-import { LineUp, ILineUpSettings, ILineUpRow, ILineUpColumn, IDataProvider } from "./LineUp";
+import { LineUp } from "./LineUp";
+import { ILineUpSettings, ILineUpRow, ILineUpColumn, IDataProvider } from "./models";
 import * as $ from "jquery";
 
 describe('LineUp', () => {
@@ -27,11 +28,6 @@ describe('LineUp', () => {
         var result = {
             instance: new LineUp(ele),
             element: ele
-        };
-        result.instance.settings = {
-            sorting: {
-                external: true
-            }
         };
         return result;
     };
@@ -76,6 +72,9 @@ describe('LineUp', () => {
         var fakeProvider = <IDataProvider>{
             canQuery(options: any) {
                 return Promise.resolve(true);
+            },
+            generateHistogram() {
+                return Promise.resolve([]);
             },
             query(options: any) {
                 return new Promise((resolve2) => {
@@ -194,109 +193,16 @@ describe('LineUp', () => {
                 expect(instance.lineupImpl.config.renderingOptions.histograms).to.be.false;
             });
         });
-        it('should pass sorting settings to lineupimpl', () => {
-            let { instance, dataLoaded } = loadInstanceWithSettings({
-                sorting: {
-                    external: true
-                }
-            });
-
-
-            return dataLoaded.then(() => { expect(instance.lineupImpl.config.sorting.external).to.be.true; });
-        });
-        it('should pass filtering settings to lineupimpl', () => {
-            let { instance, dataLoaded } = loadInstanceWithSettings({
-                filtering: {
-                    external: true
-                }
-            });
-
-
-            return dataLoaded.then(() => { expect(instance.lineupImpl.config.filtering.external).to.be.true; });
-        });
-        it('should pass histogram settings to lineupimpl', () => {
-            let { instance, dataLoaded } = loadInstanceWithSettings({
-                histograms: {
-                    generator: (column) => []
-                }
-            });
-
-            return dataLoaded.then(() => { expect(instance.lineupImpl.config.histograms.generator).to.not.be.undefined; });
-        });
     });
 
-    // describe("setData", () => {
-    //     it("should set the data property when setData is called", () => {
-    //         let { instance, dataLoaded } = createInstance();
-    //         let { data } = createFakeData();
-    //         instance.dataProvider = createProvider(data);
-
-    //         // expect(instance.getData()).to.deep.equal(data);
-    //     });
-    // });
-
-    describe("selectionEnabled", () => {
+    describe("settings", () => {
         it("should be true by default", () => {
             let { instance } = createInstance();
-            expect(instance.selectionEnabled).to.be.true;
-        });
-    });
-
-    describe("isMultiSelect", () => {
-        it("should be true by default", () => {
-            let { instance } = createInstance();
-            expect(instance.isMultiSelect).to.be.true;
+            expect(instance.settings.selection.multiSelect).to.be.true;
         });
     });
 
     describe("events", () => {
-        // describe("canLoadMoreData", () => {
-        //     it('should call the event after a scroll to implement virtual scrolling', () => {
-        //         let { instance, element } = createInstance();
-        //         let called = false;
-        //         instance.events.on(LineUp.EVENTS.CAN_LOAD_MORE_DATA, (item) => {
-        //             called = true;
-        //         });
-
-        //         let { data } = createFakeData();
-        //         instance.dataProvider = createProvider(data);
-
-        //         // Pretend we scrolled
-        //         element.find(".lu-wrapper").trigger("scroll");
-        //         expect(called).to.be.true;
-        //     });
-
-        //     it('if the listener returns false, the loadMoreData event should not be called', () => {
-        //         let { instance, element } = createInstance();
-        //         let called = false;
-        //         instance.events.on(LineUp.EVENTS.CAN_LOAD_MORE_DATA, (item) => item.result = false);
-        //         instance.events.on(LineUp.EVENTS.LOAD_MORE_DATA, () => called = true);
-
-        //         let { data, columns } = createFakeData();
-        //         instance.configuration = { primaryKey: columns[0].column, columns: columns };
-        //         instance.dataProvider = createProvider(data);
-
-        //         // Pretend we scrolled
-        //         element.find(".lu-wrapper").trigger("scroll");
-        //         expect(called).to.be.false;
-        //     });
-
-        //     xit('if the listener returns true, the loadMoreData event should be called', () => {
-        //         let { instance, element } = createInstance();
-        //         let called = false;
-        //         instance.events.on(LineUp.EVENTS.CAN_LOAD_MORE_DATA, (item) => item.result = true);
-        //         instance.events.on(LineUp.EVENTS.LOAD_MORE_DATA, () => called = true);
-
-        //         let { data, columns } = createFakeData();
-        //         instance.configuration = { primaryKey: columns[0].column, columns: columns };
-
-        //         instance.dataProvider = createProvider(data);
-
-        //         // Pretend we scrolled
-        //         element.find(".lu-wrapper").trigger("scroll");
-        //         expect(called).to.be.true;
-        //     });
-        // });
 
         describe("sortChanged", () => {
             it("should call the event when a column header is clicked", () => {
