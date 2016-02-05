@@ -25,7 +25,6 @@ export class JSONDataProvider implements IDataProvider {
             var newData = final.slice(options.offset, options.offset + options.count);
             setTimeout(() => {
                 resolve({
-                    total: final.length,
                     results: newData,
                     count: newData.length
                 });

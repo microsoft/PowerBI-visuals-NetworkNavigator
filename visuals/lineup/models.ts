@@ -187,11 +187,6 @@ export interface IQueryOptions {
  */
 export interface IQueryResult {
     /**
-     * The total number of results
-     */
-    total?: number;
-
-    /**
      * The number of returned results
      */
     count: number;

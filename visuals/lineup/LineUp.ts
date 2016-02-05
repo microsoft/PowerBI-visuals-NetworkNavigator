@@ -49,9 +49,9 @@ export class LineUp {
     };
 
     /**
-     * Simple tracker for the total number of results
+     * Represents the last query that we performed
      */
-    private total: number;
+    private lastQuery : IQueryOptions;
 
     /**
      * My element
@@ -233,6 +233,7 @@ export class LineUp {
         // Reset query vars
         this.queryOptions.offset = 0;
         this.loadingData = false;
+        this.lastQuery = undefined;
 
         this._dataProvider = dataProvider;
         if (this._dataProvider) {
@@ -409,87 +410,90 @@ export class LineUp {
     private runQuery(newQuery: boolean) {
         if (newQuery) {
             this.queryOptions.offset = 0;
-            this.total = undefined;
         }
         if (!this.dataProvider) {
             return;
         }
 
+        // No need to requery, if we have already performed this query
+        if (_.isEqual(this.queryOptions, this.lastQuery)) {
+            return;
+        }
+
+        this.lastQuery = _.merge({}, this.queryOptions);
+
         // Let everyone know we are loading more data
         this.raiseLoadMoreData();
 
         // We should only attempt to load more data, if we don't already have data loaded, or there is more to be loaded
-        if (this.total === undefined || this.queryOptions.offset < this.total) {
-            this.dataProvider.canQuery(this.queryOptions).then((value) => {
-                if (value) {
-                    this.loadingData = true;
-                    return this.dataProvider.query(this.queryOptions).then(r => {
-                        this._data = this._data || [];
-                        this._data = newQuery ? r.results : this._data.concat(r.results);
+        this.dataProvider.canQuery(this.queryOptions).then((value) => {
+            if (value) {
+                this.loadingData = true;
+                return this.dataProvider.query(this.queryOptions).then(r => {
+                    this._data = this._data || [];
+                    this._data = newQuery ? r.results : this._data.concat(r.results);
 
-                        // We've moved the offset
-                        this.queryOptions.offset += r.count;
-                        this.total = r.total;
+                    // We've moved the offset
+                    this.queryOptions.offset += r.count;
 
-                        //derive a description file
-                        var desc = this.configuration || LineUp.createConfigurationFromData(this._data);
-                        var spec: any = {};
-                        // spec.name = name;
-                        spec.dataspec = desc;
-                        delete spec.dataspec.file;
-                        delete spec.dataspec.separator;
-                        spec.dataspec.data = this._data;
-                        spec.storage = LineUpLib.createLocalStorage(this._data, desc.columns, desc.layout, desc.primaryKey);
+                    //derive a description file
+                    var desc = this.configuration || LineUp.createConfigurationFromData(this._data);
+                    var spec: any = {};
+                    // spec.name = name;
+                    spec.dataspec = desc;
+                    delete spec.dataspec.file;
+                    delete spec.dataspec.separator;
+                    spec.dataspec.data = this._data;
+                    spec.storage = LineUpLib.createLocalStorage(this._data, desc.columns, desc.layout, desc.primaryKey);
 
-                        if (this.lineupImpl) {
-                            this.lineupImpl.changeDataStorage(spec);
-                        } else {
-                            var finalOptions = $.extend(true, this.lineUpConfig, { renderingOptions: $.extend(true, {}, this.settings.presentation) });
-                            this.lineupImpl = LineUpLib.create(spec, d3.select(this.element.find('.grid')[0]), finalOptions);
-                            this.lineupImpl.listeners.on('change-sortcriteria.lineup', (ele, column, asc) => {
-                                // This only works for single columns and not grouped columns
-                                this.onLineUpSorted(column && column.column && column.column.id, asc);
-                            });
-                            this.lineupImpl.listeners.on("multiselected.lineup", (rows: ILineUpRow[]) => {
-                                if (this.settings.selection.multiSelect) {
-                                    this._selectedRows = this.updateRowSelection(rows);
-                                    this.raiseSelectionChanged(rows);
-                                }
-                            });
-                            this.lineupImpl.listeners.on("selected.lineup", (row: ILineUpRow) => {
-                                if (this.settings.selection.singleSelect && !this.settings.selection.multiSelect) {
-                                    this._selectedRows = this.updateRowSelection(row ? [row] : []);
-                                    this.raiseSelectionChanged(this.selection)
-                                }
-                            });
-                            this.lineupImpl.listeners.on('columns-changed.lineup', () => this.onLineUpColumnsChanged());
-                            this.lineupImpl.listeners.on('change-filter.lineup', (x, column) => this.onLineUpFiltered(column));
-                            var scrolled = this.lineupImpl.scrolled;
-                            var me = this;
+                    if (this.lineupImpl) {
+                        this.lineupImpl.changeDataStorage(spec);
+                    } else {
+                        var finalOptions = $.extend(true, this.lineUpConfig, { renderingOptions: $.extend(true, {}, this.settings.presentation) });
+                        this.lineupImpl = LineUpLib.create(spec, d3.select(this.element.find('.grid')[0]), finalOptions);
+                        this.lineupImpl.listeners.on('change-sortcriteria.lineup', (ele, column, asc) => {
+                            // This only works for single columns and not grouped columns
+                            this.onLineUpSorted(column && column.column && column.column.id, asc);
+                        });
+                        this.lineupImpl.listeners.on("multiselected.lineup", (rows: ILineUpRow[]) => {
+                            if (this.settings.selection.multiSelect) {
+                                this._selectedRows = this.updateRowSelection(rows);
+                                this.raiseSelectionChanged(rows);
+                            }
+                        });
+                        this.lineupImpl.listeners.on("selected.lineup", (row: ILineUpRow) => {
+                            if (this.settings.selection.singleSelect && !this.settings.selection.multiSelect) {
+                                this._selectedRows = this.updateRowSelection(row ? [row] : []);
+                                this.raiseSelectionChanged(this.selection)
+                            }
+                        });
+                        this.lineupImpl.listeners.on('columns-changed.lineup', () => this.onLineUpColumnsChanged());
+                        this.lineupImpl.listeners.on('change-filter.lineup', (x, column) => this.onLineUpFiltered(column));
+                        var scrolled = this.lineupImpl.scrolled;
+                        var me = this;
 
-                            // The use of `function` here is intentional, we need to pass along the correct scope
-                            this.lineupImpl.scrolled = function(...args) {
-                                me.checkLoadMoreData(true);
-                                return scrolled.apply(this, args);
-                            };
+                        // The use of `function` here is intentional, we need to pass along the correct scope
+                        this.lineupImpl.scrolled = function(...args) {
+                            me.checkLoadMoreData(true);
+                            return scrolled.apply(this, args);
+                        };
 
-                            this.settings = this.settings;
-                        }
+                        this.settings = this.settings;
+                    }
 
-                        this.selection = this._data.filter((n) => n.selected);
+                    this.selection = this._data.filter((n) => n.selected);
 
-                        this.applyConfigurationToLineup();
+                    this.applyConfigurationToLineup();
 
-                        // Store the configuration after it was possibly changed by load data
-                        this.saveConfiguration();
+                    // Store the configuration after it was possibly changed by load data
+                    this.saveConfiguration();
 
-                        this.loadingData = false;
+                    this.loadingData = false;
 
-                        setTimeout(() => this.checkLoadMoreData(false), 10);
-                    }, () => this.loadingData = false);
-                }
-            });
-        }
+                    setTimeout(() => this.checkLoadMoreData(false), 10);
+                }, () => this.loadingData = false);
+            }
+        });
     }
 
     /**
