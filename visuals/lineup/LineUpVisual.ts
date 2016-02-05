@@ -343,7 +343,7 @@
 //             );
 
 //             // Sort contains a missing column
-//             if (config.sort && newColNames.indexOf(config.sort.column) < 0) {
+//             if (config.sort && newColNames.indexOf(config.sort.column) < 0 && !config.sort.stack) {
 //                 config.sort = undefined;
 //             }
 
@@ -354,6 +354,7 @@
 //                     }
 //                     if (c.children) {
 //                         c.children = c.children.filter(removedColumnFilter);
+//                         return c.children.length > 0;
 //                     }
 //                     return false;
 //                 };
