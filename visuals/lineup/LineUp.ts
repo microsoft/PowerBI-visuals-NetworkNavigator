@@ -143,14 +143,28 @@ export class LineUp {
                 </ul>
             </div>
             <hr/>
-            <div class="grid"></div>
+            <div style="position:relative">
+                <div class="grid"></div>
+                <div class='load-spinner'><div>
+            </div>
         </div>
     `.trim();
 
     /**
      * A boolean indicating whehter or not we are currently loading more data
      */
-    private loadingData = false;
+    private _loadingData = false;
+    private get loadingData() {
+        return this._loadingData;
+    }
+
+    /**
+     * Setter for if we are loading data
+     */
+    private set loadingData(value: boolean) {
+        this.element.toggleClass("loading", !!value);
+        this._loadingData = value;
+    }
 
     private _selectedRows: ILineUpRow[] = [];
     private _eventEmitter: EventEmitter;
@@ -218,6 +232,7 @@ export class LineUp {
     public set dataProvider(dataProvider: IDataProvider) {
         // Reset query vars
         this.queryOptions.offset = 0;
+        this.loadingData = false;
 
         this._dataProvider = dataProvider;
         if (this._dataProvider) {
@@ -454,7 +469,7 @@ export class LineUp {
 
                             // The use of `function` here is intentional, we need to pass along the correct scope
                             this.lineupImpl.scrolled = function(...args) {
-                                me.checkLoadMoreData.apply(me, args);
+                                me.checkLoadMoreData(true);
                                 return scrolled.apply(this, args);
                             };
 
@@ -470,7 +485,7 @@ export class LineUp {
 
                         this.loadingData = false;
 
-                        setTimeout(() => this.checkLoadMoreData(), 10);
+                        setTimeout(() => this.checkLoadMoreData(false), 10);
                     }, () => this.loadingData = false);
                 }
             });
@@ -551,12 +566,12 @@ export class LineUp {
     /**
      * Checks to see if more data should be loaded based on the viewport
      */
-    protected checkLoadMoreData() {
+    protected checkLoadMoreData(scroll: boolean) {
         // truthy this.dataView.metadata.segment means there is more data to be loaded
         var scrollElement = $(this.lineupImpl.$container.node()).find('div.lu-wrapper')[0];
         var scrollHeight = scrollElement.scrollHeight;
         var top = scrollElement.scrollTop;
-        if (this.lastScrollPos !== top) {
+        if (!scroll || this.lastScrollPos !== top) {
             this.lastScrollPos = top;
             var shouldScrollLoad = scrollHeight - (top + scrollElement.clientHeight) < 200 && scrollHeight >= 200;
             if (shouldScrollLoad && !this.loadingData) {

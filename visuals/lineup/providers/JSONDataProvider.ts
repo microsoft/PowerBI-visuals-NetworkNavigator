@@ -29,7 +29,7 @@ export class JSONDataProvider implements IDataProvider {
                     results: newData,
                     count: newData.length
                 });
-            }, 10);
+            }, 0);
         });
     };
 

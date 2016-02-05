@@ -176,7 +176,6 @@
 //     private template : string = `
 //         <div>
 //             <div class="lineup"></div>
-//             <div class='load-spinner' style='transform:scale(0.6);'><div>
 //         </div>
 //     `.trim().replace(/\n/g, '');
 
