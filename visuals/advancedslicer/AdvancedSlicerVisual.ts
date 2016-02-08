@@ -148,7 +148,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
                 // We only need to give it the new items
                 this.loadDeferred.resolve(added);
                 delete this.loadDeferred;
-            } else {
+            } else if (Utils.hasDataChanged(newData.slice(0), this.mySlicer.data, (a, b) => a.match === b.match)) {
                 this.mySlicer.data = newData;
             }
             this.mySlicer.showValues = !!categorical && !!categorical.values && categorical.values.length > 0;
@@ -156,7 +156,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
             var sortedColumns = this.dataView.metadata.columns.filter((c) => !!c.sort);
             if (sortedColumns.length) {
                 var lastColumn = sortedColumns[sortedColumns.length - 1];
-                this.mySlicer.sort(sortedColumns[sortedColumns.length - 1].roles['Category'] ? 'category' : 'value', lastColumn.sort != 1);
+                this.mySlicer.sort(sortedColumns[sortedColumns.length - 1].roles['Category'] ? 'match' : 'value', lastColumn.sort != 1);
             }
         } else {
             this.mySlicer.data = [];

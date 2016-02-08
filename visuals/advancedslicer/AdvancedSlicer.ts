@@ -20,7 +20,9 @@ export class AdvancedSlicer {
             <div class="slicer-options">
                 <input class="searchbox" placeholder="Search" />
                 <div style="margin:0;padding:0;margin-top:5px;">
-                <label style="vertical-align:middle"><input class="check-all" type="checkbox" style="margin-right:5px;vertical-align:middle"/>&nbsp;Select All</label>
+                <a><span class="clear-all">Clear Selection</span></a>
+                <!-- Disabled -->
+                <label style="display:none;vertical-align:middle"><input class="check-all" type="checkbox" style="margin-right:5px;vertical-align:middle"/>&nbsp;Select All</label>
                 </div>
                 <hr/>
             </div>
@@ -97,6 +99,7 @@ export class AdvancedSlicer {
             page: 20000 // Hack
         });
         this.checkAllButton = element.find(".check-all").on("click", () => this.toggleSelectAll());
+        this.checkAllButton = element.find(".clear-all").on("click", () => this.clearSelection());
         this.attachEvents();
 
         // These two are here because the devtools call init more than once
@@ -246,6 +249,16 @@ export class AdvancedSlicer {
         this.events.raiseEvent("selectionChanged", this.selectedItems, oldSelection);
         this.element.find(".item input").prop('checked', checked);
         this.checkAllButton.prop('indeterminate', false);
+    }
+
+    /**
+     * Clears the selection
+     */
+    private clearSelection() {
+        var oldSelection = this.selectedItems.slice(0);
+        this.selectedItems.length = 0;
+        this.events.raiseEvent("selectionChanged", this.selectedItems, oldSelection);
+        this.element.find(".item input").prop('checked', false);
     }
 
     /**

@@ -6,6 +6,11 @@
 .show-highlight.has-search .match {
   background-color: yellow; }
 
+.clear-all {
+  cursor: pointer;
+  font-size: .8em;
+  color: #34f; }
+
 /** http://loading.io/ */
 @-webkit-keyframes uil-ring-anim {
   0% {
