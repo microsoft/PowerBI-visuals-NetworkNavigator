@@ -226,7 +226,7 @@ export default class FreeTextSearchVisual extends VisualBase implements IVisual 
 
             // Add this providers props to the top level
             final[n.toLowerCase().replace(/ /g, "_")] = {
-                displayName: n,
+                displayName: allProviders[n].name,
                 properties: <any>props
             };
         });

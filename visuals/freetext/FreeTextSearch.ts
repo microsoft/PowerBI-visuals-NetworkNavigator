@@ -101,6 +101,7 @@ export class FreeTextSearch extends AdvancedSlicer {
                     var cols = Object.keys(query.where.eq);
                     searchString = query.where.eq[cols[0]];
                 }
+                searchString = searchString.replace(/\"/g, "");
                 var idx = textResult.search(new RegExp(searchString, "i"));
                 var match = textResult;
                 var prefix = "";
