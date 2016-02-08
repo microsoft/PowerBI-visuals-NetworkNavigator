@@ -7,3 +7,143 @@ html, body {
 .node {
     cursor: pointer;
 }
+
+@keyframes fadein {
+  from {
+    // right: -300;
+    opacity: 0;
+  }
+
+  to {
+    // right: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes fadeout {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.graph-container {
+    position: relative;
+
+    .button-bar {
+        position: absolute;
+        right: 0;
+        top: 0;
+        margin: 5px;
+        opacity: 0;
+        animation-duration: .5s;
+        animation-name: fadeout;
+    }
+
+    &:hover {
+        .button-bar {
+            animation-duration: .5s;
+            animation-name: fadein;
+            opacity: 1;
+        }
+    }
+}
+
+
+
+.button-bar ul {
+  list-style: none;
+//   background-color: #444;
+//   text-align: center;
+  padding: 0;
+  margin: 0;
+  color: #aaa;
+}
+.button-bar li {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2em;
+//   line-height: 40px;
+//   height: 40px;
+  border-bottom: 1px solid #888;
+
+  &:first-of-type a {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+
+  &:last-of-type a {
+    // border-radius: 0px 5px 5px 0px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+}
+
+.button-bar a {
+  text-decoration: none;
+  color: #888;
+  display: block;
+  transition: .3s color;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: white;
+  overflow: hidden;
+
+  .fa-stack {
+      font-size: .5em;
+  }
+}
+
+.add-column,.add-stacked-column {
+    .fa-plus-circle {
+        margin: .5em;
+        color: green;
+    }
+}
+
+.button-bar a:hover {
+  color: #444;
+}
+
+.button-bar a.active {
+  background-color: #444;
+//   color: #444;
+  cursor: default;
+}
+
+// @media screen and (min-width: 600px) {
+  .button-bar li {
+    // width: 120px;
+    border-bottom: none;
+    // height: 50px;
+    // line-height: 50px;
+    font-size: 1.4em;
+  }
+
+  /* Option 1 - Display Inline */
+  .button-bar li {
+    display: inline-block;
+    margin-right: -4px;
+  }
+
+  /* Options 2 - Float
+  .button-bar li {
+    float: left;
+  }
+  .button-bar ul {
+    overflow: auto;
+    width: 600px;
+    margin: 0 auto;
+  }
+  .button-bar {
+    background-color: #444;
+  }
+  */
+// }
+
+#node_graph .button-bar {
+    font-size: .7em;
+}

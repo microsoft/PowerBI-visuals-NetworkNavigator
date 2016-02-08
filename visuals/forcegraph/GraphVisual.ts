@@ -146,6 +146,16 @@ export default class GraphVisual extends VisualBase implements IVisual {
         }
     };
 
+    /**
+     * The font awesome resource
+     */
+    private fontAwesome: ExternalCssResource = {
+        url: '//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css',
+        integrity: 'sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT' +
+                    '/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==',
+        crossorigin: "anonymous"
+    };
+
     private settings: GraphVisualSettings = $.extend(true, {}, GraphVisual.DEFAULT_SETTINGS);
 
     // private template : string = `
@@ -293,6 +303,13 @@ export default class GraphVisual extends VisualBase implements IVisual {
             nodes: nodeList,
             links: linkList
         };
+    }
+
+    /**
+    * Gets the external css paths used for this visualization
+    */
+    protected getExternalCssResources() : ExternalCssResource[] {
+        return super.getExternalCssResources().concat(this.fontAwesome);
     }
 
     /**

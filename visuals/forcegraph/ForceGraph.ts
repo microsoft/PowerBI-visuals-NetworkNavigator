@@ -31,12 +31,45 @@ export class ForceGraph {
     public events = new EventEmitter();
 
     /**
+     * My template string
+     */
+    private template = `
+        <div class="graph-container">
+            <div class="button-bar">
+                <ul>
+                    <li class="clear-selection" title="Clear Selection">
+                        <a>
+                            <span class="fa-stack">
+                                <i class="fa fa-check fa-stack-1x"></i>
+                                <i class="fa fa-ban fa-stack-2x"></i>
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="svg-container">
+            </div>
+        </div>
+    `.trim().replace(/\n/g, "");
+
+    /**
+     * The svg container
+     */
+    private svgContainer: JQuery;
+
+    /**
      * Constructor for the force graph
      */
     constructor(element: JQuery, width = 500, height = 500) {
-        this.element = element;
+        this.element = $(this.template);
+        element.append(this.element);
+        this.svgContainer = this.element.find(".svg-container");
+        this.element.find(".clear-selection").on("click", () => {
+            this.updateSelection(undefined);
+        });
+
         this.dimensions = { width: width, height: height };
-        this.svg = d3.select(this.element[0]).append("svg")
+        this.svg = d3.select(this.svgContainer[0]).append("svg")
             .attr("width", width)
             .attr("height", height);
         this.force = d3.layout.force()
@@ -67,6 +100,7 @@ export class ForceGraph {
             this.force.size([this.dimensions.width, this.dimensions.height]);
             this.force.resume();
             this.element.css({ width: this.dimensions.width, height: this.dimensions.height });
+            this.svgContainer.css({ width: this.dimensions.width, height: this.dimensions.height });
             this.svg.attr({ width: this.dimensions.width, height: this.dimensions.height });
         }
     }
@@ -179,7 +213,7 @@ export class ForceGraph {
 
         this.svg.remove();
 
-        this.svg = d3.select(this.element[0]).append("svg")
+        this.svg = d3.select(this.svgContainer[0]).append("svg")
             .attr("width", this.dimensions.width)
             .attr("height", this.dimensions.height)
         //  .attr("viewBox", "0 0 " + width + " " + height )
@@ -253,11 +287,11 @@ export class ForceGraph {
 
         node.on("mouseover", () => {
             console.log("mouseover");
-            d3.select(this.element.find("svg text")[0]).style("opacity", "100");
+            d3.select(this.svgContainer.find("svg text")[0]).style("opacity", "100");
         });
         node.on("mouseout", () => {
             if (!this._configuration.labels) {
-                d3.select(this.element.find("svg text")[0]).style("opacity", "0");
+                d3.select(this.svgContainer.find("svg text")[0]).style("opacity", "0");
             }
         });
 
@@ -303,12 +337,14 @@ export class ForceGraph {
     /**
      * Updates the selection based on the given node
      */
-    private updateSelection(n : IForceGraphNode) {
+    private updateSelection(n? : IForceGraphNode) {
         if (n !== this._selectedNode) {
             if (this._selectedNode) {
                 this._selectedNode.selected = false;
             }
-            n.selected = true;
+            if (n) {
+                n.selected = true;
+            }
             this._selectedNode = n;
         } else {
             if (this._selectedNode) {
