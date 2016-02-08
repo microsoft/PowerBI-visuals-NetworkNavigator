@@ -270,7 +270,9 @@ export class LineUp {
      */
     public set selection(value: ILineUpRow[]) {
         this._selectedRows = this.updateRowSelection(value);
-        this.lineupImpl.select(value);
+        if (this.lineupImpl) {
+            this.lineupImpl.select(value);
+        }
     }
 
     /**
@@ -523,7 +525,9 @@ export class LineUp {
      * Updates the selected state of each row, and returns all the selected rows
      */
     private updateRowSelection(sels: ILineUpRow[]) {
-        this._data.forEach((d) => d.selected = false);
+        if (this._data) {
+            this._data.forEach((d) => d.selected = false);
+        }
         return sels && sels.length ? sels.filter((d) => d.selected = true) : [];
     }
 

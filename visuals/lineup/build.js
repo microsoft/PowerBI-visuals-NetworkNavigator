@@ -1,11 +1,11 @@
 module.exports = {
     "output": {
-        /*"PowerBI": {
+        "PowerBI": {
             "visualName": "LineUpVisual",
             "projectId": "1450434005853",
             "icon": "icon.png",
             "entry": "LineUpVisual"
-        },*/
+        },
         "component": {
             "entry": "LineUp"
         },
