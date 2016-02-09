@@ -181,11 +181,26 @@ $(function() {
             return provider;
         }
 
+        function loadJSON(data, idField, toSearch) {
+            var ProviderConst = FreeTextSearch.DEFAULT_PROVIDERS.JSONSearchProvider;
+            var provider = new ProviderConst([{
+                name: ProviderConst.ID_FIELD_PARAM,
+                value: idField
+            }, {
+                name: ProviderConst.SEARCH_FIELDS,
+                value: toSearch
+            }], data);
+            return provider;
+        }
+
         try {
-            var freeTextEle = $('#free-text');
-            var provider = loadElastic();
-            var fts = new FreeTextSearch(freeTextEle, provider);
-            fts.dimensions = { height: freeTextEle.height(), width: freeTextEle.width() };
+            $.getJSON('lineupdata.json', function(data) {
+                var freeTextEle = $('#free-text');
+                var provider = loadJSON(data, "schoolname", "schoolname");
+                var fts = new FreeTextSearch(freeTextEle, provider);
+                fts.showSelections = true;
+                fts.dimensions = { height: freeTextEle.height(), width: freeTextEle.width() };
+            });
         } catch (e) {
             console.error(e);
         }

@@ -95,6 +95,11 @@ export class AdvancedSlicer {
     private selectionsEle : JQuery;
 
     /**
+     * Stores the currently loading promise
+     */
+    private loadPromise : PromiseLike<any>;
+
+    /**
      * Constructor for the advanced slicer
      */
     constructor(element: JQuery) {
@@ -370,7 +375,12 @@ export class AdvancedSlicer {
     private checkLoadMoreDataBasedOnSearch() {
         // Only need to load if:
         // 1. There is more data. 2. There is not too much stuff on the screen (not causing a scroll)
-        if (!this.loadingMoreData && this.raiseCanLoadMoreData(true)) {
+        if (/*!this.loadingMoreData && */this.raiseCanLoadMoreData(true)) {
+            if (this.loadPromise) {
+                this.loadPromise['cancel'] = true;
+            }
+            // We're not currently loading data, cause we cancelled
+            this.loadingMoreData = false;
             this.raiseLoadMoreData(true);
         }
     }
@@ -396,20 +406,25 @@ export class AdvancedSlicer {
         this.events.raiseEvent("loadMoreData", item, isNewSearch);
         if (item.result) {
             this.loadingMoreData = true;
-            return item.result.then((items) => {
-                this.loadingMoreData = false;
-                if (isNewSearch) {
-                    this.data = items;
-                } else {
-                    this.data = this.data.concat(items);
+            let promise = this.loadPromise = item.result.then((items) => {
+                // If this promise hasn't been cancelled
+                if (!promise['cancel']) {
+                    this.loadingMoreData = false;
+                    this.loadPromise = undefined;
+                    if (isNewSearch) {
+                        this.data = items;
+                    } else {
+                        this.data = this.data.concat(items);
+                    }
+                    // Make sure we don't need to load more after this, in case it doesn't all fit on the screen
+                    setTimeout(() => this.checkLoadMoreData(), 10);
+                    return items;
                 }
-                // Make sure we don't need to load more after this, in case it doesn't all fit on the screen
-                setTimeout(() => this.checkLoadMoreData(), 10);
-                return items;
             }, () => {
                 this.data = [];
                 this.loadingMoreData = false;
             });
+            return promise;
         }
     }
 

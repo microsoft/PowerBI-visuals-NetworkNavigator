@@ -38,7 +38,7 @@ export class FreeTextSearch extends AdvancedSlicer {
 
         this.serverSideSearch = true;
         this.events.on("canLoadMoreData", (item, isSearch) => {
-            item.result = isSearch || (typeof this.offset === 'undefined' || typeof this.total === 'undefined' || this.offset < this.total);
+            item.result = isSearch || (typeof this.offset === 'undefined' || typeof this.total === 'undefined' || (this.offset + this.skip) < this.total);
         });
         this.events.on("loadMoreData", (item, isNewSearch) => {
             if (isNewSearch) { // We're starting all over
