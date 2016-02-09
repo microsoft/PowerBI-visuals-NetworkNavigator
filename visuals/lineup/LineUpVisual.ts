@@ -153,12 +153,12 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                         displayName: "Server Side Sorting",
                         description: "If true, lineup will use PowerBI services to sort the data, rather than doing it client side",
                         type: { bool: true }
-                    },
+                    }/*,
                     serverSideFiltering: {
                         displayName: "Server Side Filtering",
                         description: "If true, lineup will use PowerBI services to filter the data, rather than doing it client side",
                         type: { bool: true }
-                    }
+                    }*/
                 }
             }
         },
@@ -469,28 +469,35 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     /**
      * Gets called when a filter is changed.
      */
-    private onFilterChanged(filter: any) {
-
+    private onFilterChanged(filter: any) : boolean {
+        const mySettings = <ILineUpVisualSettings>this.lineup.settings;
+        if (mySettings.experimental && mySettings.experimental.serverSideFiltering) {
+            return true;
+        }
     }
 
     /**
      * Listens for lineup to be sorted
      */
-    private onSorted(sort?: ILineUpSort) {
-        let args: powerbi.CustomSortEventArgs = null;
-        if (sort) {
-            let pbiCol = this.dataViewTable.columns.filter((c) => c.displayName === sort.column)[0];
-            let sortDescriptors: powerbi.SortableFieldDescriptor[] = [{
-                queryName: pbiCol.queryName,
-                sortDirection: sort.asc ? powerbi.SortDirection.Ascending : powerbi.SortDirection.Descending
-            }];
-            args = {
-                sortDescriptors: sortDescriptors
-            };
+    private onSorted(sort?: ILineUpSort) : boolean {
+        const mySettings = <ILineUpVisualSettings>this.lineup.settings;
+        if (mySettings.experimental && mySettings.experimental.serverSideSorting) {
+            let args: powerbi.CustomSortEventArgs = null;
+            if (sort) {
+                let pbiCol = this.dataViewTable.columns.filter((c) => c.displayName === sort.column)[0];
+                let sortDescriptors: powerbi.SortableFieldDescriptor[] = [{
+                    queryName: pbiCol.queryName,
+                    sortDirection: sort.asc ? powerbi.SortDirection.Ascending : powerbi.SortDirection.Descending
+                }];
+                args = {
+                    sortDescriptors: sortDescriptors
+                };
+            }
+            this.waitingForSort = true;
+            this.loading = true;
+            this.host.onCustomSort(args);
+            return true;
         }
-        this.waitingForSort = true;
-        this.loading = true;
-        this.host.onCustomSort(args);
     }
 
     /**
@@ -584,8 +591,8 @@ interface ILineUpVisualSettings extends ILineUpSettings {
 class MyDataProvider extends JSONDataProvider {
 
     private onLoadMoreData: Function;
-    private onSorted: (sort?: ILineUpSort) => any;
-    private onFiltered: (filter?: IFilter) => any;
+    private onSorted: (sort?: ILineUpSort) => boolean;
+    private onFiltered: (filter?: IFilter) => boolean;
     private sortChanged = false;
     private filterChanged = false;
     private hasMoreData;
@@ -594,8 +601,8 @@ class MyDataProvider extends JSONDataProvider {
         data: any[],
         hasMoreData: () => boolean,
         onLoadMoreData: Function,
-        onSorted: (sort?: ILineUpSort) => any,
-        onFiltered: (filter?: IFilter) => any) {
+        onSorted: (sort?: ILineUpSort) => boolean,
+        onFiltered: (filter?: IFilter) => boolean) {
         super(data);
         this.onLoadMoreData = onLoadMoreData;
         this.onSorted = onSorted;
@@ -635,15 +642,13 @@ class MyDataProvider extends JSONDataProvider {
      * Called when the data should be sorted
      */
     public sort(sort? : ILineUpSort) {
-        this.sortChanged = true;
-        this.onSorted(sort);
+        this.sortChanged = this.onSorted(sort);
     }
 
     /**
      * Called when the data is filtered
      */
     public filter(filter? : IFilter) {
-        this.sortChanged = true;
-        this.onFiltered(filter);
+        this.filterChanged = this.onFiltered(filter);
     }
 }
