@@ -252,7 +252,6 @@ export default class LineUpVisual extends VisualBase implements IVisual {
             this.checkDataChanged();
         }
 
-        this.loading = false;
         this.loadingData = false;
     }
 
@@ -274,22 +273,6 @@ export default class LineUpVisual extends VisualBase implements IVisual {
             objectName: options.objectName,
             properties: $.extend(true, {}, this.lineup.settings[options.objectName])
         }];
-    }
-
-    /**
-     * Gets the loading flag
-     */
-    private _loading : boolean;
-    public get loading() {
-        return this._loading;
-    }
-
-    /**
-     * Sets the loading flag
-     */
-    public set loading(value: boolean) {
-        this.element.toggleClass('loading', value);
-        this._loading = value;
     }
 
     /**
@@ -340,6 +323,20 @@ export default class LineUpVisual extends VisualBase implements IVisual {
             // Sort contains a missing column
             if (config.sort && newColNames.indexOf(config.sort.column) < 0 && !config.sort.stack) {
                 config.sort = undefined;
+            }
+
+            if (config.layout && config.layout['primary']) {
+                let removedColumnFilter = (c : { column: string, children: any[] }) => {
+                    if (newColNames.indexOf(c.column) >= 0) {
+                        return true;
+                    }
+                    if (c.children) {
+                        c.children = c.children.filter(removedColumnFilter);
+                        return c.children.length > 0;
+                    }
+                    return false;
+                };
+                config.layout['primary'] = config.layout['primary'].filter(removedColumnFilter);
             }
 
             Utils.listDiff<ILineUpColumn>(config.columns.slice(0), newColArr, {
@@ -402,7 +399,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                     selected: !!_.find(selectedIds, (id : SelectionId) => id.equals(newId))
                 };
                 row.forEach((colInRow, i) => {
-                    result[config.columns[i].label] = colInRow;
+                    result[table.columns[i].displayName] = colInRow;
                 });
                 data.push(result);
             });
@@ -416,8 +413,8 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     private checkDataChanged() {
         if (this.dataViewTable) {
             let config = this.getConfigFromDataView();
-            let selectedRows = [];
             let newData = LineUpVisual.converter(this.dataView, config, this.selectionManager.getSelectionIds());
+            let selectedRows = newData.filter(n => n.selected);
 
             this.lineup.configuration = config;
             if (Utils.hasDataChanged(newData, this._data, (a, b) => a.identity.equals(b.identity))) {
@@ -428,7 +425,6 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                     () => !!this.dataView.metadata.segment,
                     () => {
                         this.waitingForMoreData = true;
-                        this.loading = true;
                         this.host.loadMoreData();
                     },
                     (sort?: ILineUpSort) => this.onSorted(sort),
@@ -494,7 +490,6 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 };
             }
             this.waitingForSort = true;
-            this.loading = true;
             this.host.onCustomSort(args);
             return true;
         }

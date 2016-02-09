@@ -208,6 +208,7 @@ export class LineUp {
         });
         this._eventEmitter = new EventEmitter();
         element.append(this.element);
+        this.loadingData = true;
     }
 
     /**
