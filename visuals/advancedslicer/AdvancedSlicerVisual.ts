@@ -1,6 +1,6 @@
 /// <reference path="../../base/references.d.ts"/>
 import { AdvancedSlicer, SlicerItem } from "./AdvancedSlicer";
-import { VisualBase } from "../../base/VisualBase";
+import { VisualBase, ExternalCssResource } from "../../base/VisualBase";
 import { default as Utils, Visual } from "../../base/Utils";
 import IVisual = powerbi.IVisual;
 import IVisualHostServices = powerbi.IVisualHostServices;
@@ -104,6 +104,16 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
     private loadDeferred : JQueryDeferred<SlicerItem[]>;
 
     /**
+     * The font awesome resource
+     */
+    private fontAwesome: ExternalCssResource = {
+        url: '//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css',
+        integrity: 'sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT' +
+                    '/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==',
+        crossorigin: "anonymous"
+    };
+
+    /**
      * Called when the visual is being initialized
      */
     public init(options: powerbi.VisualInitOptions): void {
@@ -111,6 +121,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
         this.host = options.host;
         this.mySlicer = new AdvancedSlicer(this.element);
         this.mySlicer.serverSideSearch = false;
+        this.mySlicer.showSelections = true;
         this.selectionManager = new SelectionManager({ hostServices: this.host });
         this.mySlicer.events.on("loadMoreData", item => this.onLoadMoreData(item));
         this.mySlicer.events.on("canLoadMoreData", (item, isSearch) => item.result = isSearch || !!this.dataView.metadata.segment);
@@ -183,7 +194,8 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
                     identity: id,
                     selected: !!_.find(selectedIds, (oId) => oId.equals(id)),
                     value: values[i] || 0,
-                    renderedValue: undefined
+                    renderedValue: undefined,
+                    equals: (b) => id.equals((<ListItem>b).identity)
                 };
                 if (item.value > maxValue) {
                     maxValue = item.value;
@@ -203,6 +215,13 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
      */
     protected getCss() : string[] {
         return super.getCss().concat([require("!css!sass!./css/AdvancedSlicer.scss")]);
+    }
+
+    /**
+    * Gets the external css paths used for this visualization
+    */
+    protected getExternalCssResources() : ExternalCssResource[] {
+        return super.getExternalCssResources().concat(this.fontAwesome);
     }
 
     /**

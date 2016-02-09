@@ -122,7 +122,8 @@ export class FreeTextSearch extends AdvancedSlicer {
                     matchSuffix: suffix,
                     selected: false,
                     value: 0,
-                    renderedValue: undefined
+                    renderedValue: undefined,
+                    equals: (b) => d.id === (<SlicerItemWithId>b).id
                 };
 
                 return item;

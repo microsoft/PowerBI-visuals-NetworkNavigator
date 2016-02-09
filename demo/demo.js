@@ -5,10 +5,16 @@ $(function() {
             var slicerEle = $('#advanced-slicer');
             var slicer = new AdvancedSlicer(slicerEle);
             slicer.serverSideSearch = false;
+            slicer.showSelections = true;
             slicer.events.on('canLoadMoreData', function() { return false; });
             slicer.dimensions = { height: slicerEle.height(), width: slicerEle.width() };
             $.getJSON('slicerdata.json', function(data) {
-                slicer.data = data;
+                slicer.data = data.map(function (item) {
+                    item.equals = function (o) {
+                        return o.match === item.match;
+                    };
+                    return item;
+                });
             });
         } catch (e) {
             console.error(e);

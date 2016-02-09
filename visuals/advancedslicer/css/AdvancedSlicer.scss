@@ -213,3 +213,55 @@
 body {
     margin: 2px;
 }
+
+.selection-container .token {
+    display: none;
+}
+
+.show-selections .selection-container .token {
+    display: inline-block;
+}
+
+.token {
+  background-color: #e6e6e6;
+  display: inline-block;
+  border-radius: 2px;
+  border: 1px solid #666;
+  font-size: .8em;
+  color: #666;
+  padding: 2px;
+  cursor: pointer;
+  font: Arial;
+  margin: 2px;
+  max-width: 100px;
+  overflow: hidden;
+  word-wrap: break-word;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.token:before {
+  content: "\f00d";
+  font-family: FontAwesome;
+  font-weight: 100;
+  margin-right: 5px;
+}
+.token:hover:before {
+  color: #efefef;
+}
+.token:hover {
+  background-color: #d6d6d6;
+}
+
+.clear-all {
+    vertical-align: middle;
+}
+
+.item:hover {
+    background-color:#ccc;
+}
+
+.item {
+    margin: 2px;
+}
