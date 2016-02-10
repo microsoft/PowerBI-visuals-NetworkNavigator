@@ -4,7 +4,8 @@ import { IDataProvider, IQueryOptions, IQueryResult, ILineUpColumn, ILineUpSort 
  * A Data provider for a simple json array
  */
 export class JSONDataProvider implements IDataProvider {
-    private data : any[];
+    protected data : any[];
+
     constructor(data: any[]) {
         this.data = data;
     }
