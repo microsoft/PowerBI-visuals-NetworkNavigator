@@ -1,4 +1,4 @@
-import { IDataProvider, IQueryOptions, IQueryResult, ILineUpColumn } from "../models";
+import { IDataProvider, IQueryOptions, IQueryResult, ILineUpColumn, ILineUpSort } from "../models";
 
 /**
  * A Data provider for a simple json array
@@ -58,22 +58,41 @@ export class JSONDataProvider implements IDataProvider {
      */
     private getFilteredData(options: IQueryOptions) {
         var final = this.data.slice(0);
-        if (options.sort && options.sort.length) {
-            var sortItem = options.sort[0];
-            final.sort((a, b) => {
-                var aValue = a[sortItem.column];
-                var bValue = b[sortItem.column];
-                var dir = sortItem.asc ? 1 : -1;
-                if(aValue == bValue){
-                    return 0;
-                }
-                return (aValue > bValue ? 1 : -1) * dir;
-            });
-        }
+
         if (options.query && options.query.length) {
             options.query.forEach((filter) => {
                 let filterMethod : any = typeof filter.value === "string" ? JSONDataProvider.checkStringFilter : JSONDataProvider.checkNumberFilter;
                 final = final.filter((item) => filterMethod(item, filter));
+            });
+        }
+
+        if (options.sort && options.sort.length) {
+            var sortItem = options.sort[0];
+            const basicSort = (aValue, bValue, asc) => {
+                var dir = asc ? 1 : -1;
+                if(aValue == bValue){
+                    return 0;
+                }
+                return (aValue > bValue ? 1 : -1) * dir;
+            };
+
+            let maxValues = {};
+
+
+            const calcStackedValue = (item, sortToCheck : ILineUpSort, maxValues: { [col: string] : number }) => {
+                let columns = sortToCheck.stack.columns;
+                if (columns) {
+                    return columns.reduce((a, v) => a + (item[v.column] || 0) * v.weight, 0);
+                }
+                return 0;
+            };
+
+            final.sort((a, b) => {
+                if (sortItem.stack) {
+                    let maxValues = sortItem.stack.columns.reduce((a, b) => { a[b.column] = d3.max(final, (i) => i[b.column]); return a; }, <any>{});
+                    return basicSort(calcStackedValue(a, sortItem, maxValues), calcStackedValue(b, sortItem, maxValues), sortItem.asc);
+                }
+                return basicSort(a[sortItem.column], b[sortItem.column], sortItem.asc);
             });
         }
         return final;

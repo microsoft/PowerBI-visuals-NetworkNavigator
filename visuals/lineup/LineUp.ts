@@ -400,7 +400,18 @@ export class LineUp {
                     };
                 }
                 return {
-                    stack: col.label,
+                    stack: {
+                        name: col.label,
+                        columns: col.children.map((a, i) => {
+                            let scaleDomain = col.children[i].scale.domain();
+                            let rangeDomain = col.children[i].value2pixel.range();
+                            let weight = (1 / (scaleDomain[1] - scaleDomain[0])) * rangeDomain[1];
+                            return {
+                                column: a.column.column,
+                                weight: weight
+                            };
+                        })
+                    },
                     asc: primary.sortingOrderAsc
                 };
             }
@@ -423,7 +434,7 @@ export class LineUp {
             return;
         }
 
-        this.lastQuery = _.merge({}, this.queryOptions);
+        this.lastQuery = <any>_.assign({}, this.queryOptions);
 
         // Let everyone know we are loading more data
         this.raiseLoadMoreData();
@@ -561,7 +572,7 @@ export class LineUp {
             if (this.configuration && this.configuration.sort && (!currentSort || !_.isEqual(currentSort, this.configuration.sort))) {
                 this.sortingFromConfig = true;
                 let sort = this.configuration.sort;
-                this.lineupImpl.sortBy(sort.stack || sort.column, sort.asc);
+                this.lineupImpl.sortBy(sort.stack ? sort.stack.name : sort.column, sort.asc);
                 this.sortingFromConfig = false;
             }
         }

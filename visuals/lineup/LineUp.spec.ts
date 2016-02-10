@@ -420,7 +420,7 @@ describe('LineUp', () => {
                 let {instance, dataLoaded} = loadInstanceWithStackedColumnsAndClick();
                 return dataLoaded.then(() => {
                     let result = instance.getSortFromLineUp();
-                    expect(result.stack).to.equal("STACKED_COLUMN");
+                    expect(result.stack.name).to.equal("STACKED_COLUMN");
                     expect(result.column).to.be.undefined;
                 });
             });
@@ -431,7 +431,7 @@ describe('LineUp', () => {
                 let {instance, dataLoaded} = loadInstanceWithStackedColumnsAndClick();
                 return dataLoaded.then(() => {
                     expect(instance.configuration.sort).to.not.be.undefined;
-                    expect(instance.configuration.sort.stack).to.be.equal("STACKED_COLUMN");
+                    expect(instance.configuration.sort.stack.name).to.be.equal("STACKED_COLUMN");
                     expect(instance.configuration.sort.column).to.be.undefined;
                 });
             });
@@ -456,12 +456,14 @@ describe('LineUp', () => {
                         primaryKey: "col1",
                         columns: data.columns,
                         sort: {
-                            stack: "STACKED_COLUMN",
+                            stack: {
+                                name: "STACKED_COLUMN"
+                            },
                             asc: true
                         }
                     };
                     let result = instance.getSortFromLineUp();
-                    expect(result.stack).to.equal("STACKED_COLUMN");
+                    expect(result.stack.name).to.equal("STACKED_COLUMN");
                     expect(result.column).to.be.undefined;
                 });
             });

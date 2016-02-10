@@ -133,7 +133,7 @@ $(function() {
                     }
                     return col;
                 });
-                lineup.count = 2;
+                lineup.count = 100;
                 lineup.settings = {
                     sorting: {
                         external: true

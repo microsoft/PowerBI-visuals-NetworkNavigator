@@ -26,9 +26,15 @@ export interface ILineUpSort {
     column?: string;
 
     /**
-     * The stack that was sorted
+     * The stack that was sorted, and the column weights
      */
-    stack?: string;
+    stack?: {
+        name: string;
+        columns?: [{
+            column: string;
+            weight: number;
+        }];
+    };
 
     /**
      * If the sort was ascending
