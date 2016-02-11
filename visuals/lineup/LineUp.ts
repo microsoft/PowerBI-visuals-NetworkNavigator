@@ -632,7 +632,7 @@ export class LineUp {
      * Listener for lineup being filtered
      */
     private onLineUpFiltered(column) {
-        var colName = column.getLabel();
+        var colName = column.column && column.column.column;
         var ourColumn = this.configuration.columns.filter(n => n.column === colName)[0];
         var filter;
         if (ourColumn.type === "number") {
