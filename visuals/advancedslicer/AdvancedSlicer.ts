@@ -100,6 +100,11 @@ export class AdvancedSlicer {
     private loadPromise : PromiseLike<any>;
 
     /**
+     * Whether or not we are loading the search box
+     */
+    private loadingSearch = false;
+
+    /**
      * Constructor for the advanced slicer
      */
     constructor(element: JQuery) {
@@ -196,17 +201,23 @@ export class AdvancedSlicer {
         this.loadingMoreData = false;
 
         if (newData && newData.length) {
-            newData.forEach((item) => {
-                this.myList.add(item);
-                var ele = this.element.find(".item").last();
-                var renderedValue = item.renderedValue;
-                if (renderedValue) {
-                    ele.find(".value-display").css({ width: (renderedValue + "%") });
-                }
-                ele.toggle(!item.selected);
-                ele.find("input").prop('checked', item.selected);
-                ele.data("item", item);
-            })
+            this.myList.add(newData, (addedItems) => {
+                addedItems.forEach(n => {
+                    var ele = $(n.elm);
+                    var item = n.values();
+                    var renderedValue = item.renderedValue;
+                    if (renderedValue) {
+                        ele.find(".value-display").css({ width: (renderedValue + "%") });
+                    }
+                    ele[item.selected ? "hide" : "show"].call(ele);
+                    ele.find("input").prop('checked', item.selected);
+                    ele.data("item", item);
+                });
+            });
+
+            this.loadingSearch = true;
+            this.myList.search(this.searchString);
+            this.loadingSearch = false;
 
             this._data = newData;
 
@@ -342,14 +353,16 @@ export class AdvancedSlicer {
      */
     private attachEvents() {
         this.element.find(".searchbox").on("input", _.debounce(() => {
-            if (this.serverSideSearch) {
-                setTimeout(() => this.checkLoadMoreDataBasedOnSearch(), 10);
-            } else {
-                this.myList.search(this.searchString);
+            if (!this.loadingSearch) {
+                if (this.serverSideSearch) {
+                    setTimeout(() => this.checkLoadMoreDataBasedOnSearch(), 10);
+                } else {
+                    this.myList.search(this.searchString);
+                }
+                // this is required because when the list is done searching it adds back in cached elements with selected flags
+                this.syncItemStateWithSelectedItems();
+                this.element.toggleClass("has-search", !!this.searchString);
             }
-            // this is required because when the list is done searching it adds back in cached elements with selected flags
-            this.syncItemStateWithSelectedItems();
-            this.element.toggleClass("has-search", !!this.searchString);
         }, AdvancedSlicer.SEARCH_DEBOUNCE));
 
         this.listEle.on("click", (evt) => {
