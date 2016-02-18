@@ -6,7 +6,7 @@ import { IDataProvider, IQueryOptions, IQueryResult, ILineUpColumn, ILineUpSort 
 export class JSONDataProvider implements IDataProvider {
     protected data : any[];
 
-    constructor(data: any[]) {
+    constructor(data: any[], private handleSort = true, private handleFilter= true) {
         this.data = data;
     }
 
@@ -60,14 +60,14 @@ export class JSONDataProvider implements IDataProvider {
     private getFilteredData(options: IQueryOptions) {
         var final = this.data.slice(0);
 
-        if (options.query && options.query.length) {
+        if (this.handleFilter && options.query && options.query.length) {
             options.query.forEach((filter) => {
                 let filterMethod : any = typeof filter.value === "string" ? JSONDataProvider.checkStringFilter : JSONDataProvider.checkNumberFilter;
                 final = final.filter((item) => filterMethod(item, filter));
             });
         }
 
-        if (options.sort && options.sort.length) {
+        if (this.handleSort && options.sort && options.sort.length) {
             var sortItem = options.sort[0];
             const basicSort = (aValue, bValue, asc) => {
                 var dir = asc ? 1 : -1;
