@@ -399,20 +399,14 @@ export class LineUp {
                         asc: primary.sortingOrderAsc
                     };
                 }
+                let totalWidth = d3.sum(col.childrenWidths);
                 return {
                     stack: {
                         name: col.label,
                         columns: col.children.map((a, i) => {
-                            let scaleDomain = col.children[i].scale.domain();
-                            let rangeDomain = col.children[i].value2pixel.range();
-                            let domainDiff = scaleDomain[1] - scaleDomain[0];
-                            let weight = rangeDomain[1];
-                            if (domainDiff > 0) {
-                                weight *= (1 / (scaleDomain[1] - scaleDomain[0]));
-                            }
                             return {
                                 column: a.column.column,
-                                weight: weight
+                                weight: col.childrenWidths[i] / totalWidth
                             };
                         })
                     },

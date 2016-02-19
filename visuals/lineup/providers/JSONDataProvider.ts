@@ -77,20 +77,32 @@ export class JSONDataProvider implements IDataProvider {
                 return (aValue > bValue ? 1 : -1) * dir;
             };
 
-            let maxValues = {};
-
-
-            const calcStackedValue = (item, sortToCheck : ILineUpSort, maxValues: { [col: string] : number }) => {
+            let minMax = {};
+            const calcStackedValue = (item, sortToCheck : ILineUpSort, minMax: { [col: string] : { min:number, max: number}}) => {
                 let columns = sortToCheck.stack.columns;
                 if (columns) {
-                    return columns.reduce((a, v) => a + (item[v.column] || 0) * v.weight, 0);
+                    return columns.reduce((a, v) => {
+                        /**
+                         * This calculates the percent that this guy is of the max value
+                         */
+                        let value = item[v.column];
+                        value -= minMax[v.column].min;
+                        value /= (minMax[v.column].max - minMax[v.column].min);
+                        return a + (value * v.weight);
+                    }, 0);
                 }
                 return 0;
             };
 
             final.sort((a, b) => {
                 if (sortItem.stack) {
-                    let maxValues = sortItem.stack.columns.reduce((a, b) => { a[b.column] = d3.max(final, (i) => i[b.column]); return a; }, <any>{});
+                    let maxValues = sortItem.stack.columns.reduce((a, b) => {
+                        a[b.column] = {
+                            max: d3.max(final, (i) => i[b.column]),
+                            min: d3.min(final, (i) => i[b.column])
+                        };
+                        return a;
+                    }, <any>{});
                     return basicSort(calcStackedValue(a, sortItem, maxValues), calcStackedValue(b, sortItem, maxValues), sortItem.asc);
                 }
                 return basicSort(a[sortItem.column], b[sortItem.column], sortItem.asc);
