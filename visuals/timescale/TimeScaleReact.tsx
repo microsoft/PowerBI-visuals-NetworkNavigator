@@ -6,7 +6,9 @@ import { TimeScale as TimeScaleImpl, TimeScaleDataItem } from "./TimeScale";
 export interface TimeScaleProps {
     selectedRange?: [Date, Date];
     onSelectedRangeChanged?: (range: [Date, Date]) => void;
-    data?: TimeScaleDataItem[]
+    data?: TimeScaleDataItem[],
+    width?: number,
+    height?: number
 };
 
 export interface TimeScaleState { }
@@ -21,7 +23,7 @@ export class TimeScale extends React.Component<TimeScaleProps, TimeScaleState> {
 
     componentDidMount() {
         this.node = ReactDOM.findDOMNode(this);
-        this.timescale = new TimeScaleImpl($(this.node));+
+        this.timescale = new TimeScaleImpl($(this.node), {width: this.props.width, height: this.props.height});+
         this.timescale.events.on("rangeSelected", (range) => {            
             if (this.props) {
                 this.props.onSelectedRangeChanged(range);
