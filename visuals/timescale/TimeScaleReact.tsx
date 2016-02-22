@@ -7,8 +7,8 @@ export interface TimeScaleProps {
     selectedRange?: [Date, Date];
     onSelectedRangeChanged?: (range: [Date, Date]) => void;
     data?: TimeScaleDataItem[],
-    width?: number,
-    height?: number
+    width?: number;
+    height?: number;
 };
 
 export interface TimeScaleState { }
