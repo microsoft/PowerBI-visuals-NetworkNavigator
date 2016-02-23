@@ -1,0 +1,3 @@
+exports.visual = function () { return require("./AdvancedSlicerVisual"); };
+exports.component = function () { return require("./AdvancedSlicer"); };
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJpbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBVyxjQUFNLEdBQUcsY0FBTSxPQUFBLE9BQU8sQ0FBQyx3QkFBd0IsQ0FBQyxFQUFqQyxDQUFpQyxDQUFDO0FBQ2pELGlCQUFTLEdBQUcsY0FBTSxPQUFBLE9BQU8sQ0FBQyxrQkFBa0IsQ0FBQyxFQUEzQixDQUEyQixDQUFDIn0=

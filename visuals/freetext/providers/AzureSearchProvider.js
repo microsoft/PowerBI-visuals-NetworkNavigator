@@ -1,0 +1,167 @@
+/**
+ * Represents an azure search provider
+ */
+var AzureSearchProvider = (function () {
+    /**
+     * Constructor for the search provider
+     */
+    function AzureSearchProvider(params) {
+        /**
+         * The name of the search provider
+         */
+        this.name = "Azure";
+        this.params = params;
+    }
+    Object.defineProperty(AzureSearchProvider.prototype, "params", {
+        get: function () {
+            return this._params;
+        },
+        /**
+         * Sets the params of the search provider
+         */
+        set: function (params) {
+            this._params = params;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /**
+     * Runs a query against the given search provider
+     */
+    AzureSearchProvider.prototype.query = function (options) {
+        var _this = this;
+        if (this.checkRequiredParams()) {
+            var idField = this.getParamValue(AzureSearchProvider.ID_FIELD_PARAM);
+            return $.ajax({
+                dataType: "json",
+                url: this.buildQueryUrl(options),
+                method: "GET",
+                crossDomain: true,
+                beforeSend: function (request) {
+                    request.withCredentials = true;
+                    request.setRequestHeader("Api-Key", _this.getParamValue(AzureSearchProvider.API_KEY_PARAM));
+                }
+            }).then(function (results) {
+                return {
+                    results: results.value.map(function (r) {
+                        var prop = (_this.getParamValue(AzureSearchProvider.SEARCH_FIELDS) || "body").split(',')[0];
+                        return {
+                            id: r[idField],
+                            textualMatch: r[prop] || "",
+                            rawData: r.value
+                        };
+                    }),
+                    total: results["@odata.count"],
+                    offset: options.offset
+                };
+            });
+        }
+        else {
+            throw new Error("Some Required Parameters Missing");
+        }
+    };
+    /**
+     * Checks the list of require params
+     */
+    AzureSearchProvider.prototype.checkRequiredParams = function () {
+        if (this.params && this.params.length) {
+            var required = AzureSearchProvider.supportedParameters.filter(function (p) { return p.required; }).map(function (p) { return p.name; });
+            var toCheck = this.params.map(function (p) { return p.name; });
+            // Make sure that we have all the required params
+            return required.filter(function (p) { return toCheck.indexOf(p) >= 0; }).length === required.length;
+        }
+        return false;
+    };
+    /**
+     * Gets the parameter value by name
+     */
+    AzureSearchProvider.prototype.getParamValue = function (name) {
+        return this.params.filter(function (p) { return p.name === name; }).map(function (p) { return p.value; })[0];
+    };
+    /**
+     * Builds a query url from query options
+     */
+    AzureSearchProvider.prototype.buildQueryUrl = function (options) {
+        var baseUrl = this.getParamValue(AzureSearchProvider.URL_PARAM);
+        var urlParams = [
+            { key: "api-version", value: "2015-02-28" },
+            { key: "$count", value: true } // Returns the total number of results
+        ];
+        if (options.offset >= 0) {
+            urlParams.push({ key: "$skip", value: options.offset });
+        }
+        if (options.count >= 0) {
+            urlParams.push({ key: "$top", value: options.count });
+        }
+        var searchFields = this.getParamValue(AzureSearchProvider.SEARCH_FIELDS) || [];
+        var eq = options.query && options.query.where && options.query.where.eq;
+        if (eq) {
+            var searchColumns = Object.keys(eq);
+            var cleared = false;
+            // This will allow for overriding of column based searches, so `title:Haha`, if * is used, then all columns in the search fields parameters is used
+            var search = searchColumns.map(function (c) {
+                if (c !== '*') {
+                    if (!cleared) {
+                        cleared = true;
+                        searchFields.length = 0;
+                    }
+                    searchFields.push(c);
+                }
+                return eq[c];
+            }).join(" ");
+            urlParams.push({ key: "search", value: search || '*' });
+        }
+        else {
+            urlParams.push({ key: "search", value: '*' });
+        }
+        if (searchFields && searchFields.length) {
+            urlParams.push({ key: "searchFields", value: searchFields });
+        }
+        return baseUrl + "?" + urlParams.map(function (p) { return p.key + "=" + p.value; }).join("&");
+    };
+    /**
+     * The API Key param
+     */
+    AzureSearchProvider.API_KEY_PARAM = "API Key";
+    /**
+     * The field that uniquely identifies a given result
+     */
+    AzureSearchProvider.ID_FIELD_PARAM = "ID Field";
+    /**
+     * The URL param
+     */
+    AzureSearchProvider.URL_PARAM = "URL";
+    /**
+     * The fields to search when performing a text search
+     */
+    AzureSearchProvider.SEARCH_FIELDS = "Search Fields";
+    /**
+     * The parameters to call this service
+     * for example - API Key, URL
+     */
+    AzureSearchProvider.supportedParameters = [{
+            name: AzureSearchProvider.URL_PARAM,
+            description: "The URL to the Azure Search Instance",
+            value: undefined,
+            required: true
+        }, {
+            name: AzureSearchProvider.API_KEY_PARAM,
+            description: "The API Key",
+            value: undefined,
+            required: true
+        }, {
+            name: AzureSearchProvider.ID_FIELD_PARAM,
+            description: "The field that uniquely identifies a given result",
+            value: "emailid",
+            required: true
+        }, {
+            name: AzureSearchProvider.SEARCH_FIELDS,
+            description: "The fields to search when running a query (comma delimited)",
+            value: "body",
+            required: false
+        }];
+    return AzureSearchProvider;
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = AzureSearchProvider;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQXp1cmVTZWFyY2hQcm92aWRlci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIkF6dXJlU2VhcmNoUHJvdmlkZXIudHMiXSwibmFtZXMiOlsiQXp1cmVTZWFyY2hQcm92aWRlciIsIkF6dXJlU2VhcmNoUHJvdmlkZXIuY29uc3RydWN0b3IiLCJBenVyZVNlYXJjaFByb3ZpZGVyLnBhcmFtcyIsIkF6dXJlU2VhcmNoUHJvdmlkZXIucXVlcnkiLCJBenVyZVNlYXJjaFByb3ZpZGVyLmNoZWNrUmVxdWlyZWRQYXJhbXMiLCJBenVyZVNlYXJjaFByb3ZpZGVyLmdldFBhcmFtVmFsdWUiLCJBenVyZVNlYXJjaFByb3ZpZGVyLmJ1aWxkUXVlcnlVcmwiXSwibWFwcGluZ3MiOiJBQUVBOztHQUVHO0FBQ0g7SUFvRElBOztPQUVHQTtJQUNIQSw2QkFBWUEsTUFBZ0NBO1FBUjVDQzs7V0FFR0E7UUFDSUEsU0FBSUEsR0FBV0EsT0FBT0EsQ0FBQ0E7UUFNMUJBLElBQUlBLENBQUNBLE1BQU1BLEdBQUdBLE1BQU1BLENBQUNBO0lBQ3pCQSxDQUFDQTtJQU1ERCxzQkFBV0EsdUNBQU1BO2FBQWpCQTtZQUNJRSxNQUFNQSxDQUFDQSxJQUFJQSxDQUFDQSxPQUFPQSxDQUFDQTtRQUN4QkEsQ0FBQ0E7UUFFREY7O1dBRUdBO2FBQ0hBLFVBQWtCQSxNQUErQkE7WUFDN0NFLElBQUlBLENBQUNBLE9BQU9BLEdBQUdBLE1BQU1BLENBQUNBO1FBQzFCQSxDQUFDQTs7O09BUEFGO0lBVURBOztPQUVHQTtJQUNJQSxtQ0FBS0EsR0FBWkEsVUFBYUEsT0FBc0JBO1FBQW5DRyxpQkE2QkNBO1FBNUJHQSxFQUFFQSxDQUFDQSxDQUFDQSxJQUFJQSxDQUFDQSxtQkFBbUJBLEVBQUVBLENBQUNBLENBQUNBLENBQUNBO1lBQzdCQSxJQUFJQSxPQUFPQSxHQUFHQSxJQUFJQSxDQUFDQSxhQUFhQSxDQUFDQSxtQkFBbUJBLENBQUNBLGNBQWNBLENBQUNBLENBQUNBO1lBQ3JFQSxNQUFNQSxD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

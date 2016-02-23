@@ -17,6 +17,7 @@ var gutil = require("gulp-util");
 var sass = require("gulp-sass");
 var webserver = require('gulp-webserver');
 var mocha = require('gulp-mocha');
+var exec = require('child_process').exec;
 
 var args = require('yargs')
     .usage('Usage: $0 --project [name of the visual\'s folder]')
@@ -94,9 +95,18 @@ gulp.task('build:css', function() {
 });
 
 /**
+ * Straight compiles the ts files
+ */
+gulp.task('compile:ts', function(cb) {
+    exec('./node_modules/typescript/bin/tsc', function (err, stdout, stderr) {
+        cb(err);
+    });
+});
+
+/**
  * Builds the bare component
  */
-gulp.task('build:component', ['build:css'], function() {
+gulp.task('build:component', ['build:css', 'compile:ts'], function() {
     var output = projectConfig.output.component;
     var config = require('./webpack.config.dev.js');
     config.output = {
@@ -126,7 +136,7 @@ gulp.task('build:react:css', function() {
 /**
  * Builds the react component
  */
-gulp.task('build:react', ['build:react:css'], function() {
+gulp.task('build:react', ['build:react:css', 'compile:ts'], function() {
     var output = projectConfig.output.react;
     if (output) {
         var config = require('./webpack.config.dev.js');
@@ -163,7 +173,7 @@ gulp.task('build:powerbi:css', ['build:css'], function() {
 /**
  * Builds the scripts for use for with powerbi
  */
-gulp.task('build:powerbi:scripts', ['build:powerbi:css'], function() {
+gulp.task('build:powerbi:scripts', ['build:powerbi:css', 'compile:ts'], function() {
     var output = projectConfig.output.PowerBI;
     var config = require('./webpack.config.dev.js');
     config.entry = path.join(__dirname, 'visuals', project, output.entry);
