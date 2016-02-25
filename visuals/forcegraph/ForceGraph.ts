@@ -422,11 +422,11 @@ export interface IForceGraphData<NodeType> {
  * Represents the configuration for the force graph
  */
 export interface IForceGraphConfiguration {
-    linkDistance: number;
-    linkStrength: number;
-    charge: number;
-    gravity: number;
-    labels: boolean;
-    minZoom: number;
-    maxZoom: number;
+    linkDistance?: number;
+    linkStrength?: number;
+    charge?: number;
+    gravity?: number;
+    labels?: boolean;
+    minZoom?: number;
+    maxZoom?: number;
 }
