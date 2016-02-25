@@ -1,10 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 const $ = require("jquery");
-import { ForceGraph as ForceGraphImpl, IForceGraphData, IForceGraphNode } from "./ForceGraph";
+import { ForceGraph as ForceGraphImpl, IForceGraphData, IForceGraphNode, IForceGraphConfiguration } from "./ForceGraph";
 
 export interface IForceGraphProps {
-    graph: IForceGraphData<IForceGraphNode>,
+    graph: IForceGraphData<IForceGraphNode>;
+    config?: IForceGraphConfiguration;
     onSelectionChanged: (node: IForceGraphNode) => void;
 };
 
@@ -52,6 +53,10 @@ export class ForceGraph extends React.Component<IForceGraphProps, IForceGraphSta
         }
 
         this.forcegraph.data = props.graph;
+
+        if (props.config) {
+            this.forcegraph.configuration = props.config;
+        }
 
         if (props.onSelectionChanged) {
             this.selectionListener = this.forcegraph.events.on("selectionChanged", (rows) => props.onSelectionChanged(rows));

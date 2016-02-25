@@ -15,7 +15,7 @@ export class ForceGraph {
     private graph: IForceGraphData<IForceGraphNode>;
     private _dimensions: { width: number; height: number; };
     private _selectedNode : IForceGraphNode;
-    private _configuration = {
+    private _configuration : IForceGraphConfiguration = {
         linkDistance: 10,
         linkStrength: 2,
         charge: -120,
@@ -416,4 +416,17 @@ export interface IForceGraphData<NodeType> {
      * The links in the force graph
      */
     links?: IForceGraphLink[];
+}
+
+/**
+ * Represents the configuration for the force graph
+ */
+export interface IForceGraphConfiguration {
+    linkDistance: number;
+    linkStrength: number;
+    charge: number;
+    gravity: number;
+    labels: boolean;
+    minZoom: number;
+    maxZoom: number;
 }
