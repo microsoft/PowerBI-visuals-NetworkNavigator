@@ -64,6 +64,10 @@ export class AdvancedSlicer extends React.Component<IAdvancedSlicerProps, IAdvan
         // props, otherwise use what we already have.
         props = props || this.props;
 
+        this.mySlicer.showHighlight = props.showHighlight;
+        this.mySlicer.showValues = props.showValues;
+        this.mySlicer.showHighlight = props.showHighlight;
+        this.mySlicer.serverSideSearch = props.serverSideSearch;
         this.mySlicer.data = props.data;
     }
 }
