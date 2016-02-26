@@ -1,5 +1,6 @@
 import EventEmitter from '../../base/EventEmitter';
 import Utils from '../../base/Utils';
+const $ = require("jquery");
 const List = require('./List');
 
 /**
