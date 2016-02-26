@@ -1,4 +1,4 @@
-{
+module.exports = {
     "output": {
         "PowerBI": {
             "visualName": "AdvancedSlicerVisual",
@@ -8,7 +8,10 @@
         },
         "component": {
             "entry": "AdvancedSlicer.ts"
+        },
+        "react": {
+            "entry": "AdvancedSlicerReact.tsx"
         }
     },
-    "lintFiles": ["AdvancedSlicer.ts", "AdvancedSlicerVisual.ts"]
-}
+    "lintFiles": ["AdvancedSlicer.ts", "AdvancedSlicerReact.tsx", "AdvancedSlicerVisual.ts"]
+};
