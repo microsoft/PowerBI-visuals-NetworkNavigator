@@ -482,8 +482,8 @@ export interface SlicerItem {
     equals: (b: SlicerItem) => boolean;
 
     /**
-     * The value that should be displayed
+     * The percentage value that should be displayed (0 - 100)
      * TODO: Better name, basically it is the value that should be displayed in the histogram
      */
-    renderedValue: number;
+    renderedValue?: number;
 }

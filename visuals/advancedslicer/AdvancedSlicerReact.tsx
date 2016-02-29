@@ -54,9 +54,9 @@ export class AdvancedSlicer extends React.Component<IAdvancedSlicerProps, IAdvan
                 }
             };
         };
-        this.mySlicer.events.on("loadMoreData", guardedEventer("OnLoadMoreData"));
-        this.mySlicer.events.on("canLoadMoreData", guardedEventer("OnCanLoadMoreData"));
-        this.mySlicer.events.on("selectionChanged", guardedEventer("OnSelectionChanged"));
+        this.mySlicer.events.on("loadMoreData", guardedEventer("onLoadMoreData"));
+        this.mySlicer.events.on("canLoadMoreData", guardedEventer("onCanLoadMoreData"));
+        this.mySlicer.events.on("selectionChanged", guardedEventer("onSelectionChanged"));
     }
 
     private renderContent(props? : IAdvancedSlicerProps) {
