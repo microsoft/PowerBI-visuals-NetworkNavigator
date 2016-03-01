@@ -151,13 +151,13 @@ export interface IDataProvider {
     /**
      * Called when the data is filtered
      */
-    filter?: (filter: IFilter) => void;
+    filter?: (filter: ILineUpFilter) => void;
 }
 
 /**
  * Represents a filter
  */
-export interface IFilter {
+export interface ILineUpFilter {
     column: string;
     value: string | {
         domain: [number, number];
@@ -180,7 +180,7 @@ export interface IQueryOptions {
     /**
      * The query to run
      */
-    query?: IFilter[];
+    query?: ILineUpFilter[];
 
     /**
      * The current sort

@@ -2,7 +2,7 @@
 import { ExternalCssResource, VisualBase } from "../../base/VisualBase";
 import { default as Utils, Visual } from "../../base/Utils";
 import { LineUp  } from "./LineUp";
-import { ILineUpRow, ILineUpSettings, ILineUpColumn, ILineUpConfiguration, IQueryOptions, IQueryResult, ILineUpSort, IFilter } from "./models";
+import { ILineUpRow, ILineUpSettings, ILineUpColumn, ILineUpConfiguration, IQueryOptions, IQueryResult, ILineUpSort, ILineUpFilter } from "./models";
 import { JSONDataProvider } from "./providers/JSONDataProvider";
 
 
@@ -428,7 +428,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                         this.host.loadMoreData();
                     },
                     (sort?: ILineUpSort) => this.onSorted(sort),
-                    (filter?: IFilter) => this.onFilterChanged(filter));
+                    (filter?: ILineUpFilter) => this.onFilterChanged(filter));
             }
 
             this.lineup.selection = selectedRows;
@@ -587,7 +587,7 @@ class MyDataProvider extends JSONDataProvider {
 
     private onLoadMoreData: Function;
     private onSorted: (sort?: ILineUpSort) => boolean;
-    private onFiltered: (filter?: IFilter) => boolean;
+    private onFiltered: (filter?: ILineUpFilter) => boolean;
     private sortChanged = false;
     private filterChanged = false;
     private hasMoreData;
@@ -597,7 +597,7 @@ class MyDataProvider extends JSONDataProvider {
         hasMoreData: () => boolean,
         onLoadMoreData: Function,
         onSorted: (sort?: ILineUpSort) => boolean,
-        onFiltered: (filter?: IFilter) => boolean) {
+        onFiltered: (filter?: ILineUpFilter) => boolean) {
         super(data);
         this.onLoadMoreData = onLoadMoreData;
         this.onSorted = onSorted;
@@ -643,7 +643,7 @@ class MyDataProvider extends JSONDataProvider {
     /**
      * Called when the data is filtered
      */
-    public filter(filter? : IFilter) {
+    public filter(filter? : ILineUpFilter) {
         this.filterChanged = this.onFiltered(filter);
     }
 }
