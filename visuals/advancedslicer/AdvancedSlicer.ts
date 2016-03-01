@@ -417,7 +417,7 @@ export class AdvancedSlicer {
      */
     protected raiseLoadMoreData(isNewSearch: boolean) : PromiseLike<SlicerItem[]> {
         var item : { result?: PromiseLike<SlicerItem[]> } = { };
-        this.events.raiseEvent("loadMoreData", item, isNewSearch);
+        this.events.raiseEvent("loadMoreData", item, isNewSearch, this.searchString);
         if (item.result) {
             this.loadingMoreData = true;
             let promise = this.loadPromise = item.result.then((items) => {
@@ -443,7 +443,8 @@ export class AdvancedSlicer {
     }
 
     /**
-     * Raises the event 'canLoadMoreData'
+     * Raises the event 'can
+     * '
      */
     protected raiseCanLoadMoreData(isSearch: boolean = false) : boolean {
         var item = {

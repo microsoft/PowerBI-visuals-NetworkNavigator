@@ -10,7 +10,7 @@ export interface IAdvancedSlicerProps {
     showValues?: boolean;
     showSelections?: boolean;
     showHighlight?: boolean;
-    onLoadMoreData(item: { result: boolean; }) : any;
+    onLoadMoreData(item: { result: boolean; }, isSearch: boolean, searchString: string) : any;
     onCanLoadMoreData(item: { result: boolean; }, isSearch: boolean) : any;
     onSelectionChanged(newItems: any[], oldItems: any[]) : any;
 };
