@@ -265,8 +265,7 @@ body {
 }
 
 .item {
-    margin: 2px;
+    @extend .boxsized;
     padding-top: 2px;
-    box-sizing: border-box;
     padding-bottom: 2px;
 }

@@ -154,7 +154,7 @@
 .loading .load-spinner {
   display: block; }
 
-.boxsized, .category-container, .value-container, .has-values .category-container, .has-values .value-container {
+.boxsized, .category-container, .value-container, .has-values .category-container, .has-values .value-container, .item {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
@@ -226,7 +226,5 @@ body {
   background-color: #ccc; }
 
 .item {
-  margin: 2px;
   padding-top: 2px;
-  box-sizing: border-box;
   padding-bottom: 2px; }
