@@ -17,7 +17,7 @@ export class AdvancedSlicer {
      * The template for this visual
      */
     private static template = `
-        <div id='slicer-list'>
+        <div class="advanced-slicer">
             <div class="slicer-options">
                 <input class="searchbox" placeholder="Search" />
                 <div style="margin:0;padding:0;margin-top:5px;">
@@ -110,7 +110,7 @@ export class AdvancedSlicer {
      */
     constructor(element: JQuery) {
         this.element = element;
-        this.listContainer = element.append($(AdvancedSlicer.template)).find("#slicer-list");
+        this.listContainer = element.append($(AdvancedSlicer.template)).find(".advanced-slicer");
         this.listEle = this.listContainer.find(".list");
         this.listEle.scroll(() => this.checkLoadMoreData());
         this.myList = new List(this.listContainer[0], {

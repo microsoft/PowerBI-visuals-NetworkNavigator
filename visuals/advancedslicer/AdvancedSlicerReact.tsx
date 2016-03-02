@@ -40,7 +40,7 @@ export class AdvancedSlicer extends React.Component<IAdvancedSlicerProps, IAdvan
      * Renders this component
      */
     render() {
-        return <div style={{width:"100%", height:"100%"}}></div>;
+        return <div className="advanced-slicer-container" style={{width:"100%", height:"100%"}}></div>;
     }
 
     /**
