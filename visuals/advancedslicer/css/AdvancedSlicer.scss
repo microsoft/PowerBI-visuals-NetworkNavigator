@@ -189,6 +189,7 @@
     width: 100%;
     padding-right: 15px;
     margin-right: 10px;
+    vertical-align: middle;
 }
 
 .value-container {
@@ -196,6 +197,7 @@
     width: 100%;
     padding-right: 25px;
     display: none;
+    vertical-align: middle;
 }
 
 .has-values .category-container {
@@ -264,4 +266,7 @@ body {
 
 .item {
     margin: 2px;
+    padding-top: 2px;
+    box-sizing: border-box;
+    padding-bottom: 2px;
 }
