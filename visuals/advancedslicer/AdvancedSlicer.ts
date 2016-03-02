@@ -1,7 +1,7 @@
 import EventEmitter from '../../base/EventEmitter';
 import Utils from '../../base/Utils';
-const $ = require("jquery");
-const List = require('./List');
+const $ : JQueryStatic = require("jquery");
+const naturalSort = require("javascript-natural-sort");
 
 /**
  * Represents an advanced slicer to help slice through data
@@ -39,26 +39,25 @@ export class AdvancedSlicer {
     /**
      * The template used to render list items
      */
-    private static listItemTemplate = `
-        <div style="white-space:nowrap" class="item">
-            <label style="cursor:pointer">
-                <!--<input style="vertical-align:middle;cursor:pointer" type="checkbox">-->
-                <span style="margin-left: 5px;vertical-align:middle" class="display-container">
-                    <span style="display:inline-block;overflow:hidden" class="category-container">
-                        <span class="matchPrefix"></span><span class="match"></span><span class="matchSuffix"></span>
+    private static listItemFactory = (matchPrefix, match, matchSuffix) => {
+        return $(`
+            <div style="white-space:nowrap" class="item">
+                <label style="cursor:pointer">
+                    <!--<input style="vertical-align:middle;cursor:pointer" type="checkbox">-->
+                    <span style="margin-left: 5px;vertical-align:middle" class="display-container">
+                        <span style="display:inline-block;overflow:hidden" class="category-container">
+                            <span class="matchPrefix">${matchPrefix || ""}</span>
+                            <span class="match">${match || ""}</span>
+                            <span class="matchSuffix">${matchSuffix || ""}</span>
+                        </span>
+                        <span style="display:inline-block" class="value-container">
+                            <span style="display:inline-block;background-color:blue;width:0px" class="value-display">&nbsp;</span>
+                        </span>
                     </span>
-                    <span style="display:inline-block" class="value-container">
-                        <span style="display:inline-block;background-color:blue;width:0px" class="value-display">&nbsp;</span>
-                    </span>
-                </span>
-            </label>
-        </div>
-    `.trim().replace(/\n/g, '');
-
-    /**
-     * The reference to the list.js instance
-     */
-    private myList: any;
+                </label>
+            </div>
+        `.trim().replace(/\n/g, ''));
+    };
 
     /**
      * The list container
@@ -113,11 +112,7 @@ export class AdvancedSlicer {
         this.listContainer = element.append($(AdvancedSlicer.template)).find(".advanced-slicer");
         this.listEle = this.listContainer.find(".list");
         this.listEle.scroll(() => this.checkLoadMoreData());
-        this.myList = new List(this.listContainer[0], {
-            valueName: ['match', 'matchPrefix', 'matchSuffix'],
-            item: AdvancedSlicer.listItemTemplate,
-            page: 20000 // Hack
-        });
+
         this.selectionsEle = element.find(".selections");
         this.checkAllButton = element.find(".check-all").on("click", () => this.toggleSelectAll());
         this.checkAllButton = element.find(".clear-all").on("click", () => this.clearSelection());
@@ -196,28 +191,26 @@ export class AdvancedSlicer {
      * Sets the slicer data
      */
     public set data(newData: SlicerItem[]) {
-        this.myList.clear();
+       this.listEle.empty();
 
         // If some one sets the data, then clearly we are no longer loading data
         this.loadingMoreData = false;
 
         if (newData && newData.length) {
-            this.myList.add(newData, (addedItems) => {
-                addedItems.forEach(n => {
-                    var ele = $(n.elm);
-                    var item = n.values();
-                    var renderedValue = item.renderedValue;
-                    if (renderedValue) {
-                        ele.find(".value-display").css({ width: (renderedValue + "%") });
-                    }
-                    ele[item.selected ? "hide" : "show"].call(ele);
-                    ele.find("input").prop('checked', item.selected);
-                    ele.data("item", item);
-                });
-            });
+            this.listEle.append(newData.map(item => {
+                const ele = AdvancedSlicer.listItemFactory(item.matchPrefix, item.match, item.matchSuffix);
+                var renderedValue = item.renderedValue;
+                if (renderedValue) {
+                    ele.find(".value-display").css({ width: (renderedValue + "%") });
+                }
+                ele[item.selected ? "hide" : "show"].call(ele);
+                ele.find("input").prop('checked', item.selected);
+                ele.data("item", item);
+                return ele;
+            }));
 
             this.loadingSearch = true;
-            this.myList.search(this.searchString);
+            this.element.find(".searchbox").val(this.searchString);
             this.loadingSearch = false;
 
             this._data = newData;
@@ -245,7 +238,7 @@ export class AdvancedSlicer {
         let allChecked = value && value.length === this.data.length;
         let someChecked = value && value.length > 0 && !allChecked;
 
-        this.syncItemStateWithSelectedItems();
+        this.syncItemVisiblity();
 
         if (value) {
             this.selectionsEle.find(".token").remove();
@@ -269,8 +262,9 @@ export class AdvancedSlicer {
      * Sorts the slicer
      */
     public sort(toSort: string, desc?: boolean) {
-        this.myList.sort(toSort, {
-            order: desc ? "desc" : "asc"
+        this.data.sort((a, b) => {
+            const sortVal = naturalSort(a[toSort], b[toSort]);
+            return desc ? -1 * sortVal : sortVal;
         });
     }
 
@@ -291,14 +285,27 @@ export class AdvancedSlicer {
     }
 
     /**
-     * Syncs the item elements state with the current set of selected items
+     * Syncs the item elements state with the current set of selected items and the search
      */
-    private syncItemStateWithSelectedItems() {
+    private syncItemVisiblity() {
         let value = this.selectedItems;
         let eles = this.element.find(".item");
+        let me = this;
+        const isMatch = (item: SlicerItem, value: string) => {
+            return (item.match || "").indexOf(value) >= 0 ||
+                (item.matchPrefix || "").indexOf(value) >= 0 ||
+                (item.matchSuffix || "").indexOf(value) >= 0;
+        };
         eles.each(function() {
             let item = $(this).data("item");
-            $(this).toggle(!(!!value && value.filter(b => b.equals(item)).length > 0));
+            let isVisible = !(!!value && value.filter(b => b.equals(item)).length > 0);
+
+            // Update the search
+            if (isVisible && !me.serverSideSearch && me.searchString) {
+                isVisible = isMatch(item, me.searchString);
+            }
+
+            $(this).toggle(isVisible);
         });
     }
 
@@ -357,11 +364,9 @@ export class AdvancedSlicer {
             if (!this.loadingSearch) {
                 if (this.serverSideSearch) {
                     setTimeout(() => this.checkLoadMoreDataBasedOnSearch(), 10);
-                } else {
-                    this.myList.search(this.searchString);
                 }
                 // this is required because when the list is done searching it adds back in cached elements with selected flags
-                this.syncItemStateWithSelectedItems();
+                this.syncItemVisiblity();
                 this.element.toggleClass("has-search", !!this.searchString);
             }
         }, AdvancedSlicer.SEARCH_DEBOUNCE));
