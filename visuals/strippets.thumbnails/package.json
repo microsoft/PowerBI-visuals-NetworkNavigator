@@ -1,0 +1,63 @@
+{
+  "name": "strippets.thumbnails",
+  "version": "0.1.2",
+  "description": "thumbnails",
+  "main": "dist/uncharted.thumbnails.js",
+  "scripts": {
+    "test": "sh ./thumbnails.sh -t"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "browserify": "^12.0.1",
+    "browserify-handlebars": "^1.0.0",
+    "browserify-istanbul": "^0.2.1",
+    "browserify-shim": "^3.8.11",
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-eslint": "^1.1.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.1.1",
+    "gulp-streamify": "^1.0.2",
+    "gulp-uglify": "^1.5.1",
+    "http-server": "^0.8.5",
+    "karma": "^0.13.19",
+    "karma-browserify": "^4.4.2",
+    "karma-chrome-launcher": "^0.2.2",
+    "karma-coverage": "^0.5.3",
+    "karma-mocha": "^0.2.1",
+    "karma-mocha-reporter": "^1.1.5",
+    "karma-phantomjs-launcher": "^0.2.3",
+    "karma-sinon-chai": "^1.1.0",
+    "karma-tamtam-bamboo-reporter": "^1.0.1",
+    "mocha": "^2.3.4",
+    "proxyquireify": "^3.0.1",
+    "run-sequence": "^1.1.5",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "browserify-shim": {
+    "jquery": "global:$",
+    "underscore": "global:_"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "dependencies": {
+    "bluebird": "^2.10.2",
+    "jquery": "^2.1.4",
+    "underscore": "^1.8.3",
+    "velocity-animate": "^1.2.3",
+    "font-awesome": "^4.4.0",
+    "stories.common": "^0.1.0",
+    "strippets": "^0.1.2",
+    "handlebars": "^4.0.5"
+  },
+  "publishConfig":{
+    "registry": "https://nexus.uncharted.software/repository/uncharted/"
+  },
+  "jspm":{
+    "main":"src/thumbnails.js"
+  }
+}

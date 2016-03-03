@@ -1,0 +1,33 @@
+
+#thumbnails-panel {
+  font-family: sans-serif;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.42857;
+  color: #333333;
+  background-color: #fff;
+  margin: 0;
+  position: relative;
+  overflow: hidden;
+  @import 'thumbnails.base';
+
+  // Thumbnails style
+  .thumbnails.viewport {
+    height: 100%;
+    background: #f2f2f2;
+    overflow-y: scroll;
+  }
+  .thumbnails-container {
+    overflow: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  @import 'thumbnails.thumbnail';
+  @import 'thumbnails.readerview';
+}

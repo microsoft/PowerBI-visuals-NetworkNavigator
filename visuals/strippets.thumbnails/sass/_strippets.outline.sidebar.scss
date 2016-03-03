@@ -1,0 +1,29 @@
+.sidebar {
+  float: right;
+  width: 24px;
+  background: repeating-linear-gradient(
+                  -45deg,
+                  #E9E7E6,
+                  #E9E7E6 10px,
+                  #F5F5F5 10px,
+                  #F5F5F5 20px
+  );
+  height: calc(100% - #{$outline-header-height});
+  height: -webkit-calc(100% - #{$outline-header-height});
+  .entityContainer {
+    position: relative;
+    top: 0;
+    height: calc(100% - #{$entity-height} - #{$footer-space});
+    height: -webkit-calc(100% - #{$entity-height} - #{$footer-space});
+  }
+}
+
+.expand-enabled .sidebar {
+    .entityContainer {
+      top: $outline-title-height;
+      height: calc(100% - #{$outline-title-height} - #{$entity-height} - #{$footer-space});
+      height: -webkit-calc(100% - #{$outline-title-height} - #{$entity-height} - #{$footer-space});
+    }
+}
+
+@import 'strippets.entity';

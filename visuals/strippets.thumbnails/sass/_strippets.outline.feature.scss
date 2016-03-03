@@ -1,0 +1,42 @@
+.mainOutlineContent {
+  float: left;
+  height: calc(100% - #{$outline-header-height});
+  height: -webkit-calc(100% - #{$outline-header-height});
+  .title {
+    border-bottom: 1px dotted #E9E7E6;
+    width: inherit;
+    position: absolute;
+    height: $outline-title-height;
+
+    .centering-container {
+      color: #777777;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+      font-size: 9px;
+      width: auto;
+      height: auto;
+      max-height: $outline-title-height;
+      padding-left: 0.3em;
+      padding-right: 0.3em;
+      transform: translate(0, -1em) translate(0, -50%) translate(0, $outline-title-height * 0.5);
+    }
+
+  }
+  .entityContainer {
+    position: relative;
+    top: 0;
+    height: calc(100% - #{$entity-height} - #{$footer-space});
+    height: -webkit-calc(100% - #{$entity-height} - #{$footer-space});
+  }
+}
+
+.expand-enabled .mainOutlineContent {
+    .entityContainer {
+      top: $outline-title-height;
+      height: calc(100% - #{$outline-title-height} - #{$entity-height} - #{$footer-space});
+      height: -webkit-calc(100% - #{$outline-title-height} - #{$entity-height} - #{$footer-space});
+    }
+}
+
+@import 'strippets.entity';

@@ -1,0 +1,116 @@
+.outlineItemContainer {
+  white-space: initial;
+  margin: $outline-vertical-margin 0 $outline-vertical-margin 0;
+  display: inline-block;
+  background-color: transparent;
+  height: calc(100% - (#{$outline-vertical-margin} + 1px) * 2);
+  height: -webkit-calc(100% - (#{$outline-vertical-margin} + 1px) * 2);
+  height: -moz-calc(100% - (#{$outline-vertical-margin} + 1px) * 2);
+
+  /***************** Header *****************/
+  .outlineHeader {
+    height: $outline-header-height;
+    background: #f6f6f6;
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    .sourceIcon {
+      height: $outline-header-height;
+      background-position: right 3px center;
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+      background-color: transparent;
+      border-bottom: solid 1px #e9e9e9;
+      position: relative;
+      z-index: 100;
+      /*grayscale for background image*/
+      -webkit-filter: grayscale(1);
+      -webkit-filter: grayscale(100%);
+      -moz-filter: grayscale(100%);
+      filter: gray;
+      filter: grayscale(100%);
+      filter: url("data:image/svg+xml;utf8,<svg version='1.1' xmlns='http://www.w3.org/2000/svg' height='0'><filter id='greyscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0' /></filter></svg>#greyscale");
+    }
+
+    .sourceText {
+      width: calc(100% - #{$outline-header-height});
+      width: -webkit-calc(100% - #{$outline-header-height});
+      position: absolute;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+      font-size: 13px;
+      line-height: $outline-header-height+1;
+      vertical-align: middle;
+      height: auto;
+      white-space: nowrap;
+      margin-left: 16px;
+
+      a {
+        color: #656565;
+        text-decoration: none;
+        &:hover {
+          color: #337ab7;
+        }
+      }
+
+    }
+  }
+  /****************** Outline *****************/
+  .outlineItem {
+    height: 100%;
+    box-shadow: -1px 0 0 #e5e5e5, 0 0 2px rgba(0, 0, 0, .12), 2px 0 4px rgba(0, 0, 0, .24);
+    border: solid 0.5px #e9e9e9;
+    background: #ffffff;
+    cursor: pointer;
+    float: right;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /************** Reading Mode **************/
+  &.read {
+    .outlineItem {
+      margin: 0px 5px 0px 5px;
+      float: right;
+      z-index: 1;
+
+      .highlightedText {
+        background-color: #ffee00;
+      }
+
+      .readingSlider {
+        opacity: 0;
+        background-color: #aaaaaa;
+        border-radius: 5px;
+        width: 100%;
+        position: absolute;
+        transition: opacity 0.5s ease-out;
+      }
+      &:hover {
+        .readingSlider {
+          opacity: 0.15;
+        }
+      }
+    }
+  }
+  &.expanded {
+
+  }
+  &.hidden {
+    .outlineItem {
+      cursor: default;
+    }
+  }
+  &.minimized {
+    .outlineHeader .sourceText {
+      width: 0;
+    }
+  }
+}
+
+@import 'strippets.outline.feature';
+@import 'strippets.outline.sidebar';
+@import 'strippets.outline.reader';
