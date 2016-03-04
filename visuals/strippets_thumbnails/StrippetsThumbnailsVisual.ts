@@ -8,6 +8,7 @@ import VisualCapabilities = powerbi.VisualCapabilities;
 import VisualInitOptions = powerbi.VisualInitOptions;
 import VisualUpdateOptions = powerbi.VisualUpdateOptions;
 import VisualDataRoleKind = powerbi.VisualDataRoleKind;
+import IVisualHostServices = powerbi.IVisualHostServices;
 const Thumbnails = require("./lib/strippets_thumbnails/uncharted_thumbnails");
 
 @Visual(require("./build.js").output.PowerBI)
@@ -41,6 +42,10 @@ export default class StrippetsThumbnailsVisual extends VisualBase implements IVi
     };
 
     private thumbnailEle: JQuery;
+    private dataResolver: (data: any) => void;
+    private dataView: DataView;
+    private host: IVisualHostServices;
+    private loadingMoreData: boolean;
 
     /**
      * The font awesome resource
@@ -59,6 +64,7 @@ export default class StrippetsThumbnailsVisual extends VisualBase implements IVi
         */
     public init(options: VisualInitOptions) {
         super.init(options, '<div id="thumbnails-panel"></div>');
+        this.host = options.host;
         this.thumbnailEle = this.element.find("#thumbnails-panel");
         Thumbnails.asJQueryPlugin();
         this.thumbnailEle['thumbnails']({
@@ -76,23 +82,16 @@ export default class StrippetsThumbnailsVisual extends VisualBase implements IVi
             },
         });
 
-        // let sampleData = JSON.parse(require("./example/sampledata.json"));
-        // this.thumbnailEle['thumbnails']("loaddata", sampleData);
-        // this.thumbnailEle['thumbnails']("onInfinite", function() {
-        //     var nextDataId = 13;
-        //     return new Promise(function(resolve) {
-        //         // simulate async call
-        //         setTimeout(function() {
-        //             var data = JSON.parse(JSON.stringify(sampleData));
-        //             data.forEach(function(data) {
-        //                 data.id = nextDataId;
-        //                 data.rank = nextDataId;
-        //                 nextDataId += 1;
-        //             });
-        //             resolve(data);
-        //         }, 500);
-        //     });
-        // });
+        this.thumbnailEle['thumbnails']("onInfinite", () => {
+            // Do we have more data?
+            if (this.dataView && this.dataView.metadata.segment) {
+                return new Promise(resolve => {
+                    this.dataResolver = resolve;
+                    this.loadingMoreData = true;
+                    this.host.loadMoreData();
+                });
+            }
+        });
     }
 
     /**
@@ -155,7 +154,6 @@ export default class StrippetsThumbnailsVisual extends VisualBase implements IVi
             'summary',
             'url',
             'readerUrl'
-            // 'entities'
         ];
         if (dataView.metadata.columns.length < docFields.length + entityFields.length) {
             return [];
@@ -173,7 +171,7 @@ export default class StrippetsThumbnailsVisual extends VisualBase implements IVi
             let docId = rowValues[docColumnMapping["id"]];
             let doc = docMap[docId];
             if (!doc) {
-                doc = docMap[doc] = {
+                doc = docMap[docId] = {
                     entities: []
                 };
             }

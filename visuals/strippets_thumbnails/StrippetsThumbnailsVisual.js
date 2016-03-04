@@ -50,7 +50,7 @@ var StrippetsThumbnailsVisual = (function (_super) {
                 height: '400px'
             },
         });
-        var sampleData = JSON.parse(require("./example/sampledata.json"));
+        // let sampleData = JSON.parse(require("./example/sampledata.json"));
         // this.thumbnailEle['thumbnails']("loaddata", sampleData);
         // this.thumbnailEle['thumbnails']("onInfinite", function() {
         //     var nextDataId = 13;
@@ -77,7 +77,6 @@ var StrippetsThumbnailsVisual = (function (_super) {
             var table = options.dataViews[0].table;
             var data = StrippetsThumbnailsVisual.converter(options.dataViews[0]);
             if (data && data.length) {
-                debugger;
                 this.thumbnailEle['thumbnails']("loaddata", data);
             }
         }
@@ -141,7 +140,7 @@ var StrippetsThumbnailsVisual = (function (_super) {
             var docId = rowValues[docColumnMapping["id"]];
             var doc = docMap[docId];
             if (!doc) {
-                doc = docMap[doc] = {
+                doc = docMap[docId] = {
                     entities: []
                 };
             }
