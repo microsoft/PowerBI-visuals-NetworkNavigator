@@ -1,0 +1,30 @@
+require("../../base/testSetup");
+var AdvancedSlicer_1 = require("./AdvancedSlicer");
+var $ = require("jquery");
+describe("AdvancedSlicer", function () {
+    var parentEle;
+    beforeEach(function () {
+        global['$'] = require("jquery");
+        global['d3'] = require("d3");
+        global['_'] = require("underscore");
+        parentEle = $('<div></div>');
+    });
+    afterEach(function () {
+        if (parentEle) {
+            parentEle.remove();
+        }
+        parentEle = null;
+    });
+    var createInstance = function () {
+        var ele = $('<div>');
+        parentEle.append(ele);
+        var result = {
+            instance: new AdvancedSlicer_1.AdvancedSlicer(ele),
+            element: ele
+        };
+        return result;
+    };
+    it("should load", function () {
+        createInstance();
+    });
+});
