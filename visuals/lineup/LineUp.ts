@@ -105,7 +105,8 @@ export class LineUp {
             stacked: true,
             values: false,
             histograms: true,
-            animation: true
+            animation: true,
+            tooltips: false
         }
     };
 
@@ -293,7 +294,11 @@ export class LineUp {
                     this.lineupImpl.changeRenderingOption(key, presProps[key]);
                 }
             }
+            this.lineupImpl.changeInteractionOption("tooltips", newSettings.presentation.tooltips);
         }
+
+        // Sets the tooltips configuration
+        this.lineUpConfig['interaction'].tooltips = newSettings.presentation.tooltips;
 
         this._settings = newSettings;
     }
