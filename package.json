@@ -63,6 +63,7 @@
     "tslint": "3.2.1",
     "typescript": "^1.7.5",
     "underscore": "1.8.3",
+    "wallaby-webpack": "0.0.16",
     "webpack": "1.12.9",
     "yargs": "3.31.0"
   }

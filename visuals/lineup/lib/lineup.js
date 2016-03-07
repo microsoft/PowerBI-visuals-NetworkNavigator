@@ -198,6 +198,20 @@ var LineUp;
   };
 
   /**
+   * // ATS: ADDED
+   * change a rendering option
+   * @param option
+   * @param value
+   */
+  LineUp.prototype.changeInteractionOption = function (option, value) {
+    var v = this.config.interaction[option];
+    if (v === value) {
+      return;
+    }
+    this.config.interaction[option] = value;
+  };
+
+  /**
    * change a rendering option
    * @param option
    * @param value

@@ -112,14 +112,43 @@ export interface ILineUpConfiguration {
  */
 export interface ILineUpSettings {
     selection?: {
+
+        /**
+         * Enables single select mode
+         */
         singleSelect?: boolean;
+
+        /**
+         * Enables multiselect mode
+         */
         multiSelect?: boolean;
     };
     presentation?: {
+
+        /**
+         * Show row values
+         */
         values?: boolean;
+
+        /**
+         * Is stacking supported
+         */
         stacked?: boolean;
+
+        /**
+         * Should histograms be visible on the column headers
+         */
         histograms?: boolean;
+
+        /**
+         * Should animation be used when transitioning states in lineup
+         */
         animation?: boolean;
+
+        /**
+         * Should tooltips be shown for each row
+         */
+        tooltips?: boolean;
     };
 }
 

@@ -280,8 +280,7 @@ gulp.task('build:powerbi', function(cb) {
  */
 gulp.task('build', function(cb) {
     var toBuild = [
-        'clean',
-        'test'
+        'clean'
     ];
     if (projectConfig.output.PowerBI) {
         toBuild.push('build:powerbi');
@@ -292,6 +291,7 @@ gulp.task('build', function(cb) {
     if (projectConfig.output.react) {
         toBuild.push("build:react");
     }
+    toBuild.push('test');
     toBuild.push(cb);
     sequence.apply(this, toBuild);
 });
