@@ -470,6 +470,11 @@ var LineUpVisual = (function (_super) {
                         displayName: "Animation",
                         description: "Should the grid be animated when sorting",
                         type: { bool: true }
+                    },
+                    tooltips: {
+                        displayName: "Table tooltips",
+                        description: "Should the grid show tooltips on hover of a row",
+                        type: { bool: true }
                     }
                 },
             },
