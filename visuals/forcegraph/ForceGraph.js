@@ -28,12 +28,16 @@ var ForceGraph = (function () {
         /**
          * My template string
          */
-        this.template = "\n        <div class=\"graph-container\">\n            <div class=\"button-bar\">\n                <ul>\n                    <li class=\"clear-selection\" title=\"Clear Selection\">\n                        <a>\n                            <span class=\"fa-stack\">\n                                <i class=\"fa fa-check fa-stack-1x\"></i>\n                                <i class=\"fa fa-ban fa-stack-2x\"></i>\n                            </span>\n                        </a>\n                    </li>\n                </ul>\n            </div>\n            <div class=\"svg-container\">\n            </div>\n        </div>\n    ".trim().replace(/\n/g, "");
+        this.template = "\n        <div class=\"graph-container\">\n            <div class=\"button-bar\">\n                <ul>\n                    <li class=\"filter-box\" title=\"Filter Nodes\">\n                        <input type=\"text\" placeholder=\"Enter text filter\" class=\"search-filter-box\"/>\n                    </li>\n                    <li class=\"clear-selection\" title=\"Clear Selection\">\n                        <a>\n                            <span class=\"fa-stack\">\n                                <i class=\"fa fa-check fa-stack-1x\"></i>\n                                <i class=\"fa fa-ban fa-stack-2x\"></i>\n                            </span>\n                        </a>\n                    </li>\n                </ul>\n            </div>\n            <div class=\"svg-container\">\n            </div>\n        </div>\n    ".trim().replace(/\n/g, "");
         this.element = $(this.template);
         element.append(this.element);
         this.svgContainer = this.element.find(".svg-container");
         this.element.find(".clear-selection").on("click", function () {
             _this.updateSelection(undefined);
+        });
+        var filterBox = this.element.find(".search-filter-box");
+        filterBox.on('input', function () {
+            _this.filterNodes(filterBox.val());
         });
         this.dimensions = { width: width, height: height };
         this.svg = d3.select(this.svgContainer[0]).append("svg")
@@ -236,7 +240,6 @@ var ForceGraph = (function () {
             _this.updateSelection(n);
         });
         node.on("mouseover", function () {
-            console.log("mouseover");
             d3.select(_this.svgContainer.find("svg text")[0]).style("opacity", "100");
         });
         node.on("mouseout", function () {
@@ -277,6 +280,26 @@ var ForceGraph = (function () {
     ForceGraph.prototype.redrawSelection = function () {
         this.vis.selectAll(".node circle")
             .style("stroke-width", function (d) { return d.selected ? 1 : 0; });
+    };
+    /**
+     * Filters the nodes to the given string
+     */
+    ForceGraph.prototype.filterNodes = function (text, animate) {
+        if (animate === void 0) { animate = true; }
+        var test = "";
+        var temp = this.vis.selectAll(".node circle");
+        if (animate) {
+            temp = temp
+                .transition()
+                .delay(100);
+        }
+        temp.attr("transform", function (d) {
+            var scale = 1;
+            if (text && d.name.indexOf(text) >= 0) {
+                scale = 3;
+            }
+            return "scale(" + scale + ")";
+        });
     };
     /**
      * Updates the selection based on the given node

@@ -118,7 +118,10 @@ $(function() {
                             max: 1,
                             values: hist
                         };
-                    } else if (colName === "international") {
+                    } else if (colName === "small_range" || colName === "large_range") {
+                        var rangeData = data.map(function(item) { return item[colName]; });
+                        col.domain = [d3.min(rangeData), d3.max(rangeData)];
+                    } /*else if (colName === "international") {
                         var hist = [];
                         for (var i = 0; i <= 50; i++) {
                             hist.push(i / 50);
@@ -128,7 +131,7 @@ $(function() {
                             max: 1,
                             values: hist
                         };
-                    } else if (colName === 'schoolname') {
+                    }*/ else if (colName === 'schoolname') {
                         col.type = "string";
                     }
                     return col;
