@@ -37,6 +37,9 @@ export class ForceGraph {
         <div class="graph-container">
             <div class="button-bar">
                 <ul>
+                    <li class="filter-box" title="Filter Nodes">
+                        <input type="text" placeholder="Enter text filter" class="search-filter-box"/>
+                    </li>
                     <li class="clear-selection" title="Clear Selection">
                         <a>
                             <span class="fa-stack">
@@ -66,6 +69,10 @@ export class ForceGraph {
         this.svgContainer = this.element.find(".svg-container");
         this.element.find(".clear-selection").on("click", () => {
             this.updateSelection(undefined);
+        });
+        const filterBox = this.element.find(".search-filter-box");
+        filterBox.on('input', () => {
+            this.filterNodes(filterBox.val());
         });
 
         this.dimensions = { width: width, height: height };
@@ -286,7 +293,6 @@ export class ForceGraph {
         });
 
         node.on("mouseover", () => {
-            console.log("mouseover");
             d3.select(this.svgContainer.find("svg text")[0]).style("opacity", "100");
         });
         node.on("mouseout", () => {
@@ -332,6 +338,26 @@ export class ForceGraph {
     public redrawSelection() {
         this.vis.selectAll(".node circle")
             .style("stroke-width", (d) => d.selected ? 1 : 0);
+    }
+
+    /**
+     * Filters the nodes to the given string
+     */
+    public filterNodes(text: string, animate = true) {
+        let test = "";
+        let temp = this.vis.selectAll(".node circle");
+        if (animate) {
+            temp = temp
+                .transition()
+                .delay(100);
+        }
+        temp.attr("transform", (d) => {
+            let scale = 1;
+            if (text && d.name.indexOf(text) >= 0) {
+                scale = 3;
+            }
+            return `scale(${scale})`;
+        });
     }
 
     /**
