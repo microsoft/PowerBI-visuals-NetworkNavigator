@@ -33,7 +33,9 @@ var StrippetsThumbnailsVisual = (function (_super) {
         * @param options Initialization options for the visual.
         */
     StrippetsThumbnailsVisual.prototype.init = function (options) {
+        var _this = this;
         _super.prototype.init.call(this, options, '<div id="thumbnails-panel"></div>');
+        this.host = options.host;
         this.thumbnailEle = this.element.find("#thumbnails-panel");
         Thumbnails.asJQueryPlugin();
         this.thumbnailEle['thumbnails']({
@@ -50,23 +52,16 @@ var StrippetsThumbnailsVisual = (function (_super) {
                 height: '400px'
             },
         });
-        // let sampleData = JSON.parse(require("./example/sampledata.json"));
-        // this.thumbnailEle['thumbnails']("loaddata", sampleData);
-        // this.thumbnailEle['thumbnails']("onInfinite", function() {
-        //     var nextDataId = 13;
-        //     return new Promise(function(resolve) {
-        //         // simulate async call
-        //         setTimeout(function() {
-        //             var data = JSON.parse(JSON.stringify(sampleData));
-        //             data.forEach(function(data) {
-        //                 data.id = nextDataId;
-        //                 data.rank = nextDataId;
-        //                 nextDataId += 1;
-        //             });
-        //             resolve(data);
-        //         }, 500);
-        //     });
-        // });
+        this.thumbnailEle['thumbnails']("onInfinite", function () {
+            // Do we have more data?
+            if (_this.dataView && _this.dataView.metadata.segment) {
+                return new Promise(function (resolve) {
+                    _this.dataResolver = resolve;
+                    _this.loadingMoreData = true;
+                    _this.host.loadMoreData();
+                });
+            }
+        });
     };
     /**
      * Notifies the IVisual of an update (data, viewmode, size change).

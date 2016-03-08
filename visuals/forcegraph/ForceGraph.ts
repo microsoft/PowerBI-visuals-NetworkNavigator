@@ -349,6 +349,7 @@ export class ForceGraph {
         if (animate) {
             temp = temp
                 .transition()
+                .duration(500)
                 .delay(100);
         }
         temp.attr("transform", (d) => {
