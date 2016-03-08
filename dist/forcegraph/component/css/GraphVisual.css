@@ -98,3 +98,8 @@ html, body {
   */
 #node_graph .button-bar {
   font-size: .7em; }
+
+.search-filter-box {
+  vertical-align: bottom;
+  border: 1px solid #ccc;
+  height: calc(1.4em + 10px); }
