@@ -18,6 +18,7 @@ var sass = require("gulp-sass");
 var webserver = require('gulp-webserver');
 var mocha = require('gulp-mocha');
 var exec = require('child_process').exec;
+var gutil = require('gulp-util');
 
 var args = require('yargs')
     .usage('Usage: $0 --project [name of the visual\'s folder]')
@@ -99,6 +100,9 @@ gulp.task('build:css', function() {
  */
 gulp.task('compile:ts', function(cb) {
     exec('./node_modules/typescript/bin/tsc', function (err, stdout, stderr) {
+        if (err) {
+            gutil.log( gutil.colors.yellow('\nTypeScript Compilation Issues:\n'), gutil.colors.yellow(stdout));
+        }
         cb(err);
     });
 });

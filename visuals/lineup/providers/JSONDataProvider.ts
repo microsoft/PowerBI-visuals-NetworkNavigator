@@ -86,8 +86,12 @@ export class JSONDataProvider implements IDataProvider {
                          * This calculates the percent that this guy is of the max value
                          */
                         let value = item[v.column];
-                        value -= minMax[v.column].min;
-                        value /= (minMax[v.column].max - minMax[v.column].min);
+                        if (value) {
+                            value -= minMax[v.column].min;
+                            value /= (minMax[v.column].max - minMax[v.column].min);
+                        } else {
+                           value = 0;   
+                        }
                         return a + (value * v.weight);
                     }, 0);
                 }

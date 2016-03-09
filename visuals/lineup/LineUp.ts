@@ -385,7 +385,7 @@ export class LineUp {
         const dataColNames = getDataColumnNames();
         const columns: ILineUpColumn[] = getDataColumnNames().map(createLineUpColumn);
         return {
-            primaryKey: dataColNames[0],
+            primaryKey: "id",
             columns
         };
     }
@@ -455,6 +455,10 @@ export class LineUp {
 
                     //derive a description file
                     var desc = this.configuration || LineUp.createConfigurationFromData(this._data);
+                    
+                    // Primary Key needs to always be ID
+                    desc.primaryKey = "id";
+                    
                     var spec: any = {};
                     // spec.name = name;
                     spec.dataspec = desc;

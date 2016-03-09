@@ -99,6 +99,7 @@ $(function() {
                     item.equals = function(otherItem) {
                         return item.schoolname === otherItem.schoolname;
                     };
+                    item.id = item.schoolname;
                     item.selected = false;
                     return item;
                 });

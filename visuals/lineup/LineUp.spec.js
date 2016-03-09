@@ -31,6 +31,7 @@ describe('LineUp', function () {
         for (var i = 0; i < 100; i++) {
             (function (myId) {
                 rows.push({
+                    id: myId,
                     col1: myId,
                     col2: i * (Math.random() * 100),
                     selected: false,
