@@ -7,6 +7,11 @@ export interface ILineUpRow {
      * Data for each column in the row
      */
     [columnName: string]: any;
+    
+    /**
+     * Some unique ID column
+     */
+    id: string|number;
 
     /**
      * Whether or not this row is selected

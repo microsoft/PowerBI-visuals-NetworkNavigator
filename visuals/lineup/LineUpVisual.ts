@@ -386,8 +386,8 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         if (view && view.table) {
             var table = view.table;
             table.rows.forEach((row, rowIndex) => {
-                var identity;
-                var newId;
+                let identity;
+                let newId;
                 if (view.categorical && view.categorical.categories.length) {
                     identity = view.categorical.categories[0].identity[rowIndex];
                     newId = SelectionId.createWithId(identity);
@@ -397,7 +397,8 @@ export default class LineUpVisual extends VisualBase implements IVisual {
 
                 // The below is busted > 100
                 //var identity = SelectionId.createWithId(this.dataViewTable.identity[rowIndex]);
-                var result : ILineUpVisualRow = {
+                let result : ILineUpVisualRow = {
+                    id: newId.key,
                     identity: newId,
                     equals: (b) => (<ILineUpVisualRow>b).identity.equals(newId),
                     filterExpr: identity && identity.expr,

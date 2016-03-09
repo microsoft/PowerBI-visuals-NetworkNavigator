@@ -246,7 +246,7 @@ var LineUp = (function () {
         var dataColNames = getDataColumnNames();
         var columns = getDataColumnNames().map(createLineUpColumn);
         return {
-            primaryKey: dataColNames[0],
+            primaryKey: "id",
             columns: columns
         };
     };
@@ -309,6 +309,8 @@ var LineUp = (function () {
                     _this.queryOptions.offset += r.count;
                     //derive a description file
                     var desc = _this.configuration || LineUp.createConfigurationFromData(_this._data);
+                    // Primary Key needs to always be ID
+                    desc.primaryKey = "id";
                     var spec = {};
                     // spec.name = name;
                     spec.dataspec = desc;
