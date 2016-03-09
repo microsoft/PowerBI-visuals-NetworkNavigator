@@ -1,3 +1,4 @@
+"use strict";
 var DOMPurify = require("./purify");
 var $ = require("jquery");
 /**
@@ -54,5 +55,5 @@ var DocumentViewer = (function () {
      */
     DocumentViewer.template = "\n        <div>\n            <div class=\"table\"></div>\n            <div class=\"error\"></div>\n        </div>\n    ".trim();
     return DocumentViewer;
-})();
+}());
 exports.DocumentViewer = DocumentViewer;

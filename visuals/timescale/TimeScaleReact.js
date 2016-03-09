@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -35,7 +36,7 @@ var TimeScale = (function (_super) {
      * Renders this component
      */
     TimeScale.prototype.render = function () {
-        return React.createElement("div", {"style": { width: "100%", height: "100%" }});
+        return React.createElement("div", {style: { width: "100%", height: "100%" }});
     };
     TimeScale.prototype.renderContent = function (props) {
         // if called from `componentWillReceiveProps`, then we use the new
@@ -45,5 +46,5 @@ var TimeScale = (function (_super) {
         this.timescale.selectedRange = props.selectedRange || null;
     };
     return TimeScale;
-})(React.Component);
+}(React.Component));
 exports.TimeScale = TimeScale;

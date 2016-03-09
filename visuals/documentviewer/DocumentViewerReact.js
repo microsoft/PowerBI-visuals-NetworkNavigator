@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -28,7 +29,7 @@ var DocumentViewer = (function (_super) {
      * Renders this component
      */
     DocumentViewer.prototype.render = function () {
-        return React.createElement("div", {"style": { width: "100%", height: "100%" }});
+        return React.createElement("div", {style: { width: "100%", height: "100%" }});
     };
     DocumentViewer.prototype.renderContent = function (props) {
         // if called from `componentWillReceiveProps`, then we use the new
@@ -37,5 +38,5 @@ var DocumentViewer = (function (_super) {
         this.documentViewer.data = props.data;
     };
     return DocumentViewer;
-})(React.Component);
+}(React.Component));
 exports.DocumentViewer = DocumentViewer;

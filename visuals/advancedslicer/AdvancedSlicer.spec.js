@@ -1,3 +1,4 @@
+"use strict";
 require("../../base/testSetup");
 var chai_1 = require("chai");
 var AdvancedSlicer_1 = require("./AdvancedSlicer");

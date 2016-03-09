@@ -1,3 +1,4 @@
+"use strict";
 var EventEmitter_1 = require('../../base/EventEmitter');
 var $ = require("jquery");
 var _ = require("lodash");
@@ -190,5 +191,5 @@ var TimeScale = (function () {
             .attr("height", 30);
     };
     return TimeScale;
-})();
+}());
 exports.TimeScale = TimeScale;

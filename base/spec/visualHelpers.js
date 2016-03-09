@@ -1,3 +1,4 @@
+"use strict";
 /// <reference path="../../base/references.d.ts"/>
 require("../testSetup");
 global['powerbi'] = {

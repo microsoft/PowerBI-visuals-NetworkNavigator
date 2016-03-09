@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -364,7 +365,7 @@ var GraphVisual = (function (_super) {
         Utils_1.Visual(JSON.parse(require("./build.json")).output.PowerBI)
     ], GraphVisual);
     return GraphVisual;
-})(VisualBase_1.VisualBase);
+}(VisualBase_1.VisualBase));
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = GraphVisual;
 ;

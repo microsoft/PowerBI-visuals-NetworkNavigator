@@ -1,3 +1,4 @@
+"use strict";
 var EventEmitter_1 = require('../../base/EventEmitter');
 var $ = require("jquery");
 /**
@@ -325,5 +326,5 @@ var ForceGraph = (function () {
         this.redrawSelection();
     };
     return ForceGraph;
-})();
+}());
 exports.ForceGraph = ForceGraph;

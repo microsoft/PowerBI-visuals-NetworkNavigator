@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -76,14 +77,14 @@ var FreeTextSearchVisual = (function (_super) {
                 }
             });
             var ppKeys = Object.keys(this.providerSettings);
-            var enabledPPKey = ppKeys.filter(function (k) { return _this.providerSettings[k].enabled; })[0];
+            var enabledPPKey_1 = ppKeys.filter(function (k) { return _this.providerSettings[k].enabled; })[0];
             // We have something enabled
-            if (enabledPPKey) {
-                var enabledProvider = this.propKeyToProvider[enabledPPKey];
+            if (enabledPPKey_1) {
+                var enabledProvider = this.propKeyToProvider[enabledPPKey_1];
                 var newParams = enabledProvider.supportedParameters.map(function (p) {
                     return {
                         name: p.name,
-                        value: _this.providerSettings[enabledPPKey][p.name.replace(/ /g, "_")]
+                        value: _this.providerSettings[enabledPPKey_1][p.name.replace(/ /g, "_")]
                     };
                 });
                 // Were changing providers
@@ -266,6 +267,6 @@ var FreeTextSearchVisual = (function (_super) {
         Utils_1.Visual(require("./build.js").output.PowerBI)
     ], FreeTextSearchVisual);
     return FreeTextSearchVisual;
-})(VisualBase_1.VisualBase);
+}(VisualBase_1.VisualBase));
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = FreeTextSearchVisual;

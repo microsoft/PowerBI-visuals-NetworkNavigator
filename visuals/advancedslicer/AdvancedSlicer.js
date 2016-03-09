@@ -1,3 +1,4 @@
+"use strict";
 var EventEmitter_1 = require('../../base/EventEmitter');
 var $ = require("jquery");
 var naturalSort = require("javascript-natural-sort");
@@ -344,9 +345,9 @@ var AdvancedSlicer = (function () {
         this.events.raiseEvent("loadMoreData", item, isNewSearch, this.searchString);
         if (item.result) {
             this.loadingMoreData = true;
-            var promise = this.loadPromise = item.result.then(function (items) {
+            var promise_1 = this.loadPromise = item.result.then(function (items) {
                 // If this promise hasn't been cancelled
-                if (!promise['cancel']) {
+                if (!promise_1['cancel']) {
                     _this.loadingMoreData = false;
                     _this.loadPromise = undefined;
                     if (isNewSearch) {
@@ -363,7 +364,7 @@ var AdvancedSlicer = (function () {
                 _this.data = [];
                 _this.loadingMoreData = false;
             });
-            return promise;
+            return promise_1;
         }
     };
     /**
@@ -399,5 +400,5 @@ var AdvancedSlicer = (function () {
         return $(("\n            <div style=\"white-space:nowrap\" class=\"item\">\n                <label style=\"cursor:pointer\">\n                    <!--<input style=\"vertical-align:middle;cursor:pointer\" type=\"checkbox\">-->\n                    <span style=\"margin-left: 5px;vertical-align:middle\" class=\"display-container\">\n                        <span style=\"display:inline-block;overflow:hidden\" class=\"category-container\">\n                            <span class=\"matchPrefix\">" + (matchPrefix || "") + "</span>\n                            <span class=\"match\">" + (match || "") + "</span>\n                            <span class=\"matchSuffix\">" + (matchSuffix || "") + "</span>\n                        </span>\n                        <span style=\"display:inline-block\" class=\"value-container\">\n                            <span style=\"display:inline-block;background-color:blue;width:0px\" class=\"value-display\">&nbsp;</span>\n                        </span>\n                    </span>\n                </label>\n            </div>\n        ").trim().replace(/\n/g, ''));
     };
     return AdvancedSlicer;
-})();
+}());
 exports.AdvancedSlicer = AdvancedSlicer;

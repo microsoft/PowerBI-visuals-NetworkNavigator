@@ -1,3 +1,4 @@
+"use strict";
 /// <reference path="./references.d.ts"/>
 var VisualBase = (function () {
     function VisualBase() {
@@ -61,7 +62,7 @@ var VisualBase = (function () {
         return [];
     };
     return VisualBase;
-})();
+}());
 exports.VisualBase = VisualBase;
 /* HACK FIXES */
 if (powerbi.visuals.utility.SelectionManager.prototype['selectInternal']) {

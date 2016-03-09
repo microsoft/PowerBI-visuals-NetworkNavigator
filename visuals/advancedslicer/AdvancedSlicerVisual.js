@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -57,7 +58,7 @@ var AdvancedSlicerVisual = (function (_super) {
             var categorical = this.dataView && this.dataView.categorical;
             var newData = AdvancedSlicerVisual.converter(this.dataView, this.selectionManager);
             if (this.loadDeferred) {
-                var added = [];
+                var added_1 = [];
                 var anyRemoved = false;
                 Utils_1.default.listDiff(this.mySlicer.data.slice(0), newData, {
                     /**
@@ -67,10 +68,10 @@ var AdvancedSlicerVisual = (function (_super) {
                     /**
                      * Gets called when the given item was added
                      */
-                    onAdd: function (item) { return added.push(item); }
+                    onAdd: function (item) { return added_1.push(item); }
                 });
                 // We only need to give it the new items
-                this.loadDeferred.resolve(added);
+                this.loadDeferred.resolve(added_1);
                 delete this.loadDeferred;
             }
             else if (Utils_1.default.hasDataChanged(newData.slice(0), this.mySlicer.data, function (a, b) { return a.match === b.match; })) {
@@ -245,6 +246,6 @@ var AdvancedSlicerVisual = (function (_super) {
         Utils_1.Visual(require("./build").output.PowerBI)
     ], AdvancedSlicerVisual);
     return AdvancedSlicerVisual;
-})(VisualBase_1.VisualBase);
+}(VisualBase_1.VisualBase));
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = AdvancedSlicerVisual;

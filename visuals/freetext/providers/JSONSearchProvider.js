@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Represents an elastic search provider
  */
@@ -32,21 +33,21 @@ var JSONSearchProvider = (function () {
     JSONSearchProvider.prototype.query = function (options) {
         var _this = this;
         if (this.checkRequiredParams()) {
-            var idField = this.getParamValue(JSONSearchProvider.ID_FIELD_PARAM);
-            var final = this.data.slice(0);
-            var eq = options.query && options.query.where && options.query.where.eq;
-            if (eq) {
-                var searchColumns = Object.keys(eq);
+            var idField_1 = this.getParamValue(JSONSearchProvider.ID_FIELD_PARAM);
+            var final_1 = this.data.slice(0);
+            var eq_1 = options.query && options.query.where && options.query.where.eq;
+            if (eq_1) {
+                var searchColumns = Object.keys(eq_1);
                 var cleared = false;
                 // This will allow for overriding of column based searches, so `title:Haha`, if * is used, then all columns in the search fields parameters is used
                 var searchFilters = searchColumns.forEach(function (c) {
-                    var searchValue = eq[c];
+                    var searchValue = eq_1[c];
                     if (c !== '*') {
-                        final = final.filter(function (item) { return item[c].indexOf(searchValue) >= 0; });
+                        final_1 = final_1.filter(function (item) { return item[c].indexOf(searchValue) >= 0; });
                     }
                     else {
                         if (searchValue !== "*") {
-                            final = final.filter(function (item) {
+                            final_1 = final_1.filter(function (item) {
                                 return Object.keys(item).filter(function (column) {
                                     var result = item[column];
                                     if (result && result.indexOf) {
@@ -58,24 +59,24 @@ var JSONSearchProvider = (function () {
                     }
                 });
             }
-            var filteredCount = final.length;
+            var filteredCount_1 = final_1.length;
             if (options.offset) {
-                final = final.slice(options.offset);
+                final_1 = final_1.slice(options.offset);
             }
             if (options.count) {
-                final = final.slice(0, options.count);
+                final_1 = final_1.slice(0, options.count);
             }
             return new Promise(function (resolve) {
                 setTimeout(function () { return resolve({
-                    results: final.map(function (r) {
+                    results: final_1.map(function (r) {
                         var prop = (_this.getParamValue(JSONSearchProvider.SEARCH_FIELDS) || "body").split(',')[0];
                         return {
-                            id: r[idField],
+                            id: r[idField_1],
                             textualMatch: r[prop] || "",
                             rawData: r
                         };
                     }),
-                    total: filteredCount,
+                    total: filteredCount_1,
                     offset: options.offset
                 }); }, 5000);
             });
@@ -141,6 +142,6 @@ var JSONSearchProvider = (function () {
             required: false
         }];
     return JSONSearchProvider;
-})();
+}());
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = JSONSearchProvider;

@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -29,7 +30,7 @@ var LineUp = (function (_super) {
      * Renders this component
      */
     LineUp.prototype.render = function () {
-        return React.createElement("div", {"style": { width: "100%", height: "100%" }});
+        return React.createElement("div", {style: { width: "100%", height: "100%" }});
     };
     /**
      * Attaches the events
@@ -86,5 +87,5 @@ var LineUp = (function (_super) {
         };
     };
     return LineUp;
-})(React.Component);
+}(React.Component));
 exports.LineUp = LineUp;

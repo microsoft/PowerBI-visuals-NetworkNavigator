@@ -1,3 +1,4 @@
+"use strict";
 require("../../base/testSetup");
 var chai_1 = require("chai");
 var ForceGraph_1 = require("./ForceGraph");

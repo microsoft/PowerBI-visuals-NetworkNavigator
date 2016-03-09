@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -35,7 +36,7 @@ var ForceGraph = (function (_super) {
      * Renders this component
      */
     ForceGraph.prototype.render = function () {
-        return React.createElement("div", {"style": { width: "100%", height: "100%" }});
+        return React.createElement("div", {style: { width: "100%", height: "100%" }});
     };
     ForceGraph.prototype.renderContent = function (props) {
         // if called from `componentWillReceiveProps`, then we use the new
@@ -56,5 +57,5 @@ var ForceGraph = (function (_super) {
         }
     };
     return ForceGraph;
-})(React.Component);
+}(React.Component));
 exports.ForceGraph = ForceGraph;

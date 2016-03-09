@@ -1,3 +1,4 @@
+"use strict";
 /**
  * A Data provider for a simple json array
  */
@@ -64,7 +65,7 @@ var JSONDataProvider = (function () {
         }
         if (this.handleSort && options.sort && options.sort.length) {
             var sortItem = options.sort[0];
-            var basicSort = function (aValue, bValue, asc) {
+            var basicSort_1 = function (aValue, bValue, asc) {
                 var dir = asc ? 1 : -1;
                 if (aValue == bValue) {
                     return 0;
@@ -72,7 +73,7 @@ var JSONDataProvider = (function () {
                 return (aValue > bValue ? 1 : -1) * dir;
             };
             var minMax = {};
-            var calcStackedValue = function (item, sortToCheck, minMax) {
+            var calcStackedValue_1 = function (item, sortToCheck, minMax) {
                 var columns = sortToCheck.stack.columns;
                 if (columns) {
                     return columns.reduce(function (a, v) {
@@ -96,9 +97,9 @@ var JSONDataProvider = (function () {
                         };
                         return a;
                     }, {});
-                    return basicSort(calcStackedValue(a, sortItem, maxValues), calcStackedValue(b, sortItem, maxValues), sortItem.asc);
+                    return basicSort_1(calcStackedValue_1(a, sortItem, maxValues), calcStackedValue_1(b, sortItem, maxValues), sortItem.asc);
                 }
-                return basicSort(a[sortItem.column], b[sortItem.column], sortItem.asc);
+                return basicSort_1(a[sortItem.column], b[sortItem.column], sortItem.asc);
             });
         }
         return final;
@@ -117,5 +118,5 @@ var JSONDataProvider = (function () {
         return value >= filter.value.domain[0] && value <= filter.value.domain[1];
     };
     return JSONDataProvider;
-})();
+}());
 exports.JSONDataProvider = JSONDataProvider;

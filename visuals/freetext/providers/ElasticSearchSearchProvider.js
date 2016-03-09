@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Represents an elastic search provider
  */
@@ -31,7 +32,7 @@ var ElasticSearchSearchProvider = (function () {
     ElasticSearchSearchProvider.prototype.query = function (options) {
         var _this = this;
         if (this.checkRequiredParams()) {
-            var idField = this.getParamValue(ElasticSearchSearchProvider.ID_FIELD_PARAM);
+            var idField_1 = this.getParamValue(ElasticSearchSearchProvider.ID_FIELD_PARAM);
             return $.ajax({
                 dataType: "json",
                 url: this.buildQueryUrl(options),
@@ -48,7 +49,7 @@ var ElasticSearchSearchProvider = (function () {
                         var r = hit._source;
                         var prop = (_this.getParamValue(ElasticSearchSearchProvider.SEARCH_FIELDS) || "body").split(',')[0];
                         return {
-                            id: r[idField],
+                            id: r[idField_1],
                             textualMatch: r[prop] || "",
                             rawData: r
                         };
@@ -96,12 +97,12 @@ var ElasticSearchSearchProvider = (function () {
         var eq = options.query && options.query.where && options.query.where.eq;
         if (eq) {
             var searchColumns = Object.keys(eq);
-            var cleared = false;
+            var cleared_1 = false;
             // This will allow for overriding of column based searches, so `title:Haha`, if * is used, then all columns in the search fields parameters is used
             var search = searchColumns.map(function (c) {
                 if (c !== '*') {
-                    if (!cleared) {
-                        cleared = true;
+                    if (!cleared_1) {
+                        cleared_1 = true;
                         searchFields.length = 0;
                     }
                     searchFields.push(c);
@@ -158,6 +159,6 @@ var ElasticSearchSearchProvider = (function () {
             required: false
         }];
     return ElasticSearchSearchProvider;
-})();
+}());
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = ElasticSearchSearchProvider;

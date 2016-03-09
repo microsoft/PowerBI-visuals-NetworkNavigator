@@ -1,3 +1,4 @@
+"use strict";
 /**
  * A mixin that adds support for event emitting
  */
@@ -47,6 +48,6 @@ var EventEmitter = (function () {
         }
     };
     return EventEmitter;
-})();
+}());
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = EventEmitter;

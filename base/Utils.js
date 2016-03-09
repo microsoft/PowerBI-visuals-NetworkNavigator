@@ -1,3 +1,4 @@
+"use strict";
 function applyMixins(derivedCtor, baseCtors) {
     baseCtors.forEach(function (baseCtor) {
         Object.getOwnPropertyNames(baseCtor.prototype).forEach(function (name) {
@@ -111,6 +112,6 @@ var Utils = (function () {
         }
     };
     return Utils;
-})();
+}());
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Utils;

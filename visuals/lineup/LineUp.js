@@ -1,3 +1,4 @@
+"use strict";
 var EventEmitter_1 = require("../../base/EventEmitter");
 var JSONDataProvider_1 = require("./providers/JSONDataProvider");
 var _ = require("lodash");
@@ -263,14 +264,14 @@ var LineUp = (function () {
                         asc: primary.sortingOrderAsc
                     };
                 }
-                var totalWidth = d3.sum(col.childrenWidths);
+                var totalWidth_1 = d3.sum(col.childrenWidths);
                 return {
                     stack: {
                         name: col.label,
                         columns: col.children.map(function (a, i) {
                             return {
                                 column: a.column.column,
-                                weight: col.childrenWidths[i] / totalWidth
+                                weight: col.childrenWidths[i] / totalWidth_1
                             };
                         })
                     },
@@ -575,5 +576,5 @@ var LineUp = (function () {
      */
     LineUp.isNumeric = function (obj) { return (obj - parseFloat(obj) + 1) >= 0; };
     return LineUp;
-})();
+}());
 exports.LineUp = LineUp;

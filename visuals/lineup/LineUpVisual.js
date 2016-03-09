@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -161,17 +162,17 @@ var LineUpVisual = (function (_super) {
                 config.sort = undefined;
             }
             if (config.layout && config.layout['primary']) {
-                var removedColumnFilter = function (c) {
+                var removedColumnFilter_1 = function (c) {
                     if (newColNames.indexOf(c.column) >= 0) {
                         return true;
                     }
                     if (c.children) {
-                        c.children = c.children.filter(removedColumnFilter);
+                        c.children = c.children.filter(removedColumnFilter_1);
                         return c.children.length > 0;
                     }
                     return false;
                 };
-                config.layout['primary'] = config.layout['primary'].filter(removedColumnFilter);
+                config.layout['primary'] = config.layout['primary'].filter(removedColumnFilter_1);
             }
             Utils_1.default.listDiff(config.columns.slice(0), newColArr, {
                 /**
@@ -502,7 +503,7 @@ var LineUpVisual = (function (_super) {
         Utils_1.Visual(require("./build.js").output.PowerBI)
     ], LineUpVisual);
     return LineUpVisual;
-})(VisualBase_1.VisualBase);
+}(VisualBase_1.VisualBase));
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = LineUpVisual;
 /**
@@ -558,4 +559,4 @@ var MyDataProvider = (function (_super) {
         this.filterChanged = this.onFiltered(filter);
     };
     return MyDataProvider;
-})(JSONDataProvider_1.JSONDataProvider);
+}(JSONDataProvider_1.JSONDataProvider));

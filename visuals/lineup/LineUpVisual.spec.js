@@ -1,3 +1,4 @@
+"use strict";
 var visualHelpers_1 = require("../../base/spec/visualHelpers");
 var chai_1 = require("chai");
 var LineUpVisual_1 = require("./LineUpVisual");
