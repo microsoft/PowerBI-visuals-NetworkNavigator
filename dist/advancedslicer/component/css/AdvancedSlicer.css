@@ -1,23 +1,23 @@
 .secondaryFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .secondaryBoldFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .lightFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .semilightFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .regularFont, .advanced-slicer, .token {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .semiboldFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .boldFontFamily {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .smallFontSize, .advanced-slicer {
   font-size: 12px; }
