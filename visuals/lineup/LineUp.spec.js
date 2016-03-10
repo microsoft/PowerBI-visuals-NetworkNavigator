@@ -24,6 +24,11 @@ describe('LineUp', function () {
             instance: new LineUp_1.LineUp(ele),
             element: ele
         };
+        result.instance.settings = {
+            presentation: {
+                animation: false
+            }
+        };
         return result;
     };
     var createFakeData = function () {

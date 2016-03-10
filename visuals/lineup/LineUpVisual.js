@@ -24,7 +24,7 @@ var LineUpVisual = (function (_super) {
     /**
      * The constructor for the visual
      */
-    function LineUpVisual(noCss) {
+    function LineUpVisual(noCss, initialSettings) {
         if (noCss === void 0) { noCss = false; }
         _super.call(this);
         /**
@@ -42,6 +42,7 @@ var LineUpVisual = (function (_super) {
          */
         this.noCss = false;
         this.noCss = noCss;
+        this.initialSettings = initialSettings || {};
     }
     /** This is called once when the visual is initialially created */
     LineUpVisual.prototype.init = function (options) {
@@ -56,6 +57,7 @@ var LineUpVisual = (function (_super) {
             hostServices: options.host
         });
         this.lineup = new LineUp_1.LineUp(this.element.find(".lineup"));
+        this.lineup.settings = this.initialSettings;
         this.lineup.events.on("selectionChanged", function (rows) { return _this.onSelectionChanged(rows); });
         this.lineup.events.on(LineUp_1.LineUp.EVENTS.FILTER_CHANGED, function (filter) { return _this.onFilterChanged(filter); });
         this.lineup.events.on(LineUp_1.LineUp.EVENTS.CLEAR_SELECTION, function () { return _this.onSelectionChanged(); });

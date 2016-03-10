@@ -214,7 +214,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
      * Gets the inline css used for this element
      */
     protected getCss() : string[] {
-        return super.getCss().concat([require("!css!sass!./css/AdvancedSlicer.scss")]);
+        return super.getCss().concat([require("!css!sass!./css/AdvancedSlicerVisual.scss")]);
     }
 
     /**

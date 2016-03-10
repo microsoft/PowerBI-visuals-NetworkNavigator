@@ -1,23 +1,23 @@
 .secondaryFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: wf_standard-font, helvetica, arial, sans-serif; }
 
 .secondaryBoldFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: wf_standard-font_bold, helvetica, arial, sans-serif; }
 
 .lightFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: "Segoe UI Light", wf_segoe-ui_light, helvetica, arial, sans-serif; }
 
 .semilightFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: "Segoe UI Semilight", wf_segoe-ui_semilight, helvetica, arial, sans-serif; }
 
 .regularFont, .advanced-slicer, .token {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: "Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif; }
 
 .semiboldFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: "Segoe UI Semibold", wf_segoe-ui_semibold, helvetica, arial, sans-serif; }
 
 .boldFontFamily {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: "Segoe UI Bold", wf_segoe-ui_bold, helvetica, arial, sans-serif; }
 
 .smallFontSize, .advanced-slicer {
   font-size: 12px; }
@@ -33,6 +33,57 @@ html, body {
   margin: 0;
   padding: 0; }
 
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: transparent; }
+
+*::-webkit-scrollbar-thumb {
+  background: transparent; }
+
+*::-webkit-scrollbar-track {
+  background: transparent; }
+
+*:hover::-webkit-scrollbar-thumb {
+  background: #C8C8C8; }
+
+*:hover::-webkit-scrollbar-track {
+  background: transparent; }
+
+*::-webkit-scrollbar-track-piece {
+  background: 0 0; }
+
+* {
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+  -ms-scrollbar-track-color: transparent;
+  -ms-scrollbar-arrow-color: #C8C8C8;
+  -ms-scrollbar-face-color: #C8C8C8; }
+
+* body {
+  scrollbar-face-color: #C8C8C8;
+  scrollbar-track-color: transparent; }
+
+/*
+* {
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    -ms-scrollbar-track-color:#d8d8ea;
+    -ms-scrollbar-arrow-color:$thumbColor;
+    -ms-scrollbar-face-color:$thumbColor;
+}
+
+* ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background-color: transparent;
+}`
+
+* ::-webkit-scrollbar-thumb {
+    background: $thumbColor;
+}
+
+* ::-webkit-scrollbar-track-piece {
+    background: 0 0;
+}*/
 .advanced-slicer {
   position: relative; }
 
