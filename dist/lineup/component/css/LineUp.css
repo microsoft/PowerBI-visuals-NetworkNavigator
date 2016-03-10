@@ -1,23 +1,23 @@
 .secondaryFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .secondaryBoldFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .lightFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .semilightFont {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .regularFont, .lu .tableData, .lu-popup, .lu-popup2, .lu-tooltip, .lineup-component {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .semiboldFont, .lu .sortedColumn, .lu .addColumnButton text {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .boldFontFamily {
-  font-family: "Helvetica,Arial,Verdana,Geneva,sans-serif"; }
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
 
 .smallFontSize, .lu .headerLabel, .lu text.headerSort, .lu .tableData, .lu .tableData.action text, .lu .addColumnButton text, .lu .stackedOption text, .lu-popup, .lu-popup2, .lu-tooltip, .lineup-component {
   font-size: 12px; }

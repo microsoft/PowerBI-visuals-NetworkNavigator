@@ -18,7 +18,7 @@ import SelectionId = powerbi.visuals.SelectionId;
 import SelectionManager = powerbi.visuals.utility.SelectionManager;
 import VisualDataRoleKind = powerbi.VisualDataRoleKind;
 import utility = powerbi.visuals.utility;
-
+const colors = require("../../base/powerbi/colors");
 declare var _;
 
 @Visual(JSON.parse(require("./build.json")).output.PowerBI)
@@ -41,7 +41,9 @@ export default class GraphVisual extends VisualBase implements IVisual {
             target: "target",
             edgeValue: "value",
             sourceColor: "sourceColor",
+            sourceLabelColor: "sourceLabelColor",
             targetColor: "targetColor",
+            targetLabelColor: "targetLabelColor",
             sourceGroup: "sourceGroup",
             targetGroup: "targetGroup"
         },
@@ -52,7 +54,8 @@ export default class GraphVisual extends VisualBase implements IVisual {
             charge: -120,
             labels: false,
             minZoom: .1,
-            maxZoom: 100
+            maxZoom: 100,
+            defaultLabelColor: colors[0]
         }
     };
 
@@ -103,10 +106,18 @@ export default class GraphVisual extends VisualBase implements IVisual {
                         displayName: "Source Node Color Column",
                         type: { text: true }
                     },
+                    sourceLabelColor: {
+                        displayName: "Source Node Label Color Column",
+                        type: { text: true }
+                    },
                     targetColor: {
                         displayName: "Target Node Color Column",
                         type: { text: true }
-                    }
+                    },
+                    targetLabelColor: {
+                        displayName: "Target Node Label Color Column",
+                        type: { text: true }
+                    },
                 },
             },
             layout: {
@@ -132,6 +143,11 @@ export default class GraphVisual extends VisualBase implements IVisual {
                         displayName: "Labels",
                         description: "If labels on the nodes should be shown",
                         type: { bool: true }
+                    },
+                    defaultLabelColor: {
+                        displayName: "Default Label Color",
+                        description: "The default color to use for labels",
+                        type: { text: true }  
                     },
                     minZoom: {
                         displayName: "Min Zoom",
@@ -205,6 +221,8 @@ export default class GraphVisual extends VisualBase implements IVisual {
                 if (updated) {
                     this.myGraph.redrawSelection();
                 }
+                
+                this.myGraph.redrawLabels();
             }
         }
 
@@ -253,16 +271,18 @@ export default class GraphVisual extends VisualBase implements IVisual {
 
         var sourceIdx = colMap[settings.columnMappings.source.toLocaleLowerCase()];
         var sourceColorIdx = colMap[settings.columnMappings.sourceColor.toLocaleLowerCase()];
+        var sourceLabelColorIdx = colMap[settings.columnMappings.sourceLabelColor.toLocaleLowerCase()];
         var sourceGroup = colMap[settings.columnMappings.sourceGroup.toLocaleLowerCase()];
         var targetGroupIdx = colMap[settings.columnMappings.targetGroup.toLocaleLowerCase()];
         var targetColorIdx = colMap[settings.columnMappings.targetColor.toLocaleLowerCase()];
+        var targetLabelColorIdx = colMap[settings.columnMappings.targetLabelColor.toLocaleLowerCase()];
         var targetIdx = colMap[settings.columnMappings.target.toLocaleLowerCase()];
         var edgeValueIdx = colMap[settings.columnMappings.edgeValue.toLocaleLowerCase()];
 
         var sourceField = dataView.categorical.categories[0].identityFields[sourceIdx];
         var targetField = dataView.categorical.categories[0].identityFields[targetIdx];
 
-        function getNode(id: string, identity: powerbi.DataViewScopeIdentity, isSource: boolean, color: string = "gray", group: number = 0) : ForceGraphSelectableNode {
+        function getNode(id: string, identity: powerbi.DataViewScopeIdentity, isSource: boolean, color: string = "gray", labelColor = undefined, group: number = 0) : ForceGraphSelectableNode {
             var node = nodeMap[id];
             // var expr = identity.expr;
             var expr = powerbi.data.SQExprBuilder.equal(isSource ? sourceField : targetField, powerbi.data.SQExprBuilder.text(id));
@@ -271,6 +291,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
                 node = nodeMap[id] = {
                     name: id,
                     color: color || "gray",
+                    labelColor: labelColor,
                     index: nodeList.length,
                     filterExpr: expr,
                     num: 1,
@@ -289,8 +310,8 @@ export default class GraphVisual extends VisualBase implements IVisual {
                 var sourceId = row[sourceIdx] + "";
                 var targetId = row[targetIdx] + "";
                 var edge = {
-                    source: getNode(sourceId, identity, true, row[sourceColorIdx], row[sourceGroup]).index,
-                    target: getNode(targetId, identity, false, row[targetColorIdx], row[targetGroupIdx]).index,
+                    source: getNode(sourceId, identity, true, row[sourceColorIdx], row[sourceLabelColorIdx], row[sourceGroup]).index,
+                    target: getNode(targetId, identity, false, row[targetColorIdx], row[targetLabelColorIdx], row[targetGroupIdx]).index,
                     value: row[edgeValueIdx]
                 };
                 nodeList[edge.source].num += 1;
@@ -336,7 +357,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
             if (!_.isEqual(oldSettings.layout, this.settings.layout)) {
                 this.myGraph.configuration = $.extend(true, {}, this.settings.layout);
             }
-
+           
             if (!_.isEqual(oldSettings.columnMappings, this.settings.columnMappings)) {
                 // This is necessary because some of the settings affect how the data is loaded
                 return true;
@@ -417,7 +438,9 @@ interface GraphVisualSettings {
         target?: string;
         edgeValue?: string;
         sourceColor?: string;
+        sourceLabelColor?: string;
         targetColor?: string;
+        targetLabelColor?: string;
         sourceGroup?: string;
         targetGroup?: string;
     };
@@ -429,6 +452,7 @@ interface GraphVisualSettings {
         labels?: boolean;
         minZoom?: number;
         maxZoom?: number;
+        defaultLabelColor?: string;
     };
 };
 

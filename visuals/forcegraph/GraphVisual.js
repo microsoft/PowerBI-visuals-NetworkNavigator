@@ -17,6 +17,7 @@ var Utils_1 = require("../../base/Utils");
 var InteractivityService = powerbi.visuals.InteractivityService;
 var SelectionId = powerbi.visuals.SelectionId;
 var utility = powerbi.visuals.utility;
+var colors = require("../../base/powerbi/colors");
 var GraphVisual = (function (_super) {
     __extends(GraphVisual, _super);
     function GraphVisual() {
@@ -72,6 +73,7 @@ var GraphVisual = (function (_super) {
                 if (updated) {
                     this.myGraph.redrawSelection();
                 }
+                this.myGraph.redrawLabels();
             }
         }
         this.dataViewTable = dataViewTable;
@@ -112,15 +114,18 @@ var GraphVisual = (function (_super) {
         // value - The number of times that the link has been made, ie, I emailed bob@gmail.com 10 times, so value would be 10
         var sourceIdx = colMap[settings.columnMappings.source.toLocaleLowerCase()];
         var sourceColorIdx = colMap[settings.columnMappings.sourceColor.toLocaleLowerCase()];
+        var sourceLabelColorIdx = colMap[settings.columnMappings.sourceLabelColor.toLocaleLowerCase()];
         var sourceGroup = colMap[settings.columnMappings.sourceGroup.toLocaleLowerCase()];
         var targetGroupIdx = colMap[settings.columnMappings.targetGroup.toLocaleLowerCase()];
         var targetColorIdx = colMap[settings.columnMappings.targetColor.toLocaleLowerCase()];
+        var targetLabelColorIdx = colMap[settings.columnMappings.targetLabelColor.toLocaleLowerCase()];
         var targetIdx = colMap[settings.columnMappings.target.toLocaleLowerCase()];
         var edgeValueIdx = colMap[settings.columnMappings.edgeValue.toLocaleLowerCase()];
         var sourceField = dataView.categorical.categories[0].identityFields[sourceIdx];
         var targetField = dataView.categorical.categories[0].identityFields[targetIdx];
-        function getNode(id, identity, isSource, color, group) {
+        function getNode(id, identity, isSource, color, labelColor, group) {
             if (color === void 0) { color = "gray"; }
+            if (labelColor === void 0) { labelColor = undefined; }
             if (group === void 0) { group = 0; }
             var node = nodeMap[id];
             // var expr = identity.expr;
@@ -129,6 +134,7 @@ var GraphVisual = (function (_super) {
                 node = nodeMap[id] = {
                     name: id,
                     color: color || "gray",
+                    labelColor: labelColor,
                     index: nodeList.length,
                     filterExpr: expr,
                     num: 1,
@@ -146,8 +152,8 @@ var GraphVisual = (function (_super) {
                 var sourceId = row[sourceIdx] + "";
                 var targetId = row[targetIdx] + "";
                 var edge = {
-                    source: getNode(sourceId, identity, true, row[sourceColorIdx], row[sourceGroup]).index,
-                    target: getNode(targetId, identity, false, row[targetColorIdx], row[targetGroupIdx]).index,
+                    source: getNode(sourceId, identity, true, row[sourceColorIdx], row[sourceLabelColorIdx], row[sourceGroup]).index,
+                    target: getNode(targetId, identity, false, row[targetColorIdx], row[targetLabelColorIdx], row[targetGroupIdx]).index,
                     value: row[edgeValueIdx]
                 };
                 nodeList[edge.source].num += 1;
@@ -258,7 +264,9 @@ var GraphVisual = (function (_super) {
             target: "target",
             edgeValue: "value",
             sourceColor: "sourceColor",
+            sourceLabelColor: "sourceLabelColor",
             targetColor: "targetColor",
+            targetLabelColor: "targetLabelColor",
             sourceGroup: "sourceGroup",
             targetGroup: "targetGroup"
         },
@@ -269,7 +277,8 @@ var GraphVisual = (function (_super) {
             charge: -120,
             labels: false,
             minZoom: .1,
-            maxZoom: 100
+            maxZoom: 100,
+            defaultLabelColor: colors[0]
         }
     };
     GraphVisual.capabilities = {
@@ -319,10 +328,18 @@ var GraphVisual = (function (_super) {
                         displayName: "Source Node Color Column",
                         type: { text: true }
                     },
+                    sourceLabelColor: {
+                        displayName: "Source Node Label Color Column",
+                        type: { text: true }
+                    },
                     targetColor: {
                         displayName: "Target Node Color Column",
                         type: { text: true }
-                    }
+                    },
+                    targetLabelColor: {
+                        displayName: "Target Node Label Color Column",
+                        type: { text: true }
+                    },
                 },
             },
             layout: {
@@ -348,6 +365,11 @@ var GraphVisual = (function (_super) {
                         displayName: "Labels",
                         description: "If labels on the nodes should be shown",
                         type: { bool: true }
+                    },
+                    defaultLabelColor: {
+                        displayName: "Default Label Color",
+                        description: "The default color to use for labels",
+                        type: { text: true }
                     },
                     minZoom: {
                         displayName: "Min Zoom",
