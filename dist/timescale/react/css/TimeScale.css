@@ -1,8 +1,4 @@
-svg {
-  font: 10px sans-serif; }
-
 .area {
-  fill: steelblue;
   clip-path: url(#clip); }
 
 .axis path,
@@ -26,3 +22,41 @@ body, html {
   margin: 0;
   padding: 0;
   overflow: hidden; }
+
+.secondaryFont {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.secondaryBoldFont {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.lightFont {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.semilightFont {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.regularFont, svg {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.semiboldFont {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.boldFontFamily {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.smallFontSize, svg {
+  font-size: 12px; }
+
+.mediumFontSize {
+  font-size: 14px; }
+
+.largeFontSize {
+  font-size: 16px; }
+
+html, body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0; }
+
+.bars {
+  fill: rgba(0, 100, 200, 0.5); }

@@ -123,7 +123,7 @@ var TimeScaleVisual = (function (_super) {
      * Gets the inline css used for this element
      */
     TimeScaleVisual.prototype.getCss = function () {
-        return _super.prototype.getCss.call(this).concat([require("!css!sass!./css/TimeScale.scss")]);
+        return _super.prototype.getCss.call(this).concat([require("!css!sass!./css/TimeScaleVisual.scss")]);
     };
     /**
      * The set of capabilities for the visual
