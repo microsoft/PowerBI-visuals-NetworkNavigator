@@ -8,6 +8,32 @@ describe("JSONDataProvider", function () {
         global['d3'] = require("d3");
         global['_'] = require("underscore");
     });
+    var TEST_CASE_ONE = [
+        {
+            "id": 1,
+            "num_hashtags": 3,
+            "num_mentions": 2,
+            "num_tweets": 1
+        },
+        {
+            "id": 2,
+            "num_hashtags": 10,
+            "num_mentions": 0,
+            "num_tweets": 1
+        },
+        {
+            "id": 3,
+            "num_hashtags": 4,
+            "num_mentions": 1,
+            "num_tweets": 4
+        },
+        {
+            "id": 4,
+            "num_hashtags": 0,
+            "num_mentions": 0,
+            "num_tweets": 9
+        }
+    ];
     var TEST_DATA_WITH_ALL_NULLS = [{
             id: 1,
             col1: 12,
@@ -59,6 +85,37 @@ describe("JSONDataProvider", function () {
                 chai_1.expect(sorted.results[2]['col1']).to.equal(TEST_DATA_WITH_ALL_NULLS[1].col1 // This has the highest value
                 );
                 done();
+            });
+        });
+        it("should sort TEST_CASE_1 correctly", function () {
+            var instance = createInstance(TEST_CASE_ONE).instance;
+            var result = instance.query({
+                offset: 0,
+                count: 100,
+                sort: [{
+                        "stack": {
+                            "name": "Stacked",
+                            "columns": [
+                                {
+                                    "column": "num_hashtags",
+                                    "weight": 1
+                                },
+                                {
+                                    "column": "num_mentions",
+                                    "weight": 1
+                                },
+                                {
+                                    "column": "num_tweets",
+                                    "weight": 1
+                                }
+                            ]
+                        },
+                        "asc": true
+                    }]
+            });
+            return result.then(function (resp) {
+                var ids = resp.results.map(function (n) { return n.id; });
+                chai_1.expect(ids).to.deep.equal([2, 4, 3, 1]);
             });
         });
     });
