@@ -196,7 +196,7 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
      * Gets the inline css used for this element
      */
     protected getCss() : string[] {
-        return super.getCss().concat([require("!css!sass!./css/TimeScale.scss")]);
+        return super.getCss().concat([require("!css!sass!./css/TimeScaleVisual.scss")]);
     }
 }
 

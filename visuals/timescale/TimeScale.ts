@@ -137,8 +137,7 @@ export class TimeScale {
             .attr("class", "context");
 
         this.bars = this.context.append("g")
-            .attr("class", "bars")
-            .style("fill", "rgba(0,100,200,.5)");
+            .attr("class", "bars");
 
         this.xAxis = this.context.append("g")
             .attr("class", "x axis");
