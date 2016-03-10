@@ -3,7 +3,14 @@
 @import "./includes";
 
 $thumbColor: #C8C8C8;
+$trackColor: transparent;
+$scrollbarSize: 8px;
 
+* {
+    @include scrollbars($scrollbarSize, $thumbColor, $trackColor, true);
+}
+
+/*
 * {
     -ms-overflow-style: -ms-autohiding-scrollbar;
     -ms-scrollbar-track-color:#d8d8ea;
@@ -15,7 +22,7 @@ $thumbColor: #C8C8C8;
     width: 8px;
     height: 8px;
     background-color: transparent;
-}
+}`
 
 * ::-webkit-scrollbar-thumb {
     background: $thumbColor;
@@ -23,4 +30,4 @@ $thumbColor: #C8C8C8;
 
 * ::-webkit-scrollbar-track-piece {
     background: 0 0;
-}
+}*/

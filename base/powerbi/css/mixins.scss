@@ -2,29 +2,59 @@
 /// Beware, this does not work in all browsers
 /// @author Hugo Giraudel
 /// @param {Length} $size - Horizontal scrollbar's height and vertical scrollbar's width
-/// @param {Color} $foreground-color - Scrollbar's color
-/// @param {Color} $background-color [mix($foreground-color, white, 50%)] - Scrollbar's color
+/// @param {Color} $thumb-color - Scrollbar's color
+/// @param {Color} $track-color [mix($thumb-color, white, 50%)] - Scrollbar's color
 /// @example scss - Scrollbar styling
 ///   @include scrollbars(.5em, slategray);
-@mixin scrollbars($size, $foreground-color, $background-color: mix($foreground-color, white,  50%)) {
+@mixin scrollbars($size, $thumb-color, $track-color: mix($thumb-color, white,  50%), $hover-only:false) {
+
   // For Google Chrome
-  ::-webkit-scrollbar {
+  &::-webkit-scrollbar {
       width:  $size;
       height: $size;
       background-color: transparent;
   }
 
-  ::-webkit-scrollbar-thumb {
-      background: $foreground-color;
+  &::-webkit-scrollbar-thumb {
+      @if $hover-only == false {
+          background: $thumb-color;
+      } @else {
+          background: transparent;
+      }
   }
 
-  ::-webkit-scrollbar-track {
-      background: $background-color;
+  &::-webkit-scrollbar-track {
+      @if $hover-only == false {
+          background: $track-color;
+      } @else {
+          background: transparent;
+      }
+  }  
+  
+  @if $hover-only == true {
+    &:hover::-webkit-scrollbar-thumb {
+        background: $thumb-color;
+    }
+
+    &:hover::-webkit-scrollbar-track {
+        background: $track-color;
+    } 
+  } 
+  
+  &::-webkit-scrollbar-track-piece {
+      background: 0 0;
+  }
+  
+  & {
+      -ms-overflow-style: -ms-autohiding-scrollbar;
+      -ms-scrollbar-track-color: $track-color;
+      -ms-scrollbar-arrow-color: $thumb-color;
+      -ms-scrollbar-face-color: $thumb-color;
   }
 
   // For Internet Explorer
   body {
-    scrollbar-face-color: $foreground-color;
-    scrollbar-track-color: $background-color;
-  }
+    scrollbar-face-color: $thumb-color;
+    scrollbar-track-color: $track-color;
+  }  
 }
