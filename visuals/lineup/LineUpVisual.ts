@@ -20,6 +20,8 @@ import SelectionId = powerbi.visuals.SelectionId;
 import SelectionManager = powerbi.visuals.utility.SelectionManager;
 import VisualDataRoleKind = powerbi.VisualDataRoleKind;
 
+const colors = require("../../base/powerbi/colors");
+
 @Visual(require("./build.js").output.PowerBI)
 export default class LineUpVisual extends VisualBase implements IVisual {
     private dataViewTable: DataViewTable;
@@ -39,6 +41,11 @@ export default class LineUpVisual extends VisualBase implements IVisual {
      * The default settings for the visual
      */
     private static VISUAL_DEFAULT_SETTINGS : ILineUpVisualSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS, {
+        presentation: {
+            columnColors: (idx) => {
+                return colors[idx % colors.length]  
+            }
+        },
         experimental: {
             serverSideSorting: false,
             serverSideFiltering: false

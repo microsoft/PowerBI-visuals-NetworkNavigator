@@ -129,6 +129,11 @@ export interface ILineUpSettings {
         multiSelect?: boolean;
     };
     presentation?: {
+        
+        /**
+         * Provides a mapping from column index to colors
+         */
+        columnColors?: (columnIdx: number) => string;
 
         /**
          * Show row values

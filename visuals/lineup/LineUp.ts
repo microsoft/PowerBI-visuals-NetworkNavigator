@@ -2,6 +2,7 @@ import { default as EventEmitter } from "../../base/EventEmitter";
 import { default as Utils } from "../../base/Utils";
 import { JSONDataProvider } from "./providers/JSONDataProvider";
 import * as _  from "lodash";
+import * as d3 from "d3";
 import { IQueryOptions, IQueryResult, IDataProvider, ILineUpColumn, ILineUpRow, ILineUpSettings, ILineUpConfiguration, ILineUpSort } from "./models";
 const $ = require("jquery");
 const LineUpLib = require("./lib/lineup");
@@ -102,6 +103,7 @@ export class LineUp {
             multiSelect: true
         },
         presentation: {
+            columnColors: <any>d3.scale.category20(),
             stacked: true,
             values: false,
             histograms: true,
@@ -296,6 +298,8 @@ export class LineUp {
             }
             this.lineupImpl.changeInteractionOption("tooltips", newSettings.presentation.tooltips);
         }
+        
+        this.lineUpConfig['columnColors'] = newSettings.presentation.columnColors;
 
         // Sets the tooltips configuration
         this.lineUpConfig['interaction'].tooltips = newSettings.presentation.tooltips;

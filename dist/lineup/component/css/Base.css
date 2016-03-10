@@ -1,38 +1,3 @@
-.secondaryFont {
-  font-family: wf_standard-font, helvetica, arial, sans-serif; }
-
-.secondaryBoldFont {
-  font-family: wf_standard-font_bold, helvetica, arial, sans-serif; }
-
-.lightFont {
-  font-family: "Segoe UI Light", wf_segoe-ui_light, helvetica, arial, sans-serif; }
-
-.semilightFont {
-  font-family: "Segoe UI Semilight", wf_segoe-ui_semilight, helvetica, arial, sans-serif; }
-
-.regularFont, .lu .tableData, .lu-popup, .lu-popup2, .lu-tooltip, .lineup-component {
-  font-family: "Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif; }
-
-.semiboldFont, .lu .sortedColumn, .lu .addColumnButton text {
-  font-family: "Segoe UI Semibold", wf_segoe-ui_semibold, helvetica, arial, sans-serif; }
-
-.boldFontFamily {
-  font-family: "Segoe UI Bold", wf_segoe-ui_bold, helvetica, arial, sans-serif; }
-
-.smallFontSize, .lu .headerLabel, .lu text.headerSort, .lu .tableData, .lu .tableData.action text, .lu .addColumnButton text, .lu .stackedOption text, .lu-popup, .lu-popup2, .lu-tooltip, .lineup-component {
-  font-size: 12px; }
-
-.mediumFontSize, .lu .sortedColumn, .lu .fontawe, .nav li {
-  font-size: 14px; }
-
-.largeFontSize {
-  font-size: 16px; }
-
-html, body {
-  overflow: hidden;
-  margin: 0;
-  padding: 0; }
-
 .lu .weightHandle {
   fill: white;
   /*stroke:grey;*/

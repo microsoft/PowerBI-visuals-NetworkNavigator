@@ -1,87 +1,494 @@
-.grid {
-  position: relative;
+.secondaryFont {
+  font-family: wf_standard-font, helvetica, arial, sans-serif; }
+
+.secondaryBoldFont {
+  font-family: wf_standard-font_bold, helvetica, arial, sans-serif; }
+
+.lightFont {
+  font-family: "Segoe UI Light", wf_segoe-ui_light, helvetica, arial, sans-serif; }
+
+.semilightFont {
+  font-family: "Segoe UI Semilight", wf_segoe-ui_semilight, helvetica, arial, sans-serif; }
+
+.regularFont, .lu .tableData, .lu-popup, .lu-popup2, .lu-tooltip, .lineup-component {
+  font-family: "Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif; }
+
+.semiboldFont, .lu .sortedColumn, .lu .addColumnButton text {
+  font-family: "Segoe UI Semibold", wf_segoe-ui_semibold, helvetica, arial, sans-serif; }
+
+.boldFontFamily {
+  font-family: "Segoe UI Bold", wf_segoe-ui_bold, helvetica, arial, sans-serif; }
+
+.smallFontSize, .lu .headerLabel, .lu text.headerSort, .lu .tableData, .lu .tableData.action text, .lu .addColumnButton text, .lu .stackedOption text, .lu-popup, .lu-popup2, .lu-tooltip, .lineup-component {
   font-size: 12px; }
 
-#lugui-menu {
-  height: 20px; }
+.mediumFontSize, .lu .sortedColumn, .lu .fontawe, .nav li {
+  font-size: 14px; }
 
-#lugui-menu {
-  background-color: lightgray;
-  /*padding-left: 5px;*/
-  /*padding-right: 5px;*/
-  /*border: 2px solid darkgrey;*/
-  border-radius: 5px;
-  font-family: 'Lato', Helvetica, Arial;
-  font-weight: normal;
-  font-size: 11pt;
-  white-space: nowrap;
-  padding: 5;
-  width: 100%; }
-
-#lugui-menu a {
-  font-size: 10pt;
-  font-weight: normal;
-  font-style: normal;
-  text-decoration: none;
-  color: royalblue; }
-
-#lugui-menu a:hover {
-  /*font-size: 11pt;*/
-  font-weight: bold; }
-
-#lugui-menu-actions span, form span {
-  font-size: 10pt;
-  font-weight: normal;
-  font-style: normal;
-  text-decoration: none;
-  color: royalblue;
-  background-color: white;
-  border-radius: 4px;
-  padding: 1px;
-  padding-left: 5px;
-  padding-right: 5px;
-  margin-right: 5px;
-  cursor: pointer; }
-
-#lugui-menu-actions span:hover {
-  background-color: darkgrey; }
+.largeFontSize {
+  font-size: 16px; }
 
 html, body {
-  padding: 0;
+  overflow: hidden;
   margin: 0;
-  /*width: 100%;
-    height: 100%;*/ }
+  padding: 0; }
 
-/**
- * basic wrapper of LineUp
- */
-#lugui-wrapper {
-  clear: both;
-  position: absolute;
-  top: 35px;
-  padding: 0;
-  width: 100%;
-  height: -moz-calc(100% - 35px);
-  height: -webkit-calc(100% - 35px);
-  height: calc(100% - 35px); }
+.lu .weightHandle {
+  fill: white;
+  /*stroke:grey;*/
+  /*stroke-width:1;*/
+  cursor: col-resize; }
 
-form {
-  display: inline; }
+.lu .headerLabel {
+  dominant-baseline: middle;
+  fill: black;
+  pointer-events: none;
+  /*stroke-size:.1;*/
+  /*stroke:white;*/ }
 
-#drop_zone {
-  border: 2px dashed #BBB;
-  border-radius: 5px;
-  padding: 1px 2em;
-  text-align: center;
-  color: #BBB; }
+.lu g.hist rect {
+  fill: black;
+  opacity: 0.3; }
+
+.lu g.hist rect.hover {
+  fill: red;
+  opacity: 0.8; }
+
+.lu text.headerSort {
+  font-family: 'FontAwesome';
+  fill: white; }
+
+.lu .tableData {
+  dominant-baseline: middle;
+  fill: darkgrey; }
+
+.lu .tableData.action text {
+  font-family: 'FontAwesome';
+  font-weight: bold;
+  dominant-baseline: central;
+  text-anchor: middle;
+  fill: grey;
+  user-select: none; }
+
+.lu .tableData.action text:hover {
+  cursor: pointer;
+  fill: black; }
+
+.lu .emptyHeader {
+  opacity: .5; }
+
+.lu .sortedColumn {
+  font-weight: 600; }
+
+.lu .fa {
+  position: relative;
+  top: .5pt; }
+
+.lu .addColumnButton rect {
+  fill: white;
+  border-radius: 5px; }
+
+.lu .addColumnButton rect:hover {
+  fill: darkgray; }
+
+.lu .addColumnButton text {
+  font-family: 'FontAwesome';
+  fill: black;
+  dominant-baseline: central;
+  text-anchor: middle;
+  pointer-events: none;
+  user-select: none; }
+
+.lu .fontawe {
+  font-family: 'FontAwesome';
+  dominant-baseline: central;
+  text-anchor: middle; }
+
+.lu .stackedColumnInfo, .singleColumnDelete, .singleColumnFilter {
+  fill: lightgrey;
+  cursor: pointer; }
+
+.lu .singleColumnFilter.filtered {
+  fill: steelblue; }
+
+.lu .stackedColumnInfo:hover, .singleColumnDelete:hover, .singleColumnFilter:hover {
+  fill: white; }
+
+/* for gui helper */
+.lu .stackedOption rect {
+  fill: white;
+  opacity: .9; }
+
+.lu .stackedOption text {
+  font-family: 'FontAwesome';
+  dominant-baseline: central;
+  font-weight: bold;
+  fill: black;
+  cursor: pointer; }
+
+.lu .stackedOption text:hover {
+  fill: royalblue; }
+
+.lu .dragObject {
+  opacity: .5; }
+
+.lu .dragHeader {
+  fill: grey;
+  opacity: .6; }
+
+.lu .row rect.filler {
+  fill: transparent; }
+
+.lu .row.hover text {
+  fill: black;
+  font-weight: bold; }
 
 .lu .row.selected rect.filler {
-  stroke: none !important;
-  stroke-width: 1 !important;
-  fill: #aaa !important; }
+  stroke: orange;
+  stroke-width: 1; }
 
-.lu .tableData.text {
-  fill: black !important; }
+.lu .row.values text {
+  fill: black; }
 
-.lu .row {
-  cursor: pointer !important; }
+.lu .row.hover rect.tableData, .lu .row.hover g.tableData rect,
+.lu .row.values rect.tableData, .lu .row.values g.tableData rect {
+  opacity: 0.5; }
+
+.lu .row .hoveronly {
+  pointer-events: none;
+  user-select: none; }
+
+.lu .row .valueonly {
+  user-select: none; }
+
+.lugui-me line.axis, .lugui-me g.data line {
+  stroke: gray; }
+
+.lugui-me line.bound {
+  stroke: black;
+  stroke-width: 2; }
+
+.lugui-me circle.handle {
+  fill: steelblue;
+  cursor: pointer; }
+
+.lugui-me circle.handle.dragging {
+  fill: black; }
+
+.lugui-me text.drag {
+  visibility: hidden; }
+
+.lugui-me text.centered {
+  text-anchor: middle; }
+
+.lu-popupBG {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  opacity: 0.3; }
+
+.lu-popup {
+  background: white;
+  position: absolute;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 10px 10px 5px #888888;
+  dominant-baseline: central;
+  text-anchor: middle; }
+
+.lu-popup .selectionTable {
+  background: white;
+  overflow-x: auto;
+  overflow-y: scroll; }
+
+.lu-popup .selectionTable table {
+  width: 95%;
+  border: 0; }
+
+.lu-popup .ok {
+  position: absolute;
+  right: 10px; }
+
+.lu-popup .selectionTable tr:hover {
+  background-color: lightblue; }
+
+.lu-popup2 {
+  background-color: rgba(255, 255, 255, 0.5);
+  position: absolute;
+  padding: 2px;
+  clear: right; }
+
+.lu-popup2 * {
+  margin: 0; }
+
+.lu-popup2 .ok {
+  float: right; }
+
+.lu-tooltip {
+  background-color: white;
+  min-width: 200px;
+  position: absolute;
+  z-index: 3;
+  text-align: left;
+  padding: 2px; }
+
+.lu-tooltip table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1em; }
+
+.lu-tooltip tbody th {
+  width: 100px; }
+
+.lu-tooltip td, .lu-tooltip th {
+  border: 1px solid black; }
+
+/**
+ * in the combined mode just a single svg is used and the container is the scrolling container
+ */
+.lu-mode-combined {
+  overflow-x: visible;
+  overflow-y: auto; }
+
+/*
+ * in the separate mode a dedicated header and body svg are used
+ */
+.lu-mode-separate .lu-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px; }
+
+/*
+ * in the separate mode a dedicated header and body svg are used, with an additional wrapper div for the body as scrolling container
+ */
+.lu-mode-separate .lu-wrapper {
+  position: relative;
+  left: 0;
+  top: 50px;
+  width: 100%;
+  height: -moz-calc(100% - 100px);
+  height: -webkit-calc(100% - 100px);
+  height: calc(100% - 100px);
+  overflow-x: visible;
+  overflow-y: auto; }
+
+.nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: #aaa; }
+
+.nav li {
+  border-bottom: 1px solid #888; }
+  .nav li:first-of-type a {
+    border-radius: 5px 0px 0px 5px; }
+  .nav li:last-of-type a {
+    border-radius: 0px 5px 5px 0px; }
+
+.nav a {
+  text-decoration: none;
+  color: #888;
+  display: block;
+  transition: .3s color;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  padding: 5px; }
+  .nav a .fa-stack {
+    font-size: .5em; }
+
+.add-column .fa-plus-circle, .add-stacked-column .fa-plus-circle {
+  margin: .5em;
+  color: green; }
+
+.nav a:hover {
+  color: #444; }
+
+.nav a.active {
+  background-color: #444;
+  cursor: default; }
+
+.nav li {
+  border-bottom: none;
+  font-size: 1.4em; }
+
+/* Option 1 - Display Inline */
+.nav li {
+  display: inline-block;
+  margin-right: -4px; }
+
+/* Options 2 - Float
+  .nav li {
+    float: left;
+  }
+  .nav ul {
+    overflow: auto;
+    width: 600px;
+    margin: 0 auto;
+  }
+  .nav {
+    background-color: #444;
+  }
+  */
+.lineup-component {
+  /** http://loading.io/ */ }
+
+@-webkit-keyframes uil-ring-anim {
+  0% {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+
+@-webkit-keyframes uil-ring-anim {
+  0% {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+
+@-moz-keyframes uil-ring-anim {
+  0% {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+
+@-ms-keyframes uil-ring-anim {
+  .lineup-component 0% {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  .lineup-component 100% {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+
+@-moz-keyframes uil-ring-anim {
+  0% {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+
+@-webkit-keyframes uil-ring-anim {
+  0% {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+
+@-o-keyframes uil-ring-anim {
+  0% {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+
+@keyframes uil-ring-anim {
+  0% {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+  .lineup-component .load-spinner > div {
+    position: absolute;
+    display: block;
+    width: 160px;
+    height: 160px;
+    top: 20px;
+    left: 20px;
+    border-radius: 80px;
+    box-shadow: 0 6px 0 0 #59ebff;
+    -ms-animation: uil-ring-anim 1s linear infinite;
+    -moz-animation: uil-ring-anim 1s linear infinite;
+    -webkit-animation: uil-ring-anim 1s linear infinite;
+    -o-animation: uil-ring-anim 1s linear infinite;
+    animation: uil-ring-anim 1s linear infinite; }
+  .lineup-component .load-spinner {
+    background: none;
+    position: absolute;
+    display: none;
+    width: 200px;
+    height: 200px;
+    left: 50%;
+    top: 50%;
+    margin-left: -80px;
+    margin-top: -80px;
+    transform: scale(0.5); }
+  .lineup-component.loading {
+    color: #ccc; }
+    .lineup-component.loading .lu-wrapper text {
+      stroke: #ccc;
+      fill: #ccc; }
+    .lineup-component.loading .lu-wrapper {
+      position: relative; }
+    .lineup-component.loading .lu-wrapper:after {
+      content: " ";
+      z-index: 10;
+      display: block;
+      position: absolute;
+      height: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: transparent; }
+    .lineup-component.loading .load-spinner {
+      display: block; }
