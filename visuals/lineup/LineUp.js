@@ -2,6 +2,7 @@
 var EventEmitter_1 = require("../../base/EventEmitter");
 var JSONDataProvider_1 = require("./providers/JSONDataProvider");
 var _ = require("lodash");
+var d3 = require("d3");
 var $ = require("jquery");
 var LineUpLib = require("./lib/lineup");
 /**
@@ -149,6 +150,7 @@ var LineUp = (function () {
                 }
                 this.lineupImpl.changeInteractionOption("tooltips", newSettings.presentation.tooltips);
             }
+            this.lineUpConfig['columnColors'] = newSettings.presentation.columnColors;
             // Sets the tooltips configuration
             this.lineUpConfig['interaction'].tooltips = newSettings.presentation.tooltips;
             this._settings = newSettings;
@@ -566,6 +568,7 @@ var LineUp = (function () {
             multiSelect: true
         },
         presentation: {
+            columnColors: d3.scale.category20(),
             stacked: true,
             values: false,
             histograms: true,

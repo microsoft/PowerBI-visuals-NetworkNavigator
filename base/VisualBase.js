@@ -25,6 +25,7 @@ var VisualBase = (function () {
         if (addCssToParent) {
             this.container.append(this.getCss().map(function (css) { return $("<st" + "yle>" + css + "</st" + "yle>"); }));
         }
+        this.HACK_fonts();
         this.element.append(this.getCss().map(function (css) { return $("<st" + "yle>" + css + "</st" + "yle>"); }));
         if (template) {
             this.element = this.element.append($(template));
@@ -40,7 +41,7 @@ var VisualBase = (function () {
      * Gets the inline css used for this element
      */
     VisualBase.prototype.getCss = function () {
-        return [require("!css!sass!./css/base.scss")];
+        return [require("!css!sass!./css/main.scss")];
     };
     /**
      * Builds the link for the given external css resource
@@ -60,6 +61,25 @@ var VisualBase = (function () {
      */
     VisualBase.prototype.getExternalCssResources = function () {
         return [];
+    };
+    VisualBase.prototype.HACK_fonts = function () {
+        var faces = this.HACK_getFontFaces();
+        this.element.append(faces.map(function (n) { return $("<st" + "yle>" + n.cssText + "</st" + "yle>"); }));
+    };
+    VisualBase.prototype.HACK_getFontFaces = function (obj) {
+        var sheet = document.styleSheets, rule = null, i = sheet.length, j, toReturn = [];
+        while (0 <= --i) {
+            rule = sheet[i]['rules'] || sheet[i]['cssRules'] || [];
+            j = rule.length;
+            while (0 <= --j) {
+                if (rule[j].constructor.name === 'CSSFontFaceRule') {
+                    //o[ rule[j].style.fontFamily ] = rule[j].style.src;
+                    toReturn.push(rule[j]);
+                }
+                ;
+            }
+        }
+        return toReturn;
     };
     return VisualBase;
 }());

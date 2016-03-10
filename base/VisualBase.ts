@@ -18,6 +18,9 @@ export class VisualBase implements powerbi.IVisual {
         if (addCssToParent) {
             this.container.append(this.getCss().map((css) => $("<st" + "yle>" + css + "</st" + "yle>")));
         }
+        
+        this.HACK_fonts();
+        
         this.element.append(this.getCss().map((css) => $("<st" + "yle>" + css + "</st" + "yle>")));
 
         if (template) {
@@ -36,7 +39,7 @@ export class VisualBase implements powerbi.IVisual {
      * Gets the inline css used for this element
      */
     protected getCss() : string[] {
-        return [require("!css!sass!./css/base.scss")];
+        return [require("!css!sass!./css/main.scss")];
     }
 
     /**
@@ -59,6 +62,44 @@ export class VisualBase implements powerbi.IVisual {
     protected getExternalCssResources() : ExternalCssResource[] {
         return [];
     }
+    
+    private HACK_fonts() {
+        let faces = this.HACK_getFontFaces();
+        this.element.append(faces.map(n => $("<st" + "yle>" + n.cssText + "</st" + "yle>")));
+    }
+ 
+    private HACK_getFontFaces(obj?) {
+        var sheet = document.styleSheets,
+            rule = null,
+            i = sheet.length, j, toReturn = [];
+        while( 0 <= --i ){
+            rule = sheet[i]['rules'] || sheet[i]['cssRules'] || [];
+            j = rule.length;
+            while( 0 <= --j ){
+                if( rule[j].constructor.name === 'CSSFontFaceRule' ){ // rule[j].slice(0, 10).toLowerCase() === '@font-face'
+                    //o[ rule[j].style.fontFamily ] = rule[j].style.src;
+                    toReturn.push(rule[j]);
+                };
+            }
+        }
+        return toReturn;
+    }   
+    // private HACK_getFontFaces(obj?) {
+    //     var o = obj || {},
+    //         sheet = document.styleSheets,
+    //         rule = null,
+    //         i = sheet.length, j;
+    //     while( 0 <= --i ){
+    //         rule = sheet[i]['rules'] || sheet[i]['cssRules'] || [];
+    //         j = rule.length;
+    //         while( 0 <= --j ){
+    //             if( rule[j].constructor.name === 'CSSFontFaceRule' ){ // rule[j].slice(0, 10).toLowerCase() === '@font-face'
+    //                 o[ rule[j].style.fontFamily ] = rule[j].style.src;
+    //             };
+    //         }
+    //     }
+    //     return o;
+    // }
 }
 
 /**

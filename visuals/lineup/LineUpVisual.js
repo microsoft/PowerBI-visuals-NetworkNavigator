@@ -18,6 +18,7 @@ var JSONDataProvider_1 = require("./providers/JSONDataProvider");
 var SelectionId = powerbi.visuals.SelectionId;
 var SelectionManager = powerbi.visuals.utility.SelectionManager;
 var VisualDataRoleKind = powerbi.VisualDataRoleKind;
+var colors = require("../../base/powerbi/colors");
 var LineUpVisual = (function (_super) {
     __extends(LineUpVisual, _super);
     /**
@@ -369,6 +370,11 @@ var LineUpVisual = (function (_super) {
      * The default settings for the visual
      */
     LineUpVisual.VISUAL_DEFAULT_SETTINGS = $.extend(true, {}, LineUp_1.LineUp.DEFAULT_SETTINGS, {
+        presentation: {
+            columnColors: function (idx) {
+                return colors[idx % colors.length];
+            }
+        },
         experimental: {
             serverSideSorting: false,
             serverSideFiltering: false
