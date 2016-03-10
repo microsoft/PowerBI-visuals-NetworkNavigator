@@ -20,7 +20,8 @@ var ForceGraph = (function () {
             gravity: .1,
             labels: false,
             minZoom: .1,
-            maxZoom: 100
+            maxZoom: 100,
+            defaultLabelColor: "blue"
         };
         /**
          * The event emitter for this graph
@@ -261,9 +262,10 @@ var ForceGraph = (function () {
         });
         link.on("click", function (n) { console.log(n); });
         node.append("svg:text")
+            .attr("class", "node-label")
             .text(function (d) { return d.name; })
-            .attr("fill", "blue")
-            .attr("stroke", "blue")
+            .attr("fill", function (d) { return d.labelColor || _this.configuration.defaultLabelColor; })
+            .attr("stroke", function (d) { return d.labelColor || _this.configuration.defaultLabelColor; })
             .attr("font-size", "5pt")
             .attr("stroke-width", "0.5px")
             .style("opacity", this._configuration.labels ? 100 : 0);
@@ -281,6 +283,15 @@ var ForceGraph = (function () {
     ForceGraph.prototype.redrawSelection = function () {
         this.vis.selectAll(".node circle")
             .style("stroke-width", function (d) { return d.selected ? 1 : 0; });
+    };
+    /**
+     * Redraws the node labels
+     */
+    ForceGraph.prototype.redrawLabels = function () {
+        var _this = this;
+        this.vis.selectAll(".node .node-label")
+            .attr("fill", function (d) { return d.labelColor || _this.configuration.defaultLabelColor; })
+            .attr("stroke", function (d) { return d.labelColor || _this.configuration.defaultLabelColor; });
     };
     /**
      * Filters the nodes to the given string

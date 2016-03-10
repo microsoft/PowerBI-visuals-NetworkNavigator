@@ -22,7 +22,8 @@ export class ForceGraph {
         gravity: .1,
         labels: false,
         minZoom: .1,
-        maxZoom: 100
+        maxZoom: 100,
+        defaultLabelColor: "blue"
     };
 
     /**
@@ -316,9 +317,10 @@ export class ForceGraph {
         link.on("click", function(n) { console.log(n); });
 
         node.append("svg:text")
+            .attr("class", "node-label")
             .text(function(d) { return d.name; })
-            .attr("fill", "blue")
-            .attr("stroke", "blue")
+            .attr("fill", (d) => d.labelColor || this.configuration.defaultLabelColor)
+            .attr("stroke", (d) => d.labelColor || this.configuration.defaultLabelColor)
             .attr("font-size", "5pt")
             .attr("stroke-width", "0.5px")
             .style("opacity", this._configuration.labels ? 100 : 0);
@@ -338,6 +340,15 @@ export class ForceGraph {
     public redrawSelection() {
         this.vis.selectAll(".node circle")
             .style("stroke-width", (d) => d.selected ? 1 : 0);
+    }
+    
+    /**
+     * Redraws the node labels
+     */
+    public redrawLabels() {
+        this.vis.selectAll(".node .node-label")
+            .attr("fill", (d) => d.labelColor || this.configuration.defaultLabelColor)
+            .attr("stroke", (d) => d.labelColor || this.configuration.defaultLabelColor);
     }
 
     /**
@@ -397,6 +408,11 @@ export interface IForceGraphNode {
      * The color of the node
      */
     color?: string;
+    
+    /**
+     * The color of the label of the node
+     */
+    labelColor?: string;
 
     /**
      * The size of the node
@@ -456,4 +472,5 @@ export interface IForceGraphConfiguration {
     labels?: boolean;
     minZoom?: number;
     maxZoom?: number;
+    defaultLabelColor?: string;
 }
