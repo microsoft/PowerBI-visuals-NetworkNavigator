@@ -223,7 +223,6 @@ body {
   display: inline-block; }
 
 .token {
-  background-color: #e6e6e6;
   display: inline-block;
   border-radius: 2px;
   border: 1px solid #666;
@@ -254,9 +253,15 @@ body {
 .clear-all {
   vertical-align: middle; }
 
-.item:hover {
-  background-color: #ccc; }
-
 .item {
   padding-top: 2px;
   padding-bottom: 2px; }
+
+.value-display {
+  background-color: blue; }
+
+.item:hover {
+  background-color: #ccc; }
+
+.token {
+  background-color: #e6e6e6; }

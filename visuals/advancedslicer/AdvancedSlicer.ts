@@ -51,7 +51,7 @@ export class AdvancedSlicer {
                             <span class="matchSuffix">${matchSuffix || ""}</span>
                         </span>
                         <span style="display:inline-block" class="value-container">
-                            <span style="display:inline-block;background-color:blue;width:0px" class="value-display">&nbsp;</span>
+                            <span style="display:inline-block;width:0px" class="value-display">&nbsp;</span>
                         </span>
                     </span>
                 </label>

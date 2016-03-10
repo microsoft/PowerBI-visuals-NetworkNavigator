@@ -1,2 +1,14 @@
 @import "../../../base/powerbi/css/main";
 @import "./Base";
+
+.value-display {
+   background-color: $dataColor9;
+}
+
+.item:hover {
+    background-color:$neutralTertiaryAltColor;
+}
+
+.token {
+    background-color: $neutralLightColor;
+}
