@@ -17,7 +17,11 @@ describe('LineUpVisual', function () {
         parentEle = null;
     });
     var createVisual = function () {
-        var instance = new LineUpVisual_1.default(true);
+        var instance = new LineUpVisual_1.default(true, {
+            presentation: {
+                animation: false
+            }
+        });
         var initOptions = visualHelpers_1.Utils.createFakeInitOptions();
         parentEle.append(initOptions.element);
         instance.init(initOptions);

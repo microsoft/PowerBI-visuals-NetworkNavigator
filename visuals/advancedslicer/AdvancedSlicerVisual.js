@@ -127,7 +127,7 @@ var AdvancedSlicerVisual = (function (_super) {
      * Gets the inline css used for this element
      */
     AdvancedSlicerVisual.prototype.getCss = function () {
-        return _super.prototype.getCss.call(this).concat([require("!css!sass!./css/AdvancedSlicer.scss")]);
+        return _super.prototype.getCss.call(this).concat([require("!css!sass!./css/AdvancedSlicerVisual.scss")]);
     };
     /**
     * Gets the external css paths used for this visualization

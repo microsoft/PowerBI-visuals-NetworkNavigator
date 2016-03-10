@@ -1,6 +1,39 @@
+.secondaryFont {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.secondaryBoldFont {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.lightFont {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.semilightFont {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.regularFont, .advanced-slicer, .token {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.semiboldFont {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.boldFontFamily {
+  font-family: Helvetica, Arial, Verdana, Geneva, sans-serif; }
+
+.smallFontSize, .advanced-slicer {
+  font-size: 12px; }
+
+.mediumFontSize {
+  font-size: 14px; }
+
+.largeFontSize {
+  font-size: 16px; }
+
+html, body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0; }
+
 .advanced-slicer {
-  font-family: 'Segoe UI Semibold',wf_segoe-ui_semibold,helvetica,arial,sans-serif;
-  font-size: 12px;
   position: relative; }
 
 .show-highlight.has-search .match {
@@ -190,7 +223,6 @@ body {
   display: inline-block; }
 
 .token {
-  background-color: #e6e6e6;
   display: inline-block;
   border-radius: 2px;
   border: 1px solid #666;
@@ -198,7 +230,6 @@ body {
   color: #666;
   padding: 2px;
   cursor: pointer;
-  font: Arial;
   margin: 2px;
   max-width: 100px;
   overflow: hidden;
@@ -222,9 +253,15 @@ body {
 .clear-all {
   vertical-align: middle; }
 
-.item:hover {
-  background-color: #ccc; }
-
 .item {
   padding-top: 2px;
   padding-bottom: 2px; }
+
+.value-display {
+  background-color: blue; }
+
+.item:hover {
+  background-color: #ccc; }
+
+.token {
+  background-color: #e6e6e6; }
