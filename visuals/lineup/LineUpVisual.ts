@@ -203,24 +203,12 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     /**
      * The constructor for the visual
      */
-    public constructor(noCss: boolean = false) {
+    public constructor(noCss: boolean = false, initialSettings?: ILineUpSettings) {
         super();
         this.noCss = noCss;
-    }
-
-    /** This is called once when the visual is initialially created */
-    public init(options: VisualInitOptions): void {
-        super.init(options, this.template, true);
-        this.host = options.host;
-
-        // Temporary, because the popups will load outside of the iframe for some reason
-        this.buildExternalCssLink(this.fontAwesome).then((ele) => {
-            this.container.append($(ele));
-        });
-        this.selectionManager = new SelectionManager({
-            hostServices: options.host
-        });
+        
         this.lineup = new LineUp(this.element.find(".lineup"));
+        this.lineup.settings = initialSettings || {};
         this.lineup.events.on("selectionChanged", (rows) => this.onSelectionChanged(rows));
         this.lineup.events.on(LineUp.EVENTS.FILTER_CHANGED, (filter) => this.onFilterChanged(filter));
         this.lineup.events.on(LineUp.EVENTS.CLEAR_SELECTION, () => this.onSelectionChanged());
@@ -239,6 +227,20 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 };
                 this.host.persistProperties(objects);
             }
+        });
+    }
+
+    /** This is called once when the visual is initialially created */
+    public init(options: VisualInitOptions): void {
+        super.init(options, this.template, true);
+        this.host = options.host;
+
+        // Temporary, because the popups will load outside of the iframe for some reason
+        this.buildExternalCssLink(this.fontAwesome).then((ele) => {
+            this.container.append($(ele));
+        });
+        this.selectionManager = new SelectionManager({
+            hostServices: options.host
         });
         this.dimensions = { width: options.viewport.width, height: options.viewport.height };
     }

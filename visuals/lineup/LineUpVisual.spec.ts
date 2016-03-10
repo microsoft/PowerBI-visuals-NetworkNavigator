@@ -21,9 +21,14 @@ describe('LineUpVisual', () => {
     });
 
     let createVisual = () => {
-        let instance = new LineUpVisual(true);
+        let instance = new LineUpVisual(true, {
+            presentation: {
+                animation: false
+            }
+        });
         let initOptions = SpecUtils.createFakeInitOptions();
         parentEle.append(initOptions.element);
+
         instance.init(initOptions);
         return {
             instance,
@@ -31,11 +36,11 @@ describe('LineUpVisual', () => {
         };
     };
 
-    it ('should load', () => {
+    it('should load', () => {
         expect(createVisual()).to.not.be.undefined;
     });
 
-    it ('should remove columns from LineUp.configuration if columns are removed from PBI', () => {
+    it('should remove columns from LineUp.configuration if columns are removed from PBI', () => {
         let { instance } = createVisual();
 
         // Load initial data
@@ -60,7 +65,7 @@ describe('LineUpVisual', () => {
         expect(instance.lineup.configuration.columns.length).to.be.equal(1);
     });
 
-    it ('should remove sort from LineUp.configuration if columns are removed from PBI', () => {
+    it('should remove sort from LineUp.configuration if columns are removed from PBI', () => {
         let { instance } = createVisual();
 
         // Load initial data

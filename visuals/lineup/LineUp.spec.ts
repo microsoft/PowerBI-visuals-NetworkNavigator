@@ -28,6 +28,11 @@ describe('LineUp', () => {
             instance: new LineUp(ele),
             element: ele
         };
+        result.instance.settings = {
+            presentation: {
+                animation: false
+            }
+        };
         return result;
     };
 
