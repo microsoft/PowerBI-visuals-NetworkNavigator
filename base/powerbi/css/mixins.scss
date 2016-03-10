@@ -11,6 +11,7 @@
   ::-webkit-scrollbar {
       width:  $size;
       height: $size;
+      background-color: transparent;
   }
 
   ::-webkit-scrollbar-thumb {

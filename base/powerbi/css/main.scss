@@ -1,3 +1,26 @@
 @import "./variables";
 @import "./mixins";
 @import "./includes";
+
+$thumbColor: #C8C8C8;
+
+* {
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    -ms-scrollbar-track-color:#d8d8ea;
+    -ms-scrollbar-arrow-color:$thumbColor;
+    -ms-scrollbar-face-color:$thumbColor;
+}
+
+* ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background-color: transparent;
+}
+
+* ::-webkit-scrollbar-thumb {
+    background: $thumbColor;
+}
+
+* ::-webkit-scrollbar-track-piece {
+    background: 0 0;
+}

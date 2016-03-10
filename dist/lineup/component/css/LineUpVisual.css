@@ -33,6 +33,23 @@ html, body {
   margin: 0;
   padding: 0; }
 
+* {
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+  -ms-scrollbar-track-color: #d8d8ea;
+  -ms-scrollbar-arrow-color: #C8C8C8;
+  -ms-scrollbar-face-color: #C8C8C8; }
+
+* ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: transparent; }
+
+* ::-webkit-scrollbar-thumb {
+  background: #C8C8C8; }
+
+* ::-webkit-scrollbar-track-piece {
+  background: 0 0; }
+
 .lu .weightHandle {
   fill: white;
   /*stroke:grey;*/
