@@ -97,16 +97,20 @@ export class JSONDataProvider implements IDataProvider {
                 }
                 return 0;
             };
+            
+            let maxValues;
+            if (sortItem.stack) {
+                 maxValues = sortItem.stack.columns.reduce((a, b) => {
+                    a[b.column] = {
+                        max: d3.max(final, (i) => i[b.column]),
+                        min: d3.min(final, (i) => i[b.column])
+                    };
+                    return a;
+                }, <any>{});
+            }
 
             final.sort((a, b) => {
                 if (sortItem.stack) {
-                    let maxValues = sortItem.stack.columns.reduce((a, b) => {
-                        a[b.column] = {
-                            max: d3.max(final, (i) => i[b.column]),
-                            min: d3.min(final, (i) => i[b.column])
-                        };
-                        return a;
-                    }, <any>{});
                     return basicSort(calcStackedValue(a, sortItem, maxValues), calcStackedValue(b, sortItem, maxValues), sortItem.asc);
                 }
                 return basicSort(a[sortItem.column], b[sortItem.column], sortItem.asc);

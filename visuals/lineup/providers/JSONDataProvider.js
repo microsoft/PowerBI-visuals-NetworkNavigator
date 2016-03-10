@@ -93,16 +93,19 @@ var JSONDataProvider = (function () {
                 }
                 return 0;
             };
+            var maxValues_1;
+            if (sortItem.stack) {
+                maxValues_1 = sortItem.stack.columns.reduce(function (a, b) {
+                    a[b.column] = {
+                        max: d3.max(final, function (i) { return i[b.column]; }),
+                        min: d3.min(final, function (i) { return i[b.column]; })
+                    };
+                    return a;
+                }, {});
+            }
             final.sort(function (a, b) {
                 if (sortItem.stack) {
-                    var maxValues = sortItem.stack.columns.reduce(function (a, b) {
-                        a[b.column] = {
-                            max: d3.max(final, function (i) { return i[b.column]; }),
-                            min: d3.min(final, function (i) { return i[b.column]; })
-                        };
-                        return a;
-                    }, {});
-                    return basicSort_1(calcStackedValue_1(a, sortItem, maxValues), calcStackedValue_1(b, sortItem, maxValues), sortItem.asc);
+                    return basicSort_1(calcStackedValue_1(a, sortItem, maxValues_1), calcStackedValue_1(b, sortItem, maxValues_1), sortItem.asc);
                 }
                 return basicSort_1(a[sortItem.column], b[sortItem.column], sortItem.asc);
             });
