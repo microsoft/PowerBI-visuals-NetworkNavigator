@@ -1,5 +1,4 @@
 "use strict";
-/// <reference path="./references.d.ts"/>
 var VisualBase = (function () {
     function VisualBase() {
     }
@@ -36,7 +35,30 @@ var VisualBase = (function () {
     VisualBase.prototype.update = function (options) {
         this.width = options.viewport.width;
         this.height = options.viewport.height;
+        var dataView = options.dataViews && options.dataViews[0];
+        if (dataView) {
+            var objs = dataView.metadata.objects;
+            var experimental = objs && objs['experimental'];
+            var sandboxed = !!(experimental && experimental['sandboxed']);
+            if (this.sandboxed !== sandboxed) {
+                this.sandboxed = sandboxed;
+            }
+        }
         this.parent.css({ width: this.width, height: this.height });
+    };
+    /**
+     * Enumerates the instances for the objects that appear in the power bi panel
+     */
+    VisualBase.prototype.enumerateObjectInstances = function (options) {
+        if (options.objectName === 'experimental') {
+            return [{
+                    selector: null,
+                    objectName: 'experimental',
+                    properties: {
+                        sandboxed: this.sandboxed
+                    }
+                }];
+        }
     };
     Object.defineProperty(VisualBase.prototype, "sandboxed", {
         /**
@@ -113,6 +135,22 @@ var VisualBase = (function () {
             }
         }
         return toReturn;
+    };
+    /**
+     * The set of capabilities for the visual
+     */
+    VisualBase.capabilities = {
+        objects: {
+            experimental: {
+                displayName: "Experimental",
+                properties: {
+                    sandboxed: {
+                        type: { bool: true },
+                        displayName: "Enable to sandbox the visual into an IFrame"
+                    }
+                }
+            }
+        }
     };
     return VisualBase;
 }());

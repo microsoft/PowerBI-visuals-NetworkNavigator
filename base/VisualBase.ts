@@ -1,4 +1,8 @@
 /// <reference path="./references.d.ts"/>
+import VisualCapabilities = powerbi.VisualCapabilities;
+import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
+import VisualObjectInstance = powerbi.VisualObjectInstance;
+
 export class VisualBase implements powerbi.IVisual {
     protected element: JQuery;
     protected container: JQuery;
@@ -6,6 +10,23 @@ export class VisualBase implements powerbi.IVisual {
     private _sandboxed: boolean;
     private width: number;
     private height: number;
+
+    /**
+     * The set of capabilities for the visual
+     */
+    public static capabilities: VisualCapabilities = {
+        objects: {
+            experimental: {
+                displayName: "Experimental",
+                properties: {
+                    sandboxed: {
+                        type: { bool: true },
+                        displayName: "Enable to sandbox the visual into an IFrame"
+                    }
+                }
+            }
+        }
+    };
 
     /** This is called once when the visual is initialially created */
     public init(options: powerbi.VisualInitOptions, template: string = "", addCssToParent: boolean = false, sandbox = false): void {
@@ -35,7 +56,33 @@ export class VisualBase implements powerbi.IVisual {
     public update(options: powerbi.VisualUpdateOptions) {
         this.width = options.viewport.width;
         this.height = options.viewport.height;
+        
+        const dataView = options.dataViews && options.dataViews[0];
+        if (dataView) {
+            const objs = dataView.metadata.objects;
+            const experimental = objs && objs['experimental'];
+            const sandboxed = !!(experimental && experimental['sandboxed']);
+            if (this.sandboxed !== sandboxed) {
+                this.sandboxed = sandboxed;
+            }
+        }
+        
         this.parent.css({ width: this.width, height: this.height });
+    }
+
+    /**
+     * Enumerates the instances for the objects that appear in the power bi panel
+     */
+    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
+        if (options.objectName === 'experimental') {
+            return [{
+                selector: null,
+                objectName: 'experimental',
+                properties: {
+                    sandboxed: this.sandboxed
+                }
+            }];
+        }
     }
     
     /**

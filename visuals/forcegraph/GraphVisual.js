@@ -55,12 +55,6 @@ var GraphVisual = (function (_super) {
         var dataViewTable = dataView && dataView.table;
         var forceDataReload = this.updateSettings(options);
         if (dataViewTable) {
-            var objs = dataView.metadata.objects;
-            var experimental = objs && objs['experimental'];
-            var sandboxed = !!(experimental && experimental['sandboxed']);
-            if (this.sandboxed !== sandboxed) {
-                this.sandboxed = sandboxed;
-            }
             if ((forceDataReload || this.hasDataChanged(this.dataViewTable, dataViewTable))) {
                 var parsedData = GraphVisual.converter(dataView, this.settings);
                 this.myGraph.setData(parsedData);
@@ -94,11 +88,13 @@ var GraphVisual = (function (_super) {
      * Enumerates the instances for the objects that appear in the power bi panel
      */
     GraphVisual.prototype.enumerateObjectInstances = function (options) {
-        return [{
+        var instances = _super.prototype.enumerateObjectInstances.call(this, options) || [{
                 selector: null,
                 objectName: options.objectName,
-                properties: $.extend(true, {}, this.settings[options.objectName])
+                properties: {}
             }];
+        $.extend(true, instances[0].properties, this.settings[options.objectName]);
+        return instances;
     };
     /**
      * Converts the data view into an internal data structure
@@ -276,9 +272,6 @@ var GraphVisual = (function (_super) {
             sourceGroup: "sourceGroup",
             targetGroup: "targetGroup"
         },
-        experimental: {
-            sandboxed: false
-        },
         layout: {
             linkDistance: 10,
             linkStrength: 2,
@@ -290,7 +283,7 @@ var GraphVisual = (function (_super) {
             defaultLabelColor: colors[0]
         }
     };
-    GraphVisual.capabilities = {
+    GraphVisual.capabilities = $.extend(true, {}, VisualBase_1.VisualBase.capabilities, {
         dataRoles: [{
                 name: "Edges",
                 displayName: "Edges",
@@ -389,18 +382,9 @@ var GraphVisual = (function (_super) {
                         type: { numeric: true }
                     }
                 }
-            },
-            experimental: {
-                displayName: "Experimental",
-                properties: {
-                    sandboxed: {
-                        type: { bool: true },
-                        displayName: "Enable to sandbox the visual into an IFrame"
-                    }
-                }
             }
         }
-    };
+    });
     GraphVisual = __decorate([
         Utils_1.Visual(JSON.parse(require("./build.json")).output.PowerBI)
     ], GraphVisual);

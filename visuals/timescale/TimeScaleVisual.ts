@@ -13,7 +13,6 @@ import VisualInitOptions = powerbi.VisualInitOptions;
 import VisualUpdateOptions = powerbi.VisualUpdateOptions;
 import DataViewMetadataColumn = powerbi.DataViewMetadataColumn;
 import VisualObjectInstance = powerbi.VisualObjectInstance;
-import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import DataView = powerbi.DataView;
 import SelectionId = powerbi.visuals.SelectionId;
 import SelectionManager = powerbi.visuals.utility.SelectionManager;
@@ -30,7 +29,7 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
     /**
      * The set of capabilities for the visual
      */
-    public static capabilities: VisualCapabilities = {
+    public static capabilities: VisualCapabilities = $.extend(true, {}, VisualBase.capabilities, {
         dataRoles: [{
             name: 'Times',
             kind: VisualDataRoleKind.Grouping,
@@ -41,9 +40,6 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
             displayName: "Values"
         }],
         dataViewMappings: [{
-            // conditions: [
-            //     { 'Times': { max: 1, min: 1 }, 'Values': { max: 1, min: 1 } },
-            // ],
             categorical: {
                 categories: {
                     for: { in: 'Times' },
@@ -68,18 +64,9 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
                         }
                     },
                 },
-            },
-            experimental: {
-                displayName: "Experimental",
-                properties: {
-                    sandboxed: {
-                        type: { bool: true },
-                        displayName: "Enable to sandbox the visual into an IFrame"
-                    }
-                }
             }
         }
-    };
+    });
 
     /**
      * The template for the grid
@@ -114,13 +101,6 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
         if (dataView) {
             var dataViewCategorical = dataView.categorical;
             var data = TimeScaleVisual.converter(dataView);
-            
-            const objs = dataView.metadata.objects;
-            const experimental = objs && objs['experimental'];
-            const sandboxed = !!(experimental && experimental['sandboxed']);
-            if (this.sandboxed !== sandboxed) {
-                this.sandboxed = sandboxed;
-            }
 
             // Stash this bad boy for later, so we can filter the time column
             this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
@@ -153,21 +133,6 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
             if (!_.isEqual(this.timeScale.dimensions, options.viewport)) {
                 this.timeScale.dimensions = { width: options.viewport.width, height: options.viewport.height };
             }
-        }
-    }
-
-    /**
-     * Enumerates the instances for the objects that appear in the power bi panel
-     */
-    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
-        if (options.objectName === 'experimental') {
-            return [{
-                selector: null,
-                objectName: 'experimental',
-                properties: {
-                    sandboxed: this.sandboxed
-                }
-            }];
         }
     }
 

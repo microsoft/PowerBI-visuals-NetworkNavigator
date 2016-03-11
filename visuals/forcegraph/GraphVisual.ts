@@ -47,9 +47,6 @@ export default class GraphVisual extends VisualBase implements IVisual {
             sourceGroup: "sourceGroup",
             targetGroup: "targetGroup"
         },
-        experimental: {
-            sandboxed: false  
-        },
         layout: {
             linkDistance: 10,
             linkStrength: 2,
@@ -62,7 +59,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
         }
     };
 
-    public static capabilities: VisualCapabilities = {
+    public static capabilities: VisualCapabilities = $.extend(true, {}, VisualBase.capabilities, {
         dataRoles: [{
             name: "Edges",
             displayName: "Edges",
@@ -161,18 +158,9 @@ export default class GraphVisual extends VisualBase implements IVisual {
                         type: { numeric: true }
                     }
                 }
-            },
-            experimental: {
-                displayName: "Experimental",
-                properties: {
-                    sandboxed: {
-                        type: { bool: true },
-                        displayName: "Enable to sandbox the visual into an IFrame"
-                    }
-                }
             }
         }
-    };
+    });
 
     /**
      * The font awesome resource
@@ -214,14 +202,6 @@ export default class GraphVisual extends VisualBase implements IVisual {
         var forceDataReload = this.updateSettings(options);
 
         if (dataViewTable) {
-            
-            const objs = dataView.metadata.objects;
-            const experimental = objs && objs['experimental'];
-            const sandboxed = !!(experimental && experimental['sandboxed']);
-            if (this.sandboxed !== sandboxed) {
-                this.sandboxed = sandboxed;
-            }
-            
             if ((forceDataReload || this.hasDataChanged(this.dataViewTable, dataViewTable))) {
                 var parsedData = GraphVisual.converter(dataView, this.settings);
                 this.myGraph.setData(parsedData);
@@ -256,16 +236,18 @@ export default class GraphVisual extends VisualBase implements IVisual {
             this.element.css({ width: options.viewport.width, height: options.viewport.height });
         }
     }
-
+    
     /**
      * Enumerates the instances for the objects that appear in the power bi panel
      */
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
-        return [{
-            selector: null,
+        let instances = super.enumerateObjectInstances(options) || [{
+            selector: null, 
             objectName: options.objectName,
-            properties: $.extend(true, {}, this.settings[options.objectName])
+            properties: {}
         }];
+        $.extend(true, instances[0].properties, this.settings[options.objectName]);
+        return instances;
     }
 
     /**
@@ -463,9 +445,6 @@ interface GraphVisualSettings {
         targetLabelColor?: string;
         sourceGroup?: string;
         targetGroup?: string;
-    };
-    experimental?: {
-        sandboxed?: boolean;  
     };
     layout?: {
         linkDistance?: number;

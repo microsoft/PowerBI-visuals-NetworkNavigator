@@ -11,8 +11,6 @@ import VisualDataRoleKind = powerbi.VisualDataRoleKind;
 import data = powerbi.data;
 import SelectableDataPoint = powerbi.visuals.SelectableDataPoint;
 import SelectionManager = powerbi.visuals.utility.SelectionManager;
-import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
-import VisualObjectInstance = powerbi.VisualObjectInstance;
 
 @Visual(require("./build").output.PowerBI)
 export default class AdvancedSlicerVisual extends VisualBase implements IVisual {
@@ -45,7 +43,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
     /**
      * The set of capabilities for the visual
      */
-    public static capabilities: VisualCapabilities = {
+    public static capabilities: VisualCapabilities = $.extend(true, {}, VisualBase.capabilities, {
         dataRoles: [
             {
                 name: 'Category',
@@ -88,15 +86,6 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
                         }
                     },
                 },
-            },
-            experimental: {
-                displayName: "Experimental",
-                properties: {
-                    sandboxed: {
-                        type: { bool: true },
-                        displayName: "Enable to sandbox the visual into an IFrame"
-                    }
-                }
             }
             /*,
             sorting: {
@@ -111,7 +100,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
                 }
             }*/
         }
-    };
+    });
 
     private loadDeferred : JQueryDeferred<SlicerItem[]>;
 
@@ -150,13 +139,6 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
 
         this.dataView = options.dataViews && options.dataViews[0];
         if (this.dataView) {
-            const objs = this.dataView.metadata.objects;
-            const experimental = objs && objs['experimental'];
-            const sandboxed = !!(experimental && experimental['sandboxed']);
-            if (this.sandboxed !== sandboxed) {
-                this.sandboxed = sandboxed;
-            }
-            
             var categorical = this.dataView && this.dataView.categorical;
             var newData = AdvancedSlicerVisual.converter(this.dataView, this.selectionManager);
             if (this.loadDeferred) {
@@ -241,21 +223,6 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
     */
     protected getExternalCssResources() : ExternalCssResource[] {
         return super.getExternalCssResources().concat(this.fontAwesome);
-    }
-
-    /**
-     * Enumerates the instances for the objects that appear in the power bi panel
-     */
-    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
-        if (options.objectName === 'experimental') {
-            return [{
-                selector: null,
-                objectName: 'experimental',
-                properties: {
-                    sandboxed: this.sandboxed
-                }
-            }];
-        }
     }
 
     /**
