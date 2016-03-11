@@ -29,14 +29,17 @@ export class VisualBase implements powerbi.IVisual {
     };
 
     /** This is called once when the visual is initialially created */
-    public init(options: powerbi.VisualInitOptions, template: string = "", addCssToParent: boolean = false, sandbox = false): void {
-        var width = options.viewport.width;
-        var height = options.viewport.height;
+    public init(options: powerbi.VisualInitOptions, template: string = "", addCssToParent: boolean = false): void {
+        const width = options.viewport.width;
+        const height = options.viewport.height;
         this.container = options.element;
         this.element = $("<div/>");
-        this.sandboxed = sandbox;
         
-        var promises = this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource));
+        // We should sandbox stuff if we aren't already sandboxed
+        const isInIFrame = window.parent !== window;
+        this.sandboxed = !isInIFrame;
+        
+        const promises = this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource));
         $.when.apply($, promises).then((...styles) => this.element.append(styles.map((s)=> $(s))));
 
         if (addCssToParent) {
@@ -66,7 +69,6 @@ export class VisualBase implements powerbi.IVisual {
                 this.sandboxed = sandboxed;
             }
         }
-        
         this.parent.css({ width: this.width, height: this.height });
     }
 
