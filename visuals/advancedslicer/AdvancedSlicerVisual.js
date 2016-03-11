@@ -185,7 +185,7 @@ var AdvancedSlicerVisual = (function (_super) {
     /**
      * The set of capabilities for the visual
      */
-    AdvancedSlicerVisual.capabilities = {
+    AdvancedSlicerVisual.capabilities = $.extend(true, {}, VisualBase_1.VisualBase.capabilities, {
         dataRoles: [
             {
                 name: 'Category',
@@ -228,20 +228,9 @@ var AdvancedSlicerVisual = (function (_super) {
                         }
                     },
                 },
-            } /*,
-            sorting: {
-                displayName: "Sorting",
-                properties: {
-                    byHistogram: {
-                        type: { bool: true }
-                    },
-                    byName: {
-                        type: { bool: true }
-                    }
-                }
-            }*/
+            }
         }
-    };
+    });
     AdvancedSlicerVisual = __decorate([
         Utils_1.Visual(require("./build").output.PowerBI)
     ], AdvancedSlicerVisual);

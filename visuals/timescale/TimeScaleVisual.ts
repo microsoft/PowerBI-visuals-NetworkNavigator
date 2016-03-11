@@ -13,7 +13,6 @@ import VisualInitOptions = powerbi.VisualInitOptions;
 import VisualUpdateOptions = powerbi.VisualUpdateOptions;
 import DataViewMetadataColumn = powerbi.DataViewMetadataColumn;
 import VisualObjectInstance = powerbi.VisualObjectInstance;
-import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import DataView = powerbi.DataView;
 import SelectionId = powerbi.visuals.SelectionId;
 import SelectionManager = powerbi.visuals.utility.SelectionManager;
@@ -30,7 +29,7 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
     /**
      * The set of capabilities for the visual
      */
-    public static capabilities: VisualCapabilities = {
+    public static capabilities: VisualCapabilities = $.extend(true, {}, VisualBase.capabilities, {
         dataRoles: [{
             name: 'Times',
             kind: VisualDataRoleKind.Grouping,
@@ -41,9 +40,6 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
             displayName: "Values"
         }],
         dataViewMappings: [{
-            // conditions: [
-            //     { 'Times': { max: 1, min: 1 }, 'Values': { max: 1, min: 1 } },
-            // ],
             categorical: {
                 categories: {
                     for: { in: 'Times' },
@@ -68,9 +64,9 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
                         }
                     },
                 },
-            },
+            }
         }
-    };
+    });
 
     /**
      * The template for the grid

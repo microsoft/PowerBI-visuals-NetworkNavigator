@@ -128,7 +128,7 @@ var TimeScaleVisual = (function (_super) {
     /**
      * The set of capabilities for the visual
      */
-    TimeScaleVisual.capabilities = {
+    TimeScaleVisual.capabilities = $.extend(true, {}, VisualBase_1.VisualBase.capabilities, {
         dataRoles: [{
                 name: 'Times',
                 kind: VisualDataRoleKind.Grouping,
@@ -139,9 +139,6 @@ var TimeScaleVisual = (function (_super) {
                 displayName: "Values"
             }],
         dataViewMappings: [{
-                // conditions: [
-                //     { 'Times': { max: 1, min: 1 }, 'Values': { max: 1, min: 1 } },
-                // ],
                 categorical: {
                     categories: {
                         for: { in: 'Times' },
@@ -166,9 +163,9 @@ var TimeScaleVisual = (function (_super) {
                         }
                     },
                 },
-            },
+            }
         }
-    };
+    });
     TimeScaleVisual = __decorate([
         Utils_1.Visual(JSON.parse(require("./build.json")).output.PowerBI)
     ], TimeScaleVisual);

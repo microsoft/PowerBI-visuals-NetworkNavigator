@@ -55,7 +55,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     /**
      * The set of capabilities for the visual
      */
-    public static capabilities: VisualCapabilities = {
+    public static capabilities: VisualCapabilities = $.extend(true, {}, VisualBase.capabilities, {
         dataRoles: [{
             name: 'Values',
             kind: VisualDataRoleKind.Grouping
@@ -177,7 +177,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         sorting: {
             custom:{}
         }
-    };
+    });
 
     /**
      * The font awesome resource
@@ -278,20 +278,19 @@ export default class LineUpVisual extends VisualBase implements IVisual {
      * Enumerates the instances for the objects that appear in the power bi panel
      */
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
-        if (options.objectName === 'layout') {
-            return [{
-                selector: null,
-                objectName: 'layout',
-                properties: {
-                    layout: JSON.stringify(this.lineup.configuration)
-                }
-            }];
-        }
-        return [{
-            selector: null,
+        let instances = super.enumerateObjectInstances(options) || [{
+            selector: null, 
             objectName: options.objectName,
-            properties: $.extend(true, {}, this.lineup.settings[options.objectName])
+            properties: {}
         }];
+        if (options.objectName === 'layout') {
+            $.extend(true, instances[0].properties, {
+                layout: JSON.stringify(this.lineup.configuration)
+            });
+        } else {
+            $.extend(true, instances[0].properties, this.lineup.settings[options.objectName]);
+        }
+        return instances;
     }
 
     /**

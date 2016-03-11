@@ -103,20 +103,20 @@ var LineUpVisual = (function (_super) {
      * Enumerates the instances for the objects that appear in the power bi panel
      */
     LineUpVisual.prototype.enumerateObjectInstances = function (options) {
-        if (options.objectName === 'layout') {
-            return [{
-                    selector: null,
-                    objectName: 'layout',
-                    properties: {
-                        layout: JSON.stringify(this.lineup.configuration)
-                    }
-                }];
-        }
-        return [{
+        var instances = _super.prototype.enumerateObjectInstances.call(this, options) || [{
                 selector: null,
                 objectName: options.objectName,
-                properties: $.extend(true, {}, this.lineup.settings[options.objectName])
+                properties: {}
             }];
+        if (options.objectName === 'layout') {
+            $.extend(true, instances[0].properties, {
+                layout: JSON.stringify(this.lineup.configuration)
+            });
+        }
+        else {
+            $.extend(true, instances[0].properties, this.lineup.settings[options.objectName]);
+        }
+        return instances;
     };
     /**
      * Gets the css used for this element
@@ -385,7 +385,7 @@ var LineUpVisual = (function (_super) {
     /**
      * The set of capabilities for the visual
      */
-    LineUpVisual.capabilities = {
+    LineUpVisual.capabilities = $.extend(true, {}, VisualBase_1.VisualBase.capabilities, {
         dataRoles: [{
                 name: 'Values',
                 kind: VisualDataRoleKind.Grouping
@@ -507,7 +507,7 @@ var LineUpVisual = (function (_super) {
         sorting: {
             custom: {}
         }
-    };
+    });
     LineUpVisual = __decorate([
         Utils_1.Visual(require("./build.js").output.PowerBI)
     ], LineUpVisual);

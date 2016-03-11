@@ -43,7 +43,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
     /**
      * The set of capabilities for the visual
      */
-    public static capabilities: VisualCapabilities = {
+    public static capabilities: VisualCapabilities = $.extend(true, {}, VisualBase.capabilities, {
         dataRoles: [
             {
                 name: 'Category',
@@ -86,7 +86,8 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
                         }
                     },
                 },
-            }/*,
+            }
+            /*,
             sorting: {
                 displayName: "Sorting",
                 properties: {
@@ -99,7 +100,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
                 }
             }*/
         }
-    };
+    });
 
     private loadDeferred : JQueryDeferred<SlicerItem[]>;
 

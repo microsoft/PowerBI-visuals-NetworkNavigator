@@ -59,7 +59,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
         }
     };
 
-    public static capabilities: VisualCapabilities = {
+    public static capabilities: VisualCapabilities = $.extend(true, {}, VisualBase.capabilities, {
         dataRoles: [{
             name: "Edges",
             displayName: "Edges",
@@ -160,7 +160,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
                 }
             }
         }
-    };
+    });
 
     /**
      * The font awesome resource
@@ -236,16 +236,18 @@ export default class GraphVisual extends VisualBase implements IVisual {
             this.element.css({ width: options.viewport.width, height: options.viewport.height });
         }
     }
-
+    
     /**
      * Enumerates the instances for the objects that appear in the power bi panel
      */
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
-        return [{
-            selector: null,
+        let instances = super.enumerateObjectInstances(options) || [{
+            selector: null, 
             objectName: options.objectName,
-            properties: $.extend(true, {}, this.settings[options.objectName])
+            properties: {}
         }];
+        $.extend(true, instances[0].properties, this.settings[options.objectName]);
+        return instances;
     }
 
     /**
