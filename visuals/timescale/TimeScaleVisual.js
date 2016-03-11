@@ -47,6 +47,12 @@ var TimeScaleVisual = (function (_super) {
         if (dataView) {
             var dataViewCategorical = dataView.categorical;
             var data = TimeScaleVisual.converter(dataView);
+            var objs = dataView.metadata.objects;
+            var experimental = objs && objs['experimental'];
+            var sandboxed = !!(experimental && experimental['sandboxed']);
+            if (this.sandboxed !== sandboxed) {
+                this.sandboxed = sandboxed;
+            }
             // Stash this bad boy for later, so we can filter the time column
             this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
             var item = dataView.metadata.objects;
@@ -74,6 +80,20 @@ var TimeScaleVisual = (function (_super) {
             if (!_.isEqual(this.timeScale.dimensions, options.viewport)) {
                 this.timeScale.dimensions = { width: options.viewport.width, height: options.viewport.height };
             }
+        }
+    };
+    /**
+     * Enumerates the instances for the objects that appear in the power bi panel
+     */
+    TimeScaleVisual.prototype.enumerateObjectInstances = function (options) {
+        if (options.objectName === 'experimental') {
+            return [{
+                    selector: null,
+                    objectName: 'experimental',
+                    properties: {
+                        sandboxed: this.sandboxed
+                    }
+                }];
         }
     };
     /**
@@ -167,6 +187,15 @@ var TimeScaleVisual = (function (_super) {
                     },
                 },
             },
+            experimental: {
+                displayName: "Experimental",
+                properties: {
+                    sandboxed: {
+                        type: { bool: true },
+                        displayName: "Enable to sandbox the visual into an IFrame"
+                    }
+                }
+            }
         }
     };
     TimeScaleVisual = __decorate([

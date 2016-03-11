@@ -69,6 +69,15 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
                     },
                 },
             },
+            experimental: {
+                displayName: "Experimental",
+                properties: {
+                    sandboxed: {
+                        type: { bool: true },
+                        displayName: "Enable to sandbox the visual into an IFrame"
+                    }
+                }
+            }
         }
     };
 
@@ -105,6 +114,13 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
         if (dataView) {
             var dataViewCategorical = dataView.categorical;
             var data = TimeScaleVisual.converter(dataView);
+            
+            const objs = dataView.metadata.objects;
+            const experimental = objs && objs['experimental'];
+            const sandboxed = !!(experimental && experimental['sandboxed']);
+            if (this.sandboxed !== sandboxed) {
+                this.sandboxed = sandboxed;
+            }
 
             // Stash this bad boy for later, so we can filter the time column
             this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
@@ -137,6 +153,21 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
             if (!_.isEqual(this.timeScale.dimensions, options.viewport)) {
                 this.timeScale.dimensions = { width: options.viewport.width, height: options.viewport.height };
             }
+        }
+    }
+
+    /**
+     * Enumerates the instances for the objects that appear in the power bi panel
+     */
+    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
+        if (options.objectName === 'experimental') {
+            return [{
+                selector: null,
+                objectName: 'experimental',
+                properties: {
+                    sandboxed: this.sandboxed
+                }
+            }];
         }
     }
 

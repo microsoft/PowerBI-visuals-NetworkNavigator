@@ -47,6 +47,9 @@ export default class GraphVisual extends VisualBase implements IVisual {
             sourceGroup: "sourceGroup",
             targetGroup: "targetGroup"
         },
+        experimental: {
+            sandboxed: false  
+        },
         layout: {
             linkDistance: 10,
             linkStrength: 2,
@@ -158,6 +161,15 @@ export default class GraphVisual extends VisualBase implements IVisual {
                         type: { numeric: true }
                     }
                 }
+            },
+            experimental: {
+                displayName: "Experimental",
+                properties: {
+                    sandboxed: {
+                        type: { bool: true },
+                        displayName: "Enable to sandbox the visual into an IFrame"
+                    }
+                }
             }
         }
     };
@@ -202,6 +214,14 @@ export default class GraphVisual extends VisualBase implements IVisual {
         var forceDataReload = this.updateSettings(options);
 
         if (dataViewTable) {
+            
+            const objs = dataView.metadata.objects;
+            const experimental = objs && objs['experimental'];
+            const sandboxed = !!(experimental && experimental['sandboxed']);
+            if (this.sandboxed !== sandboxed) {
+                this.sandboxed = sandboxed;
+            }
+            
             if ((forceDataReload || this.hasDataChanged(this.dataViewTable, dataViewTable))) {
                 var parsedData = GraphVisual.converter(dataView, this.settings);
                 this.myGraph.setData(parsedData);
@@ -443,6 +463,9 @@ interface GraphVisualSettings {
         targetLabelColor?: string;
         sourceGroup?: string;
         targetGroup?: string;
+    };
+    experimental?: {
+        sandboxed?: boolean;  
     };
     layout?: {
         linkDistance?: number;

@@ -55,6 +55,12 @@ var GraphVisual = (function (_super) {
         var dataViewTable = dataView && dataView.table;
         var forceDataReload = this.updateSettings(options);
         if (dataViewTable) {
+            var objs = dataView.metadata.objects;
+            var experimental = objs && objs['experimental'];
+            var sandboxed = !!(experimental && experimental['sandboxed']);
+            if (this.sandboxed !== sandboxed) {
+                this.sandboxed = sandboxed;
+            }
             if ((forceDataReload || this.hasDataChanged(this.dataViewTable, dataViewTable))) {
                 var parsedData = GraphVisual.converter(dataView, this.settings);
                 this.myGraph.setData(parsedData);
@@ -270,6 +276,9 @@ var GraphVisual = (function (_super) {
             sourceGroup: "sourceGroup",
             targetGroup: "targetGroup"
         },
+        experimental: {
+            sandboxed: false
+        },
         layout: {
             linkDistance: 10,
             linkStrength: 2,
@@ -378,6 +387,15 @@ var GraphVisual = (function (_super) {
                     maxZoom: {
                         displayName: "Max Zoom",
                         type: { numeric: true }
+                    }
+                }
+            },
+            experimental: {
+                displayName: "Experimental",
+                properties: {
+                    sandboxed: {
+                        type: { bool: true },
+                        displayName: "Enable to sandbox the visual into an IFrame"
                     }
                 }
             }
