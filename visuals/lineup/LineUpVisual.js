@@ -284,6 +284,10 @@ var LineUpVisual = (function (_super) {
                     }
                 }
             }
+            var sandboxed = !!(newObjs && newObjs.experimental && newObjs.experimental.sandboxed);
+            if (this.sandboxed !== sandboxed) {
+                this.sandboxed = sandboxed;
+            }
             this.lineup.settings = updatedSettings;
         }
     };
@@ -379,7 +383,8 @@ var LineUpVisual = (function (_super) {
         },
         experimental: {
             serverSideSorting: false,
-            serverSideFiltering: false
+            serverSideFiltering: false,
+            sandboxed: false
         }
     });
     /**
@@ -494,6 +499,11 @@ var LineUpVisual = (function (_super) {
                     serverSideSorting: {
                         displayName: "Server Side Sorting",
                         description: "If true, lineup will use PowerBI services to sort the data, rather than doing it client side",
+                        type: { bool: true }
+                    },
+                    sandboxed: {
+                        displayName: "Sandbox",
+                        description: "If true, lineup will be sandboxed within an IFrame",
                         type: { bool: true }
                     } /*,
                     serverSideFiltering: {

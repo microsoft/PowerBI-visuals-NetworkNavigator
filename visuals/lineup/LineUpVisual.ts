@@ -48,7 +48,8 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         },
         experimental: {
             serverSideSorting: false,
-            serverSideFiltering: false
+            serverSideFiltering: false,
+            sandboxed: false
         }
     });
 
@@ -164,6 +165,11 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                     serverSideSorting: {
                         displayName: "Server Side Sorting",
                         description: "If true, lineup will use PowerBI services to sort the data, rather than doing it client side",
+                        type: { bool: true }
+                    }, 
+                    sandboxed: {
+                        displayName: "Sandbox",
+                        description: "If true, lineup will be sandboxed within an IFrame",
                         type: { bool: true }
                     }/*,
                     serverSideFiltering: {
@@ -478,6 +484,10 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                     }
                 }
             }
+            const sandboxed = !!(newObjs && newObjs.experimental && newObjs.experimental.sandboxed);
+            if (this.sandboxed !== sandboxed) {
+                this.sandboxed = sandboxed;
+            }
             this.lineup.settings = updatedSettings;
         }
     }
@@ -596,6 +606,7 @@ interface ILineUpVisualSettings extends ILineUpSettings {
     experimental?: {
         serverSideSorting?: boolean;
         serverSideFiltering?: boolean;
+        sandboxed?: boolean;
     }
 }
 

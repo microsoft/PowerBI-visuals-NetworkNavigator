@@ -2,24 +2,25 @@
 export class VisualBase implements powerbi.IVisual {
     protected element: JQuery;
     protected container: JQuery;
-    private iframe : JQuery;
+    private parent : JQuery;
+    private _sandboxed: boolean;
+    private width: number;
+    private height: number;
 
     /** This is called once when the visual is initialially created */
-    public init(options: powerbi.VisualInitOptions, template: string = "", addCssToParent: boolean = false): void {
+    public init(options: powerbi.VisualInitOptions, template: string = "", addCssToParent: boolean = false, sandbox = false): void {
         var width = options.viewport.width;
         var height = options.viewport.height;
         this.container = options.element;
-        this.iframe = $(`<iframe style="width:${width}px;height:${height}px;border:0;margin:0;padding:0" frameBorder="0"/>`);
-        this.container.append(this.iframe);
-        this.element = this.iframe.contents().find("body");
+        this.element = $("<div/>");
+        this.sandboxed = sandbox;
+        
         var promises = this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource));
         $.when.apply($, promises).then((...styles) => this.element.append(styles.map((s)=> $(s))));
 
         if (addCssToParent) {
             this.container.append(this.getCss().map((css) => $("<st" + "yle>" + css + "</st" + "yle>")));
         }
-        
-        this.HACK_fonts();
         
         this.element.append(this.getCss().map((css) => $("<st" + "yle>" + css + "</st" + "yle>")));
 
@@ -32,7 +33,42 @@ export class VisualBase implements powerbi.IVisual {
      * Notifies the IVisual of an update (data, viewmode, size change).
      */
     public update(options: powerbi.VisualUpdateOptions) {
-        this.iframe.css({ width: options.viewport.width, height: options.viewport.height });
+        this.width = options.viewport.width;
+        this.height = options.viewport.height;
+        this.parent.css({ width: this.width, height: this.height });
+    }
+    
+    /**
+     * Sets the sandboxed state
+     */
+    public set sandboxed(value: boolean) {
+        this._sandboxed = value;
+        this.element.detach();
+        
+        if (this.parent) {
+            this.parent.remove();            
+        }
+        if (value) {
+            this.parent = $(`<iframe style="width:${this.width}px;height:${this.height}px;border:0;margin:0;padding:0" frameBorder="0"/>`);
+            
+            // Important that this happens first, otherwise there might not be a body
+            this.container.append(this.parent);
+            
+            this.parent.contents().find("body").append(this.element);
+            
+            this.HACK_fonts();
+        } else {
+            this.parent = $(`<div style="width:${this.width}px;height:${this.height}px;border:0;margin:0;padding:0"/>`);
+            this.parent.append(this.element);
+            this.container.append(this.parent);
+        }
+    }
+    
+    /**
+     * 
+     */
+    public get sandboxed() {
+        return this._sandboxed;
     }
 
     /**

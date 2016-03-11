@@ -55,6 +55,12 @@ var AdvancedSlicerVisual = (function (_super) {
         this.mySlicer.dimensions = options.viewport;
         this.dataView = options.dataViews && options.dataViews[0];
         if (this.dataView) {
+            var objs = this.dataView.metadata.objects;
+            var experimental = objs && objs['experimental'];
+            var sandboxed = !!(experimental && experimental['sandboxed']);
+            if (this.sandboxed !== sandboxed) {
+                this.sandboxed = sandboxed;
+            }
             var categorical = this.dataView && this.dataView.categorical;
             var newData = AdvancedSlicerVisual.converter(this.dataView, this.selectionManager);
             if (this.loadDeferred) {
@@ -134,6 +140,20 @@ var AdvancedSlicerVisual = (function (_super) {
     */
     AdvancedSlicerVisual.prototype.getExternalCssResources = function () {
         return _super.prototype.getExternalCssResources.call(this).concat(this.fontAwesome);
+    };
+    /**
+     * Enumerates the instances for the objects that appear in the power bi panel
+     */
+    AdvancedSlicerVisual.prototype.enumerateObjectInstances = function (options) {
+        if (options.objectName === 'experimental') {
+            return [{
+                    selector: null,
+                    objectName: 'experimental',
+                    properties: {
+                        sandboxed: this.sandboxed
+                    }
+                }];
+        }
     };
     /**
      * Listener for when loading more data
@@ -228,18 +248,16 @@ var AdvancedSlicerVisual = (function (_super) {
                         }
                     },
                 },
-            } /*,
-            sorting: {
-                displayName: "Sorting",
+            },
+            experimental: {
+                displayName: "Experimental",
                 properties: {
-                    byHistogram: {
-                        type: { bool: true }
-                    },
-                    byName: {
-                        type: { bool: true }
+                    sandboxed: {
+                        type: { bool: true },
+                        displayName: "Enable to sandbox the visual into an IFrame"
                     }
                 }
-            }*/
+            }
         }
     };
     AdvancedSlicerVisual = __decorate([
