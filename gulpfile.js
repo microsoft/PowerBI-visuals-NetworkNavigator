@@ -1,7 +1,6 @@
-require("ts-node/register");
-
 const gulp = require('gulp');
 
+require("ts-node/register");
 require("./tasks/build")(gulp);
 require("./tasks/compile")(gulp);
 require("./tasks/clean")(gulp);

@@ -1,18 +1,17 @@
 "use strict";
-const pathFactory = require("./paths");
 const fs = require("fs");
 const del = require("del");
 const sequence = require("gulp-sequence");
 const mocha = require('gulp-mocha');
-const projectConfig = require('./projectConfig');
 const tslint = require('gulp-tslint');
 const filter = require("gulp-filter");
+const projects = require("./projects");
 
 module.exports = function(gulp) {
-    let projects = fs.readdirSync('visuals').filter(n => /^[\w|_]+$/.test(n));
-    projects.forEach((project) => {
-        const paths = pathFactory(project);
-        const config = projectConfig(project);
+    projects.forEach((projectConfig) => {
+        const project = projectConfig.name;
+        const paths = projectConfig.paths;
+        const config = projectConfig.buildConfig;
         
         // Not all tasks need to use streams
         // A gulpfile is just another node program and you can use any package available on npm
@@ -32,6 +31,6 @@ module.exports = function(gulp) {
     });
 
     gulp.task("lint", function(cb) {
-        return sequence.apply(this, [projects.map(n => `lint:${n}`)].concat(cb));
+        return sequence.apply(this, [projects.map(n => `lint:${n.name}`)].concat(cb));
     });
 };
