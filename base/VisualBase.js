@@ -3,16 +3,15 @@ var VisualBase = (function () {
     function VisualBase() {
     }
     /** This is called once when the visual is initialially created */
-    VisualBase.prototype.init = function (options, template, addCssToParent, sandbox) {
+    VisualBase.prototype.init = function (options, template, addCssToParent) {
         var _this = this;
         if (template === void 0) { template = ""; }
         if (addCssToParent === void 0) { addCssToParent = false; }
-        if (sandbox === void 0) { sandbox = false; }
         var width = options.viewport.width;
         var height = options.viewport.height;
         this.container = options.element;
         this.element = $("<div/>");
-        this.sandboxed = sandbox;
+        this.sandboxed = VisualBase.DEFAULT_SANDBOX_ENABLED;
         var promises = this.getExternalCssResources().map(function (resource) { return _this.buildExternalCssLink(resource); });
         $.when.apply($, promises).then(function () {
             var styles = [];
@@ -39,7 +38,8 @@ var VisualBase = (function () {
         if (dataView) {
             var objs = dataView.metadata.objects;
             var experimental = objs && objs['experimental'];
-            var sandboxed = !!(experimental && experimental['sandboxed']);
+            var sandboxed = experimental && experimental['sandboxed'];
+            sandboxed = typeof sandboxed === "undefined" ? VisualBase.DEFAULT_SANDBOX_ENABLED : sandboxed;
             if (this.sandboxed !== sandboxed) {
                 this.sandboxed = sandboxed;
             }
@@ -136,6 +136,10 @@ var VisualBase = (function () {
         }
         return toReturn;
     };
+    /**
+     * True if the sandbox is enabled by default
+     */
+    VisualBase.DEFAULT_SANDBOX_ENABLED = window.parent === window /* Checks if we are in an iframe */;
     /**
      * The set of capabilities for the visual
      */
