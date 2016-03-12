@@ -260,6 +260,7 @@ var GraphVisual = (function (_super) {
         };
         this.host.persistProperties(objects);
     };
+    GraphVisual.MAX_EDGES = 100;
     GraphVisual.DEFAULT_SETTINGS = {
         columnMappings: {
             source: "source",
@@ -292,9 +293,10 @@ var GraphVisual = (function (_super) {
         dataViewMappings: [{
                 table: {
                     rows: {
-                        for: { in: "Edges" }
+                        for: { in: "Edges" },
+                        dataReductionAlgorithm: { top: { count: GraphVisual.MAX_EDGES } }
                     }
-                }
+                },
             }],
         objects: {
             general: {

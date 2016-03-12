@@ -324,14 +324,23 @@ export class ForceGraph {
             .attr("font-size", "5pt")
             .attr("stroke-width", "0.5px")
             .style("opacity", this._configuration.labels ? 100 : 0);
+           
+        // Alpha measures the amount of movement
+        let k = 0;
+        while ((this.force.alpha() > 1e-2) && (k < 150)) {
+            this.force.tick();
+            k = k + 1;
+        }
+        
+        this.force.stop();
 
-        this.force.on("tick", function() {
+        // this.force.on("tick", function() {
             link.attr("x1", (d) => d[0].x)
                 .attr("y1", (d) => d[0].y)
                 .attr("x2", (d) => d[2].x)
                 .attr("y2", (d) => d[2].y);
             node.attr("transform", (d) => `translate(${d.x},${d.y})`);
-        });
+        // });
     }
 
     /**
