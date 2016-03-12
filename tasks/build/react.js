@@ -46,7 +46,7 @@ module.exports =function(gulp) {
         });
     });
     
-    gulp.task("build:component", function(callback) {
-        return sequence.apply(this, [projects.map(n => `build:${n.name}:component`)].concat(callback));
+    gulp.task("build:react", function(callback) {
+        return sequence.apply(this, [projects.map(n => `build:${n.name}:react`)].concat(callback));
     });
 };

@@ -27,7 +27,7 @@ module.exports = function (gulp) {
         /**
          * Builds the css for the visual
          */
-        gulp.task(`${buildName}:css`, [`${buildName}:css`], function() {
+        gulp.task(`${buildName}:css`, [`${baseBuildName}:css`], function() {
             var output = config.output.PowerBI;
             if (output && output.icon) {
                 var base64Contents = new Buffer(fs.readFileSync(paths.projectDir + '/' + output.icon), 'binary').toString('base64');
@@ -44,7 +44,7 @@ module.exports = function (gulp) {
         /**
          * Builds the scripts for use for with powerbi
          */
-        gulp.task(`${buildName}:scripts`, [`build:${project}:css`, `compile:${project}:ts`], function() {
+        gulp.task(`${buildName}:scripts`, [`${buildName}:css`, `compile:${project}:ts`], function() {
             var output = config.output.PowerBI;
             var webpackConfig = require(baseDir + 'webpack.config.dev.js');
             webpackConfig.entry = path.join(baseDir, 'visuals', project, output.entry);
@@ -144,6 +144,10 @@ module.exports = function (gulp) {
         gulp.task(`${buildName}`, function(cb) {
             sequence(`${buildName}:pre_clean`, `${buildName}:scripts`, `${buildName}:package_json`, `${buildName}:package_icon`, `${buildName}:create_empty_ts`, `${buildName}:zip`, `${buildName}:post_clean`, cb);
         });
+    });
+    
+    gulp.task("build:powerbi", function(callback) {
+        return sequence.apply(this, [projects.map(n => `build:${n.name}:powerbi`)].concat(callback));
     });
 }
 
