@@ -40,8 +40,8 @@ var AdvancedSlicer = (function () {
         this.listEle = this.listContainer.find(".list");
         this.listEle.scroll(function () { return _this.checkLoadMoreData(); });
         this.selectionsEle = element.find(".selections");
-        this.checkAllButton = element.find(".check-all").on("click", function () { return _this.toggleSelectAll(); });
-        this.checkAllButton = element.find(".clear-all").on("click", function () { return _this.clearSelection(); });
+        this.checkAllEle = element.find(".check-all").on("click", function () { return _this.toggleSelectAll(); });
+        this.clearAllEle = element.find(".clear-all").on("click", function () { return _this.clearSelection(); });
         this.attachEvents();
         // These two are here because the devtools call init more than once
         this.loadingMoreData = true;
@@ -172,8 +172,8 @@ var AdvancedSlicer = (function () {
                 value.map(function (v) { return _this.createSelectionToken(v); }).forEach(function (n) { return n.insertBefore(_this.element.find(".clear-all")); });
             }
             this.events.raiseEvent("selectionChanged", this._selectedItems, oldSelection);
-            this.checkAllButton.prop("checked", someChecked);
-            this.checkAllButton.prop('indeterminate', someChecked);
+            this.checkAllEle.prop("checked", someChecked);
+            this.checkAllEle.prop('indeterminate', someChecked);
         },
         enumerable: true,
         configurable: true
@@ -237,7 +237,7 @@ var AdvancedSlicer = (function () {
      * Toggle the select all state
      */
     AdvancedSlicer.prototype.toggleSelectAll = function () {
-        var checked = this.checkAllButton.prop('checked');
+        var checked = this.checkAllEle.prop('checked');
         if (!!checked) {
             this.selectedItems = this._data.slice(0);
         }
@@ -275,8 +275,8 @@ var AdvancedSlicer = (function () {
      * Updates the select all button state to match the data
      */
     AdvancedSlicer.prototype.updateSelectAllButtonState = function () {
-        this.checkAllButton.prop('indeterminate', this.selectedItems.length > 0 && this._data.length !== this.selectedItems.length);
-        this.checkAllButton.prop('checked', this.selectedItems.length > 0);
+        this.checkAllEle.prop('indeterminate', this.selectedItems.length > 0 && this._data.length !== this.selectedItems.length);
+        this.checkAllEle.prop('checked', this.selectedItems.length > 0);
     };
     /**
      * Attaches all the necessary events
