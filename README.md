@@ -6,7 +6,8 @@ This is a base project for developing Power BI visuals.  It is hopefully a tempo
 #Getting Started
 * Run `npm install` on the project directory
 * Create a folder with some project name, under the `visuals` directory.
-* Create a new class file, and name it the name of your visual, and put this in it
+* If you are creating a PowerBI version of the component
+    * Create a new class file, and name it the name of your visual, and put the following in it:
 
 ```
 import { VisualBase } from "../../base/VisualBase"; // Provides some base functionality
@@ -62,19 +63,21 @@ export default class LineUpVisual extends VisualBase implements IVisual {
 }
 
 ```
-* Create an index.ts that does `require('./MyVisual.ts')`
 * Create a file called build.json, and put the following values in it
 
 ```
 {
     "output": {
-        "PowerBI": { // If the component can be output to powerbi
+        "PowerBI": { // The powerbi version of the component (if it exists)
             "visualName": "<Class Name of the Visual >",
             "projectId": "<Random Id: (13 digits)>",
             "icon": "<File name of icon>",
             "entry": "<The entry point file name, i.e The main class name for the visual>"
         },
-        "component": { // The actual component to be used outside power bi
+        "react": { // The react version of the component (if it exists)
+            "entry": "<The entry point file name, i.e The main class name for the react component>"
+        },
+        "component": { // The base component, that can be used by itself
             "entry": "<The entry point file name, i.e The main class name for the individual component>"
         }
     },
@@ -85,4 +88,9 @@ export default class LineUpVisual extends VisualBase implements IVisual {
 * Review the Power BI [Visuals Getting Started](https://github.com/Microsoft/PowerBI-visuals/wiki).
 
 #Building
-* Run `gulp package --project <projectFolder>`, this will create a `.pbiviz` file in the `build\<projectFolder>` directory. Go to [Power BI](https://app.powerbi.com/), and to import your new visual.
+* Running `gulp build:<projectFolder>` will do the following:
+  * Creates a `.pbiviz` file in the `dist\<projectFolder>\powerbi` directory. 
+    * Go to [Power BI](https://app.powerbi.com/), and to import your new visual.
+  * Creates a webpacked version of your react class (if you defined *react* in your build.json property file) and puts it in the `dist\<projectFolder>\react` folder.
+  * Creates a webpacked version of your plain component class (if you defined *component* in your build.json file) and puts it in the `dist\<projectFolder>\component` folder.
+* You can also run specific builds for the different versions of your component by running `gulp build:<projectFolder>:<version>`. For example, if you only want to build the *react* version of your component, you would run `gulp build:myComponent:react`.
