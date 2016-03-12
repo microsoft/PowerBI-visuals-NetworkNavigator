@@ -152,7 +152,12 @@ describe('LineUp', () => {
         instance.dataProvider = provider;
 
         // Set the settings
-        instance.settings = settings;
+        instance.settings = $.extend(true, {}, settings, {
+            presentation: {
+                animation: false
+            } 
+        });
+        
         return {
             instance,
             element,

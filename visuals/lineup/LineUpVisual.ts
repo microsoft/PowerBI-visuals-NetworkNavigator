@@ -463,7 +463,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
             var oldSettings : ILineUpVisualSettings = $.extend(true, {}, this.lineup.settings);
 
             // Make sure we have the default values
-            var updatedSettings : ILineUpVisualSettings = $.extend(true, {}, this.lineup.settings, LineUpVisual.VISUAL_DEFAULT_SETTINGS);
+            var updatedSettings : ILineUpVisualSettings = $.extend(true, {}, this.lineup.settings, LineUpVisual.VISUAL_DEFAULT_SETTINGS, this.initialSettings || {});
 
             // Copy over new values
             var newObjs = $.extend(true, {}, <ILineUpVisualSettings>this.dataView.metadata.objects);

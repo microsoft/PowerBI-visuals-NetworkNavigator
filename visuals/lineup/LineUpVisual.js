@@ -271,7 +271,7 @@ var LineUpVisual = (function (_super) {
             // Store this to compare
             var oldSettings = $.extend(true, {}, this.lineup.settings);
             // Make sure we have the default values
-            var updatedSettings = $.extend(true, {}, this.lineup.settings, LineUpVisual.VISUAL_DEFAULT_SETTINGS);
+            var updatedSettings = $.extend(true, {}, this.lineup.settings, LineUpVisual.VISUAL_DEFAULT_SETTINGS, this.initialSettings || {});
             // Copy over new values
             var newObjs = $.extend(true, {}, this.dataView.metadata.objects);
             if (newObjs) {

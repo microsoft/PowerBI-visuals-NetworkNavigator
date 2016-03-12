@@ -136,7 +136,11 @@ describe('LineUp', function () {
         var _b = createProvider(data), provider = _b.provider, dataLoaded = _b.dataLoaded;
         instance.dataProvider = provider;
         // Set the settings
-        instance.settings = settings;
+        instance.settings = $.extend(true, {}, settings, {
+            presentation: {
+                animation: false
+            }
+        });
         return {
             instance: instance,
             element: element,
