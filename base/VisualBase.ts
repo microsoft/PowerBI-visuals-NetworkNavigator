@@ -40,7 +40,6 @@ export class VisualBase implements powerbi.IVisual {
         this.container = options.element;
         this.element = $("<div/>");
         this.sandboxed = VisualBase.DEFAULT_SANDBOX_ENABLED;
-        
         const promises = this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource));
         $.when.apply($, promises).then((...styles) => this.element.append(styles.map((s)=> $(s))));
 
