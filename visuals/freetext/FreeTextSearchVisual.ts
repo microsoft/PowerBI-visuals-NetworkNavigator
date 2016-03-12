@@ -37,8 +37,6 @@ export default class FreeTextSearchVisual extends VisualBase implements IVisual 
      */
     private selectionManager: utility.SelectionManager;
 
-
-
     /**
      * The set of capabilities for the visual
      */

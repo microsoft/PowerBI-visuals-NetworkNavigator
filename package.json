@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:timescale": "gulp test -p timescale",
-    "test:lineup": "gulp test -p lineup",
-    "test:freetext": "gulp test -p freetext",
-    "test:forcegraph": "gulp test -p forcegraph",
-    "test:documentviewer": "gulp test -p documentviewer",
-    "test:advancedslicer": "gulp test -p advancedslicer",
+    "test:timescale": "gulp test:timescale",
+    "test:lineup": "gulp test:lineup",
+    "test:freetext": "gulp test:freetext",
+    "test:forcegraph": "gulp test:forcegraph",
+    "test:documentviewer": "gulp test:documentviewer",
+    "test:advancedslicer": "gulp test:advancedslicer",
     "test": "npm-run-all 'test:*'"
   },
   "author": "",
