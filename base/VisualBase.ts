@@ -10,6 +10,11 @@ export class VisualBase implements powerbi.IVisual {
     private _sandboxed: boolean;
     private width: number;
     private height: number;
+    
+    /**
+     * True if the sandbox is enabled by default
+     */
+    public static DEFAULT_SANDBOX_ENABLED = window.parent === window /* Checks if we are in an iframe */;
 
     /**
      * The set of capabilities for the visual
@@ -34,10 +39,7 @@ export class VisualBase implements powerbi.IVisual {
         const height = options.viewport.height;
         this.container = options.element;
         this.element = $("<div/>");
-        
-        // We should sandbox stuff if we aren't already sandboxed
-        const isInIFrame = window.parent !== window;
-        this.sandboxed = !isInIFrame;
+        this.sandboxed = VisualBase.DEFAULT_SANDBOX_ENABLED;
         
         const promises = this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource));
         $.when.apply($, promises).then((...styles) => this.element.append(styles.map((s)=> $(s))));
@@ -64,7 +66,8 @@ export class VisualBase implements powerbi.IVisual {
         if (dataView) {
             const objs = dataView.metadata.objects;
             const experimental = objs && objs['experimental'];
-            const sandboxed = !!(experimental && experimental['sandboxed']);
+            let sandboxed = experimental && experimental['sandboxed'];
+            sandboxed = typeof sandboxed === "undefined" ? VisualBase.DEFAULT_SANDBOX_ENABLED : sandboxed;
             if (this.sandboxed !== sandboxed) {
                 this.sandboxed = sandboxed;
             }
