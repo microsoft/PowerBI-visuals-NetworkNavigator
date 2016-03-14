@@ -411,7 +411,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 // The below is busted > 100
                 //var identity = SelectionId.createWithId(this.dataViewTable.identity[rowIndex]);
                 let result : ILineUpVisualRow = {
-                    id: newId.key,
+                    id: newId.key + rowIndex,
                     identity: newId,
                     equals: (b) => (<ILineUpVisualRow>b).identity.equals(newId),
                     filterExpr: identity && identity.expr,
