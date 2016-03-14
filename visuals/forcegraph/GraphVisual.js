@@ -166,6 +166,11 @@ var GraphVisual = (function (_super) {
                 linkList.push(edge);
             }
         });
+        var maxNodes = settings.layout.maxNodeCount;
+        if (typeof maxNodes === "number" && maxNodes > 0) {
+            nodeList = nodeList.slice(0, maxNodes);
+            linkList = linkList.filter(function (n) { return n.source < maxNodes && n.target < maxNodes; });
+        }
         return {
             nodes: nodeList,
             links: linkList
@@ -197,6 +202,9 @@ var GraphVisual = (function (_super) {
             // There were some changes to the layout
             if (!_.isEqual(oldSettings.layout, this.settings.layout)) {
                 this.myGraph.configuration = $.extend(true, {}, this.settings.layout);
+            }
+            if (oldSettings.layout.maxNodeCount !== this.settings.layout.maxNodeCount) {
+                return true;
             }
         }
         return false;

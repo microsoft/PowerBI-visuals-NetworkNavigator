@@ -266,7 +266,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
     public static converter(dataView: DataView, settings: GraphVisualSettings): IForceGraphData<ForceGraphSelectableNode> {
         var nodeList = [];
         var nodeMap : { [name: string] : ForceGraphSelectableNode } = {};
-        var linkList = [];
+        var linkList : IForceGraphLink[] = [];
         var table = dataView.table;
         
         var colMap = {};
@@ -334,6 +334,12 @@ export default class GraphVisual extends VisualBase implements IVisual {
                 linkList.push(edge);
             }
         });
+        
+        const maxNodes = settings.layout.maxNodeCount;
+        if (typeof maxNodes === "number" && maxNodes > 0) {
+            nodeList = nodeList.slice(0, maxNodes);
+            linkList = linkList.filter(n => n.source < maxNodes && n.target < maxNodes);
+        }
 
         return {
             nodes: nodeList,
@@ -371,6 +377,10 @@ export default class GraphVisual extends VisualBase implements IVisual {
             // There were some changes to the layout
             if (!_.isEqual(oldSettings.layout, this.settings.layout)) {
                 this.myGraph.configuration = $.extend(true, {}, this.settings.layout);
+            }
+            
+            if (oldSettings.layout.maxNodeCount !== this.settings.layout.maxNodeCount) {
+                return true;
             }
         }
         return false;
