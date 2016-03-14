@@ -27,7 +27,6 @@ export default class GraphVisual extends VisualBase implements IVisual {
     private myGraph: ForceGraph;
     private host : IVisualHostServices;
     private interactivityService : IInteractivityService;
-    private static MAX_EDGES = 100;
 
     private listener : { destroy: Function; };
     
@@ -80,6 +79,8 @@ export default class GraphVisual extends VisualBase implements IVisual {
 
     private static DEFAULT_SETTINGS: GraphVisualSettings = {
         layout: {
+            animate: true,
+            maxNodeCount: 0,
             linkDistance: 10,
             linkStrength: 2,
             gravity: .1,
@@ -100,8 +101,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
         dataViewMappings: [{
             table: {
                 rows: {
-                    select: Object.keys(GraphVisual.DATA_ROLES).map(n => ({ bind: { to: GraphVisual.DATA_ROLES[n].name }})),
-                    dataReductionAlgorithm: { top: { count: GraphVisual.MAX_EDGES }}
+                    select: Object.keys(GraphVisual.DATA_ROLES).map(n => ({ bind: { to: GraphVisual.DATA_ROLES[n].name }}))
                 }
             },
         }],
@@ -123,6 +123,16 @@ export default class GraphVisual extends VisualBase implements IVisual {
             layout: {
                 displayName: "Layout",
                 properties: {
+                    animate: {
+                        displayName: "Animate",
+                        description: "Should the graph be animated",
+                        type: { bool: true }
+                    },  
+                    maxNodeCount: {
+                        displayName: "Max nodes",
+                        description: "The maximum number of nodes to render",
+                        type: { numeric: true }
+                    },  
                     linkDistance: {
                         displayName: "Link Distance",
                         type: { numeric: true }
@@ -434,6 +444,8 @@ export default class GraphVisual extends VisualBase implements IVisual {
  */
 interface GraphVisualSettings {
     layout?: {
+        animate?: boolean;
+        maxNodeCount?: number;
         linkDistance?: number;
         linkStrength?: number;
         gravity?: number;

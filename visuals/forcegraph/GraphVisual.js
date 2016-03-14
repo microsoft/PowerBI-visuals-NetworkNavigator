@@ -259,7 +259,6 @@ var GraphVisual = (function (_super) {
         };
         this.host.persistProperties(objects);
     };
-    GraphVisual.MAX_EDGES = 100;
     /**
      * A list of our data roles
      */
@@ -303,6 +302,8 @@ var GraphVisual = (function (_super) {
     };
     GraphVisual.DEFAULT_SETTINGS = {
         layout: {
+            animate: true,
+            maxNodeCount: 0,
             linkDistance: 10,
             linkStrength: 2,
             gravity: .1,
@@ -322,8 +323,7 @@ var GraphVisual = (function (_super) {
         dataViewMappings: [{
                 table: {
                     rows: {
-                        select: Object.keys(GraphVisual.DATA_ROLES).map(function (n) { return ({ bind: { to: GraphVisual.DATA_ROLES[n].name } }); }),
-                        dataReductionAlgorithm: { top: { count: GraphVisual.MAX_EDGES } }
+                        select: Object.keys(GraphVisual.DATA_ROLES).map(function (n) { return ({ bind: { to: GraphVisual.DATA_ROLES[n].name } }); })
                     }
                 },
             }],
@@ -345,6 +345,16 @@ var GraphVisual = (function (_super) {
             layout: {
                 displayName: "Layout",
                 properties: {
+                    animate: {
+                        displayName: "Animate",
+                        description: "Should the graph be animated",
+                        type: { bool: true }
+                    },
+                    maxNodeCount: {
+                        displayName: "Max nodes",
+                        description: "The maximum number of nodes to render",
+                        type: { numeric: true }
+                    },
                     linkDistance: {
                         displayName: "Link Distance",
                         type: { numeric: true }
