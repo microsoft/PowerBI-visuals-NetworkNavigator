@@ -228,7 +228,7 @@ var LineUpVisual = (function (_super) {
                 // The below is busted > 100
                 //var identity = SelectionId.createWithId(this.dataViewTable.identity[rowIndex]);
                 var result = {
-                    id: newId.key,
+                    id: newId.key + rowIndex,
                     identity: newId,
                     equals: function (b) { return b.identity.equals(newId); },
                     filterExpr: identity && identity.expr,
