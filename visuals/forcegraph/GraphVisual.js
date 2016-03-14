@@ -259,6 +259,7 @@ var GraphVisual = (function (_super) {
         };
         this.host.persistProperties(objects);
     };
+    GraphVisual.MAX_EDGES = 100;
     /**
      * A list of our data roles
      */
@@ -321,9 +322,10 @@ var GraphVisual = (function (_super) {
         dataViewMappings: [{
                 table: {
                     rows: {
-                        select: Object.keys(GraphVisual.DATA_ROLES).map(function (n) { return ({ bind: { to: GraphVisual.DATA_ROLES[n].name } }); })
+                        select: Object.keys(GraphVisual.DATA_ROLES).map(function (n) { return ({ bind: { to: GraphVisual.DATA_ROLES[n].name } }); }),
+                        dataReductionAlgorithm: { top: { count: GraphVisual.MAX_EDGES } }
                     }
-                }
+                },
             }],
         objects: {
             general: {

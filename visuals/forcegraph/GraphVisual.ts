@@ -27,6 +27,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
     private myGraph: ForceGraph;
     private host : IVisualHostServices;
     private interactivityService : IInteractivityService;
+    private static MAX_EDGES = 100;
 
     private listener : { destroy: Function; };
     
@@ -99,9 +100,10 @@ export default class GraphVisual extends VisualBase implements IVisual {
         dataViewMappings: [{
             table: {
                 rows: {
-                    select: Object.keys(GraphVisual.DATA_ROLES).map(n => ({ bind: { to: GraphVisual.DATA_ROLES[n].name }}))
+                    select: Object.keys(GraphVisual.DATA_ROLES).map(n => ({ bind: { to: GraphVisual.DATA_ROLES[n].name }})),
+                    dataReductionAlgorithm: { top: { count: GraphVisual.MAX_EDGES }}
                 }
-            }
+            },
         }],
         objects: {
             general: {
