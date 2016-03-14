@@ -280,12 +280,18 @@ var ForceGraph = (function () {
         // If we are not animating, then play the force quickly
         if (!this.configuration.animate) {
             var k = 0;
+            this.force.start();
             // Alpha measures the amount of movement
             while ((this.force.alpha() > 1e-2) && (k < 150)) {
                 this.force.tick();
                 k = k + 1;
             }
             this.force.stop();
+            link.attr("x1", function (d) { return d[0].x; })
+                .attr("y1", function (d) { return d[0].y; })
+                .attr("x2", function (d) { return d[2].x; })
+                .attr("y2", function (d) { return d[2].y; });
+            node.attr("transform", function (d) { return ("translate(" + d.x + "," + d.y + ")"); });
         }
         this.force.on("tick", function () {
             if (_this.configuration.animate) {

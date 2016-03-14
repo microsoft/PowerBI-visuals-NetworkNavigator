@@ -336,12 +336,19 @@ export class ForceGraph {
         // If we are not animating, then play the force quickly
         if (!this.configuration.animate) {
             let k = 0;
+            this.force.start();
             // Alpha measures the amount of movement
             while ((this.force.alpha() > 1e-2) && (k < 150)) {
                 this.force.tick();
                 k = k + 1;
             }
             this.force.stop();
+            
+            link.attr("x1", (d) => d[0].x)
+                .attr("y1", (d) => d[0].y)
+                .attr("x2", (d) => d[2].x)
+                .attr("y2", (d) => d[2].y);
+            node.attr("transform", (d) => `translate(${d.x},${d.y})`);
         }
 
         this.force.on("tick", () => {
