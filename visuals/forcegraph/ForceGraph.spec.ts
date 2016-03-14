@@ -27,6 +27,9 @@ describe("ForceGraph", () => {
             instance: new ForceGraph(ele),
             element: ele
         };
+        result.instance.configuration = {
+            animate: false
+        };
         return result;
     };
 

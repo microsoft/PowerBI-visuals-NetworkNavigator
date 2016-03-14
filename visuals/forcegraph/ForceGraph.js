@@ -14,6 +14,7 @@ var ForceGraph = (function () {
         if (width === void 0) { width = 500; }
         if (height === void 0) { height = 500; }
         this._configuration = {
+            animate: true,
             linkDistance: 10,
             linkStrength: 2,
             charge: -120,
@@ -111,8 +112,11 @@ var ForceGraph = (function () {
                     newConfig.maxZoom !== this._configuration.maxZoom) {
                     this.zoom.scaleExtent([newConfig.minZoom, newConfig.maxZoom]);
                 }
-                if (runStart) {
+                if (runStart && this.configuration.animate) {
                     this.force.start();
+                }
+                else if (!this.configuration.animate) {
+                    this.force.stop();
                 }
                 if (newConfig.labels !== this._configuration.labels) {
                     this.vis.selectAll(".node text")
@@ -199,7 +203,11 @@ var ForceGraph = (function () {
             links.push({ source: s, target: i }, { source: i, target: t });
             bilinks.push([s, i, t, w]);
         });
-        this.force.nodes(nodes).links(links).start();
+        this.force.nodes(nodes).links(links);
+        // If we have animation on, then start that beast
+        if (this.configuration.animate) {
+            this.force.start();
+        }
         this.vis.append("svg:defs").selectAll("marker")
             .data(["end"])
             .enter()
@@ -269,12 +277,30 @@ var ForceGraph = (function () {
             .attr("font-size", "5pt")
             .attr("stroke-width", "0.5px")
             .style("opacity", this._configuration.labels ? 100 : 0);
-        this.force.on("tick", function () {
+        // If we are not animating, then play the force quickly
+        if (!this.configuration.animate) {
+            var k = 0;
+            this.force.start();
+            // Alpha measures the amount of movement
+            while ((this.force.alpha() > 1e-2) && (k < 150)) {
+                this.force.tick();
+                k = k + 1;
+            }
+            this.force.stop();
             link.attr("x1", function (d) { return d[0].x; })
                 .attr("y1", function (d) { return d[0].y; })
                 .attr("x2", function (d) { return d[2].x; })
                 .attr("y2", function (d) { return d[2].y; });
             node.attr("transform", function (d) { return ("translate(" + d.x + "," + d.y + ")"); });
+        }
+        this.force.on("tick", function () {
+            if (_this.configuration.animate) {
+                link.attr("x1", function (d) { return d[0].x; })
+                    .attr("y1", function (d) { return d[0].y; })
+                    .attr("x2", function (d) { return d[2].x; })
+                    .attr("y2", function (d) { return d[2].y; });
+                node.attr("transform", function (d) { return ("translate(" + d.x + "," + d.y + ")"); });
+            }
         });
     };
     /**

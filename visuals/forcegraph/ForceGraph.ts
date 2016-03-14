@@ -16,6 +16,7 @@ export class ForceGraph {
     private _dimensions: { width: number; height: number; };
     private _selectedNode : IForceGraphNode;
     private _configuration : IForceGraphConfiguration = {
+        animate: true,
         linkDistance: 10,
         linkStrength: 2,
         charge: -120,
@@ -148,8 +149,10 @@ export class ForceGraph {
                 this.zoom.scaleExtent([newConfig.minZoom, newConfig.maxZoom]);
             }
 
-            if (runStart) {
+            if (runStart && this.configuration.animate) {
                 this.force.start();
+            } else if (!this.configuration.animate) {
+                this.force.stop();
             }
 
             if (newConfig.labels !== this._configuration.labels) {
@@ -245,7 +248,12 @@ export class ForceGraph {
             bilinks.push([s, i, t, w]);
         });
 
-        this.force.nodes(nodes).links(links).start();
+        this.force.nodes(nodes).links(links);
+        
+        // If we have animation on, then start that beast
+        if (this.configuration.animate) {
+            this.force.start();
+        }
 
         this.vis.append("svg:defs").selectAll("marker")
             .data(["end"])
@@ -324,13 +332,33 @@ export class ForceGraph {
             .attr("font-size", "5pt")
             .attr("stroke-width", "0.5px")
             .style("opacity", this._configuration.labels ? 100 : 0);
-
-        this.force.on("tick", function() {
+           
+        // If we are not animating, then play the force quickly
+        if (!this.configuration.animate) {
+            let k = 0;
+            this.force.start();
+            // Alpha measures the amount of movement
+            while ((this.force.alpha() > 1e-2) && (k < 150)) {
+                this.force.tick();
+                k = k + 1;
+            }
+            this.force.stop();
+            
             link.attr("x1", (d) => d[0].x)
                 .attr("y1", (d) => d[0].y)
                 .attr("x2", (d) => d[2].x)
                 .attr("y2", (d) => d[2].y);
             node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+        }
+
+        this.force.on("tick", () => {
+            if (this.configuration.animate) {
+                link.attr("x1", (d) => d[0].x)
+                    .attr("y1", (d) => d[0].y)
+                    .attr("x2", (d) => d[2].x)
+                    .attr("y2", (d) => d[2].y);
+                node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+            }
         });
     }
 
@@ -465,6 +493,7 @@ export interface IForceGraphData<NodeType> {
  * Represents the configuration for the force graph
  */
 export interface IForceGraphConfiguration {
+    animate?: boolean;
     linkDistance?: number;
     linkStrength?: number;
     charge?: number;

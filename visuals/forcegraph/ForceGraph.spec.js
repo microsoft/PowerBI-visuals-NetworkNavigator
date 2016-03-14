@@ -24,6 +24,9 @@ describe("ForceGraph", function () {
             instance: new ForceGraph_1.ForceGraph(ele),
             element: ele
         };
+        result.instance.configuration = {
+            animate: false
+        };
         return result;
     };
     it("should load", function () {
