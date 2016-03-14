@@ -105,8 +105,10 @@ var GraphVisual = (function (_super) {
         var linkList = [];
         var table = dataView.table;
         var colMap = {};
-        table.columns.forEach(function (n, i) {
-            colMap[n.displayName.toLocaleLowerCase()] = i;
+        dataView.metadata.columns.forEach(function (c, i) {
+            Object.keys(c.roles).forEach(function (role) {
+                colMap[role] = i;
+            });
         });
         // group defines the bundle basically
         // name, user friendly name,
@@ -114,15 +116,16 @@ var GraphVisual = (function (_super) {
         // source - array index into nodes
         // target - array index into node
         // value - The number of times that the link has been made, ie, I emailed bob@gmail.com 10 times, so value would be 10
-        var sourceIdx = colMap[settings.columnMappings.source.toLocaleLowerCase()];
-        var sourceColorIdx = colMap[settings.columnMappings.sourceColor.toLocaleLowerCase()];
-        var sourceLabelColorIdx = colMap[settings.columnMappings.sourceLabelColor.toLocaleLowerCase()];
-        var sourceGroup = colMap[settings.columnMappings.sourceGroup.toLocaleLowerCase()];
-        var targetGroupIdx = colMap[settings.columnMappings.targetGroup.toLocaleLowerCase()];
-        var targetColorIdx = colMap[settings.columnMappings.targetColor.toLocaleLowerCase()];
-        var targetLabelColorIdx = colMap[settings.columnMappings.targetLabelColor.toLocaleLowerCase()];
-        var targetIdx = colMap[settings.columnMappings.target.toLocaleLowerCase()];
-        var edgeValueIdx = colMap[settings.columnMappings.edgeValue.toLocaleLowerCase()];
+        var roles = GraphVisual.DATA_ROLES;
+        var sourceIdx = colMap[roles.source.name];
+        var sourceColorIdx = colMap[roles.sourceColor.name];
+        var sourceLabelColorIdx = colMap[roles.sourceLabelColor.name];
+        // var sourceGroup = colMap[roles.sourceGroup.name];
+        // var targetGroupIdx = colMap[roles.targetGroup.name];
+        var targetColorIdx = colMap[roles.targetColor.name];
+        var targetLabelColorIdx = colMap[roles.targetLabelColor.name];
+        var targetIdx = colMap[roles.target.name];
+        // var edgeValueIdx = colMap[roles.edgeValue.name];
         var sourceField = dataView.categorical.categories[0].identityFields[sourceIdx];
         var targetField = dataView.categorical.categories[0].identityFields[targetIdx];
         function getNode(id, identity, isSource, color, labelColor, group) {
@@ -154,9 +157,9 @@ var GraphVisual = (function (_super) {
                 var sourceId = row[sourceIdx] + "";
                 var targetId = row[targetIdx] + "";
                 var edge = {
-                    source: getNode(sourceId, identity, true, row[sourceColorIdx], row[sourceLabelColorIdx], row[sourceGroup]).index,
-                    target: getNode(targetId, identity, false, row[targetColorIdx], row[targetLabelColorIdx], row[targetGroupIdx]).index,
-                    value: row[edgeValueIdx]
+                    source: getNode(sourceId, identity, true, row[sourceColorIdx], row[sourceLabelColorIdx] /*, row[sourceGroup]*/).index,
+                    target: getNode(targetId, identity, false, row[targetColorIdx], row[targetLabelColorIdx] /*, row[targetGroupIdx]*/).index,
+                    value: undefined //row[edgeValueIdx]
                 };
                 nodeList[edge.source].num += 1;
                 nodeList[edge.target].num += 1;
@@ -194,10 +197,6 @@ var GraphVisual = (function (_super) {
             // There were some changes to the layout
             if (!_.isEqual(oldSettings.layout, this.settings.layout)) {
                 this.myGraph.configuration = $.extend(true, {}, this.settings.layout);
-            }
-            if (!_.isEqual(oldSettings.columnMappings, this.settings.columnMappings)) {
-                // This is necessary because some of the settings affect how the data is loaded
-                return true;
             }
         }
         return false;
@@ -260,18 +259,48 @@ var GraphVisual = (function (_super) {
         };
         this.host.persistProperties(objects);
     };
-    GraphVisual.DEFAULT_SETTINGS = {
-        columnMappings: {
-            source: "source",
-            target: "target",
-            edgeValue: "value",
-            sourceColor: "sourceColor",
-            sourceLabelColor: "sourceLabelColor",
-            targetColor: "targetColor",
-            targetLabelColor: "targetLabelColor",
-            sourceGroup: "sourceGroup",
-            targetGroup: "targetGroup"
+    /**
+     * A list of our data roles
+     */
+    GraphVisual.DATA_ROLES = {
+        source: {
+            displayName: "Source Node",
+            name: "SOURCE_NODE"
         },
+        target: {
+            displayName: "Target Node",
+            name: "TARGET_NODE"
+        } /*,
+        edgeValue: {
+            displayName: "Edge Weight",
+            name: "EDGE_VALUE"
+        },
+        sourceGroup: {
+            displayName: "Source Node Group",
+            name: "SOURCE_GROUP"
+        }*/,
+        sourceColor: {
+            displayName: "Source Node Color",
+            name: "SOURCE_NODE_COLOR"
+        },
+        sourceLabelColor: {
+            displayName: "Source Node Label Color",
+            name: "SOURCE_LABEL_COLOR"
+        } /*,
+        targetGroup: {
+            displayName: "Target Node Group",
+            name: "TARGET_GROUP"
+        }*/,
+        targetColor: {
+            displayName: "Target Node Color",
+            name: "TARGET_NODE_COLOR"
+        },
+        targetLabelColor: {
+            displayName: "Target Node Label Color",
+            name: "TARGET_LABEL_COLOR"
+        }
+    };
+    GraphVisual.DEFAULT_SETTINGS = {
         layout: {
             linkDistance: 10,
             linkStrength: 2,
@@ -284,15 +313,15 @@ var GraphVisual = (function (_super) {
         }
     };
     GraphVisual.capabilities = $.extend(true, {}, VisualBase_1.VisualBase.capabilities, {
-        dataRoles: [{
-                name: "Edges",
-                displayName: "Edges",
-                kind: powerbi.VisualDataRoleKind.GroupingOrMeasure,
-            }],
+        dataRoles: Object.keys(GraphVisual.DATA_ROLES).map(function (n) { return ({
+            name: GraphVisual.DATA_ROLES[n].name,
+            displayName: GraphVisual.DATA_ROLES[n].displayName,
+            kind: powerbi.VisualDataRoleKind.Grouping
+        }); }),
         dataViewMappings: [{
                 table: {
                     rows: {
-                        for: { in: "Edges" }
+                        select: Object.keys(GraphVisual.DATA_ROLES).map(function (n) { return ({ bind: { to: GraphVisual.DATA_ROLES[n].name } }); })
                     }
                 }
             }],
@@ -308,39 +337,6 @@ var GraphVisual = (function (_super) {
                                 selector: ['Values'],
                             }
                         }
-                    },
-                },
-            },
-            columnMappings: {
-                displayName: "Column Bindings",
-                properties: {
-                    source: {
-                        displayName: "Source Column",
-                        type: { text: true }
-                    },
-                    target: {
-                        displayName: "Target Column",
-                        type: { text: true }
-                    },
-                    edgeValue: {
-                        displayName: "Edge Weight Column",
-                        type: { text: true }
-                    },
-                    sourceColor: {
-                        displayName: "Source Node Color Column",
-                        type: { text: true }
-                    },
-                    sourceLabelColor: {
-                        displayName: "Source Node Label Color Column",
-                        type: { text: true }
-                    },
-                    targetColor: {
-                        displayName: "Target Node Color Column",
-                        type: { text: true }
-                    },
-                    targetLabelColor: {
-                        displayName: "Target Node Label Color Column",
-                        type: { text: true }
                     },
                 },
             },
