@@ -80,6 +80,7 @@ var VisualBase = (function () {
                 this.parent = $("<iframe style=\"width:" + this.width + "px;height:" + this.height + "px;border:0;margin:0;padding:0\" frameBorder=\"0\"/>");
                 // Important that this happens first, otherwise there might not be a body
                 this.container.append(this.parent);
+                this.parent.contents().find("head").append($('<meta http-equiv="X-UA-Compatible" content="IE=edge">'));
                 this.parent.contents().find("body").append(this.element);
                 this.HACK_fonts();
             }
