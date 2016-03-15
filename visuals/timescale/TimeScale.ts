@@ -172,10 +172,8 @@ export class TimeScale {
                     var rectHeight = this.y(d.value);
                     return `translate(${this.x(d.date)},${height - rectHeight})`;
                 })
-                .style({ "width": 2 })
-                .style("height", (d) => {
-                    return this.y(d.value);
-                });
+                .attr("width", 2)
+                .attr("height", (d) => this.y(d.value));
 
             tmp.exit().remove();
         }
