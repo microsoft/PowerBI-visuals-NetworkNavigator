@@ -22,15 +22,6 @@ var GraphVisual = (function (_super) {
     __extends(GraphVisual, _super);
     function GraphVisual() {
         _super.apply(this, arguments);
-        /**
-         * The font awesome resource
-         */
-        this.fontAwesome = {
-            url: '//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css',
-            integrity: 'sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT' +
-                '/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==',
-            crossorigin: "anonymous"
-        };
         this.settings = $.extend(true, {}, GraphVisual.DEFAULT_SETTINGS);
         // private template : string = `
         //     <div class="load-container load5">
@@ -175,12 +166,6 @@ var GraphVisual = (function (_super) {
             nodes: nodeList,
             links: linkList
         };
-    };
-    /**
-    * Gets the external css paths used for this visualization
-    */
-    GraphVisual.prototype.getExternalCssResources = function () {
-        return _super.prototype.getExternalCssResources.call(this).concat(this.fontAwesome);
     };
     /**
      * Gets the inline css used for this element

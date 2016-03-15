@@ -27,15 +27,6 @@ var LineUpVisual = (function (_super) {
     function LineUpVisual(noCss, initialSettings) {
         if (noCss === void 0) { noCss = false; }
         _super.call(this);
-        /**
-         * The font awesome resource
-         */
-        this.fontAwesome = {
-            url: '//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css',
-            integrity: 'sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT' +
-                '/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==',
-            crossorigin: "anonymous"
-        };
         this.template = "\n        <div>\n            <div class=\"lineup\"></div>\n        </div>\n    ".trim().replace(/\n/g, '');
         /**
          * If css should be loaded or not
@@ -49,10 +40,6 @@ var LineUpVisual = (function (_super) {
         var _this = this;
         _super.prototype.init.call(this, options, this.template, true);
         this.host = options.host;
-        // Temporary, because the popups will load outside of the iframe for some reason
-        this.buildExternalCssLink(this.fontAwesome).then(function (ele) {
-            _this.container.append($(ele));
-        });
         this.selectionManager = new SelectionManager({
             hostServices: options.host
         });
@@ -123,12 +110,6 @@ var LineUpVisual = (function (_super) {
      */
     LineUpVisual.prototype.getCss = function () {
         return this.noCss ? [] : _super.prototype.getCss.call(this).concat([require("!css!sass!./css/LineUp.scss"), require("!css!sass!./css/LineUpVisual.scss")]);
-    };
-    /**
-    * Gets the external css paths used for this visualization
-    */
-    LineUpVisual.prototype.getExternalCssResources = function () {
-        return _super.prototype.getExternalCssResources.call(this).concat(this.fontAwesome);
     };
     /**
      * Gets a lineup config from the data view

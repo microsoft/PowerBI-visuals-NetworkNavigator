@@ -179,16 +179,6 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         }
     });
 
-    /**
-     * The font awesome resource
-     */
-    private fontAwesome: ExternalCssResource = {
-        url: '//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css',
-        integrity: 'sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT' +
-                    '/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==',
-        crossorigin: "anonymous"
-    };
-
     private template : string = `
         <div>
             <div class="lineup"></div>
@@ -218,11 +208,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     public init(options: VisualInitOptions): void {
         super.init(options, this.template, true);
         this.host = options.host;
-
-        // Temporary, because the popups will load outside of the iframe for some reason
-        this.buildExternalCssLink(this.fontAwesome).then((ele) => {
-            this.container.append($(ele));
-        });
+        
         this.selectionManager = new SelectionManager({
             hostServices: options.host
         });
@@ -299,14 +285,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     protected getCss() : string[] {
         return this.noCss ? [] : super.getCss().concat([require("!css!sass!./css/LineUp.scss"), require("!css!sass!./css/LineUpVisual.scss")]);
     }
-
-    /**
-    * Gets the external css paths used for this visualization
-    */
-    protected getExternalCssResources() : ExternalCssResource[] {
-        return super.getExternalCssResources().concat(this.fontAwesome);
-    }
-
+    
     /**
      * Gets a lineup config from the data view
      */
