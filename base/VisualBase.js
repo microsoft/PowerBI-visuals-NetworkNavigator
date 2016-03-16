@@ -36,12 +36,14 @@ var VisualBase = (function () {
         this.height = options.viewport.height;
         var dataView = options.dataViews && options.dataViews[0];
         if (dataView) {
-            var objs = dataView.metadata.objects;
-            var experimental = objs && objs['experimental'];
-            var sandboxed = experimental && experimental['sandboxed'];
-            sandboxed = typeof sandboxed === "undefined" ? VisualBase.DEFAULT_SANDBOX_ENABLED : sandboxed;
-            if (this.sandboxed !== sandboxed) {
-                this.sandboxed = sandboxed;
+            if (VisualBase.EXPERIMENTAL_ENABLED) {
+                var objs = dataView.metadata.objects;
+                var experimental = objs && objs['experimental'];
+                var sandboxed = experimental && experimental['sandboxed'];
+                sandboxed = typeof sandboxed === "undefined" ? VisualBase.DEFAULT_SANDBOX_ENABLED : sandboxed;
+                if (this.sandboxed !== sandboxed) {
+                    this.sandboxed = sandboxed;
+                }
             }
         }
         this.parent.css({ width: this.width, height: this.height });
@@ -50,7 +52,7 @@ var VisualBase = (function () {
      * Enumerates the instances for the objects that appear in the power bi panel
      */
     VisualBase.prototype.enumerateObjectInstances = function (options) {
-        if (options.objectName === 'experimental') {
+        if (options.objectName === 'experimental' && VisualBase.EXPERIMENTAL_ENABLED) {
             return [{
                     selector: null,
                     objectName: 'experimental',
@@ -137,6 +139,8 @@ var VisualBase = (function () {
         }
         return toReturn;
     };
+    // TODO: Switch this to a build config
+    VisualBase.EXPERIMENTAL_ENABLED = false;
     /**
      * True if the sandbox is enabled by default
      */
@@ -144,7 +148,7 @@ var VisualBase = (function () {
     /**
      * The set of capabilities for the visual
      */
-    VisualBase.capabilities = {
+    VisualBase.capabilities = VisualBase.EXPERIMENTAL_ENABLED ? {
         objects: {
             experimental: {
                 displayName: "Experimental",
@@ -156,7 +160,7 @@ var VisualBase = (function () {
                 }
             }
         }
-    };
+    } : {};
     return VisualBase;
 }());
 exports.VisualBase = VisualBase;
