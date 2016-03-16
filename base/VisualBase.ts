@@ -110,8 +110,17 @@ export class VisualBase implements powerbi.IVisual {
             // Important that this happens first, otherwise there might not be a body
             this.container.append(this.parent);
             
-            this.parent.contents().find("head").append($('<meta http-equiv="X-UA-Compatible" content="IE=edge">'));
-            this.parent.contents().find("body").append(this.element);
+            if(typeof navigator !== "undefined" && navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+                // If you append the element without doing this, the iframe will load after you've appended it and remove everything that you added
+                this.parent[0].onload = () => {
+                    setTimeout(() => {
+                        this.parent.contents().find("body").append(this.element);
+                    }, 0);
+                };
+            } else {
+                this.parent.contents().find("head").append($('<meta http-equiv="X-UA-Compatible" content="IE=edge">'));
+                this.parent.contents().find("body").append(this.element);
+            }
             
             this.HACK_fonts();
         } else {

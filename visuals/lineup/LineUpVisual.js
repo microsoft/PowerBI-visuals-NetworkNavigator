@@ -25,6 +25,7 @@ var LineUpVisual = (function (_super) {
      * The constructor for the visual
      */
     function LineUpVisual(noCss, initialSettings) {
+        var _this = this;
         if (noCss === void 0) { noCss = false; }
         _super.call(this);
         this.template = "\n        <div>\n            <div class=\"lineup\"></div>\n        </div>\n    ".trim().replace(/\n/g, '');
@@ -32,6 +33,14 @@ var LineUpVisual = (function (_super) {
          * If css should be loaded or not
          */
         this.noCss = false;
+        /**
+         * Resizer function to resize lineup
+         */
+        this.lineupResizer = _.debounce(function () {
+            if (_this.lineup && _this.lineup.lineupImpl) {
+                _this.lineup.lineupImpl.updateBody();
+            }
+        }, 100);
         this.noCss = noCss;
         this.initialSettings = initialSettings || {};
     }
@@ -84,6 +93,7 @@ var LineUpVisual = (function (_super) {
             this.checkSettingsChanged();
             this.checkDataChanged();
         }
+        this.updateWrapperHeight();
         this.loadingData = false;
     };
     /**
@@ -105,6 +115,20 @@ var LineUpVisual = (function (_super) {
         }
         return instances;
     };
+    Object.defineProperty(LineUpVisual.prototype, "dimensions", {
+        /**
+         * Getter for dimensions
+         */
+        get: function () {
+            return this._dimensions;
+        },
+        set: function (value) {
+            this._dimensions = value;
+            this.lineupResizer();
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * Gets the css used for this element
      */
@@ -222,6 +246,18 @@ var LineUpVisual = (function (_super) {
             });
         }
         return data;
+    };
+    /**
+     * Updates the height of the wrapper to fill the remaining space
+     */
+    LineUpVisual.prototype.updateWrapperHeight = function () {
+        var wrapper = this.element.find(".lu-wrapper");
+        var header = this.element.find(".lu-header");
+        if (wrapper.length && header.length) {
+            wrapper.css({
+                height: this.dimensions.height - header.height()
+            });
+        }
     };
     /**
      * Event listener for when the visual data's changes

@@ -32,7 +32,6 @@ var GraphVisual = (function (_super) {
     /** This is called once when the visual is initialially created */
     GraphVisual.prototype.init = function (options) {
         _super.prototype.init.call(this, options, this.template);
-        this.element.append(this.template);
         this.myGraph = new ForceGraph_1.ForceGraph(this.element.find("#node_graph"), 500, 500);
         this.host = options.host;
         this.interactivityService = new InteractivityService(this.host);
