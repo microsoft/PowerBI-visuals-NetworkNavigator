@@ -69,7 +69,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 rowCount: { preferred: { min: 1 } }
             }
         }],
-        objects: {
+        objects: $.extend({
             general: {
                 displayName: powerbi.data.createDisplayNameGetter('Visual_General'),
                 properties: {
@@ -157,7 +157,8 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                         type: { bool: true }
                     }
                 },
-            },
+            }
+        }, VisualBase.EXPERIMENTAL_ENABLED ? {
             experimental: {
                 displayName: "Experimental",
                 properties: {
@@ -173,7 +174,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                     }*/
                 }
             }
-        },
+        } : {}),
         sorting: {
             custom:{}
         }
@@ -465,7 +466,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
      */
     private onFilterChanged(filter: any) : boolean {
         const mySettings = <ILineUpVisualSettings>this.lineup.settings;
-        if (mySettings.experimental && mySettings.experimental.serverSideFiltering) {
+        if (VisualBase.EXPERIMENTAL_ENABLED && mySettings.experimental && mySettings.experimental.serverSideFiltering) {
             return true;
         }
     }
@@ -475,7 +476,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
      */
     private onSorted(sort?: ILineUpSort) : boolean {
         const mySettings = <ILineUpVisualSettings>this.lineup.settings;
-        if (mySettings.experimental && mySettings.experimental.serverSideSorting) {
+        if (VisualBase.EXPERIMENTAL_ENABLED && mySettings.experimental && mySettings.experimental.serverSideSorting) {
             let args: powerbi.CustomSortEventArgs = null;
             if (sort) {
                 let pbiCol = this.dataViewTable.columns.filter((c) => c.displayName === sort.column)[0];

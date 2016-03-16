@@ -11,6 +11,9 @@ export class VisualBase implements powerbi.IVisual {
     private width: number;
     private height: number;
     
+    // TODO: Switch this to a build config
+    public static EXPERIMENTAL_ENABLED = false;
+    
     /**
      * True if the sandbox is enabled by default
      */
@@ -19,7 +22,7 @@ export class VisualBase implements powerbi.IVisual {
     /**
      * The set of capabilities for the visual
      */
-    public static capabilities: VisualCapabilities = {
+    public static capabilities: VisualCapabilities = VisualBase.EXPERIMENTAL_ENABLED ? {
         objects: {
             experimental: {
                 displayName: "Experimental",
@@ -31,7 +34,7 @@ export class VisualBase implements powerbi.IVisual {
                 }
             }
         }
-    };
+    } : {};
 
     /** This is called once when the visual is initialially created */
     public init(options: powerbi.VisualInitOptions, template: string = "", addCssToParent: boolean = false): void {
@@ -63,12 +66,14 @@ export class VisualBase implements powerbi.IVisual {
         
         const dataView = options.dataViews && options.dataViews[0];
         if (dataView) {
-            const objs = dataView.metadata.objects;
-            const experimental = objs && objs['experimental'];
-            let sandboxed = experimental && experimental['sandboxed'];
-            sandboxed = typeof sandboxed === "undefined" ? VisualBase.DEFAULT_SANDBOX_ENABLED : sandboxed;
-            if (this.sandboxed !== sandboxed) {
-                this.sandboxed = sandboxed;
+            if (VisualBase.EXPERIMENTAL_ENABLED) {
+                const objs = dataView.metadata.objects;
+                const experimental = objs && objs['experimental'];
+                let sandboxed = experimental && experimental['sandboxed'];
+                sandboxed = typeof sandboxed === "undefined" ? VisualBase.DEFAULT_SANDBOX_ENABLED : sandboxed;
+                if (this.sandboxed !== sandboxed) {
+                    this.sandboxed = sandboxed;
+                }
             }
         }
         this.parent.css({ width: this.width, height: this.height });
@@ -78,7 +83,7 @@ export class VisualBase implements powerbi.IVisual {
      * Enumerates the instances for the objects that appear in the power bi panel
      */
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
-        if (options.objectName === 'experimental') {
+        if (options.objectName === 'experimental' && VisualBase.EXPERIMENTAL_ENABLED) {
             return [{
                 selector: null,
                 objectName: 'experimental',

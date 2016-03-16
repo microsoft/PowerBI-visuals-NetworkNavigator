@@ -273,7 +273,7 @@ var LineUpVisual = (function (_super) {
      */
     LineUpVisual.prototype.onFilterChanged = function (filter) {
         var mySettings = this.lineup.settings;
-        if (mySettings.experimental && mySettings.experimental.serverSideFiltering) {
+        if (VisualBase_1.VisualBase.EXPERIMENTAL_ENABLED && mySettings.experimental && mySettings.experimental.serverSideFiltering) {
             return true;
         }
     };
@@ -282,7 +282,7 @@ var LineUpVisual = (function (_super) {
      */
     LineUpVisual.prototype.onSorted = function (sort) {
         var mySettings = this.lineup.settings;
-        if (mySettings.experimental && mySettings.experimental.serverSideSorting) {
+        if (VisualBase_1.VisualBase.EXPERIMENTAL_ENABLED && mySettings.experimental && mySettings.experimental.serverSideSorting) {
             var args = null;
             if (sort) {
                 var pbiCol = this.dataViewTable.columns.filter(function (c) { return c.displayName === sort.column; })[0];
@@ -380,7 +380,7 @@ var LineUpVisual = (function (_super) {
                     rowCount: { preferred: { min: 1 } }
                 }
             }],
-        objects: {
+        objects: $.extend({
             general: {
                 displayName: powerbi.data.createDisplayNameGetter('Visual_General'),
                 properties: {
@@ -468,7 +468,8 @@ var LineUpVisual = (function (_super) {
                         type: { bool: true }
                     }
                 },
-            },
+            }
+        }, VisualBase_1.VisualBase.EXPERIMENTAL_ENABLED ? {
             experimental: {
                 displayName: "Experimental",
                 properties: {
@@ -484,7 +485,7 @@ var LineUpVisual = (function (_super) {
                     }*/
                 }
             }
-        },
+        } : {}),
         sorting: {
             custom: {}
         }
