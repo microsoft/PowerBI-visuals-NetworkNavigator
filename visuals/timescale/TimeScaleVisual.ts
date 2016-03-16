@@ -103,7 +103,9 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
             var data = TimeScaleVisual.converter(dataView);
 
             // Stash this bad boy for later, so we can filter the time column
-            this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
+            if (dataViewCategorical && dataViewCategorical.categories) {
+                this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
+            }
 
             var item: any = dataView.metadata.objects;
             if (dataView.metadata.objects && item.general && item.general.filter
@@ -145,6 +147,7 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
 
         // Must be two columns: times and values
         if (dataViewCategorical &&
+            dataViewCategorical.categories &&
             dataViewCategorical.categories.length === 1 &&
             dataViewCategorical.values && dataViewCategorical.values.length) {
             items = dataViewCategorical.categories[0].values.map((val, i) => ({

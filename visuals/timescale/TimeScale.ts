@@ -53,9 +53,9 @@ export class TimeScale {
      * Setter for the data
      */
     public set data(data: TimeScaleDataItem[]) {
-        this._data = data;
-        this.x.domain(d3.extent(data.map((d) => d.date)));
-        this.y.domain([0, d3.max(data.map((d) => d.value))]);
+        this._data = data || [];
+        this.x.domain(d3.extent(this._data.map((d) => d.date)));
+        this.y.domain([0, d3.max(this._data.map((d) => +d.value))]);
         this.resizeElements();
     }
 
@@ -158,7 +158,7 @@ export class TimeScale {
             height = this._dimensions.height - margin.top - margin.bottom;
 
         this.x.range([0, <any>width])
-        this.y.range([0, height]);
+        this.y.range([height, 0]);
 
         if (this.bars && this._data) {
             var tmp = this.bars
@@ -169,11 +169,11 @@ export class TimeScale {
 
             tmp
                 .attr("transform", (d, i) => {
-                    var rectHeight = this.y(d.value);
+                    var rectHeight = this.y(0) - this.y(d.value);
                     return `translate(${this.x(d.date)},${height - rectHeight})`;
                 })
                 .attr("width", 2)
-                .attr("height", (d) => this.y(d.value));
+                .attr("height", (d) => Math.max(0, this.y(0) - this.y(d.value)));
 
             tmp.exit().remove();
         }
