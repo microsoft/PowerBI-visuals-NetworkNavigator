@@ -153,19 +153,54 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
         var dataViewCategorical = dataView && dataView.categorical;
 
         // Must be two columns: times and values
-        if (dataViewCategorical &&
-            dataViewCategorical.categories &&
-            dataViewCategorical.categories.length === 1 &&
-            dataViewCategorical.values && dataViewCategorical.values.length) {
-            items = dataViewCategorical.categories[0].values.map((date, i) => {
-                return {
-                    date: TimeScaleVisual.coerceDate(date),
-                    value: dataViewCategorical.values[0].values[i],
-                    identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
-                };
-            })
+        if (dataViewCategorical && dataViewCategorical.categories && dataViewCategorical.values && dataViewCategorical.values.length) {
+            if (dataViewCategorical.categories.length === 1) {
+                items = dataViewCategorical.categories[0].values.map((date, i) => {
+                    return {
+                        date: TimeScaleVisual.coerceDate(date),
+                        value: dataViewCategorical.values[0].values[i],
+                        identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
+                    };
+                });
+            }/* else if (dataViewCategorical.categories.length > 1) {
+                let yearCategory;
+                let monthCategory;
+                let dayCategory;
+                dataViewCategorical.categories.forEach(cat => {
+                    let categoryName = cat.source.displayName;
+                    if (categoryName === "Year") {
+                        yearCategory = cat;
+                    } else if (categoryName === "Month") {
+                        monthCategory = cat;
+                    } else if (categoryName === "Day") {
+                        dayCategory = cat;
+                    }
+                });
+                
+                items = [];
+                let numValues = dataViewCategorical.categories[0].values.length;
+                let date = new Date();
+                for (let i = 0; i < numValues; i++) {
+                    items.push({
+                        date: new Date(
+                            yearCategory ? yearCategory.values[i] : date.getFullYear(),
+                            monthCategory ? TimeScaleVisual.getMonthFromString(monthCategory.values[i]) - 1 : 0,
+                            dayCategory ? dayCategory.values[i] : 1
+                        ),
+                        value: dataViewCategorical.values[0].values[i],
+                        identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
+                    });
+                }
+            }*/
         }
         return items;
+    }
+    
+    /**
+     * Returns a numerical value for a month
+     */
+    public static getMonthFromString(mon: string){
+        return new Date(Date.parse(mon +" 1, 2012")).getMonth()+1
     }
     
     /**
