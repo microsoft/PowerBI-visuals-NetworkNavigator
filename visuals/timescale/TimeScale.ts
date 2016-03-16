@@ -170,7 +170,8 @@ export class TimeScale {
             tmp
                 .attr("transform", (d, i) => {
                     var rectHeight = this.y(0) - this.y(d.value);
-                    return `translate(${this.x(d.date)},${height - rectHeight})`;
+                    let x = this.x(d.date) || 0;
+                    return `translate(${x},${height - rectHeight})`;
                 })
                 .attr("width", 2)
                 .attr("height", (d) => Math.max(0, this.y(0) - this.y(d.value)));
