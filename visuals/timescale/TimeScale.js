@@ -39,7 +39,7 @@ var TimeScale = (function () {
         set: function (data) {
             this._data = data || [];
             this.x.domain(d3.extent(this._data.map(function (d) { return d.date; })));
-            this.y.domain([0, d3.max(this._data.map(function (d) { return d.value; }))]);
+            this.y.domain([0, d3.max(this._data.map(function (d) { return +d.value; }))]);
             this.resizeElements();
         },
         enumerable: true,
@@ -141,7 +141,7 @@ var TimeScale = (function () {
         var _this = this;
         var margin = { top: 0, right: 10, bottom: 20, left: 10 }, width = this._dimensions.width - margin.left - margin.right, height = this._dimensions.height - margin.top - margin.bottom;
         this.x.range([0, width]);
-        this.y.range([0, height]);
+        this.y.range([height, 0]);
         if (this.bars && this._data) {
             var tmp = this.bars
                 .selectAll("rect")
@@ -150,11 +150,11 @@ var TimeScale = (function () {
                 .enter().append("rect");
             tmp
                 .attr("transform", function (d, i) {
-                var rectHeight = _this.y(d.value);
+                var rectHeight = _this.y(0) - _this.y(d.value);
                 return "translate(" + _this.x(d.date) + "," + (height - rectHeight) + ")";
             })
                 .attr("width", 2)
-                .attr("height", function (d) { return _this.y(d.value); });
+                .attr("height", function (d) { return Math.max(0, _this.y(0) - _this.y(d.value)); });
             tmp.exit().remove();
         }
         this.svg
