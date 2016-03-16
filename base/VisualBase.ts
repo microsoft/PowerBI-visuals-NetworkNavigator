@@ -105,6 +105,7 @@ export class VisualBase implements powerbi.IVisual {
             // Important that this happens first, otherwise there might not be a body
             this.container.append(this.parent);
             
+            this.parent.contents().find("head").append($('<meta http-equiv="X-UA-Compatible" content="IE=edge">'));
             this.parent.contents().find("body").append(this.element);
             
             this.HACK_fonts();

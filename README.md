@@ -95,3 +95,6 @@ export default class LineUpVisual extends VisualBase implements IVisual {
   * Creates a webpacked version of your react class (if you defined *react* in your build.json property file) and puts it in the `dist\<projectFolder>\react` folder.
   * Creates a webpacked version of your plain component class (if you defined *component* in your build.json file) and puts it in the `dist\<projectFolder>\component` folder.
 * You can also build all components by running `gulp build`.  To run specific builds for the different versions of components, you can append `:<type>` to the command to limit the build scope.  For example, if you only want to build the to build all of the react versions of your components, you would run `gulp build:react`, to build the react version of a single component, you would run run `gulp build:myComponent:react`.
+
+#Demo
+* Running `gulp demo:<projectFolder>` will create a demo server/webpage which will show the given component being run in standalone mode.

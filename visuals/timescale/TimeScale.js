@@ -153,10 +153,8 @@ var TimeScale = (function () {
                 var rectHeight = _this.y(d.value);
                 return "translate(" + _this.x(d.date) + "," + (height - rectHeight) + ")";
             })
-                .style({ "width": 2 })
-                .style("height", function (d) {
-                return _this.y(d.value);
-            });
+                .attr("width", 2)
+                .attr("height", function (d) { return _this.y(d.value); });
             tmp.exit().remove();
         }
         this.svg
