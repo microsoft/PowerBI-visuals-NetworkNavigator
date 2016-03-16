@@ -3513,7 +3513,7 @@ var LineUp;
 
     allHeaders.select('.labelBG').attr({
       width: function (d) {
-        return d.getColumnWidth() - 5;
+        return Math.max(d.getColumnWidth() - 5, 0);
       },
       height: function (d) {
         return d.height;
@@ -3562,7 +3562,7 @@ var LineUp;
       }).append('rect').attr({
         'class': 'weightHandle',
         x: function (d) {
-          return d.getColumnWidth() - 5;
+          return Math.max(d.getColumnWidth() - 5, 0);
         },
         y: 0,
         width: 5
@@ -3570,7 +3570,7 @@ var LineUp;
 
       allHeaders.select('.weightHandle').attr({
         x: function (d) {
-          return (d.getColumnWidth() - 5);
+          return Math.max(d.getColumnWidth() - 5, 0);
         },
         height: function (d) {
           return d.height;
