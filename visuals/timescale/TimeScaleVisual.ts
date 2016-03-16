@@ -49,6 +49,7 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
                     select: [{ bind: { to: 'Values' } }]
                 }
             },
+            conditions: [{ 'Times': { max: 1, min: 1 }, 'Values': { max: 1, min: 0 } }],
         }],
         objects: {
             general: {
@@ -102,45 +103,42 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
     public update(options: VisualUpdateOptions) {
         super.update(options);
 
-        var startDate;
-        var endDate;
-        var dataView = options.dataViews && options.dataViews[0];
-        if (dataView) {
-            var dataViewCategorical = dataView.categorical;
-            var data = TimeScaleVisual.converter(dataView);
+        // If the dimensions changed
+        if (!_.isEqual(this.timeScale.dimensions, options.viewport)) {
+            this.timeScale.dimensions = { width: options.viewport.width, height: options.viewport.height };
+        } else {
+            var startDate;
+            var endDate;
+            var dataView = options.dataViews && options.dataViews[0];
+            if (dataView) {
+                var dataViewCategorical = dataView.categorical;
+                var data = TimeScaleVisual.converter(dataView);
 
-            // Stash this bad boy for later, so we can filter the time column
-            if (dataViewCategorical && dataViewCategorical.categories) {
-                this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
-            }
-
-            var item: any = dataView.metadata.objects;
-            if (dataView.metadata.objects && item.general && item.general.filter
-                && item.general.filter.whereItems && item.general.filter.whereItems[0]
-                && item.general.filter.whereItems && item.general.filter.whereItems[0].condition) {
-                var filterStartDate = item.general.filter.whereItems[0].condition.lower.value;
-                var filterEndDate = item.general.filter.whereItems[0].condition.upper.value;
-                startDate = new Date(filterStartDate.getTime());
-                endDate = new Date(filterEndDate.getTime());
-
-                // If the selection has changed at all, then set it
-                var currentSelection = this.timeScale.selectedRange;
-                if (!currentSelection ||
-                    currentSelection.length !== 2 ||
-                    startDate !== currentSelection[0] ||
-                    endDate !== currentSelection[1]) {
-                    this.timeScale.selectedRange = [startDate, endDate];
+                // Stash this bad boy for later, so we can filter the time column
+                if (dataViewCategorical && dataViewCategorical.categories) {
+                    this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
                 }
-            }
 
-            // If the data has changed at all, then update the timeScale
-            if (Utils.hasDataChanged(data, <TimeScaleVisualDataItem[]>this.timeScale.data, this.idCompare)) {
+                var item: any = dataView.metadata.objects;
+                if (dataView.metadata.objects && item.general && item.general.filter
+                    && item.general.filter.whereItems && item.general.filter.whereItems[0]
+                    && item.general.filter.whereItems && item.general.filter.whereItems[0].condition) {
+                    var filterStartDate = item.general.filter.whereItems[0].condition.lower.value;
+                    var filterEndDate = item.general.filter.whereItems[0].condition.upper.value;
+                    startDate = new Date(filterStartDate.getTime());
+                    endDate = new Date(filterEndDate.getTime());
+
+                    // If the selection has changed at all, then set it
+                    var currentSelection = this.timeScale.selectedRange;
+                    if (!currentSelection ||
+                        currentSelection.length !== 2 ||
+                        startDate !== currentSelection[0] ||
+                        endDate !== currentSelection[1]) {
+                        this.timeScale.selectedRange = [startDate, endDate];
+                    }
+                }
+                
                 this.timeScale.data = data;
-            }
-
-            // If the dimensions changed
-            if (!_.isEqual(this.timeScale.dimensions, options.viewport)) {
-                this.timeScale.dimensions = { width: options.viewport.width, height: options.viewport.height };
             }
         }
     }
