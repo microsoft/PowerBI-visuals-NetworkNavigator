@@ -20,6 +20,8 @@ var LineUp;
 //    this.sortedColumn = [];
     this.$container = $container;
     this.tooltip = LineUp.createTooltip($container.node());
+    // Uncharted (Dario): Hide default tooltip to avoid undesired artifacts.
+    this.tooltip.hide();
     //trigger hover event
     this.listeners = d3.dispatch('hover','change-sortcriteria','change-filter', 'columns-changed', 'selected','multiselected', 'generate-histogram');
 
@@ -3481,7 +3483,8 @@ var LineUp;
       }
     })
       .on('click', function (d) {
-        if (d3.event.defaultPrevented || d instanceof LineUp.LayoutEmptyColumn || d instanceof LineUp.LayoutActionColumn) {
+        // Uncharted (Dario): Removed click functionality from LayoutRankColumn instances
+        if (d3.event.defaultPrevented || d instanceof LineUp.LayoutEmptyColumn || d instanceof LineUp.LayoutActionColumn || d instanceof LineUp.LayoutRankColumn) {
           return;
         }
         // no sorting for empty stacked columns !!!
@@ -3512,7 +3515,8 @@ var LineUp;
 
     allHeaders.select('.labelBG').attr({
       width: function (d) {
-        return d.getColumnWidth() - 5;
+        // Uncharted (Dario): Added safety check to avoid negative values.
+        return Math.max(d.getColumnWidth() - 5, 0);
       },
       height: function (d) {
         return d.height;
@@ -3561,7 +3565,8 @@ var LineUp;
       }).append('rect').attr({
         'class': 'weightHandle',
         x: function (d) {
-          return d.getColumnWidth() - 5;
+          // Uncharted (Dario): Added safety check to avoid negative values.
+          return Math.max(d.getColumnWidth() - 5, 0);
         },
         y: 0,
         width: 5
@@ -3569,7 +3574,8 @@ var LineUp;
 
       allHeaders.select('.weightHandle').attr({
         x: function (d) {
-          return (d.getColumnWidth() - 5);
+          // Uncharted (Dario): Added safety check to avoid negative values.
+          return Math.max(d.getColumnWidth() - 5, 0);
         },
         height: function (d) {
           return d.height;
