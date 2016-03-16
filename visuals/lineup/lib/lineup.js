@@ -3514,6 +3514,7 @@ var LineUp;
 
     allHeaders.select('.labelBG').attr({
       width: function (d) {
+        // Uncharted (Dario): Added safety check to avoid negative values.
         return Math.max(d.getColumnWidth() - 5, 0);
       },
       height: function (d) {
@@ -3563,6 +3564,7 @@ var LineUp;
       }).append('rect').attr({
         'class': 'weightHandle',
         x: function (d) {
+          // Uncharted (Dario): Added safety check to avoid negative values.
           return Math.max(d.getColumnWidth() - 5, 0);
         },
         y: 0,
@@ -3571,6 +3573,7 @@ var LineUp;
 
       allHeaders.select('.weightHandle').attr({
         x: function (d) {
+          // Uncharted (Dario): Added safety check to avoid negative values.
           return Math.max(d.getColumnWidth() - 5, 0);
         },
         height: function (d) {
