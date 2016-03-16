@@ -53,9 +53,9 @@ export class TimeScale {
      * Setter for the data
      */
     public set data(data: TimeScaleDataItem[]) {
-        this._data = data;
-        this.x.domain(d3.extent(data.map((d) => d.date)));
-        this.y.domain([0, d3.max(data.map((d) => d.value))]);
+        this._data = data || [];
+        this.x.domain(d3.extent(this._data.map((d) => d.date)));
+        this.y.domain([0, d3.max(this._data.map((d) => d.value))]);
         this.resizeElements();
     }
 

@@ -37,9 +37,9 @@ var TimeScale = (function () {
          * Setter for the data
          */
         set: function (data) {
-            this._data = data;
-            this.x.domain(d3.extent(data.map(function (d) { return d.date; })));
-            this.y.domain([0, d3.max(data.map(function (d) { return d.value; }))]);
+            this._data = data || [];
+            this.x.domain(d3.extent(this._data.map(function (d) { return d.date; })));
+            this.y.domain([0, d3.max(this._data.map(function (d) { return d.value; }))]);
             this.resizeElements();
         },
         enumerable: true,

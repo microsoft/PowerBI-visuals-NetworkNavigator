@@ -48,7 +48,9 @@ var TimeScaleVisual = (function (_super) {
             var dataViewCategorical = dataView.categorical;
             var data = TimeScaleVisual.converter(dataView);
             // Stash this bad boy for later, so we can filter the time column
-            this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
+            if (dataViewCategorical && dataViewCategorical.categories) {
+                this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
+            }
             var item = dataView.metadata.objects;
             if (dataView.metadata.objects && item.general && item.general.filter
                 && item.general.filter.whereItems && item.general.filter.whereItems[0]
@@ -84,6 +86,7 @@ var TimeScaleVisual = (function (_super) {
         var dataViewCategorical = dataView && dataView.categorical;
         // Must be two columns: times and values
         if (dataViewCategorical &&
+            dataViewCategorical.categories &&
             dataViewCategorical.categories.length === 1 &&
             dataViewCategorical.values && dataViewCategorical.values.length) {
             items = dataViewCategorical.categories[0].values.map(function (val, i) { return ({
