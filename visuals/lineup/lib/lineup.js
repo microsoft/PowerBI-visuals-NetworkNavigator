@@ -20,6 +20,7 @@ var LineUp;
 //    this.sortedColumn = [];
     this.$container = $container;
     this.tooltip = LineUp.createTooltip($container.node());
+    // Uncharted (Dario): Hide default tooltip to avoid undesired artifacts.
     this.tooltip.hide();
     //trigger hover event
     this.listeners = d3.dispatch('hover','change-sortcriteria','change-filter', 'columns-changed', 'selected','multiselected', 'generate-histogram');
