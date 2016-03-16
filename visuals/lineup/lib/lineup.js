@@ -3482,7 +3482,8 @@ var LineUp;
       }
     })
       .on('click', function (d) {
-        if (d3.event.defaultPrevented || d instanceof LineUp.LayoutEmptyColumn || d instanceof LineUp.LayoutActionColumn) {
+        // Uncharted (Dario): Removed click functionality from LayoutRankColumn instances
+        if (d3.event.defaultPrevented || d instanceof LineUp.LayoutEmptyColumn || d instanceof LineUp.LayoutActionColumn || d instanceof LineUp.LayoutRankColumn) {
           return;
         }
         // no sorting for empty stacked columns !!!
