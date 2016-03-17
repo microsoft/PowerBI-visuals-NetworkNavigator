@@ -31,7 +31,6 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     private selectionManager : SelectionManager;
     private waitingForMoreData : boolean;
     private waitingForSort : boolean;
-    private dimensions: { width: number; height: number };
     private loadingData : boolean;
 
     // Stores our current set of data.
@@ -257,7 +256,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
             this.checkSettingsChanged();
             this.checkDataChanged();
         }
-
+        this.updateWrapperHeight();
         this.loadingData = false;
     }
 
@@ -278,6 +277,31 @@ export default class LineUpVisual extends VisualBase implements IVisual {
             $.extend(true, instances[0].properties, this.lineup.settings[options.objectName]);
         }
         return instances;
+    }
+    
+    /**
+     * Resizer function to resize lineup
+     */
+    private lineupResizer = _.debounce(() => {
+        if(this.lineup && this.lineup.lineupImpl) {
+            this.lineup.lineupImpl.updateBody();
+        }
+    }, 100);
+    
+    /**
+     * Setter for dimensions
+     */
+    private _dimensions: { width: number; height: number };
+    public set dimensions (value: { width: number; height: number }) {
+        this._dimensions = value;
+        this.lineupResizer();
+    }
+    
+    /**
+     * Getter for dimensions
+     */
+    public get dimensions() {
+        return this._dimensions;
     }
 
     /**
@@ -404,6 +428,19 @@ export default class LineUpVisual extends VisualBase implements IVisual {
             });
         }
         return data;
+    }
+    
+    /**
+     * Updates the height of the wrapper to fill the remaining space
+     */
+    private updateWrapperHeight() {
+        const wrapper = this.element.find(".lu-wrapper");
+        const header = this.element.find(".lu-header");
+        if (wrapper.length && header.length) {
+            wrapper.css( {
+                height: this.dimensions.height - header.height()
+            });
+        }
     }
 
     /**

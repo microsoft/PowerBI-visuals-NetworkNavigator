@@ -73,6 +73,7 @@ var VisualBase = (function () {
          * Sets the sandboxed state
          */
         set: function (value) {
+            var _this = this;
             this._sandboxed = value;
             this.element.detach();
             if (this.parent) {
@@ -82,8 +83,18 @@ var VisualBase = (function () {
                 this.parent = $("<iframe style=\"width:" + this.width + "px;height:" + this.height + "px;border:0;margin:0;padding:0\" frameBorder=\"0\"/>");
                 // Important that this happens first, otherwise there might not be a body
                 this.container.append(this.parent);
-                this.parent.contents().find("head").append($('<meta http-equiv="X-UA-Compatible" content="IE=edge">'));
-                this.parent.contents().find("body").append(this.element);
+                if (typeof navigator !== "undefined" && navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+                    // If you append the element without doing this, the iframe will load after you've appended it and remove everything that you added
+                    this.parent[0].onload = function () {
+                        setTimeout(function () {
+                            _this.parent.contents().find("body").append(_this.element);
+                        }, 0);
+                    };
+                }
+                else {
+                    this.parent.contents().find("head").append($('<meta http-equiv="X-UA-Compatible" content="IE=edge">'));
+                    this.parent.contents().find("body").append(this.element);
+                }
                 this.HACK_fonts();
             }
             else {

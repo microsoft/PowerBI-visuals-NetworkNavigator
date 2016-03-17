@@ -185,7 +185,6 @@ export default class GraphVisual extends VisualBase implements IVisual {
     /** This is called once when the visual is initialially created */
     public init(options: VisualInitOptions): void {
         super.init(options, this.template);
-        this.element.append(this.template);
         this.myGraph = new ForceGraph(this.element.find("#node_graph"), 500, 500);
         this.host = options.host;
         this.interactivityService = new InteractivityService(this.host);
