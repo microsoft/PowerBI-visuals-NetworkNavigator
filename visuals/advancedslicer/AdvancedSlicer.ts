@@ -250,7 +250,7 @@ export class AdvancedSlicer {
             value.map((v) => this.createSelectionToken(v)).forEach(n => n.insertBefore(this.element.find(".clear-all")));
         }
 
-        this.events.raiseEvent("selectionChanged", this._selectedItems, oldSelection);
+        this.raiseSelectionChanged(this.selectedItems, oldSelection);
 
         this.checkAllEle.prop("checked", someChecked);
         this.checkAllEle.prop('indeterminate', someChecked);
@@ -380,11 +380,9 @@ export class AdvancedSlicer {
             // var checkbox = $(evt.target);
             var ele = $((<HTMLElement>evt.target)).parents(".item");
             if (ele.length > 0) {
-                let oldSelectedItems = this.selectedItems.slice(0);
                 let item : any = ele.data("item");
                 this.selectedItems.push(item);
                 this.selectedItems = this.selectedItems.slice(0);
-                this.raiseSelectionChanged(this.selectedItems, oldSelectedItems);
                 this.updateSelectAllButtonState();
             }
             evt.stopImmediatePropagation();
