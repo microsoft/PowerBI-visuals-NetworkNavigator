@@ -318,6 +318,10 @@ var GraphVisual = (function (_super) {
                         select: Object.keys(GraphVisual.DATA_ROLES).map(function (n) { return ({ bind: { to: GraphVisual.DATA_ROLES[n].name } }); })
                     }
                 },
+                conditions: [Object.keys(GraphVisual.DATA_ROLES).reduce(function (a, b) {
+                        a[GraphVisual.DATA_ROLES[b].name] = { min: 0, max: 1 };
+                        return a;
+                    }, {})]
             }],
         objects: {
             general: {
