@@ -299,7 +299,7 @@ export class AdvancedSlicer {
         let eles = this.element.find(".item");
         let me = this;
         const isMatch = (item: SlicerItem, value: string) => {
-            return (item.match || "").indexOf(value) >= 0 ||
+            return (item.match.toString() || "").indexOf(value) >= 0 ||
                 (item.matchPrefix || "").indexOf(value) >= 0 ||
                 (item.matchSuffix || "").indexOf(value) >= 0;
         };
