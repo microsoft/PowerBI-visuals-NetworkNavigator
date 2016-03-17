@@ -74,7 +74,7 @@ export default class TimeBrush extends VisualBase implements IVisual {
      */
     private template: string = `
         <div>
-            <div class="timescale"></div>
+            <div class="timebrush"></div>
         </div>
     `;
     
@@ -84,7 +84,7 @@ export default class TimeBrush extends VisualBase implements IVisual {
     private idCompare = (a : TimeBrushVisualDataItem, b: TimeBrushVisualDataItem) => a.identity.equals(b.identity);
     
     /**
-     * Constructor for the timescale visual
+     * Constructor for the timebrush visual
      */
     constructor(private noCss = false) {
         super();
@@ -95,7 +95,7 @@ export default class TimeBrush extends VisualBase implements IVisual {
         super.init(options);
         this.element.append($(this.template));
         this.host = options.host;
-        this.timeBrush = new TimeBrushImpl(this.element.find(".timescale"), { width: options.viewport.width, height: options.viewport.height });
+        this.timeBrush = new TimeBrushImpl(this.element.find(".timebrush"), { width: options.viewport.width, height: options.viewport.height });
         this.timeBrush.events.on("rangeSelected", (range) => this.onTimeRangeSelected(range));
     }
 
@@ -154,12 +154,13 @@ export default class TimeBrush extends VisualBase implements IVisual {
         if (dataViewCategorical && dataViewCategorical.categories && dataViewCategorical.values && dataViewCategorical.values.length) {
             if (dataViewCategorical.categories.length === 1) {
                 items = dataViewCategorical.categories[0].values.map((date, i) => {
-                    return {
-                        date: TimeBrush.coerceDate(date),
+                    let coercedDate = TimeBrush.coerceDate(date);
+                    return coercedDate ? {
+                        date: coercedDate,
                         value: dataViewCategorical.values[0].values[i],
                         identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
-                    };
-                });
+                    } : null;
+                }).filter(n => !!n);
             }/* else if (dataViewCategorical.categories.length > 1) {
                 let yearCategory;
                 let monthCategory;
@@ -206,7 +207,7 @@ export default class TimeBrush extends VisualBase implements IVisual {
      */
     public static coerceDate(dateValue: any) : Date {
         if (!dateValue) {
-            dateValue = new Date();
+            return;
         }
             
         if (typeof dateValue === "string") {

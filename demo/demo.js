@@ -21,18 +21,18 @@ $(function() {
         }
     }
 
-    function loadTimescale() {
+    function loadTimebrush() {
         try {
-            var timescaleEle = $('#time-scale');
-            var timeScale = new TimeScale(timescaleEle, { height: timescaleEle.height(), width: timescaleEle.width() });
+            var timebrushEle = $('#time-scale');
+            var timeBrush = new TimeBrush(timebrushEle, { height: timebrushEle.height(), width: timebrushEle.width() });
             $.getJSON('timescaledata.json', function(data) {
                 data.forEach(function(item) {
                     item.date = new Date(item.date);
                 });
-                timeScale.data = data;
+                timeBrush.data = data;
             });
-            timeScale.events.on("rangeSelected", function(dates) {
-                timescaleEle.find("#selected-range").text(dates[0] + " -> " + dates[1]);
+            timeBrush.events.on("rangeSelected", function(dates) {
+                timebrushEle.find("#selected-range").text(dates[0] + " -> " + dates[1]);
             });
         } catch (e) {
             console.error(e);
@@ -211,7 +211,7 @@ $(function() {
     }
 
     loadSlicer();
-    loadTimescale();
+    loadTimebrush();
     loadDocumentViewer();
     loadForceGraph();
     loadLineUp();

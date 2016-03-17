@@ -1522,6 +1522,12 @@ var LineUp;
     var containerHeight = this.$container.node().clientHeight;
     var height = Math.max(270, Math.min(containerHeight / 2, 470));
     // ATS: Was d3.select('body').appe...
+    
+    // ATS: Was d3.select('body').appe...
+    var popupBG = this.$container.append('div')
+    // var popupBG = d3.select("body").append("div")
+        .attr("class", "lu-popupBG");
+
     var popup = this.$container.append('div')
       .attr({
         "class": "lu-popup"
@@ -1582,11 +1588,13 @@ var LineUp;
     popup.select(".ok").on("click", function () {
       applyMapping(act);
       popup.remove();
+      popupBG.remove();
     });
     popup.select('.cancel').on('click', function () {
       selectedColumn.mapping(bak);
       $button.classed('filtered', !isSame(bak.range(), original.range()) || !isSame(bak.domain(), original.domain()));
       popup.remove();
+      popupBG.remove();
     });
     popup.select('.reset').on('click', function () {
       act = bak = original;
@@ -1626,8 +1634,13 @@ var LineUp;
     }
 
     function renameStackedColumn(col) {
-      var x = +(window.innerWidth) / 2 - 100;
+      var x = +(this.$container.node().clientWidth) / 2 - 100;
       var y = +100;
+
+    // ATS: Was d3.select('body').appe...
+    var popupBG = this.$container.append('div')
+    // var popupBG = d3.select("body").append("div")
+        .attr("class", "lu-popupBG");
 
     // ATS: Was d3.select('body').appe...
     var popup = this.$container.append('div')
@@ -1653,6 +1666,7 @@ var LineUp;
           col.label = newValue;
           that.updateHeader(that.storage.getColumnLayout(col.columnBundle));
           popup.remove();
+          popupBG.remove();
         } else {
           window.alert('non empty string required');
         }
@@ -1660,6 +1674,7 @@ var LineUp;
 
       popup.select('.cancel').on('click', function () {
         popup.remove();
+        popupBG.remove();
       });
     }
 
@@ -1724,11 +1739,16 @@ var LineUp;
     }
     var bak = column.filter || [];
     // ATS: Was d3.select('body').appe...
+    var popupBG = this.$container.append('div')
+    // var popupBG = d3.select("body").append("div")
+        .attr("class", "lu-popupBG");
+
+    // ATS: Was d3.select('body').appe...
     var popup = this.$container.append('div')
       .attr({
         'class': 'lu-popup'
       }).style({
-        left: +(window.innerWidth) / 2 - 100 + 'px',
+        left: +(this.$container.node().clientWidth) / 2 - 100,
         top: 100 + 'px',
         width: (400) + 'px',
         height: (300) + 'px'
@@ -1791,6 +1811,7 @@ var LineUp;
     popup.select('.cancel').on('click', function () {
       updateData(bak);
       popup.remove();
+      popupBG.remove();
     });
     popup.select('.reset').on('click', function () {
       trData.forEach(function (d) {
@@ -1810,6 +1831,7 @@ var LineUp;
       }
       updateData(f);
       popup.remove();
+      popupBG.remove();
     });
   };
 
@@ -1826,6 +1848,12 @@ var LineUp;
         top: column.offsetY
     };
     var bak = column.filter || '';
+    
+    // ATS: Was d3.select('body').appe...
+    var popupBG = this.$container.append('div')
+    // var popupBG = d3.select("body").append("div")
+        .attr("class", "lu-popupBG");
+
 
     // ATS: Was d3.select('body').appe...
     var popup = this.$container.append('div')
@@ -1862,6 +1890,7 @@ var LineUp;
       getElementById('popupInputText').value = bak;
       updateData(bak);
       popup.remove();
+      popupBG.remove();
     });
     popup.select('.reset').on('click', function () {
       getElementById('popupInputText').value = '';
@@ -1870,6 +1899,7 @@ var LineUp;
     popup.select('.ok').on('click', function () {
       updateData(getElementById('popupInputText').value);
       popup.remove();
+      popupBG.remove();
     });
   };
 
