@@ -49,7 +49,7 @@ export default class TimeBrush extends VisualBase implements IVisual {
                     select: [{ bind: { to: 'Values' } }]
                 }
             },
-            conditions: [{ 'Times': { max: 1, min: 1 }, 'Values': { max: 1, min: 0 } }],
+            conditions: [{ 'Times': { max: 1, min: 0 }, 'Values': { max: 1, min: 0 } }],
         }],
         objects: {
             general: {
