@@ -104,6 +104,10 @@ export default class GraphVisual extends VisualBase implements IVisual {
                     select: Object.keys(GraphVisual.DATA_ROLES).map(n => ({ bind: { to: GraphVisual.DATA_ROLES[n].name }}))
                 }
             },
+            conditions: [Object.keys(GraphVisual.DATA_ROLES).reduce((a, b) => {
+                a[GraphVisual.DATA_ROLES[b].name] = { min: 0, max: 1 }; 
+                return a; 
+            }, {})]
         }],
         objects: {
             general: {
