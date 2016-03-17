@@ -245,18 +245,22 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
             var selectors = this.selectionManager.getSelectionIds().map((id) => id.getSelector());
             filter = data.Selector.filterFromSelector(selectors);
         }
-        var objects: powerbi.VisualObjectInstancesToPersist = {
-            merge: [
-                <powerbi.VisualObjectInstance>{
-                    objectName: "general",
-                    selector: undefined,
-                    properties: {
-                        "filter": filter
+
+        if (filter) {
+            var objects: powerbi.VisualObjectInstancesToPersist = {
+                merge: [
+                    <powerbi.VisualObjectInstance>{
+                        objectName: "general",
+                        selector: undefined,
+                        properties: {
+                            "filter": filter
+                        }
                     }
-                }
-            ]
-        };
-        this.host.persistProperties(objects);
+                ]
+            };
+
+            this.host.persistProperties(objects);
+        }
     }
 }
 
