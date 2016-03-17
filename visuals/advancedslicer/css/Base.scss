@@ -212,6 +212,13 @@
     display: inline-block;
 }
 
+.item:hover .value-display .value {
+    display: inline-block;
+}
+.value-display .value {
+    display: none;
+}
+
 body {
     margin: 2px;
 }
