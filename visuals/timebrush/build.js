@@ -1,17 +1,17 @@
 module.exports = {
     "output": {
         "PowerBI": {
-            "visualName": "TimeScaleVisual",
+            "visualName": "TimeBrush",
             "projectId": "1450434005853",
             "icon": "icon.png",
-            "entry": "TimeScaleVisual"
+            "entry": "TimeBrushVisual"
         },
         "component": {
-            "entry": "TimeScale"
+            "entry": "TimeBrush"
         },
         "react": {
-            "entry": "TimeScaleReact"
+            "entry": "TimeBrushReact"
         }
     },
-    "lintFiles": ["TimeScale.ts"]
+    "lintFiles": ["TimeBrush.ts"]
 };

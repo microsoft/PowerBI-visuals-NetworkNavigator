@@ -1,30 +1,30 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 const $ = require("jquery");
-import { TimeScale as TimeScaleImpl, TimeScaleDataItem } from "./TimeScale";
+import { TimeBrush as TimeBrushImpl, TimeBrushDataItem } from "./TimeBrush";
 
-export interface TimeScaleProps {
+export interface TimeBrushProps {
     selectedRange?: [Date, Date];
     onSelectedRangeChanged?: (range: [Date, Date]) => void;
-    data?: TimeScaleDataItem[],
+    data?: TimeBrushDataItem[],
     width?: number;
     height?: number;
 };
 
-export interface TimeScaleState { }
+export interface TimeBrushState { }
 
 /**
- * Thin wrapper around TimeScale
+ * Thin wrapper around TimeBrush
  */
-export class TimeScale extends React.Component<TimeScaleProps, TimeScaleState> {
-    private timescale: TimeScaleImpl;
+export class TimeBrush extends React.Component<TimeBrushProps, TimeBrushState> {
+    private timeBrush: TimeBrushImpl;
     private node: any;
-    public props : TimeScaleProps = {};
+    public props : TimeBrushProps = {};
 
     componentDidMount() {
         this.node = ReactDOM.findDOMNode(this);
-        this.timescale = new TimeScaleImpl($(this.node), {width: this.props.width, height: this.props.height});+
-        this.timescale.events.on("rangeSelected", (range) => {            
+        this.timeBrush = new TimeBrushImpl($(this.node), {width: this.props.width, height: this.props.height});+
+        this.timeBrush.events.on("rangeSelected", (range) => {            
             if (this.props) {
                 this.props.onSelectedRangeChanged(range);
             }
@@ -32,7 +32,7 @@ export class TimeScale extends React.Component<TimeScaleProps, TimeScaleState> {
         this.renderContent();
     }
 
-    componentWillReceiveProps(newProps : TimeScaleProps) {
+    componentWillReceiveProps(newProps : TimeBrushProps) {
         this.renderContent(newProps);
     }
 
@@ -43,12 +43,12 @@ export class TimeScale extends React.Component<TimeScaleProps, TimeScaleState> {
         return <div style={{width:"100%", height:"100%"}}></div>;
     }
 
-    private renderContent(props? : TimeScaleProps) {
+    private renderContent(props? : TimeBrushProps) {
         // if called from `componentWillReceiveProps`, then we use the new
         // props, otherwise use what we already have.
         props = props || this.props;
 
-        this.timescale.data = props.data || [];
-        this.timescale.selectedRange = props.selectedRange || null;
+        this.timeBrush.data = props.data || [];
+        this.timeBrush.selectedRange = props.selectedRange || null;
     }
 }

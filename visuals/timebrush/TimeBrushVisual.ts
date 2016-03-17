@@ -1,7 +1,7 @@
 /// <reference path="../../base/references.d.ts"/>
 declare var _;
 
-import { TimeScale, TimeScaleDataItem } from "./TimeScale";
+import { TimeBrush as TimeBrushImpl, TimeBrushDataItem } from "./TimeBrush";
 
 import { VisualBase } from "../../base/VisualBase";
 import { default as Utils, Visual } from "../../base/Utils";
@@ -20,11 +20,11 @@ import VisualDataRoleKind = powerbi.VisualDataRoleKind;
 import SQExpr = powerbi.data.SQExpr;
 
 @Visual(require("./build.js").output.PowerBI)
-export default class TimeScaleVisual extends VisualBase implements IVisual {
+export default class TimeBrush extends VisualBase implements IVisual {
 
     private host : IVisualHostServices;
     private timeColumnIdentity: SQExpr;
-    private timeScale: TimeScale;
+    private timeBrush: TimeBrushImpl;
 
     /**
      * The set of capabilities for the visual
@@ -81,7 +81,7 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
     /**
      * Compares the ids of the two given items
      */
-    private idCompare = (a : TimeScaleVisualDataItem, b: TimeScaleVisualDataItem) => a.identity.equals(b.identity);
+    private idCompare = (a : TimeBrushVisualDataItem, b: TimeBrushVisualDataItem) => a.identity.equals(b.identity);
     
     /**
      * Constructor for the timescale visual
@@ -95,8 +95,8 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
         super.init(options);
         this.element.append($(this.template));
         this.host = options.host;
-        this.timeScale = new TimeScale(this.element.find(".timescale"), { width: options.viewport.width, height: options.viewport.height });
-        this.timeScale.events.on("rangeSelected", (range) => this.onTimeRangeSelected(range));
+        this.timeBrush = new TimeBrushImpl(this.element.find(".timescale"), { width: options.viewport.width, height: options.viewport.height });
+        this.timeBrush.events.on("rangeSelected", (range) => this.onTimeRangeSelected(range));
     }
 
     /** Update is called for data updates, resizes & formatting changes */
@@ -104,15 +104,15 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
         super.update(options);
 
         // If the dimensions changed
-        if (!_.isEqual(this.timeScale.dimensions, options.viewport)) {
-            this.timeScale.dimensions = { width: options.viewport.width, height: options.viewport.height };
+        if (!_.isEqual(this.timeBrush.dimensions, options.viewport)) {
+            this.timeBrush.dimensions = { width: options.viewport.width, height: options.viewport.height };
         } else {
             var startDate;
             var endDate;
             var dataView = options.dataViews && options.dataViews[0];
             if (dataView) {
                 var dataViewCategorical = dataView.categorical;
-                var data = TimeScaleVisual.converter(dataView);
+                var data = TimeBrush.converter(dataView);
 
                 // Stash this bad boy for later, so we can filter the time column
                 if (dataViewCategorical && dataViewCategorical.categories) {
@@ -129,16 +129,16 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
                     endDate = new Date(filterEndDate.getTime());
 
                     // If the selection has changed at all, then set it
-                    var currentSelection = this.timeScale.selectedRange;
+                    var currentSelection = this.timeBrush.selectedRange;
                     if (!currentSelection ||
                         currentSelection.length !== 2 ||
                         startDate !== currentSelection[0] ||
                         endDate !== currentSelection[1]) {
-                        this.timeScale.selectedRange = [startDate, endDate];
+                        this.timeBrush.selectedRange = [startDate, endDate];
                     }
                 }
                 
-                this.timeScale.data = data;
+                this.timeBrush.data = data;
             }
         }
     }
@@ -146,8 +146,8 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
     /**
      * Converts the data view into a time scale
      */
-    public static converter(dataView : DataView) : TimeScaleVisualDataItem[] {
-        var items : TimeScaleVisualDataItem[];
+    public static converter(dataView : DataView) : TimeBrushVisualDataItem[] {
+        var items : TimeBrushVisualDataItem[];
         var dataViewCategorical = dataView && dataView.categorical;
 
         // Must be two columns: times and values
@@ -155,7 +155,7 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
             if (dataViewCategorical.categories.length === 1) {
                 items = dataViewCategorical.categories[0].values.map((date, i) => {
                     return {
-                        date: TimeScaleVisual.coerceDate(date),
+                        date: TimeBrush.coerceDate(date),
                         value: dataViewCategorical.values[0].values[i],
                         identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
                     };
@@ -182,7 +182,7 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
                     items.push({
                         date: new Date(
                             yearCategory ? yearCategory.values[i] : date.getFullYear(),
-                            monthCategory ? TimeScaleVisual.getMonthFromString(monthCategory.values[i]) - 1 : 0,
+                            monthCategory ? TimeBrushVisual.getMonthFromString(monthCategory.values[i]) - 1 : 0,
                             dayCategory ? dayCategory.values[i] : 1
                         ),
                         value: dataViewCategorical.values[0].values[i],
@@ -260,14 +260,14 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
      * Gets the inline css used for this element
      */
     protected getCss() : string[] {
-        return this.noCss ? [] : super.getCss().concat([require("!css!sass!./css/TimeScaleVisual.scss")]);
+        return this.noCss ? [] : super.getCss().concat([require("!css!sass!./css/TimeBrushVisual.scss")]);
     }
 }
 
 /**
- * The data item used by the TimeScaleVisual
+ * The data item used by the TimeBrushVisual
  */
-interface TimeScaleVisualDataItem extends TimeScaleDataItem {
+interface TimeBrushVisualDataItem extends TimeBrushDataItem {
 
     /**
      * The identity for this individual selection item

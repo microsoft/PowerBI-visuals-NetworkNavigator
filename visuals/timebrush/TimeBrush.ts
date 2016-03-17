@@ -9,12 +9,12 @@ const DEBOUNCE_TIME = 1000;
 * Represents a timescale
 */
 /* @Mixin(EventEmitter)*/
-export class TimeScale {
+export class TimeBrush {
     private element: JQuery;
     private svg: d3.Selection<any>;
     private x: d3.time.Scale<Date, any>;
     private y: d3.scale.Linear<any, any>;
-    private timeScalePath: d3.Selection<any>;
+    private timeBrushPath: d3.Selection<any>;
     private area: d3.svg.Area<any>;
     private brush: d3.svg.Brush<Date>;
     private clip: d3.Selection<any>;
@@ -24,7 +24,7 @@ export class TimeScale {
     private xAxis: d3.Selection<any>;
     private _dimensions: { width: number; height: number; } = { width: 500, height: 500 };
     private _eventEmitter = new EventEmitter();
-    private _data: TimeScaleDataItem[];
+    private _data: TimeBrushDataItem[];
     private _range: [Date, Date];
 
     /**
@@ -52,7 +52,7 @@ export class TimeScale {
     /**
      * Setter for the data
      */
-    public set data(data: TimeScaleDataItem[]) {
+    public set data(data: TimeBrushDataItem[]) {
         this._data = data || [];
         this.x.domain(d3.extent(this._data.map((d) => d.date)));
         this.y.domain([0, d3.max(this._data.map((d) => +d.value))]);
@@ -220,7 +220,7 @@ export class TimeScale {
 /**
  * Represents a data item on a timescale
  */
-export interface TimeScaleDataItem {
+export interface TimeBrushDataItem {
     /**
      * The date of the time scale item
      */

@@ -8,11 +8,11 @@ var DEBOUNCE_TIME = 1000;
 * Represents a timescale
 */
 /* @Mixin(EventEmitter)*/
-var TimeScale = (function () {
+var TimeBrush = (function () {
     /**
      * Constructor for the timescale
      */
-    function TimeScale(element, dimensions) {
+    function TimeBrush(element, dimensions) {
         this._dimensions = { width: 500, height: 500 };
         this._eventEmitter = new EventEmitter_1.default();
         this.element = element;
@@ -26,7 +26,7 @@ var TimeScale = (function () {
             this.dimensions = dimensions;
         }
     }
-    Object.defineProperty(TimeScale.prototype, "data", {
+    Object.defineProperty(TimeBrush.prototype, "data", {
         /**
          * Returns the data contained in this timescale
          */
@@ -45,7 +45,7 @@ var TimeScale = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(TimeScale.prototype, "events", {
+    Object.defineProperty(TimeBrush.prototype, "events", {
         /**
          * Gets an event emitter by which events can be listened to
          * Note: Would be nice if we could mixin EventEmitter
@@ -56,7 +56,7 @@ var TimeScale = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(TimeScale.prototype, "dimensions", {
+    Object.defineProperty(TimeBrush.prototype, "dimensions", {
         /**
          * Gets the dimensions of this timescale
          */
@@ -73,7 +73,7 @@ var TimeScale = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(TimeScale.prototype, "selectedRange", {
+    Object.defineProperty(TimeBrush.prototype, "selectedRange", {
         /**
          * Sets the currently selected range of dates
          */
@@ -117,7 +117,7 @@ var TimeScale = (function () {
     /**
      * Builds the initial timescale
      */
-    TimeScale.prototype.buildTimeScale = function () {
+    TimeBrush.prototype.buildTimeScale = function () {
         var _this = this;
         this.svg = d3.select(this.element[0]).append("svg");
         this.clip = this.svg.append("defs").append("clipPath")
@@ -137,7 +137,7 @@ var TimeScale = (function () {
     /**
      * Resizes all the elements in the graph
      */
-    TimeScale.prototype.resizeElements = function () {
+    TimeBrush.prototype.resizeElements = function () {
         var _this = this;
         var margin = { top: 0, right: 10, bottom: 20, left: 10 }, width = this._dimensions.width - margin.left - margin.right, height = this._dimensions.height - margin.top - margin.bottom;
         this.x.range([0, width]);
@@ -188,6 +188,6 @@ var TimeScale = (function () {
             .attr("fill", "lightgray")
             .attr("height", 30);
     };
-    return TimeScale;
+    return TimeBrush;
 }());
-exports.TimeScale = TimeScale;
+exports.TimeBrush = TimeBrush;

@@ -11,17 +11,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 /// <reference path="../../base/references.d.ts"/>
-var TimeScale_1 = require("./TimeScale");
+var TimeBrush_1 = require("./TimeBrush");
 var VisualBase_1 = require("../../base/VisualBase");
 var Utils_1 = require("../../base/Utils");
 var SelectionId = powerbi.visuals.SelectionId;
 var VisualDataRoleKind = powerbi.VisualDataRoleKind;
-var TimeScaleVisual = (function (_super) {
-    __extends(TimeScaleVisual, _super);
+var TimeBrush = (function (_super) {
+    __extends(TimeBrush, _super);
     /**
      * Constructor for the timescale visual
      */
-    function TimeScaleVisual(noCss) {
+    function TimeBrush(noCss) {
         if (noCss === void 0) { noCss = false; }
         _super.call(this);
         this.noCss = noCss;
@@ -35,20 +35,20 @@ var TimeScaleVisual = (function (_super) {
         this.idCompare = function (a, b) { return a.identity.equals(b.identity); };
     }
     /** This is called once when the visual is initialially created */
-    TimeScaleVisual.prototype.init = function (options) {
+    TimeBrush.prototype.init = function (options) {
         var _this = this;
         _super.prototype.init.call(this, options);
         this.element.append($(this.template));
         this.host = options.host;
-        this.timeScale = new TimeScale_1.TimeScale(this.element.find(".timescale"), { width: options.viewport.width, height: options.viewport.height });
-        this.timeScale.events.on("rangeSelected", function (range) { return _this.onTimeRangeSelected(range); });
+        this.timeBrush = new TimeBrush_1.TimeBrush(this.element.find(".timescale"), { width: options.viewport.width, height: options.viewport.height });
+        this.timeBrush.events.on("rangeSelected", function (range) { return _this.onTimeRangeSelected(range); });
     };
     /** Update is called for data updates, resizes & formatting changes */
-    TimeScaleVisual.prototype.update = function (options) {
+    TimeBrush.prototype.update = function (options) {
         _super.prototype.update.call(this, options);
         // If the dimensions changed
-        if (!_.isEqual(this.timeScale.dimensions, options.viewport)) {
-            this.timeScale.dimensions = { width: options.viewport.width, height: options.viewport.height };
+        if (!_.isEqual(this.timeBrush.dimensions, options.viewport)) {
+            this.timeBrush.dimensions = { width: options.viewport.width, height: options.viewport.height };
         }
         else {
             var startDate;
@@ -56,7 +56,7 @@ var TimeScaleVisual = (function (_super) {
             var dataView = options.dataViews && options.dataViews[0];
             if (dataView) {
                 var dataViewCategorical = dataView.categorical;
-                var data = TimeScaleVisual.converter(dataView);
+                var data = TimeBrush.converter(dataView);
                 // Stash this bad boy for later, so we can filter the time column
                 if (dataViewCategorical && dataViewCategorical.categories) {
                     this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
@@ -70,22 +70,22 @@ var TimeScaleVisual = (function (_super) {
                     startDate = new Date(filterStartDate.getTime());
                     endDate = new Date(filterEndDate.getTime());
                     // If the selection has changed at all, then set it
-                    var currentSelection = this.timeScale.selectedRange;
+                    var currentSelection = this.timeBrush.selectedRange;
                     if (!currentSelection ||
                         currentSelection.length !== 2 ||
                         startDate !== currentSelection[0] ||
                         endDate !== currentSelection[1]) {
-                        this.timeScale.selectedRange = [startDate, endDate];
+                        this.timeBrush.selectedRange = [startDate, endDate];
                     }
                 }
-                this.timeScale.data = data;
+                this.timeBrush.data = data;
             }
         }
     };
     /**
      * Converts the data view into a time scale
      */
-    TimeScaleVisual.converter = function (dataView) {
+    TimeBrush.converter = function (dataView) {
         var items;
         var dataViewCategorical = dataView && dataView.categorical;
         // Must be two columns: times and values
@@ -93,7 +93,7 @@ var TimeScaleVisual = (function (_super) {
             if (dataViewCategorical.categories.length === 1) {
                 items = dataViewCategorical.categories[0].values.map(function (date, i) {
                     return {
-                        date: TimeScaleVisual.coerceDate(date),
+                        date: TimeBrush.coerceDate(date),
                         value: dataViewCategorical.values[0].values[i],
                         identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
                     };
@@ -120,7 +120,7 @@ var TimeScaleVisual = (function (_super) {
                     items.push({
                         date: new Date(
                             yearCategory ? yearCategory.values[i] : date.getFullYear(),
-                            monthCategory ? TimeScaleVisual.getMonthFromString(monthCategory.values[i]) - 1 : 0,
+                            monthCategory ? TimeBrushVisual.getMonthFromString(monthCategory.values[i]) - 1 : 0,
                             dayCategory ? dayCategory.values[i] : 1
                         ),
                         value: dataViewCategorical.values[0].values[i],
@@ -134,13 +134,13 @@ var TimeScaleVisual = (function (_super) {
     /**
      * Returns a numerical value for a month
      */
-    TimeScaleVisual.getMonthFromString = function (mon) {
+    TimeBrush.getMonthFromString = function (mon) {
         return new Date(Date.parse(mon + " 1, 2012")).getMonth() + 1;
     };
     /**
      * Coerces the given date value into a date object
      */
-    TimeScaleVisual.coerceDate = function (dateValue) {
+    TimeBrush.coerceDate = function (dateValue) {
         if (!dateValue) {
             dateValue = new Date();
         }
@@ -164,7 +164,7 @@ var TimeScaleVisual = (function (_super) {
      * Raised when the time range is selected
      * @param range undefined means no range, otherwise should be [startDate, endDate]
      */
-    TimeScaleVisual.prototype.onTimeRangeSelected = function (range) {
+    TimeBrush.prototype.onTimeRangeSelected = function (range) {
         var filter;
         if (range && range.length === 2) {
             var filterExpr = powerbi.data.SQExprBuilder.between(this.timeColumnIdentity, powerbi.data.SQExprBuilder.dateTime(range[0]), powerbi.data.SQExprBuilder.dateTime(range[1]));
@@ -188,13 +188,13 @@ var TimeScaleVisual = (function (_super) {
     /**
      * Gets the inline css used for this element
      */
-    TimeScaleVisual.prototype.getCss = function () {
-        return this.noCss ? [] : _super.prototype.getCss.call(this).concat([require("!css!sass!./css/TimeScaleVisual.scss")]);
+    TimeBrush.prototype.getCss = function () {
+        return this.noCss ? [] : _super.prototype.getCss.call(this).concat([require("!css!sass!./css/TimeBrushVisual.scss")]);
     };
     /**
      * The set of capabilities for the visual
      */
-    TimeScaleVisual.capabilities = $.extend(true, {}, VisualBase_1.VisualBase.capabilities, {
+    TimeBrush.capabilities = $.extend(true, {}, VisualBase_1.VisualBase.capabilities, {
         dataRoles: [{
                 name: 'Times',
                 kind: VisualDataRoleKind.Grouping,
@@ -233,10 +233,10 @@ var TimeScaleVisual = (function (_super) {
             }
         }
     });
-    TimeScaleVisual = __decorate([
+    TimeBrush = __decorate([
         Utils_1.Visual(require("./build.js").output.PowerBI)
-    ], TimeScaleVisual);
-    return TimeScaleVisual;
+    ], TimeBrush);
+    return TimeBrush;
 }(VisualBase_1.VisualBase));
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = TimeScaleVisual;
+exports.default = TimeBrush;
