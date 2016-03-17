@@ -246,8 +246,9 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
             filter = data.Selector.filterFromSelector(selectors);
         }
 
+        var objects: powerbi.VisualObjectInstancesToPersist = { };
         if (filter) {
-            var objects: powerbi.VisualObjectInstancesToPersist = {
+            $.extend(objects, {
                 merge: [
                     <powerbi.VisualObjectInstance>{
                         objectName: "general",
@@ -257,10 +258,22 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
                         }
                     }
                 ]
-            };
-
-            this.host.persistProperties(objects);
+            });
+        } else {
+            $.extend(objects, {
+                remove: [
+                    <powerbi.VisualObjectInstance>{
+                        objectName: "general",
+                        selector: undefined,
+                        properties: {
+                            "filter": filter
+                        }
+                    }
+                ]
+            });
         }
+
+        this.host.persistProperties(objects);
     }
 }
 

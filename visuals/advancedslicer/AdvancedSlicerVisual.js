@@ -48,7 +48,7 @@ var AdvancedSlicerVisual = (function (_super) {
         if (this.dataView) {
             var categorical = this.dataView && this.dataView.categorical;
             var newData = AdvancedSlicerVisual.converter(this.dataView, this.selectionManager);
-            if (this.loadDeferred) {
+            if (this.loadDeferred && this.mySlicer.data) {
                 var added_1 = [];
                 var anyRemoved = false;
                 Utils_1.default.listDiff(this.mySlicer.data.slice(0), newData, {
@@ -65,7 +65,7 @@ var AdvancedSlicerVisual = (function (_super) {
                 this.loadDeferred.resolve(added_1);
                 delete this.loadDeferred;
             }
-            else if (Utils_1.default.hasDataChanged(newData.slice(0), this.mySlicer.data, function (a, b) { return a.match === b.match && a.renderedValue === b.renderedValue; })) {
+            else if (newData && Utils_1.default.hasDataChanged(newData.slice(0), this.mySlicer.data, function (a, b) { return a.match === b.match && a.renderedValue === b.renderedValue; })) {
                 this.mySlicer.data = newData;
             }
             this.mySlicer.showValues = !!categorical && !!categorical.values && categorical.values.length > 0;
@@ -154,17 +154,33 @@ var AdvancedSlicerVisual = (function (_super) {
             var selectors = this.selectionManager.getSelectionIds().map(function (id) { return id.getSelector(); });
             filter = data.Selector.filterFromSelector(selectors);
         }
-        var objects = {
-            merge: [
-                {
-                    objectName: "general",
-                    selector: undefined,
-                    properties: {
-                        "filter": filter
+        var objects = {};
+        if (filter) {
+            $.extend(objects, {
+                merge: [
+                    {
+                        objectName: "general",
+                        selector: undefined,
+                        properties: {
+                            "filter": filter
+                        }
                     }
-                }
-            ]
-        };
+                ]
+            });
+        }
+        else {
+            $.extend(objects, {
+                remove: [
+                    {
+                        objectName: "general",
+                        selector: undefined,
+                        properties: {
+                            "filter": filter
+                        }
+                    }
+                ]
+            });
+        }
         this.host.persistProperties(objects);
     };
     /**
