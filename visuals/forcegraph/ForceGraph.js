@@ -31,14 +31,16 @@ var ForceGraph = (function () {
         /**
          * My template string
          */
-        this.template = "\n        <div class=\"graph-container\">\n            <div class=\"button-bar\">\n                <ul>\n                    <li class=\"filter-box\" title=\"Filter Nodes\">\n                        <input type=\"text\" placeholder=\"Enter text filter\" class=\"search-filter-box\"/>\n                    </li>\n                    <li class=\"clear-selection\" title=\"Clear Selection\">\n                        <a>\n                            <span class=\"fa-stack\">\n                                <i class=\"fa fa-check fa-stack-1x\"></i>\n                                <i class=\"fa fa-ban fa-stack-2x\"></i>\n                            </span>\n                        </a>\n                    </li>\n                </ul>\n            </div>\n            <div class=\"svg-container\">\n            </div>\n        </div>\n    ".trim().replace(/\n/g, "");
+        this.template = "\n        <div class=\"graph-container\">\n            <div class=\"button-bar\">\n                <ul>\n                    <li class=\"filter-box\" title=\"Filter Nodes\">\n                        <input type=\"text\" placeholder=\"Enter text filter\" class=\"search-filter-box\"/>\n                    </li>\n                    <li class=\"clear-selection\" title=\"Clear filter and selection\">\n                        <a>\n                            <span class=\"fa-stack\">\n                                <i class=\"fa fa-check fa-stack-1x\"></i>\n                                <i class=\"fa fa-ban fa-stack-2x\"></i>\n                            </span>\n                        </a>\n                    </li>\n                </ul>\n            </div>\n            <div class=\"svg-container\">\n            </div>\n        </div>\n    ".trim().replace(/\n/g, "");
         this.element = $(this.template);
         element.append(this.element);
         this.svgContainer = this.element.find(".svg-container");
+        var filterBox = this.element.find(".search-filter-box");
         this.element.find(".clear-selection").on("click", function () {
+            filterBox.val('');
+            _this.filterNodes(filterBox.val());
             _this.updateSelection(undefined);
         });
-        var filterBox = this.element.find(".search-filter-box");
         filterBox.on('input', function () {
             _this.filterNodes(filterBox.val());
         });

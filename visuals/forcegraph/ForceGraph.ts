@@ -42,7 +42,7 @@ export class ForceGraph {
                     <li class="filter-box" title="Filter Nodes">
                         <input type="text" placeholder="Enter text filter" class="search-filter-box"/>
                     </li>
-                    <li class="clear-selection" title="Clear Selection">
+                    <li class="clear-selection" title="Clear filter and selection">
                         <a>
                             <span class="fa-stack">
                                 <i class="fa fa-check fa-stack-1x"></i>
@@ -69,10 +69,12 @@ export class ForceGraph {
         this.element = $(this.template);
         element.append(this.element);
         this.svgContainer = this.element.find(".svg-container");
+        const filterBox = this.element.find(".search-filter-box");
         this.element.find(".clear-selection").on("click", () => {
+            filterBox.val('');
+            this.filterNodes(filterBox.val());
             this.updateSelection(undefined);
         });
-        const filterBox = this.element.find(".search-filter-box");
         filterBox.on('input', () => {
             this.filterNodes(filterBox.val());
         });
@@ -249,7 +251,7 @@ export class ForceGraph {
         });
 
         this.force.nodes(nodes).links(links);
-        
+
         // If we have animation on, then start that beast
         if (this.configuration.animate) {
             this.force.start();
@@ -332,7 +334,7 @@ export class ForceGraph {
             .attr("font-size", "5pt")
             .attr("stroke-width", "0.5px")
             .style("opacity", this._configuration.labels ? 100 : 0);
-           
+
         // If we are not animating, then play the force quickly
         if (!this.configuration.animate) {
             let k = 0;
@@ -343,7 +345,7 @@ export class ForceGraph {
                 k = k + 1;
             }
             this.force.stop();
-            
+
             link.attr("x1", (d) => d[0].x)
                 .attr("y1", (d) => d[0].y)
                 .attr("x2", (d) => d[2].x)
@@ -369,7 +371,7 @@ export class ForceGraph {
         this.vis.selectAll(".node circle")
             .style("stroke-width", (d) => d.selected ? 1 : 0);
     }
-    
+
     /**
      * Redraws the node labels
      */
@@ -436,7 +438,7 @@ export interface IForceGraphNode {
      * The color of the node
      */
     color?: string;
-    
+
     /**
      * The color of the label of the node
      */
