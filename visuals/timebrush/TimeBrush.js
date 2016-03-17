@@ -5,12 +5,12 @@ var _ = require("lodash");
 var d3 = require("d3");
 var DEBOUNCE_TIME = 1000;
 /**
-* Represents a timescale
+* Represents a timebrush
 */
 /* @Mixin(EventEmitter)*/
 var TimeBrush = (function () {
     /**
-     * Constructor for the timescale
+     * Constructor for the timebrush
      */
     function TimeBrush(element, dimensions) {
         this._dimensions = { width: 500, height: 500 };
@@ -28,7 +28,7 @@ var TimeBrush = (function () {
     }
     Object.defineProperty(TimeBrush.prototype, "data", {
         /**
-         * Returns the data contained in this timescale
+         * Returns the data contained in this timebrush
          */
         get: function () {
             return this._data;
@@ -58,13 +58,13 @@ var TimeBrush = (function () {
     });
     Object.defineProperty(TimeBrush.prototype, "dimensions", {
         /**
-         * Gets the dimensions of this timescale
+         * Gets the dimensions of this timebrush
          */
         get: function () {
             return this._dimensions;
         },
         /**
-         * Sets the dimensions of this timescale
+         * Sets the dimensions of this timebrush
          */
         set: function (value) {
             $.extend(this._dimensions, value);

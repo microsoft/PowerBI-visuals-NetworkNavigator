@@ -19,7 +19,7 @@ var VisualDataRoleKind = powerbi.VisualDataRoleKind;
 var TimeBrush = (function (_super) {
     __extends(TimeBrush, _super);
     /**
-     * Constructor for the timescale visual
+     * Constructor for the timebrush visual
      */
     function TimeBrush(noCss) {
         if (noCss === void 0) { noCss = false; }
@@ -28,7 +28,7 @@ var TimeBrush = (function (_super) {
         /**
          * The template for the grid
          */
-        this.template = "\n        <div>\n            <div class=\"timescale\"></div>\n        </div>\n    ";
+        this.template = "\n        <div>\n            <div class=\"timebrush\"></div>\n        </div>\n    ";
         /**
          * Compares the ids of the two given items
          */
@@ -40,7 +40,7 @@ var TimeBrush = (function (_super) {
         _super.prototype.init.call(this, options);
         this.element.append($(this.template));
         this.host = options.host;
-        this.timeBrush = new TimeBrush_1.TimeBrush(this.element.find(".timescale"), { width: options.viewport.width, height: options.viewport.height });
+        this.timeBrush = new TimeBrush_1.TimeBrush(this.element.find(".timebrush"), { width: options.viewport.width, height: options.viewport.height });
         this.timeBrush.events.on("rangeSelected", function (range) { return _this.onTimeRangeSelected(range); });
     };
     /** Update is called for data updates, resizes & formatting changes */
@@ -92,12 +92,13 @@ var TimeBrush = (function (_super) {
         if (dataViewCategorical && dataViewCategorical.categories && dataViewCategorical.values && dataViewCategorical.values.length) {
             if (dataViewCategorical.categories.length === 1) {
                 items = dataViewCategorical.categories[0].values.map(function (date, i) {
-                    return {
-                        date: TimeBrush.coerceDate(date),
+                    var coercedDate = TimeBrush.coerceDate(date);
+                    return coercedDate ? {
+                        date: coercedDate,
                         value: dataViewCategorical.values[0].values[i],
                         identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
-                    };
-                });
+                    } : null;
+                }).filter(function (n) { return !!n; });
             } /* else if (dataViewCategorical.categories.length > 1) {
                 let yearCategory;
                 let monthCategory;
@@ -142,7 +143,7 @@ var TimeBrush = (function (_super) {
      */
     TimeBrush.coerceDate = function (dateValue) {
         if (!dateValue) {
-            dateValue = new Date();
+            return;
         }
         if (typeof dateValue === "string") {
             dateValue = new Date((Date.parse(dateValue) + ((new Date().getTimezoneOffset() + 60) * 60 * 1000)));

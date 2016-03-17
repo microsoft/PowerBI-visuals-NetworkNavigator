@@ -1,6 +1,6 @@
 require("ts-node/register");
 module.exports = {
-    TimeScale: require('./visuals/timescale/TimeScale').TimeScale,
+    TimeBrush: require('./visuals/timebrush/TimeBrush').TimeBrush,
     LineUp: require('./visuals/lineup/LineUp').LineUp,
     ForceGraph: require('./visuals/forcegraph/ForceGraph').ForceGraph,
     DocumentViewer: require('./visuals/documentviewer/DocumentViewer').DocumentViewer,

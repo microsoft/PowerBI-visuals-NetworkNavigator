@@ -6,7 +6,7 @@ import * as d3 from "d3";
 const DEBOUNCE_TIME = 1000;
 
 /**
-* Represents a timescale
+* Represents a timebrush
 */
 /* @Mixin(EventEmitter)*/
 export class TimeBrush {
@@ -28,7 +28,7 @@ export class TimeBrush {
     private _range: [Date, Date];
 
     /**
-     * Constructor for the timescale
+     * Constructor for the timebrush
      */
     constructor(element: JQuery, dimensions?: any) {
         this.element = element;
@@ -43,7 +43,7 @@ export class TimeBrush {
     }
 
     /**
-     * Returns the data contained in this timescale
+     * Returns the data contained in this timebrush
      */
     public get data() {
         return this._data;
@@ -68,14 +68,14 @@ export class TimeBrush {
     }
 
     /**
-     * Gets the dimensions of this timescale
+     * Gets the dimensions of this timebrush
      */
     public get dimensions() {
         return this._dimensions;
     }
 
     /**
-     * Sets the dimensions of this timescale
+     * Sets the dimensions of this timebrush
      */
     public set dimensions(value: any) {
         $.extend(this._dimensions, value);
