@@ -131,7 +131,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
         if (this.dataView) {
             var categorical = this.dataView && this.dataView.categorical;
             var newData = AdvancedSlicerVisual.converter(this.dataView, this.selectionManager);
-            if (this.loadDeferred) {
+            if (this.loadDeferred && this.mySlicer.data) {
 
                 let added = [];
                 let anyRemoved = false;
@@ -150,7 +150,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
                 // We only need to give it the new items
                 this.loadDeferred.resolve(added);
                 delete this.loadDeferred;
-            } else if (Utils.hasDataChanged(newData.slice(0), this.mySlicer.data, (a, b) => a.match === b.match && a.renderedValue === b.renderedValue)) {
+            } else if (newData && Utils.hasDataChanged(newData.slice(0), this.mySlicer.data, (a, b) => a.match === b.match && a.renderedValue === b.renderedValue)) {
                 this.mySlicer.data = newData;
             }
             this.mySlicer.showValues = !!categorical && !!categorical.values && categorical.values.length > 0;
@@ -245,17 +245,34 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
             var selectors = this.selectionManager.getSelectionIds().map((id) => id.getSelector());
             filter = data.Selector.filterFromSelector(selectors);
         }
-        var objects: powerbi.VisualObjectInstancesToPersist = {
-            merge: [
-                <powerbi.VisualObjectInstance>{
-                    objectName: "general",
-                    selector: undefined,
-                    properties: {
-                        "filter": filter
+
+        var objects: powerbi.VisualObjectInstancesToPersist = { };
+        if (filter) {
+            $.extend(objects, {
+                merge: [
+                    <powerbi.VisualObjectInstance>{
+                        objectName: "general",
+                        selector: undefined,
+                        properties: {
+                            "filter": filter
+                        }
                     }
-                }
-            ]
-        };
+                ]
+            });
+        } else {
+            $.extend(objects, {
+                remove: [
+                    <powerbi.VisualObjectInstance>{
+                        objectName: "general",
+                        selector: undefined,
+                        properties: {
+                            "filter": filter
+                        }
+                    }
+                ]
+            });
+        }
+
         this.host.persistProperties(objects);
     }
 }

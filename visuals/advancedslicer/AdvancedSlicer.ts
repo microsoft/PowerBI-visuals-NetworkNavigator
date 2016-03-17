@@ -252,7 +252,7 @@ export class AdvancedSlicer {
             value.map((v) => this.createSelectionToken(v)).forEach(n => n.insertBefore(this.element.find(".clear-all")));
         }
 
-        this.events.raiseEvent("selectionChanged", this._selectedItems, oldSelection);
+        this.raiseSelectionChanged(this.selectedItems, oldSelection);
 
         this.checkAllEle.prop("checked", someChecked);
         this.checkAllEle.prop('indeterminate', someChecked);
@@ -299,9 +299,9 @@ export class AdvancedSlicer {
         let eles = this.element.find(".item");
         let me = this;
         const isMatch = (item: SlicerItem, value: string) => {
-            return (item.match || "").indexOf(value) >= 0 ||
-                (item.matchPrefix || "").indexOf(value) >= 0 ||
-                (item.matchSuffix || "").indexOf(value) >= 0;
+            return ((item.match + "") || "").indexOf(value) >= 0 ||
+                ((item.matchPrefix + "") || "").indexOf(value) >= 0 ||
+                ((item.matchSuffix + "") || "").indexOf(value) >= 0;
         };
         eles.each(function() {
             let item = $(this).data("item");
@@ -382,11 +382,9 @@ export class AdvancedSlicer {
             // var checkbox = $(evt.target);
             var ele = $((<HTMLElement>evt.target)).parents(".item");
             if (ele.length > 0) {
-                let oldSelectedItems = this.selectedItems.slice(0);
                 let item : any = ele.data("item");
                 this.selectedItems.push(item);
                 this.selectedItems = this.selectedItems.slice(0);
-                this.raiseSelectionChanged(this.selectedItems, oldSelectedItems);
                 this.updateSelectAllButtonState();
             }
             evt.stopImmediatePropagation();

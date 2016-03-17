@@ -173,7 +173,7 @@ var AdvancedSlicer = (function () {
                 this.selectionsEle.find(".token").remove();
                 value.map(function (v) { return _this.createSelectionToken(v); }).forEach(function (n) { return n.insertBefore(_this.element.find(".clear-all")); });
             }
-            this.events.raiseEvent("selectionChanged", this._selectedItems, oldSelection);
+            this.raiseSelectionChanged(this.selectedItems, oldSelection);
             this.checkAllEle.prop("checked", someChecked);
             this.checkAllEle.prop('indeterminate', someChecked);
         },
@@ -221,9 +221,9 @@ var AdvancedSlicer = (function () {
         var eles = this.element.find(".item");
         var me = this;
         var isMatch = function (item, value) {
-            return (item.match || "").indexOf(value) >= 0 ||
-                (item.matchPrefix || "").indexOf(value) >= 0 ||
-                (item.matchSuffix || "").indexOf(value) >= 0;
+            return ((item.match + "") || "").indexOf(value) >= 0 ||
+                ((item.matchPrefix + "") || "").indexOf(value) >= 0 ||
+                ((item.matchSuffix + "") || "").indexOf(value) >= 0;
         };
         eles.each(function () {
             var item = $(this).data("item");
@@ -299,11 +299,9 @@ var AdvancedSlicer = (function () {
             // var checkbox = $(evt.target);
             var ele = $(evt.target).parents(".item");
             if (ele.length > 0) {
-                var oldSelectedItems = _this.selectedItems.slice(0);
                 var item = ele.data("item");
                 _this.selectedItems.push(item);
                 _this.selectedItems = _this.selectedItems.slice(0);
-                _this.raiseSelectionChanged(_this.selectedItems, oldSelectedItems);
                 _this.updateSelectAllButtonState();
             }
             evt.stopImmediatePropagation();
