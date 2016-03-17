@@ -51,7 +51,7 @@ export class AdvancedSlicer {
                             <span class="matchSuffix">${matchSuffix || ""}</span>
                         </span>
                         <span style="display:inline-block" class="value-container">
-                            <span style="display:inline-block;width:0px" class="value-display">&nbsp;</span>
+                            <span style="display:inline-block;width:0px" class="value-display">&nbsp;<span class="value"></span></span>
                         </span>
                     </span>
                 </label>
@@ -68,7 +68,7 @@ export class AdvancedSlicer {
      * The actual list element
      */
     private listEle: JQuery;
-    
+
     /**
      * The clearAll element
      */
@@ -206,7 +206,9 @@ export class AdvancedSlicer {
                 const ele = AdvancedSlicer.listItemFactory(item.matchPrefix, item.match, item.matchSuffix);
                 var renderedValue = item.renderedValue;
                 if (renderedValue) {
-                    ele.find(".value-display").css({ width: (renderedValue + "%") });
+                    let valueDisplayEle = ele.find(".value-display");
+                    valueDisplayEle.css({ width: (renderedValue + "%") });
+                    valueDisplayEle.find(".value").html('' + item.value);
                 }
                 ele[item.selected ? "hide" : "show"].call(ele);
                 ele.find("input").prop('checked', item.selected);

@@ -2344,6 +2344,13 @@ html, body {
   padding-right: 25px;
   display: inline-block; }
 
+.item:hover .value-display .value {
+  display: inline-block; }
+
+.value-display .value {
+  display: none;
+  padding-left: 3px; }
+
 body {
   margin: 2px; }
 

@@ -135,7 +135,9 @@ var AdvancedSlicer = (function () {
                     var ele = AdvancedSlicer.listItemFactory(item.matchPrefix, item.match, item.matchSuffix);
                     var renderedValue = item.renderedValue;
                     if (renderedValue) {
-                        ele.find(".value-display").css({ width: (renderedValue + "%") });
+                        var valueDisplayEle = ele.find(".value-display");
+                        valueDisplayEle.css({ width: (renderedValue + "%") });
+                        valueDisplayEle.find(".value").html('' + item.value);
                     }
                     ele[item.selected ? "hide" : "show"].call(ele);
                     ele.find("input").prop('checked', item.selected);
@@ -397,7 +399,7 @@ var AdvancedSlicer = (function () {
      * The template used to render list items
      */
     AdvancedSlicer.listItemFactory = function (matchPrefix, match, matchSuffix) {
-        return $(("\n            <div style=\"white-space:nowrap\" class=\"item\">\n                <label style=\"cursor:pointer\">\n                    <!--<input style=\"vertical-align:middle;cursor:pointer\" type=\"checkbox\">-->\n                    <span style=\"margin-left: 5px;vertical-align:middle\" class=\"display-container\">\n                        <span style=\"display:inline-block;overflow:hidden\" class=\"category-container\">\n                            <span class=\"matchPrefix\">" + (matchPrefix || "") + "</span>\n                            <span class=\"match\">" + (match || "") + "</span>\n                            <span class=\"matchSuffix\">" + (matchSuffix || "") + "</span>\n                        </span>\n                        <span style=\"display:inline-block\" class=\"value-container\">\n                            <span style=\"display:inline-block;width:0px\" class=\"value-display\">&nbsp;</span>\n                        </span>\n                    </span>\n                </label>\n            </div>\n        ").trim().replace(/\n/g, ''));
+        return $(("\n            <div style=\"white-space:nowrap\" class=\"item\">\n                <label style=\"cursor:pointer\">\n                    <!--<input style=\"vertical-align:middle;cursor:pointer\" type=\"checkbox\">-->\n                    <span style=\"margin-left: 5px;vertical-align:middle\" class=\"display-container\">\n                        <span style=\"display:inline-block;overflow:hidden\" class=\"category-container\">\n                            <span class=\"matchPrefix\">" + (matchPrefix || "") + "</span>\n                            <span class=\"match\">" + (match || "") + "</span>\n                            <span class=\"matchSuffix\">" + (matchSuffix || "") + "</span>\n                        </span>\n                        <span style=\"display:inline-block\" class=\"value-container\">\n                            <span style=\"display:inline-block;width:0px\" class=\"value-display\">&nbsp;<span class=\"value\"></span></span>\n                        </span>\n                    </span>\n                </label>\n            </div>\n        ").trim().replace(/\n/g, ''));
     };
     return AdvancedSlicer;
 }());

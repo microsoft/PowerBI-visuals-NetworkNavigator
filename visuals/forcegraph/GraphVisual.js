@@ -237,7 +237,7 @@ var GraphVisual = (function (_super) {
      * Gets called when a node is selected
      */
     GraphVisual.prototype.onNodeSelected = function (node) {
-        var filter;
+        var filter = null;
         if (node) {
             filter = powerbi.data.SemanticFilter.fromSQExpr(node.filterExpr);
             this.selectionManager.select(node.identity, false);
@@ -245,17 +245,33 @@ var GraphVisual = (function (_super) {
         else {
             this.selectionManager.clear();
         }
-        var objects = {
-            merge: [
-                {
-                    objectName: "general",
-                    selector: undefined,
-                    properties: {
-                        "filter": filter
+        var objects = {};
+        if (filter) {
+            $.extend(objects, {
+                merge: [
+                    {
+                        objectName: "general",
+                        selector: undefined,
+                        properties: {
+                            "filter": filter
+                        }
                     }
-                }
-            ]
-        };
+                ]
+            });
+        }
+        else {
+            $.extend(objects, {
+                remove: [
+                    {
+                        objectName: "general",
+                        selector: undefined,
+                        properties: {
+                            "filter": filter
+                        }
+                    }
+                ]
+            });
+        }
         this.host.persistProperties(objects);
     };
     /**
