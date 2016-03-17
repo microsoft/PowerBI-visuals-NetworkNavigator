@@ -19,7 +19,7 @@ import SelectionManager = powerbi.visuals.utility.SelectionManager;
 import VisualDataRoleKind = powerbi.VisualDataRoleKind;
 import SQExpr = powerbi.data.SQExpr;
 
-@Visual(JSON.parse(require("./build.json")).output.PowerBI)
+@Visual(require("./build.js").output.PowerBI)
 export default class TimeScaleVisual extends VisualBase implements IVisual {
 
     private host : IVisualHostServices;
@@ -76,11 +76,18 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
             <div class="timescale"></div>
         </div>
     `;
-
+    
     /**
      * Compares the ids of the two given items
      */
     private idCompare = (a : TimeScaleVisualDataItem, b: TimeScaleVisualDataItem) => a.identity.equals(b.identity);
+    
+    /**
+     * Constructor for the timescale visual
+     */
+    constructor(private noCss = false) {
+        super();
+    }
 
     /** This is called once when the visual is initialially created */
     public init(options: VisualInitOptions): void {
@@ -146,18 +153,78 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
         var dataViewCategorical = dataView && dataView.categorical;
 
         // Must be two columns: times and values
-        if (dataViewCategorical &&
-            dataViewCategorical.categories &&
-            dataViewCategorical.categories.length === 1 &&
-            dataViewCategorical.values && dataViewCategorical.values.length) {
-            items = dataViewCategorical.categories[0].values.map((val, i) => ({
-                date: val,
-                value: dataViewCategorical.values[0].values[i],
-                identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
-            }))
+        if (dataViewCategorical && dataViewCategorical.categories && dataViewCategorical.values && dataViewCategorical.values.length) {
+            if (dataViewCategorical.categories.length === 1) {
+                items = dataViewCategorical.categories[0].values.map((date, i) => {
+                    return {
+                        date: TimeScaleVisual.coerceDate(date),
+                        value: dataViewCategorical.values[0].values[i],
+                        identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
+                    };
+                });
+            }/* else if (dataViewCategorical.categories.length > 1) {
+                let yearCategory;
+                let monthCategory;
+                let dayCategory;
+                dataViewCategorical.categories.forEach(cat => {
+                    let categoryName = cat.source.displayName;
+                    if (categoryName === "Year") {
+                        yearCategory = cat;
+                    } else if (categoryName === "Month") {
+                        monthCategory = cat;
+                    } else if (categoryName === "Day") {
+                        dayCategory = cat;
+                    }
+                });
+                
+                items = [];
+                let numValues = dataViewCategorical.categories[0].values.length;
+                let date = new Date();
+                for (let i = 0; i < numValues; i++) {
+                    items.push({
+                        date: new Date(
+                            yearCategory ? yearCategory.values[i] : date.getFullYear(),
+                            monthCategory ? TimeScaleVisual.getMonthFromString(monthCategory.values[i]) - 1 : 0,
+                            dayCategory ? dayCategory.values[i] : 1
+                        ),
+                        value: dataViewCategorical.values[0].values[i],
+                        identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
+                    });
+                }
+            }*/
         }
-
         return items;
+    }
+    
+    /**
+     * Returns a numerical value for a month
+     */
+    public static getMonthFromString(mon: string){
+        return new Date(Date.parse(mon +" 1, 2012")).getMonth()+1
+    }
+    
+    /**
+     * Coerces the given date value into a date object
+     */
+    public static coerceDate(dateValue: any) : Date {
+        if (!dateValue) {
+            dateValue = new Date();
+        }
+            
+        if (typeof dateValue === "string") {
+            dateValue = new Date((Date.parse(dateValue) + ((new Date().getTimezoneOffset() + 60) * 60 * 1000)))
+        }
+        
+        // Assume it is just a year
+        if (dateValue > 31 && dateValue <= 10000) {
+            dateValue = new Date(dateValue, 0);
+        } else if (dateValue >= 0 && dateValue <= 31) {
+            dateValue = new Date(new Date().getFullYear(), 1, dateValue);
+        } else if (typeof dateValue === "number" && dateValue > 10000) {
+            // Assume epoch
+            dateValue = new Date(dateValue);
+        }
+        return dateValue;
     }
 
     /**
@@ -195,7 +262,7 @@ export default class TimeScaleVisual extends VisualBase implements IVisual {
      * Gets the inline css used for this element
      */
     protected getCss() : string[] {
-        return super.getCss().concat([require("!css!sass!./css/TimeScaleVisual.scss")]);
+        return this.noCss ? [] : super.getCss().concat([require("!css!sass!./css/TimeScaleVisual.scss")]);
     }
 }
 

@@ -18,8 +18,13 @@ var SelectionId = powerbi.visuals.SelectionId;
 var VisualDataRoleKind = powerbi.VisualDataRoleKind;
 var TimeScaleVisual = (function (_super) {
     __extends(TimeScaleVisual, _super);
-    function TimeScaleVisual() {
-        _super.apply(this, arguments);
+    /**
+     * Constructor for the timescale visual
+     */
+    function TimeScaleVisual(noCss) {
+        if (noCss === void 0) { noCss = false; }
+        _super.call(this);
+        this.noCss = noCss;
         /**
          * The template for the grid
          */
@@ -85,17 +90,76 @@ var TimeScaleVisual = (function (_super) {
         var items;
         var dataViewCategorical = dataView && dataView.categorical;
         // Must be two columns: times and values
-        if (dataViewCategorical &&
-            dataViewCategorical.categories &&
-            dataViewCategorical.categories.length === 1 &&
-            dataViewCategorical.values && dataViewCategorical.values.length) {
-            items = dataViewCategorical.categories[0].values.map(function (val, i) { return ({
-                date: val,
-                value: dataViewCategorical.values[0].values[i],
-                identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
-            }); });
+        if (dataViewCategorical && dataViewCategorical.categories && dataViewCategorical.values && dataViewCategorical.values.length) {
+            if (dataViewCategorical.categories.length === 1) {
+                items = dataViewCategorical.categories[0].values.map(function (date, i) {
+                    return {
+                        date: TimeScaleVisual.coerceDate(date),
+                        value: dataViewCategorical.values[0].values[i],
+                        identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
+                    };
+                });
+            } /* else if (dataViewCategorical.categories.length > 1) {
+                let yearCategory;
+                let monthCategory;
+                let dayCategory;
+                dataViewCategorical.categories.forEach(cat => {
+                    let categoryName = cat.source.displayName;
+                    if (categoryName === "Year") {
+                        yearCategory = cat;
+                    } else if (categoryName === "Month") {
+                        monthCategory = cat;
+                    } else if (categoryName === "Day") {
+                        dayCategory = cat;
+                    }
+                });
+                
+                items = [];
+                let numValues = dataViewCategorical.categories[0].values.length;
+                let date = new Date();
+                for (let i = 0; i < numValues; i++) {
+                    items.push({
+                        date: new Date(
+                            yearCategory ? yearCategory.values[i] : date.getFullYear(),
+                            monthCategory ? TimeScaleVisual.getMonthFromString(monthCategory.values[i]) - 1 : 0,
+                            dayCategory ? dayCategory.values[i] : 1
+                        ),
+                        value: dataViewCategorical.values[0].values[i],
+                        identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
+                    });
+                }
+            }*/
         }
         return items;
+    };
+    /**
+     * Returns a numerical value for a month
+     */
+    TimeScaleVisual.getMonthFromString = function (mon) {
+        return new Date(Date.parse(mon + " 1, 2012")).getMonth() + 1;
+    };
+    /**
+     * Coerces the given date value into a date object
+     */
+    TimeScaleVisual.coerceDate = function (dateValue) {
+        if (!dateValue) {
+            dateValue = new Date();
+        }
+        if (typeof dateValue === "string") {
+            dateValue = new Date((Date.parse(dateValue) + ((new Date().getTimezoneOffset() + 60) * 60 * 1000)));
+        }
+        // Assume it is just a year
+        if (dateValue > 31 && dateValue <= 10000) {
+            dateValue = new Date(dateValue, 0);
+        }
+        else if (dateValue >= 0 && dateValue <= 31) {
+            dateValue = new Date(new Date().getFullYear(), 1, dateValue);
+        }
+        else if (typeof dateValue === "number" && dateValue > 10000) {
+            // Assume epoch
+            dateValue = new Date(dateValue);
+        }
+        return dateValue;
     };
     /**
      * Raised when the time range is selected
@@ -126,7 +190,7 @@ var TimeScaleVisual = (function (_super) {
      * Gets the inline css used for this element
      */
     TimeScaleVisual.prototype.getCss = function () {
-        return _super.prototype.getCss.call(this).concat([require("!css!sass!./css/TimeScaleVisual.scss")]);
+        return this.noCss ? [] : _super.prototype.getCss.call(this).concat([require("!css!sass!./css/TimeScaleVisual.scss")]);
     };
     /**
      * The set of capabilities for the visual
@@ -170,7 +234,7 @@ var TimeScaleVisual = (function (_super) {
         }
     });
     TimeScaleVisual = __decorate([
-        Utils_1.Visual(JSON.parse(require("./build.json")).output.PowerBI)
+        Utils_1.Visual(require("./build.js").output.PowerBI)
     ], TimeScaleVisual);
     return TimeScaleVisual;
 }(VisualBase_1.VisualBase));

@@ -1,4 +1,4 @@
-{
+module.exports = {
     "output": {
         "PowerBI": {
             "visualName": "TimeScaleVisual",
@@ -14,4 +14,4 @@
         }
     },
     "lintFiles": ["TimeScale.ts"]
-}
+};
