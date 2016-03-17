@@ -57,12 +57,17 @@ describe('TimeBrushVisual', function () {
             var result = TimeBrushVisual_1.default.coerceDate(myDate.getTime());
             chai_1.expect(result.getTime()).to.eq(myDate.getTime());
         });
-        it("should coerce null/undefined as todays date", function () {
+        it("should coerce '' as undefined", function () {
             var result = TimeBrushVisual_1.default.coerceDate("");
-            var today = new Date();
-            chai_1.expect(result.getFullYear()).to.eq(today.getFullYear());
-            chai_1.expect(result.getDate()).to.eq(today.getDate());
-            chai_1.expect(result.getMonth()).to.eq(today.getMonth()); // Months start at 0
+            chai_1.expect(result).to.be.undefined;
+        });
+        it("should coerce null as undefined", function () {
+            var result = TimeBrushVisual_1.default.coerceDate(null);
+            chai_1.expect(result).to.be.undefined;
+        });
+        it("should coerce undefined as undefined", function () {
+            var result = TimeBrushVisual_1.default.coerceDate(undefined);
+            chai_1.expect(result).to.be.undefined;
         });
     });
 });

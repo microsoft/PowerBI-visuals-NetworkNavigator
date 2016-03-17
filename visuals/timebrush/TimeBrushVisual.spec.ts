@@ -63,12 +63,17 @@ describe('TimeBrushVisual', () => {
             let result = TimeBrushVisual.coerceDate(myDate.getTime());
             expect(result.getTime()).to.eq(myDate.getTime());
         });
-        it("should coerce null/undefined as todays date", () => {
+        it("should coerce '' as undefined", () => {
             let result = TimeBrushVisual.coerceDate("");
-            let today = new Date();
-            expect(result.getFullYear()).to.eq(today.getFullYear());
-            expect(result.getDate()).to.eq(today.getDate());
-            expect(result.getMonth()).to.eq(today.getMonth()); // Months start at 0
+            expect(result).to.be.undefined;
+        });
+        it("should coerce null as undefined", () => {
+            let result = TimeBrushVisual.coerceDate(null);
+            expect(result).to.be.undefined;
+        });
+        it("should coerce undefined as undefined", () => {
+            let result = TimeBrushVisual.coerceDate(undefined);
+            expect(result).to.be.undefined;
         });
     });
 });

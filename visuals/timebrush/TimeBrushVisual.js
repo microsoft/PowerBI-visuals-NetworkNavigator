@@ -92,12 +92,13 @@ var TimeBrush = (function (_super) {
         if (dataViewCategorical && dataViewCategorical.categories && dataViewCategorical.values && dataViewCategorical.values.length) {
             if (dataViewCategorical.categories.length === 1) {
                 items = dataViewCategorical.categories[0].values.map(function (date, i) {
-                    return {
-                        date: TimeBrush.coerceDate(date),
+                    var coercedDate = TimeBrush.coerceDate(date);
+                    return coercedDate ? {
+                        date: coercedDate,
                         value: dataViewCategorical.values[0].values[i],
                         identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
-                    };
-                });
+                    } : null;
+                }).filter(function (n) { return !!n; });
             } /* else if (dataViewCategorical.categories.length > 1) {
                 let yearCategory;
                 let monthCategory;
@@ -142,7 +143,7 @@ var TimeBrush = (function (_super) {
      */
     TimeBrush.coerceDate = function (dateValue) {
         if (!dateValue) {
-            dateValue = new Date();
+            return;
         }
         if (typeof dateValue === "string") {
             dateValue = new Date((Date.parse(dateValue) + ((new Date().getTimezoneOffset() + 60) * 60 * 1000)));

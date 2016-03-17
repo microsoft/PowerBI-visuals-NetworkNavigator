@@ -154,12 +154,13 @@ export default class TimeBrush extends VisualBase implements IVisual {
         if (dataViewCategorical && dataViewCategorical.categories && dataViewCategorical.values && dataViewCategorical.values.length) {
             if (dataViewCategorical.categories.length === 1) {
                 items = dataViewCategorical.categories[0].values.map((date, i) => {
-                    return {
-                        date: TimeBrush.coerceDate(date),
+                    let coercedDate = TimeBrush.coerceDate(date);
+                    return coercedDate ? {
+                        date: coercedDate,
                         value: dataViewCategorical.values[0].values[i],
                         identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
-                    };
-                });
+                    } : null;
+                }).filter(n => !!n);
             }/* else if (dataViewCategorical.categories.length > 1) {
                 let yearCategory;
                 let monthCategory;
@@ -206,7 +207,7 @@ export default class TimeBrush extends VisualBase implements IVisual {
      */
     public static coerceDate(dateValue: any) : Date {
         if (!dateValue) {
-            dateValue = new Date();
+            return;
         }
             
         if (typeof dateValue === "string") {
