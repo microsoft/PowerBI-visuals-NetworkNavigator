@@ -151,7 +151,8 @@ var TimeScale = (function () {
             tmp
                 .attr("transform", function (d, i) {
                 var rectHeight = _this.y(0) - _this.y(d.value);
-                return "translate(" + _this.x(d.date) + "," + (height - rectHeight) + ")";
+                var x = _this.x(d.date) || 0;
+                return "translate(" + x + "," + (height - rectHeight) + ")";
             })
                 .attr("width", 2)
                 .attr("height", function (d) { return Math.max(0, _this.y(0) - _this.y(d.value)); });
