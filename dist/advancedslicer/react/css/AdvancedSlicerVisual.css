@@ -2348,7 +2348,8 @@ html, body {
   display: inline-block; }
 
 .value-display .value {
-  display: none; }
+  display: none;
+  padding-left: 3px; }
 
 body {
   margin: 2px; }

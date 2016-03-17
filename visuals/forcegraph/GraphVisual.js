@@ -182,7 +182,14 @@ var GraphVisual = (function (_super) {
             var oldSettings = $.extend(true, {}, this.settings);
             var newObjects = dataView.metadata.objects;
             // Merge in the settings
-            $.extend(true, this.settings, newObjects ? newObjects : GraphVisual.DEFAULT_SETTINGS);
+            $.extend(true, this.settings, GraphVisual.DEFAULT_SETTINGS, newObjects ? newObjects : {}, {
+                layout: {
+                    defaultLabelColor: newObjects &&
+                        newObjects["layout"] &&
+                        newObjects["layout"]["defaultLabelColor"] &&
+                        newObjects["layout"]["defaultLabelColor"].solid.color
+                }
+            });
             // There were some changes to the layout
             if (!_.isEqual(oldSettings.layout, this.settings.layout)) {
                 this.myGraph.configuration = $.extend(true, {}, this.settings.layout);
@@ -375,7 +382,7 @@ var GraphVisual = (function (_super) {
                     defaultLabelColor: {
                         displayName: "Default Label Color",
                         description: "The default color to use for labels",
-                        type: { text: true }
+                        type: { fill: { solid: { color: true } } }
                     },
                     minZoom: {
                         displayName: "Min Zoom",
