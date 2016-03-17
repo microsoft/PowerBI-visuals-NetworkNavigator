@@ -50,7 +50,7 @@ export class VisualBase implements powerbi.IVisual {
             this.container.append(this.getCss().map((css) => $("<st" + "yle>" + css + "</st" + "yle>")));
         }
         
-        this.element.append(this.getCss().map((css) => $("<st" + "yle>" + css + "</st" + "yle>")));
+        this.element.append($("<st" + "yle>" + this.getCss().join("\n") + "</st" + "yle>"));
 
         if (template) {
             this.element = this.element.append($(template));
@@ -114,15 +114,15 @@ export class VisualBase implements powerbi.IVisual {
                 // If you append the element without doing this, the iframe will load after you've appended it and remove everything that you added
                 this.parent[0].onload = () => {
                     setTimeout(() => {
+                        this.HACK_fonts();
                         this.parent.contents().find("body").append(this.element);
                     }, 0);
                 };
             } else {
                 this.parent.contents().find("head").append($('<meta http-equiv="X-UA-Compatible" content="IE=edge">'));
                 this.parent.contents().find("body").append(this.element);
+                this.HACK_fonts();
             }
-            
-            this.HACK_fonts();
         } else {
             this.parent = $(`<div style="width:${this.width}px;height:${this.height}px;border:0;margin:0;padding:0"/>`);
             this.parent.append(this.element);
@@ -167,20 +167,26 @@ export class VisualBase implements powerbi.IVisual {
     
     private HACK_fonts() {
         let faces = this.HACK_getFontFaces();
-        this.element.append(faces.map(n => $("<st" + "yle>" + n.cssText + "</st" + "yle>")));
+        this.element.prepend($("<st" + "yle>" + (Object.keys(faces).map(n => faces[n].cssText)).join("\n") + "</st" + "yle>"));
     }
  
     private HACK_getFontFaces(obj?) {
         var sheet = document.styleSheets,
             rule = null,
-            i = sheet.length, j, toReturn = [];
+            i = sheet.length, j, toReturn = {};
         while( 0 <= --i ){
             rule = sheet[i]['rules'] || sheet[i]['cssRules'] || [];
             j = rule.length;
             while( 0 <= --j ){
-                if( rule[j].constructor.name === 'CSSFontFaceRule' ){ // rule[j].slice(0, 10).toLowerCase() === '@font-face'
+                if( rule[j].constructor.name === 'CSSFontFaceRule' ||
+                    rule[j].constructor.toString().indexOf('CSSFontFaceRule') >= 0){ // rule[j].slice(0, 10).toLowerCase() === '@font-face'
                     //o[ rule[j].style.fontFamily ] = rule[j].style.src;
-                    toReturn.push(rule[j]);
+                    const style = rule[j].style;
+                    let fontFamily = style.fontFamily;
+                    if (!fontFamily && style.getPropertyValue) {
+                        fontFamily = style.getPropertyValue('font-family');    
+                    }
+                    toReturn[fontFamily] = rule[j];
                 };
             }
         }

@@ -23,7 +23,7 @@ var VisualBase = (function () {
         if (addCssToParent) {
             this.container.append(this.getCss().map(function (css) { return $("<st" + "yle>" + css + "</st" + "yle>"); }));
         }
-        this.element.append(this.getCss().map(function (css) { return $("<st" + "yle>" + css + "</st" + "yle>"); }));
+        this.element.append($("<st" + "yle>" + this.getCss().join("\n") + "</st" + "yle>"));
         if (template) {
             this.element = this.element.append($(template));
         }
@@ -87,6 +87,7 @@ var VisualBase = (function () {
                     // If you append the element without doing this, the iframe will load after you've appended it and remove everything that you added
                     this.parent[0].onload = function () {
                         setTimeout(function () {
+                            _this.HACK_fonts();
                             _this.parent.contents().find("body").append(_this.element);
                         }, 0);
                     };
@@ -94,8 +95,8 @@ var VisualBase = (function () {
                 else {
                     this.parent.contents().find("head").append($('<meta http-equiv="X-UA-Compatible" content="IE=edge">'));
                     this.parent.contents().find("body").append(this.element);
+                    this.HACK_fonts();
                 }
-                this.HACK_fonts();
             }
             else {
                 this.parent = $("<div style=\"width:" + this.width + "px;height:" + this.height + "px;border:0;margin:0;padding:0\"/>");
@@ -133,17 +134,23 @@ var VisualBase = (function () {
     };
     VisualBase.prototype.HACK_fonts = function () {
         var faces = this.HACK_getFontFaces();
-        this.element.append(faces.map(function (n) { return $("<st" + "yle>" + n.cssText + "</st" + "yle>"); }));
+        this.element.prepend($("<st" + "yle>" + (Object.keys(faces).map(function (n) { return faces[n].cssText; })).join("\n") + "</st" + "yle>"));
     };
     VisualBase.prototype.HACK_getFontFaces = function (obj) {
-        var sheet = document.styleSheets, rule = null, i = sheet.length, j, toReturn = [];
+        var sheet = document.styleSheets, rule = null, i = sheet.length, j, toReturn = {};
         while (0 <= --i) {
             rule = sheet[i]['rules'] || sheet[i]['cssRules'] || [];
             j = rule.length;
             while (0 <= --j) {
-                if (rule[j].constructor.name === 'CSSFontFaceRule') {
+                if (rule[j].constructor.name === 'CSSFontFaceRule' ||
+                    rule[j].constructor.toString().indexOf('CSSFontFaceRule') >= 0) {
                     //o[ rule[j].style.fontFamily ] = rule[j].style.src;
-                    toReturn.push(rule[j]);
+                    var style = rule[j].style;
+                    var fontFamily = style.fontFamily;
+                    if (!fontFamily && style.getPropertyValue) {
+                        fontFamily = style.getPropertyValue('font-family');
+                    }
+                    toReturn[fontFamily] = rule[j];
                 }
                 ;
             }
