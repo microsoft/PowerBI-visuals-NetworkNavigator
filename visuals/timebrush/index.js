@@ -1,1 +1,1 @@
-require("./TimeScaleVisual.ts");
+require("./TimeBrushVisual.ts");

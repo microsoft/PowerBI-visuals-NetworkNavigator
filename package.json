@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:timescale": "gulp test:timescale",
+    "test:timebrush": "gulp test:timebrush",
     "test:lineup": "gulp test:lineup",
     "test:freetext": "gulp test:freetext",
     "test:forcegraph": "gulp test:forcegraph",

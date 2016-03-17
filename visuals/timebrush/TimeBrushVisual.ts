@@ -74,7 +74,7 @@ export default class TimeBrush extends VisualBase implements IVisual {
      */
     private template: string = `
         <div>
-            <div class="timescale"></div>
+            <div class="timebrush"></div>
         </div>
     `;
     
@@ -84,7 +84,7 @@ export default class TimeBrush extends VisualBase implements IVisual {
     private idCompare = (a : TimeBrushVisualDataItem, b: TimeBrushVisualDataItem) => a.identity.equals(b.identity);
     
     /**
-     * Constructor for the timescale visual
+     * Constructor for the timebrush visual
      */
     constructor(private noCss = false) {
         super();
@@ -95,7 +95,7 @@ export default class TimeBrush extends VisualBase implements IVisual {
         super.init(options);
         this.element.append($(this.template));
         this.host = options.host;
-        this.timeBrush = new TimeBrushImpl(this.element.find(".timescale"), { width: options.viewport.width, height: options.viewport.height });
+        this.timeBrush = new TimeBrushImpl(this.element.find(".timebrush"), { width: options.viewport.width, height: options.viewport.height });
         this.timeBrush.events.on("rangeSelected", (range) => this.onTimeRangeSelected(range));
     }
 

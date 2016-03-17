@@ -19,7 +19,7 @@ var VisualDataRoleKind = powerbi.VisualDataRoleKind;
 var TimeBrush = (function (_super) {
     __extends(TimeBrush, _super);
     /**
-     * Constructor for the timescale visual
+     * Constructor for the timebrush visual
      */
     function TimeBrush(noCss) {
         if (noCss === void 0) { noCss = false; }
@@ -28,7 +28,7 @@ var TimeBrush = (function (_super) {
         /**
          * The template for the grid
          */
-        this.template = "\n        <div>\n            <div class=\"timescale\"></div>\n        </div>\n    ";
+        this.template = "\n        <div>\n            <div class=\"timebrush\"></div>\n        </div>\n    ";
         /**
          * Compares the ids of the two given items
          */
@@ -40,7 +40,7 @@ var TimeBrush = (function (_super) {
         _super.prototype.init.call(this, options);
         this.element.append($(this.template));
         this.host = options.host;
-        this.timeBrush = new TimeBrush_1.TimeBrush(this.element.find(".timescale"), { width: options.viewport.width, height: options.viewport.height });
+        this.timeBrush = new TimeBrush_1.TimeBrush(this.element.find(".timebrush"), { width: options.viewport.width, height: options.viewport.height });
         this.timeBrush.events.on("rangeSelected", function (range) { return _this.onTimeRangeSelected(range); });
     };
     /** Update is called for data updates, resizes & formatting changes */
