@@ -23,7 +23,7 @@ function Visual(config) {
                 (function (plugins) {
                     var name = config.visualName + config.projectId;
                     plugins[name] = {
-                        name: config.displayName || name,
+                        name: name,
                         class: name,
                         capabilities: ctor.capabilities,
                         custom: true,

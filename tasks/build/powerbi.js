@@ -31,9 +31,14 @@ module.exports = function (gulp) {
             var output = config.output.PowerBI;
             if (output && output.icon) {
                 var base64Contents = new Buffer(fs.readFileSync(paths.projectDir + '/' + output.icon), 'binary').toString('base64');
+                var mimeType = "image/png";
+                if (output.icon.indexOf(".svg") >= 0) {
+                    mimeType = "image/svg+xml";    
+                }
+                
                 return string_src('project.css', `
                 .visual-icon.${output.visualName + output.projectId}{
-                    background-image: url(data:image/png;base64,${base64Contents});
+                    background-image: url(data:${mimeType};base64,${base64Contents});
                 }
                 `.trim())
                     .pipe(gulp.dest(paths.buildDirPowerBiResources));
@@ -62,29 +67,49 @@ module.exports = function (gulp) {
             var output = config.output.PowerBI;
             return gulp.src([paths.packageDir + "/package.json"])
                 .pipe(replace("%PROJECT_NAME%", output.visualName))
+                .pipe(replace("%PROJECT_DISPLAY_NAME%", output.displayName || output.visualName))
                 .pipe(replace("%PROJECT_ID%", output.projectId))
+                .pipe(replace("%PROJECT_DESCRIPTION%", output.description))
+                .pipe(replace("%PROJECT_VERSION%", config.version || "0.0.1"))
                 .pipe(modify({
                     fileModifier: function(file, contents) {
+                        var pkg = JSON.parse(contents.toString());
                         if (output.icon) {
-                            var pkg = JSON.parse(contents.toString());
-                            pkg.images = {
-                                icon: {
-                                    "resourceId": "rId3"
-                                }
+                            pkg.images = pkg.images || {};
+                            pkg.images.icon = {
+                                "resourceId": "rId3"
                             };
                             pkg.resources.push({
                                 resourceId: "rId3",
                                 sourceType: 3,
                                 file: "resources/" + output.icon
                             });
-                            var uniqueProjName = output.visualName + output.projectId;
-                            /**
-                             * What the below is doing is basically removing the define/require calls, to remove the AMD load logic from some libraries
-                             * and then restoring it after the library is done loading
-                             */
-                            return JSON.stringify(pkg, null, 4);
                         }
-                        return `${contents}`.trim().replace("\n", "");
+                        
+                        if (output.thumbnail) {
+                            pkg.images = pkg.images || {};
+                            pkg.images.thumbnail = {
+                                "resourceId": "rId4"
+                            };
+                            pkg.resources.push({
+                                resourceId: "rId4",
+                                sourceType: 6,
+                                file: "resources/" + output.thumbnail
+                            });
+                        }
+                        
+                        if (output.screenshot) {
+                            pkg.images = pkg.images || {};
+                            pkg.images.screenshots = [{
+                                "resourceId": "rId5"
+                            }];
+                            pkg.resources.push({
+                                resourceId: "rId5",
+                                sourceType: 2,
+                                file: "resources/" + output.screenshot
+                            });
+                        }
+                        return JSON.stringify(pkg, null, 4);
                     }
                 }))
                 .pipe(gulp.dest(paths.buildDirPowerBI));
@@ -93,12 +118,20 @@ module.exports = function (gulp) {
         /**
          * Packages the icon
          */
-        gulp.task(`${buildName}:package_icon`, function() {
+        gulp.task(`${buildName}:package_images`, function() {
             var output = config.output.PowerBI;
+            var imagePaths = [];
             if (output.icon) {
-                return gulp.src([paths.projectDir + '/' + output.icon])
-                    .pipe(gulp.dest(paths.buildDirPowerBiResources));
+                imagePaths.push(output.icon);
             }
+            if (output.screenshot) {
+                imagePaths.push(output.screenshot);
+            }
+            if (output.thumbnail) {
+                imagePaths.push(output.thumbnail);
+            }
+            return gulp.src(imagePaths.map(function(img) { return paths.projectDir + '/' + img; }))
+                .pipe(gulp.dest(paths.buildDirPowerBiResources));
         });
 
         /**
@@ -142,7 +175,7 @@ module.exports = function (gulp) {
          * Packages the visualization in a pbiviz
          */
         gulp.task(`${buildName}`, function(cb) {
-            sequence(`${buildName}:pre_clean`, `${buildName}:scripts`, `${buildName}:package_json`, `${buildName}:package_icon`, `${buildName}:create_empty_ts`, `${buildName}:zip`, `${buildName}:post_clean`, cb);
+            sequence(`${buildName}:pre_clean`, `${buildName}:scripts`, `${buildName}:package_json`, `${buildName}:package_images`, `${buildName}:create_empty_ts`, `${buildName}:zip`, `${buildName}:post_clean`, cb);
         });
     });
     
