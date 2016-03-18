@@ -194,23 +194,22 @@ html, body {
 
 .category-container {
   width: 100%;
-  padding-right: 15px;
-  margin-right: 10px;
-  vertical-align: middle; }
+  padding-right: 2px;
+  vertical-align: middle;
+  text-overflow: ellipsis; }
 
 .value-container {
   width: 100%;
-  padding-right: 25px;
+  padding-right: 2px;
   display: none;
   vertical-align: middle; }
 
 .has-values .category-container {
-  width: 50%;
-  padding-right: 15px; }
+  max-width: 33%;
+  text-align: right; }
 
 .has-values .value-container {
-  width: 50%;
-  padding-right: 25px;
+  max-width: 66%;
   display: inline-block; }
 
 .item:hover .value-display .value {

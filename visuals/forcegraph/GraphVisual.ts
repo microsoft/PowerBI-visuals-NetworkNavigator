@@ -417,7 +417,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
     /**
      * Gets called when a node is selected
      */
-    private onNodeSelected(node: ForceGraphSelectableNode) {
+    private onNodeSelected = _.debounce((node: ForceGraphSelectableNode) => {
         var filter = null;
         if (node) {
             filter = powerbi.data.SemanticFilter.fromSQExpr(node.filterExpr);
@@ -454,7 +454,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
         }
 
         this.host.persistProperties(objects);
-    }
+    }, 100);
 }
 
 /**

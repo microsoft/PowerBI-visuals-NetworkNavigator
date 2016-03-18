@@ -21,6 +21,7 @@ var colors = require("../../base/powerbi/colors");
 var GraphVisual = (function (_super) {
     __extends(GraphVisual, _super);
     function GraphVisual() {
+        var _this = this;
         _super.apply(this, arguments);
         this.settings = $.extend(true, {}, GraphVisual.DEFAULT_SETTINGS);
         // private template : string = `
@@ -28,6 +29,47 @@ var GraphVisual = (function (_super) {
         //         <div class="loader">Loading...</div>
         //     </div>`;
         this.template = "\n        <div id=\"node_graph\" style= \"height: 100%;\"> </div>\n    ";
+        /**
+         * Gets called when a node is selected
+         */
+        this.onNodeSelected = _.debounce(function (node) {
+            var filter = null;
+            if (node) {
+                filter = powerbi.data.SemanticFilter.fromSQExpr(node.filterExpr);
+                _this.selectionManager.select(node.identity, false);
+            }
+            else {
+                _this.selectionManager.clear();
+            }
+            var objects = {};
+            if (filter) {
+                $.extend(objects, {
+                    merge: [
+                        {
+                            objectName: "general",
+                            selector: undefined,
+                            properties: {
+                                "filter": filter
+                            }
+                        }
+                    ]
+                });
+            }
+            else {
+                $.extend(objects, {
+                    remove: [
+                        {
+                            objectName: "general",
+                            selector: undefined,
+                            properties: {
+                                "filter": filter
+                            }
+                        }
+                    ]
+                });
+            }
+            _this.host.persistProperties(objects);
+        }, 100);
     }
     /** This is called once when the visual is initialially created */
     GraphVisual.prototype.init = function (options) {
@@ -232,47 +274,6 @@ var GraphVisual = (function (_super) {
             }
             this.listener = this.myGraph.events.on("selectionChanged", function (node) { return _this.onNodeSelected(node); });
         }
-    };
-    /**
-     * Gets called when a node is selected
-     */
-    GraphVisual.prototype.onNodeSelected = function (node) {
-        var filter = null;
-        if (node) {
-            filter = powerbi.data.SemanticFilter.fromSQExpr(node.filterExpr);
-            this.selectionManager.select(node.identity, false);
-        }
-        else {
-            this.selectionManager.clear();
-        }
-        var objects = {};
-        if (filter) {
-            $.extend(objects, {
-                merge: [
-                    {
-                        objectName: "general",
-                        selector: undefined,
-                        properties: {
-                            "filter": filter
-                        }
-                    }
-                ]
-            });
-        }
-        else {
-            $.extend(objects, {
-                remove: [
-                    {
-                        objectName: "general",
-                        selector: undefined,
-                        properties: {
-                            "filter": filter
-                        }
-                    }
-                ]
-            });
-        }
-        this.host.persistProperties(objects);
     };
     /**
      * A list of our data roles

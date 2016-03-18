@@ -187,28 +187,27 @@
 .category-container {
     @extend .boxsized;
     width: 100%;
-    padding-right: 15px;
-    margin-right: 10px;
+    padding-right: 2px;
     vertical-align: middle;
+    text-overflow: ellipsis;
 }
 
 .value-container {
     @extend .boxsized;
     width: 100%;
-    padding-right: 25px;
+    padding-right: 2px;
     display: none;
     vertical-align: middle;
 }
 
 .has-values .category-container {
     @extend .boxsized;
-    width: 50%;
-    padding-right: 15px;
+    max-width: 33%;
+    text-align: right;
 }
 .has-values .value-container {
     @extend .boxsized;
-    width: 50%;
-    padding-right: 25px;
+    max-width: 66%;
     display: inline-block;
 }
 
