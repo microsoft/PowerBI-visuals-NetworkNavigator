@@ -69,6 +69,10 @@ var TimeBrush = (function () {
         set: function (value) {
             $.extend(this._dimensions, value);
             this.resizeElements();
+            if (this._range) {
+                this.brush.extent(this._range);
+                this.brush(d3.select(this.element.find(".brush")[0]));
+            }
         },
         enumerable: true,
         configurable: true
