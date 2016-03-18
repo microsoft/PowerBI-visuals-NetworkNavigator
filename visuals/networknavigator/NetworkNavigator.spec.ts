@@ -1,10 +1,10 @@
 require("../../base/testSetup");
 
 import { expect } from "chai";
-import { ForceGraph, IForceGraphData, IForceGraphNode, IForceGraphLink } from "./ForceGraph";
+import { NetworkNavigator, INetworkNavigatorData, INetworkNavigatorNode, INetworkNavigatorLink } from "./NetworkNavigator";
 import * as $ from "jquery";
 
-describe("ForceGraph", () => {
+describe("NetworkNavigator", () => {
     var parentEle;
     beforeEach(() => {
         global['$'] = require("jquery");
@@ -24,7 +24,7 @@ describe("ForceGraph", () => {
         let ele = $('<div>');
         parentEle.append(ele);
         var result = {
-            instance: new ForceGraph(ele),
+            instance: new NetworkNavigator(ele),
             element: ele
         };
         result.instance.configuration = {
@@ -37,7 +37,7 @@ describe("ForceGraph", () => {
         createInstance();
     });
 
-    const oneSourceTwoTargets : IForceGraphData<IForceGraphNode> = {
+    const oneSourceTwoTargets : INetworkNavigatorData<INetworkNavigatorNode> = {
         nodes: [
             {  selected: false, name: "SOURCE_NODE" },
             {  selected: false, name: "TARGET_NODE_1" },

@@ -11,19 +11,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 /// <reference path="../../base/references.d.ts"/>
-var ForceGraph_1 = require("./ForceGraph");
+var NetworkNavigator_1 = require("./NetworkNavigator");
 var VisualBase_1 = require("../../base/VisualBase");
 var Utils_1 = require("../../base/Utils");
 var InteractivityService = powerbi.visuals.InteractivityService;
 var SelectionId = powerbi.visuals.SelectionId;
 var utility = powerbi.visuals.utility;
 var colors = require("../../base/powerbi/colors");
-var GraphVisual = (function (_super) {
-    __extends(GraphVisual, _super);
-    function GraphVisual() {
+var NetworkNavigator = (function (_super) {
+    __extends(NetworkNavigator, _super);
+    function NetworkNavigator() {
         var _this = this;
         _super.apply(this, arguments);
-        this.settings = $.extend(true, {}, GraphVisual.DEFAULT_SETTINGS);
+        this.settings = $.extend(true, {}, NetworkNavigator.DEFAULT_SETTINGS);
         // private template : string = `
         //     <div class="load-container load5">
         //         <div class="loader">Loading...</div>
@@ -72,27 +72,27 @@ var GraphVisual = (function (_super) {
         }, 100);
     }
     /** This is called once when the visual is initialially created */
-    GraphVisual.prototype.init = function (options) {
+    NetworkNavigator.prototype.init = function (options) {
         _super.prototype.init.call(this, options, this.template);
-        this.myGraph = new ForceGraph_1.ForceGraph(this.element.find("#node_graph"), 500, 500);
+        this.myNetworkNavigator = new NetworkNavigator_1.NetworkNavigator(this.element.find("#node_graph"), 500, 500);
         this.host = options.host;
         this.interactivityService = new InteractivityService(this.host);
         this.attachEvents();
         this.selectionManager = new utility.SelectionManager({ hostServices: this.host });
     };
     /** Update is called for data updates, resizes & formatting changes */
-    GraphVisual.prototype.update = function (options) {
+    NetworkNavigator.prototype.update = function (options) {
         _super.prototype.update.call(this, options);
         var dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
         var dataViewTable = dataView && dataView.table;
         var forceDataReload = this.updateSettings(options);
         if (dataViewTable) {
             if ((forceDataReload || this.hasDataChanged(this.dataViewTable, dataViewTable))) {
-                var parsedData = GraphVisual.converter(dataView, this.settings);
-                this.myGraph.setData(parsedData);
+                var parsedData = NetworkNavigator.converter(dataView, this.settings);
+                this.myNetworkNavigator.setData(parsedData);
             }
             var selectedIds = this.selectionManager.getSelectionIds();
-            var data = this.myGraph.getData();
+            var data = this.myNetworkNavigator.getData();
             if (data && data.nodes && data.nodes.length) {
                 var updated = false;
                 data.nodes.forEach(function (n) {
@@ -103,23 +103,23 @@ var GraphVisual = (function (_super) {
                     }
                 });
                 if (updated) {
-                    this.myGraph.redrawSelection();
+                    this.myNetworkNavigator.redrawSelection();
                 }
-                this.myGraph.redrawLabels();
+                this.myNetworkNavigator.redrawLabels();
             }
         }
         this.dataViewTable = dataViewTable;
-        var currentDimensions = this.myGraph.dimensions;
+        var currentDimensions = this.myNetworkNavigator.dimensions;
         if (currentDimensions.width !== options.viewport.width ||
             currentDimensions.height !== options.viewport.height) {
-            this.myGraph.dimensions = { width: options.viewport.width, height: options.viewport.height };
+            this.myNetworkNavigator.dimensions = { width: options.viewport.width, height: options.viewport.height };
             this.element.css({ width: options.viewport.width, height: options.viewport.height });
         }
     };
     /**
      * Enumerates the instances for the objects that appear in the power bi panel
      */
-    GraphVisual.prototype.enumerateObjectInstances = function (options) {
+    NetworkNavigator.prototype.enumerateObjectInstances = function (options) {
         var instances = _super.prototype.enumerateObjectInstances.call(this, options) || [{
                 selector: null,
                 objectName: options.objectName,
@@ -131,7 +131,7 @@ var GraphVisual = (function (_super) {
     /**
      * Converts the data view into an internal data structure
      */
-    GraphVisual.converter = function (dataView, settings) {
+    NetworkNavigator.converter = function (dataView, settings) {
         var nodeList = [];
         var nodeMap = {};
         var linkList = [];
@@ -148,7 +148,7 @@ var GraphVisual = (function (_super) {
         // source - array index into nodes
         // target - array index into node
         // value - The number of times that the link has been made, ie, I emailed bob@gmail.com 10 times, so value would be 10
-        var roles = GraphVisual.DATA_ROLES;
+        var roles = NetworkNavigator.DATA_ROLES;
         var sourceIdx = colMap[roles.source.name];
         var sourceColorIdx = colMap[roles.sourceColor.name];
         var sourceLabelColorIdx = colMap[roles.sourceLabelColor.name];
@@ -211,20 +211,20 @@ var GraphVisual = (function (_super) {
     /**
      * Gets the inline css used for this element
      */
-    GraphVisual.prototype.getCss = function () {
-        return _super.prototype.getCss.call(this).concat([require("!css!sass!./css/GraphVisual.scss")]);
+    NetworkNavigator.prototype.getCss = function () {
+        return _super.prototype.getCss.call(this).concat([require("!css!sass!./css/NetworkNavigatorVisual.scss")]);
     };
     /**
      * Handles updating of the settings
      */
-    GraphVisual.prototype.updateSettings = function (options) {
+    NetworkNavigator.prototype.updateSettings = function (options) {
         // There are some changes to the options
         var dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
         if (dataView && dataView.metadata) {
             var oldSettings = $.extend(true, {}, this.settings);
             var newObjects = dataView.metadata.objects;
             // Merge in the settings
-            $.extend(true, this.settings, GraphVisual.DEFAULT_SETTINGS, newObjects ? newObjects : {}, {
+            $.extend(true, this.settings, NetworkNavigator.DEFAULT_SETTINGS, newObjects ? newObjects : {}, {
                 layout: {
                     defaultLabelColor: newObjects &&
                         newObjects["layout"] &&
@@ -234,7 +234,7 @@ var GraphVisual = (function (_super) {
             });
             // There were some changes to the layout
             if (!_.isEqual(oldSettings.layout, this.settings.layout)) {
-                this.myGraph.configuration = $.extend(true, {}, this.settings.layout);
+                this.myNetworkNavigator.configuration = $.extend(true, {}, this.settings.layout);
             }
             if (oldSettings.layout.maxNodeCount !== this.settings.layout.maxNodeCount) {
                 return true;
@@ -245,7 +245,7 @@ var GraphVisual = (function (_super) {
     /**
      * Returns if all the properties in the first object are present and equal to the ones in the super set
      */
-    GraphVisual.prototype.objectIsSubset = function (set, superSet) {
+    NetworkNavigator.prototype.objectIsSubset = function (set, superSet) {
         var _this = this;
         if (_.isObject(set)) {
             return _.any(_.keys(set), function (key) { return !_this.objectIsSubset(set[key], superSet[key]); });
@@ -255,7 +255,7 @@ var GraphVisual = (function (_super) {
     /**
      * Determines if the old data is different from the new data.
      */
-    GraphVisual.prototype.hasDataChanged = function (oldData, newData) {
+    NetworkNavigator.prototype.hasDataChanged = function (oldData, newData) {
         if (!oldData || !newData || oldData.rows.length !== newData.rows.length) {
             return true;
         }
@@ -265,20 +265,20 @@ var GraphVisual = (function (_super) {
     /**
      * Attaches the line up events to lineup
      */
-    GraphVisual.prototype.attachEvents = function () {
+    NetworkNavigator.prototype.attachEvents = function () {
         var _this = this;
-        if (this.myGraph) {
+        if (this.myNetworkNavigator) {
             // Cleans up events
             if (this.listener) {
                 this.listener.destroy();
             }
-            this.listener = this.myGraph.events.on("selectionChanged", function (node) { return _this.onNodeSelected(node); });
+            this.listener = this.myNetworkNavigator.events.on("selectionChanged", function (node) { return _this.onNodeSelected(node); });
         }
     };
     /**
      * A list of our data roles
      */
-    GraphVisual.DATA_ROLES = {
+    NetworkNavigator.DATA_ROLES = {
         source: {
             displayName: "Source Node",
             name: "SOURCE_NODE"
@@ -316,7 +316,7 @@ var GraphVisual = (function (_super) {
             name: "TARGET_LABEL_COLOR"
         }
     };
-    GraphVisual.DEFAULT_SETTINGS = {
+    NetworkNavigator.DEFAULT_SETTINGS = {
         layout: {
             animate: true,
             maxNodeCount: 0,
@@ -330,20 +330,20 @@ var GraphVisual = (function (_super) {
             defaultLabelColor: colors[0]
         }
     };
-    GraphVisual.capabilities = $.extend(true, {}, VisualBase_1.VisualBase.capabilities, {
-        dataRoles: Object.keys(GraphVisual.DATA_ROLES).map(function (n) { return ({
-            name: GraphVisual.DATA_ROLES[n].name,
-            displayName: GraphVisual.DATA_ROLES[n].displayName,
+    NetworkNavigator.capabilities = $.extend(true, {}, VisualBase_1.VisualBase.capabilities, {
+        dataRoles: Object.keys(NetworkNavigator.DATA_ROLES).map(function (n) { return ({
+            name: NetworkNavigator.DATA_ROLES[n].name,
+            displayName: NetworkNavigator.DATA_ROLES[n].displayName,
             kind: powerbi.VisualDataRoleKind.Grouping
         }); }),
         dataViewMappings: [{
                 table: {
                     rows: {
-                        select: Object.keys(GraphVisual.DATA_ROLES).map(function (n) { return ({ bind: { to: GraphVisual.DATA_ROLES[n].name } }); })
+                        select: Object.keys(NetworkNavigator.DATA_ROLES).map(function (n) { return ({ bind: { to: NetworkNavigator.DATA_ROLES[n].name } }); })
                     }
                 },
-                conditions: [Object.keys(GraphVisual.DATA_ROLES).reduce(function (a, b) {
-                        a[GraphVisual.DATA_ROLES[b].name] = { min: 0, max: 1 };
+                conditions: [Object.keys(NetworkNavigator.DATA_ROLES).reduce(function (a, b) {
+                        a[NetworkNavigator.DATA_ROLES[b].name] = { min: 0, max: 1 };
                         return a;
                     }, {})]
             }],
@@ -413,11 +413,11 @@ var GraphVisual = (function (_super) {
             }
         }
     });
-    GraphVisual = __decorate([
+    NetworkNavigator = __decorate([
         Utils_1.Visual(JSON.parse(require("./build.json")).output.PowerBI)
-    ], GraphVisual);
-    return GraphVisual;
+    ], NetworkNavigator);
+    return NetworkNavigator;
 }(VisualBase_1.VisualBase));
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = GraphVisual;
+exports.default = NetworkNavigator;
 ;

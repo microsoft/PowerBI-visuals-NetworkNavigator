@@ -6,16 +6,16 @@ import * as _ from "lodash";
  * Class which represents the force graph
  */
 /* @Mixin(EventEmitter) */
-export class ForceGraph {
+export class NetworkNavigator {
     private element: JQuery;
     private svg: any;
     private vis: any;
     private force: any;
     private zoom: any;
-    private graph: IForceGraphData<IForceGraphNode>;
+    private graph: INetworkNavigatorData<INetworkNavigatorNode>;
     private _dimensions: { width: number; height: number; };
-    private _selectedNode : IForceGraphNode;
-    private _configuration : IForceGraphConfiguration = {
+    private _selectedNode : INetworkNavigatorNode;
+    private _configuration : INetworkNavigatorConfiguration = {
         animate: true,
         linkDistance: 10,
         linkStrength: 2,
@@ -63,7 +63,7 @@ export class ForceGraph {
     private svgContainer: JQuery;
 
     /**
-     * Constructor for the force graph
+     * Constructor for the network navigator
      */
     constructor(element: JQuery, width = 500, height = 500) {
         this.element = $(this.template);
@@ -93,7 +93,7 @@ export class ForceGraph {
     }
 
     /**
-     * Returns the dimensions of this graph
+     * Returns the dimensions of this network navigator
      */
     public get dimensions() {
         return this._dimensions;
@@ -117,7 +117,7 @@ export class ForceGraph {
     }
 
     /**
-     * Returns the configuration of this graph
+     * Returns the configuration of this network navigator
      */
     public get configuration() {
         return this._configuration;
@@ -169,19 +169,19 @@ export class ForceGraph {
     /**
      * Alias for getData
      */
-    public get data() : IForceGraphData<IForceGraphNode> {
+    public get data() : INetworkNavigatorData<INetworkNavigatorNode> {
         return this.getData();
     }
 
     /**
      * Alias for setData
      */
-    public set data(graph: IForceGraphData<IForceGraphNode>) {
+    public set data(graph: INetworkNavigatorData<INetworkNavigatorNode>) {
         this.setData(graph);
     }
 
     /**
-     * Redraws the force graph
+     * Redraws the force network navigator
      */
     public redraw() {
         if (this.vis && d3.event) {
@@ -193,14 +193,14 @@ export class ForceGraph {
     /**
      * Gets the data associated with this graph
      */
-    public getData() : IForceGraphData<IForceGraphNode> {
+    public getData() : INetworkNavigatorData<INetworkNavigatorNode> {
         return this.graph;
     }
 
     /**
      * Sets the data for this force graph
      */
-    public setData(graph: IForceGraphData<IForceGraphNode>) {
+    public setData(graph: INetworkNavigatorData<INetworkNavigatorNode>) {
         var me = this;
         this.graph = graph;
 
@@ -405,7 +405,7 @@ export class ForceGraph {
     /**
      * Updates the selection based on the given node
      */
-    private updateSelection(n? : IForceGraphNode) {
+    private updateSelection(n? : INetworkNavigatorNode) {
         if (n !== this._selectedNode) {
             if (this._selectedNode) {
                 this._selectedNode.selected = false;
@@ -426,9 +426,9 @@ export class ForceGraph {
 }
 
 /**
- * The node in a force graph
+ * The node in a graph
  */
-export interface IForceGraphNode {
+export interface INetworkNavigatorNode {
     /**
      * The name of the node
      */
@@ -456,9 +456,9 @@ export interface IForceGraphNode {
 }
 
 /**
- * Represents a link in the force graph
+ * Represents a link in the network navigator
  */
-export interface IForceGraphLink {
+export interface INetworkNavigatorLink {
     /**
      * The source node, index into the nodes list
      */
@@ -476,25 +476,25 @@ export interface IForceGraphLink {
 }
 
 /**
- * The data for the force graph
+ * The data for the network navigator
  */
-export interface IForceGraphData<NodeType> {
+export interface INetworkNavigatorData<NodeType> {
 
     /**
-     * The list of the nodes in the force graph
+     * The list of the nodes in the network navigator
      */
     nodes?: NodeType[];
 
     /**
-     * The links in the force graph
+     * The links in the network navigator
      */
-    links?: IForceGraphLink[];
+    links?: INetworkNavigatorLink[];
 }
 
 /**
- * Represents the configuration for the force graph
+ * Represents the configuration for the network navigator
  */
-export interface IForceGraphConfiguration {
+export interface INetworkNavigatorConfiguration {
     animate?: boolean;
     linkDistance?: number;
     linkStrength?: number;
