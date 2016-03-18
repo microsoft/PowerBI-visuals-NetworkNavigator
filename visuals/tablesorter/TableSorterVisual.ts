@@ -42,7 +42,7 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
     private static VISUAL_DEFAULT_SETTINGS : ITableSorterVisualSettings = $.extend(true, {}, TableSorter.DEFAULT_SETTINGS, {
         presentation: {
             columnColors: (idx) => {
-                return colors[idx % colors.length]  
+                return colors[idx % colors.length]
             }
         },
         experimental: {
@@ -63,7 +63,7 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
             table: {
                 rows: {
                     for: { in: 'Values' },
-                    dataReductionAlgorithm: { window: { count: 100 } }
+                    dataReductionAlgorithm: { window: { count: 500 } }
                 },
                 rowCount: { preferred: { min: 1 } }
             }
@@ -189,7 +189,7 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
      * If css should be loaded or not
      */
     private noCss : boolean = false;
-    
+
     /**
      * The initial set of settings to use
      */
@@ -208,7 +208,7 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
     public init(options: VisualInitOptions): void {
         super.init(options, this.template, true);
         this.host = options.host;
-        
+
         this.selectionManager = new SelectionManager({
             hostServices: options.host
         });
@@ -265,7 +265,7 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
      */
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
         let instances = super.enumerateObjectInstances(options) || [{
-            selector: null, 
+            selector: null,
             objectName: options.objectName,
             properties: {}
         }];
@@ -278,7 +278,7 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
         }
         return instances;
     }
-    
+
     /**
      * Resizer function to resize lineup
      */
@@ -287,7 +287,7 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
             this.tableSorter.lineupImpl.updateBody();
         }
     }, 100);
-    
+
     /**
      * Setter for dimensions
      */
@@ -296,7 +296,7 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
         this._dimensions = value;
         this.lineupResizer();
     }
-    
+
     /**
      * Getter for dimensions
      */
@@ -310,7 +310,7 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
     protected getCss() : string[] {
         return this.noCss ? [] : super.getCss().concat([require("!css!sass!./css/TableSorter.scss"), require("!css!sass!./css/TableSorterVisual.scss")]);
     }
-    
+
     /**
      * Gets a lineup config from the data view
      */
@@ -429,7 +429,7 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
         }
         return data;
     }
-    
+
     /**
      * Updates the height of the wrapper to fill the remaining space
      */
