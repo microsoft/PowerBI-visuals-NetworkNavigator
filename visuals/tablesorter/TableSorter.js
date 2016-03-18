@@ -371,7 +371,7 @@ var TableSorter = (function () {
      * Generates the histogram for lineup
      */
     TableSorter.prototype.generateHistogram = function (columnImpl, callback) {
-        var column = this.getColumnByName(columnImpl.column.id);
+        var column = this.getColumnByName(columnImpl.column.column);
         this.dataProvider.generateHistogram(column, this.queryOptions).then(function (h) {
             var perc = 1 / h.length;
             var values = h.map(function (v, i) { return ({
