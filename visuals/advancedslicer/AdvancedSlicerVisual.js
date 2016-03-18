@@ -127,6 +127,17 @@ var AdvancedSlicerVisual = (function (_super) {
         return converted;
     };
     /**
+     * Enumerates the instances for the objects that appear in the power bi panel
+     */
+    AdvancedSlicerVisual.prototype.enumerateObjectInstances = function (options) {
+        var instances = _super.prototype.enumerateObjectInstances.call(this, options) || [{
+                selector: null,
+                objectName: options.objectName,
+                properties: {}
+            }];
+        return instances;
+    };
+    /**
      * Gets the inline css used for this element
      */
     AdvancedSlicerVisual.prototype.getCss = function () {

@@ -18,6 +18,7 @@ import SelectionId = powerbi.visuals.SelectionId;
 import SelectionManager = powerbi.visuals.utility.SelectionManager;
 import VisualDataRoleKind = powerbi.VisualDataRoleKind;
 import SQExpr = powerbi.data.SQExpr;
+import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 
 @Visual(require("./build.js").output.PowerBI)
 export default class TimeBrush extends VisualBase implements IVisual {
@@ -141,6 +142,18 @@ export default class TimeBrush extends VisualBase implements IVisual {
                 this.timeBrush.data = data;
             }
         }
+    }
+    
+    /**
+     * Enumerates the instances for the objects that appear in the power bi panel
+     */
+    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
+        let instances = super.enumerateObjectInstances(options) || [{
+            selector: null, 
+            objectName: options.objectName,
+            properties: {}
+        }];
+        return instances;
     }
 
     /**
