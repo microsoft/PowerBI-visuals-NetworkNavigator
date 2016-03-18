@@ -5,7 +5,7 @@ module.exports = {
             "visualName": "TableSorter",
             "displayName": "Table Sorter",
             "projectId": "1450434005853",
-            "icon": "icon.png",
+            "icon": "icon.svg",
             "screenshot": "screenshot.png",
             "thumbnail": "thumbnail.png",
             "entry": "TableSorterVisual",

@@ -5,7 +5,7 @@ module.exports = {
             "visualName": "AttributeSlicer",
             "displayName": "Attribute Slicer",
             "projectId": "1652434005853",
-            "icon": "icon.png",
+            "icon": "icon.svg",
             "screenshot": "screenshot.png",
             "thumbnail": "thumbnail.png",
             "entry": "AttributeSlicerVisual.ts",

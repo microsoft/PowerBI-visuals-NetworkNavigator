@@ -31,9 +31,14 @@ module.exports = function (gulp) {
             var output = config.output.PowerBI;
             if (output && output.icon) {
                 var base64Contents = new Buffer(fs.readFileSync(paths.projectDir + '/' + output.icon), 'binary').toString('base64');
+                var mimeType = "image/png";
+                if (output.icon.indexOf(".svg") >= 0) {
+                    mimeType = "image/svg+xml";    
+                }
+                
                 return string_src('project.css', `
                 .visual-icon.${output.visualName + output.projectId}{
-                    background-image: url(data:image/png;base64,${base64Contents});
+                    background-image: url(data:${mimeType};base64,${base64Contents});
                 }
                 `.trim())
                     .pipe(gulp.dest(paths.buildDirPowerBiResources));
