@@ -227,14 +227,14 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
     /**
      * Updates the data filter based on the selection
      */
-    private onSelectionChanged(selectedItems: ListItem[]) {
+    private onSelectionChanged = _.debounce((selectedItems: ListItem[]) => {
         var filter;
         this.selectionManager.clear();
         selectedItems.forEach((item) => {
             this.selectionManager.select(item.identity, true);
         });
         this.updateSelectionFilter();
-    }
+    }, 100);
 
     /**
      * Updates the data filter based on the selection

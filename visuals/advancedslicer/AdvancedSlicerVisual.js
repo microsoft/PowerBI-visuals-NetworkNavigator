@@ -21,7 +21,19 @@ var SelectionManager = powerbi.visuals.utility.SelectionManager;
 var AdvancedSlicerVisual = (function (_super) {
     __extends(AdvancedSlicerVisual, _super);
     function AdvancedSlicerVisual() {
+        var _this = this;
         _super.apply(this, arguments);
+        /**
+         * Updates the data filter based on the selection
+         */
+        this.onSelectionChanged = _.debounce(function (selectedItems) {
+            var filter;
+            _this.selectionManager.clear();
+            selectedItems.forEach(function (item) {
+                _this.selectionManager.select(item.identity, true);
+            });
+            _this.updateSelectionFilter();
+        }, 100);
     }
     /**
      * Called when the visual is being initialized
@@ -132,18 +144,6 @@ var AdvancedSlicerVisual = (function (_super) {
             item.result = this.loadDeferred.promise();
             this.host.loadMoreData();
         }
-    };
-    /**
-     * Updates the data filter based on the selection
-     */
-    AdvancedSlicerVisual.prototype.onSelectionChanged = function (selectedItems) {
-        var _this = this;
-        var filter;
-        this.selectionManager.clear();
-        selectedItems.forEach(function (item) {
-            _this.selectionManager.select(item.identity, true);
-        });
-        this.updateSelectionFilter();
     };
     /**
      * Updates the data filter based on the selection
