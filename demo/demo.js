@@ -69,7 +69,7 @@ $(function() {
             var networkNavigatorEle = $('#network-navigator');
             var networkNavigator = new NetworkNavigator(networkNavigatorEle, networkNavigatorEle.width(), networkNavigatorEle.height());
             $.getJSON('forcegraphdata.json', function(data) {
-                forcegraph.data = data;
+                networkNavigator.data = data;
             });
             var selectedNodeEle = $('#selected-node');
             networkNavigator.events.on("selectionChanged", function(node) {
