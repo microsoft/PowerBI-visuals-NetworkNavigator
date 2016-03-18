@@ -259,7 +259,6 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
             this.checkSettingsChanged();
             this.checkDataChanged();
         }
-        this.updateWrapperHeight();
         this.loadingData = false;
     }
 
@@ -283,21 +282,14 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
     }
 
     /**
-     * Resizer function to resize lineup
-     */
-    private lineupResizer = _.debounce(() => {
-        if(this.tableSorter && this.tableSorter.lineupImpl) {
-            this.tableSorter.lineupImpl.updateBody();
-        }
-    }, 100);
-
-    /**
      * Setter for dimensions
      */
     private _dimensions: { width: number; height: number };
     public set dimensions (value: { width: number; height: number }) {
         this._dimensions = value;
-        this.lineupResizer();
+        if (this.tableSorter) {
+            this.tableSorter.dimensions = value;
+        }
     }
 
     /**
@@ -431,19 +423,6 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
             });
         }
         return data;
-    }
-
-    /**
-     * Updates the height of the wrapper to fill the remaining space
-     */
-    private updateWrapperHeight() {
-        const wrapper = this.element.find(".lu-wrapper");
-        const header = this.element.find(".lu-header");
-        if (wrapper.length && header.length) {
-            wrapper.css( {
-                height: this.dimensions.height - header.height()
-            });
-        }
     }
 
     /**

@@ -28,6 +28,11 @@ export class TableSorter {
      * My lineup instance
      */
     public lineupImpl: any;
+    
+    /**
+     * The dimensions
+     */
+    private _dimensions: { width: number; height: number };
 
     /**
      * The list of events that we expose
@@ -144,8 +149,8 @@ export class TableSorter {
                         </a>
                     </li>
                 </ul>
+                <hr/>       
             </div>
-            <hr/>
             <div style="position:relative">
                 <div class="grid"></div>
                 <div class='load-spinner'><div>
@@ -212,6 +217,38 @@ export class TableSorter {
         this._eventEmitter = new EventEmitter();
         element.append(this.element);
         this.loadingData = true;
+    }
+    
+    /**
+     * getter for the dimensions
+     */
+    public get dimensions() {
+        return this._dimensions;
+    }
+    
+    /**
+     * Resizer function to update lineups rendering
+     */
+    private bodyUpdater = _.debounce(() => {
+        if(this.lineupImpl) {
+            this.lineupImpl.updateBody();
+        }
+    }, 100);
+    
+    /**
+     * setter for the dimensions
+     */
+    public set dimensions(value) {
+        this._dimensions = value;
+        const wrapper = this.element.find(".lu-wrapper");
+        const header = this.element.find(".lu-header");
+        const nav = this.element.find(".nav");
+        
+        this.bodyUpdater();
+        
+        wrapper.css({ 
+            width: value ? value.width : null, 
+            height: value ? value.height - header.height() - nav.height() : null });        
     }
 
     /**
@@ -476,6 +513,7 @@ export class TableSorter {
                     } else {
                         var finalOptions = $.extend(true, this.lineUpConfig, { renderingOptions: $.extend(true, {}, this.settings.presentation) });
                         this.lineupImpl = LineUpLib.create(spec, d3.select(this.element.find('.grid')[0]), finalOptions);
+                        this.dimensions = this.dimensions;
                         this.lineupImpl.listeners.on('change-sortcriteria.lineup', (ele, column, asc) => {
                             // This only works for single columns and not grouped columns
                             this.onLineUpSorted(column && column.column && column.column.id, asc);
