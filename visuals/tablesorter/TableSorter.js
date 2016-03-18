@@ -24,7 +24,7 @@ var TableSorter = (function () {
         /**
          * The template for the grid
          */
-        this.template = "\n        <div class=\"lineup-component\">\n            <div class=\"nav\">\n                <ul>\n                    <li class=\"clear-selection\" title=\"Clear Selection\">\n                        <a>\n                            <span class=\"fa-stack\">\n                                <i class=\"fa fa-check fa-stack-1x\"></i>\n                                <i class=\"fa fa-ban fa-stack-2x\"></i>\n                            </span>\n                        </a>\n                    </li>\n                    <li class=\"add-column\" title=\"Add Column\">\n                        <a>\n                            <span class=\"fa-stack\">\n                                <i class=\"fa fa-columns fa-stack-2x\"></i>\n                                <i class=\"fa fa-plus-circle fa-stack-1x\"></i>\n                            </span>\n                        </a>\n                    </li>\n                    <li class=\"add-stacked-column\" title=\"Add Stacked Column\">\n                        <a>\n                            <span class=\"fa-stack\">\n                                <i class=\"fa fa-bars fa-stack-2x\"></i>\n                                <i class=\"fa fa-plus-circle fa-stack-1x\"></i>\n                            </span>\n                        </a>\n                    </li>\n                </ul>\n            </div>\n            <hr/>\n            <div style=\"position:relative\">\n                <div class=\"grid\"></div>\n                <div class='load-spinner'><div>\n            </div>\n        </div>\n    ".trim();
+        this.template = "\n        <div class=\"lineup-component\">\n            <div class=\"nav\">\n                <ul>\n                    <li class=\"clear-selection\" title=\"Clear Selection\">\n                        <a>\n                            <span class=\"fa-stack\">\n                                <i class=\"fa fa-check fa-stack-1x\"></i>\n                                <i class=\"fa fa-ban fa-stack-2x\"></i>\n                            </span>\n                        </a>\n                    </li>\n                    <li class=\"add-column\" title=\"Add Column\">\n                        <a>\n                            <span class=\"fa-stack\">\n                                <i class=\"fa fa-columns fa-stack-2x\"></i>\n                                <i class=\"fa fa-plus-circle fa-stack-1x\"></i>\n                            </span>\n                        </a>\n                    </li>\n                    <li class=\"add-stacked-column\" title=\"Add Stacked Column\">\n                        <a>\n                            <span class=\"fa-stack\">\n                                <i class=\"fa fa-bars fa-stack-2x\"></i>\n                                <i class=\"fa fa-plus-circle fa-stack-1x\"></i>\n                            </span>\n                        </a>\n                    </li>\n                </ul>\n                <hr/>       \n            </div>\n            <div style=\"position:relative\">\n                <div class=\"grid\"></div>\n                <div class='load-spinner'><div>\n            </div>\n        </div>\n    ".trim();
         /**
          * A boolean indicating whehter or not we are currently loading more data
          */
@@ -51,6 +51,14 @@ var TableSorter = (function () {
                 generator: function (columnImpl, callback) { return _this.generateHistogram(columnImpl, callback); }
             }
         };
+        /**
+         * Resizer function to update lineups rendering
+         */
+        this.bodyUpdater = _.debounce(function () {
+            if (_this.lineupImpl) {
+                _this.lineupImpl.updateBody();
+            }
+        }, 100);
         this.element = $(this.template);
         this.element.find('.clear-selection').on('click', function () {
             _this.lineupImpl.clearSelection();
@@ -76,6 +84,29 @@ var TableSorter = (function () {
         set: function (value) {
             this.element.toggleClass("loading", !!value);
             this._loadingData = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TableSorter.prototype, "dimensions", {
+        /**
+         * getter for the dimensions
+         */
+        get: function () {
+            return this._dimensions;
+        },
+        /**
+         * setter for the dimensions
+         */
+        set: function (value) {
+            this._dimensions = value;
+            var wrapper = this.element.find(".lu-wrapper");
+            var header = this.element.find(".lu-header");
+            var nav = this.element.find(".nav");
+            this.bodyUpdater();
+            wrapper.css({
+                width: value ? value.width : null,
+                height: value ? value.height - header.height() - nav.height() : null });
         },
         enumerable: true,
         configurable: true
@@ -326,6 +357,7 @@ var TableSorter = (function () {
                     else {
                         var finalOptions = $.extend(true, _this.lineUpConfig, { renderingOptions: $.extend(true, {}, _this.settings.presentation) });
                         _this.lineupImpl = LineUpLib.create(spec, d3.select(_this.element.find('.grid')[0]), finalOptions);
+                        _this.dimensions = _this.dimensions;
                         _this.lineupImpl.listeners.on('change-sortcriteria.lineup', function (ele, column, asc) {
                             // This only works for single columns and not grouped columns
                             _this.onLineUpSorted(column && column.column && column.column.id, asc);

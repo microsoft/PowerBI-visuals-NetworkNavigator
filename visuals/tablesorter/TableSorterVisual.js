@@ -34,14 +34,6 @@ var TableSorterVisual = (function (_super) {
          */
         this.noCss = false;
         /**
-         * Resizer function to resize lineup
-         */
-        this.lineupResizer = _.debounce(function () {
-            if (_this.tableSorter && _this.tableSorter.lineupImpl) {
-                _this.tableSorter.lineupImpl.updateBody();
-            }
-        }, 100);
-        /**
          * Selects the given rows
          */
         this.onSelectionChanged = _.debounce(function (rows) {
@@ -142,7 +134,6 @@ var TableSorterVisual = (function (_super) {
             this.checkSettingsChanged();
             this.checkDataChanged();
         }
-        this.updateWrapperHeight();
         this.loadingData = false;
     };
     /**
@@ -173,7 +164,9 @@ var TableSorterVisual = (function (_super) {
         },
         set: function (value) {
             this._dimensions = value;
-            this.lineupResizer();
+            if (this.tableSorter) {
+                this.tableSorter.dimensions = value;
+            }
         },
         enumerable: true,
         configurable: true
@@ -295,18 +288,6 @@ var TableSorterVisual = (function (_super) {
             });
         }
         return data;
-    };
-    /**
-     * Updates the height of the wrapper to fill the remaining space
-     */
-    TableSorterVisual.prototype.updateWrapperHeight = function () {
-        var wrapper = this.element.find(".lu-wrapper");
-        var header = this.element.find(".lu-header");
-        if (wrapper.length && header.length) {
-            wrapper.css({
-                height: this.dimensions.height - header.height()
-            });
-        }
     };
     /**
      * Event listener for when the visual data's changes
