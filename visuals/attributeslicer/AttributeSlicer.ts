@@ -6,7 +6,7 @@ const naturalSort = require("javascript-natural-sort");
 /**
  * Represents an advanced slicer to help slice through data
  */
-export class AdvancedSlicer {
+export class AttributeSlicer {
 
     /**
      * The number of milliseconds before running the search, after a user stops typing.
@@ -114,7 +114,7 @@ export class AdvancedSlicer {
      */
     constructor(element: JQuery) {
         this.element = element;
-        this.listContainer = element.append($(AdvancedSlicer.template)).find(".advanced-slicer");
+        this.listContainer = element.append($(AttributeSlicer.template)).find(".advanced-slicer");
         this.listEle = this.listContainer.find(".list");
         this.listEle.scroll(() => this.checkLoadMoreData());
 
@@ -203,7 +203,7 @@ export class AdvancedSlicer {
 
         if (newData && newData.length) {
             this.listEle.append(newData.map(item => {
-                const ele = AdvancedSlicer.listItemFactory(item.matchPrefix, item.match, item.matchSuffix);
+                const ele = AttributeSlicer.listItemFactory(item.matchPrefix, item.match, item.matchSuffix);
                 var renderedValue = item.renderedValue;
                 if (renderedValue) {
                     let valueDisplayEle = ele.find(".value-display");
@@ -376,7 +376,7 @@ export class AdvancedSlicer {
                 this.syncItemVisiblity();
                 this.element.toggleClass("has-search", !!this.searchString);
             }
-        }, AdvancedSlicer.SEARCH_DEBOUNCE));
+        }, AttributeSlicer.SEARCH_DEBOUNCE));
 
         this.listEle.on("click", (evt) => {
             // var checkbox = $(evt.target);

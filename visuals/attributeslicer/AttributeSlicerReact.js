@@ -7,35 +7,35 @@ var __extends = (this && this.__extends) || function (d, b) {
 var React = require("react");
 var ReactDOM = require("react-dom");
 var $ = require("jquery");
-var AdvancedSlicer_1 = require("./AdvancedSlicer");
+var AttributeSlicer_1 = require("./AttributeSlicer");
 ;
 /**
  * Thin wrapper around LineUp
  */
-var AdvancedSlicer = (function (_super) {
-    __extends(AdvancedSlicer, _super);
-    function AdvancedSlicer() {
+var AttributeSlicer = (function (_super) {
+    __extends(AttributeSlicer, _super);
+    function AttributeSlicer() {
         _super.apply(this, arguments);
     }
-    AdvancedSlicer.prototype.componentDidMount = function () {
+    AttributeSlicer.prototype.componentDidMount = function () {
         this.node = ReactDOM.findDOMNode(this);
-        this.mySlicer = new AdvancedSlicer_1.AdvancedSlicer($(this.node));
+        this.mySlicer = new AttributeSlicer_1.AttributeSlicer($(this.node));
         this.attachEvents();
         this.renderContent();
     };
-    AdvancedSlicer.prototype.componentWillReceiveProps = function (newProps) {
+    AttributeSlicer.prototype.componentWillReceiveProps = function (newProps) {
         this.renderContent(newProps);
     };
     /**
      * Renders this component
      */
-    AdvancedSlicer.prototype.render = function () {
+    AttributeSlicer.prototype.render = function () {
         return React.createElement("div", {className: "advanced-slicer-container", style: { width: "100%", height: "100%" }});
     };
     /**
      * Attaches events to the slicer
      */
-    AdvancedSlicer.prototype.attachEvents = function () {
+    AttributeSlicer.prototype.attachEvents = function () {
         var _this = this;
         var guardedEventer = function (evtName) {
             return function () {
@@ -52,7 +52,7 @@ var AdvancedSlicer = (function (_super) {
         this.mySlicer.events.on("canLoadMoreData", guardedEventer("onCanLoadMoreData"));
         this.mySlicer.events.on("selectionChanged", guardedEventer("onSelectionChanged"));
     };
-    AdvancedSlicer.prototype.renderContent = function (props) {
+    AttributeSlicer.prototype.renderContent = function (props) {
         // if called from `componentWillReceiveProps`, then we use the new
         // props, otherwise use what we already have.
         props = props || this.props;
@@ -62,6 +62,6 @@ var AdvancedSlicer = (function (_super) {
         this.mySlicer.serverSideSearch = props.serverSideSearch;
         this.mySlicer.data = props.data;
     };
-    return AdvancedSlicer;
+    return AttributeSlicer;
 }(React.Component));
-exports.AdvancedSlicer = AdvancedSlicer;
+exports.AttributeSlicer = AttributeSlicer;

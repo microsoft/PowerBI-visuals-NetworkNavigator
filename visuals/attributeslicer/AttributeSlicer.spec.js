@@ -1,9 +1,9 @@
 "use strict";
 require("../../base/testSetup");
 var chai_1 = require("chai");
-var AdvancedSlicer_1 = require("./AdvancedSlicer");
+var AttributeSlicer_1 = require("./AttributeSlicer");
 var $ = require("jquery");
-describe("AdvancedSlicer", function () {
+describe("AttributeSlicer", function () {
     var parentEle;
     beforeEach(function () {
         global['$'] = require("jquery");
@@ -21,7 +21,7 @@ describe("AdvancedSlicer", function () {
         var ele = $('<div>');
         parentEle.append(ele);
         var result = {
-            instance: new AdvancedSlicer_1.AdvancedSlicer(ele),
+            instance: new AttributeSlicer_1.AttributeSlicer(ele),
             element: ele
         };
         return result;

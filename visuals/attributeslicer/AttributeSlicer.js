@@ -5,11 +5,11 @@ var naturalSort = require("javascript-natural-sort");
 /**
  * Represents an advanced slicer to help slice through data
  */
-var AdvancedSlicer = (function () {
+var AttributeSlicer = (function () {
     /**
      * Constructor for the advanced slicer
      */
-    function AdvancedSlicer(element) {
+    function AttributeSlicer(element) {
         var _this = this;
         /**
          * The data contained in this slicer
@@ -36,7 +36,7 @@ var AdvancedSlicer = (function () {
          */
         this._loadingMoreData = false; // Don't use this directly
         this.element = element;
-        this.listContainer = element.append($(AdvancedSlicer.template)).find(".advanced-slicer");
+        this.listContainer = element.append($(AttributeSlicer.template)).find(".advanced-slicer");
         this.listEle = this.listContainer.find(".list");
         this.listEle.scroll(function () { return _this.checkLoadMoreData(); });
         this.selectionsEle = element.find(".selections");
@@ -46,7 +46,7 @@ var AdvancedSlicer = (function () {
         // These two are here because the devtools call init more than once
         this.loadingMoreData = true;
     }
-    Object.defineProperty(AdvancedSlicer.prototype, "serverSideSearch", {
+    Object.defineProperty(AttributeSlicer.prototype, "serverSideSearch", {
         /**
          * Getter for server side search
          */
@@ -59,7 +59,7 @@ var AdvancedSlicer = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AdvancedSlicer.prototype, "events", {
+    Object.defineProperty(AttributeSlicer.prototype, "events", {
         /**
          * Gets our event emitter
          */
@@ -69,7 +69,7 @@ var AdvancedSlicer = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AdvancedSlicer.prototype, "dimensions", {
+    Object.defineProperty(AttributeSlicer.prototype, "dimensions", {
         /**
          * Sets the dimension of the slicer
          */
@@ -80,7 +80,7 @@ var AdvancedSlicer = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AdvancedSlicer.prototype, "showValues", {
+    Object.defineProperty(AttributeSlicer.prototype, "showValues", {
         /**
          * Setter for showing the values column
          */
@@ -90,7 +90,7 @@ var AdvancedSlicer = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AdvancedSlicer.prototype, "showSelections", {
+    Object.defineProperty(AttributeSlicer.prototype, "showSelections", {
         /**
          * Setter for showing the selections area
          */
@@ -100,7 +100,7 @@ var AdvancedSlicer = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AdvancedSlicer.prototype, "showHighlight", {
+    Object.defineProperty(AttributeSlicer.prototype, "showHighlight", {
         /**
          * Gets whether or not we are showing the highlights
          */
@@ -116,7 +116,7 @@ var AdvancedSlicer = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AdvancedSlicer.prototype, "data", {
+    Object.defineProperty(AttributeSlicer.prototype, "data", {
         /**
          * Gets the data behind the slicer
          */
@@ -132,7 +132,7 @@ var AdvancedSlicer = (function () {
             this.loadingMoreData = false;
             if (newData && newData.length) {
                 this.listEle.append(newData.map(function (item) {
-                    var ele = AdvancedSlicer.listItemFactory(item.matchPrefix, item.match, item.matchSuffix);
+                    var ele = AttributeSlicer.listItemFactory(item.matchPrefix, item.match, item.matchSuffix);
                     var renderedValue = item.renderedValue;
                     if (renderedValue) {
                         var valueDisplayEle = ele.find(".value-display");
@@ -154,7 +154,7 @@ var AdvancedSlicer = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AdvancedSlicer.prototype, "selectedItems", {
+    Object.defineProperty(AttributeSlicer.prototype, "selectedItems", {
         get: function () {
             return this._selectedItems;
         },
@@ -180,7 +180,7 @@ var AdvancedSlicer = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AdvancedSlicer.prototype, "searchString", {
+    Object.defineProperty(AttributeSlicer.prototype, "searchString", {
         /**
          * Gets the current serch value
          */
@@ -193,13 +193,13 @@ var AdvancedSlicer = (function () {
     /**j
      * Sorts the slicer
      */
-    AdvancedSlicer.prototype.sort = function (toSort, desc) {
+    AttributeSlicer.prototype.sort = function (toSort, desc) {
         this.data.sort(function (a, b) {
             var sortVal = naturalSort(a[toSort], b[toSort]);
             return desc ? -1 * sortVal : sortVal;
         });
     };
-    Object.defineProperty(AdvancedSlicer.prototype, "loadingMoreData", {
+    Object.defineProperty(AttributeSlicer.prototype, "loadingMoreData", {
         get: function () {
             return this._loadingMoreData;
         },
@@ -216,7 +216,7 @@ var AdvancedSlicer = (function () {
     /**
      * Syncs the item elements state with the current set of selected items and the search
      */
-    AdvancedSlicer.prototype.syncItemVisiblity = function () {
+    AttributeSlicer.prototype.syncItemVisiblity = function () {
         var value = this.selectedItems;
         var eles = this.element.find(".item");
         var me = this;
@@ -238,7 +238,7 @@ var AdvancedSlicer = (function () {
     /**
      * Toggle the select all state
      */
-    AdvancedSlicer.prototype.toggleSelectAll = function () {
+    AttributeSlicer.prototype.toggleSelectAll = function () {
         var checked = this.checkAllEle.prop('checked');
         if (!!checked) {
             this.selectedItems = this._data.slice(0);
@@ -250,7 +250,7 @@ var AdvancedSlicer = (function () {
     /**
      * Creates a new selection token element
      */
-    AdvancedSlicer.prototype.createSelectionToken = function (v) {
+    AttributeSlicer.prototype.createSelectionToken = function (v) {
         var _this = this;
         var newEle = $('<div/>');
         var text = (v.matchPrefix || "") + v.match + (v.matchSuffix || "");
@@ -270,20 +270,20 @@ var AdvancedSlicer = (function () {
     /**
      * Clears the selection
      */
-    AdvancedSlicer.prototype.clearSelection = function () {
+    AttributeSlicer.prototype.clearSelection = function () {
         this.selectedItems = [];
     };
     /**
      * Updates the select all button state to match the data
      */
-    AdvancedSlicer.prototype.updateSelectAllButtonState = function () {
+    AttributeSlicer.prototype.updateSelectAllButtonState = function () {
         this.checkAllEle.prop('indeterminate', this.selectedItems.length > 0 && this._data.length !== this.selectedItems.length);
         this.checkAllEle.prop('checked', this.selectedItems.length > 0);
     };
     /**
      * Attaches all the necessary events
      */
-    AdvancedSlicer.prototype.attachEvents = function () {
+    AttributeSlicer.prototype.attachEvents = function () {
         var _this = this;
         this.element.find(".searchbox").on("input", _.debounce(function () {
             if (!_this.loadingSearch) {
@@ -294,7 +294,7 @@ var AdvancedSlicer = (function () {
                 _this.syncItemVisiblity();
                 _this.element.toggleClass("has-search", !!_this.searchString);
             }
-        }, AdvancedSlicer.SEARCH_DEBOUNCE));
+        }, AttributeSlicer.SEARCH_DEBOUNCE));
         this.listEle.on("click", function (evt) {
             // var checkbox = $(evt.target);
             var ele = $(evt.target).parents(".item");
@@ -312,7 +312,7 @@ var AdvancedSlicer = (function () {
      * Loads more data based on search
      * @param force Force the loading of new data, if it can
      */
-    AdvancedSlicer.prototype.checkLoadMoreDataBasedOnSearch = function () {
+    AttributeSlicer.prototype.checkLoadMoreDataBasedOnSearch = function () {
         // Only need to load if:
         // 1. There is more data. 2. There is not too much stuff on the screen (not causing a scroll)
         if (this.raiseCanLoadMoreData(true)) {
@@ -327,7 +327,7 @@ var AdvancedSlicer = (function () {
     /**
      * Listener for the list scrolling
      */
-    AdvancedSlicer.prototype.checkLoadMoreData = function () {
+    AttributeSlicer.prototype.checkLoadMoreData = function () {
         var scrollElement = this.listEle[0];
         var scrollHeight = scrollElement.scrollHeight;
         var top = scrollElement.scrollTop;
@@ -339,7 +339,7 @@ var AdvancedSlicer = (function () {
     /**
      * Raises the event to load more data
      */
-    AdvancedSlicer.prototype.raiseLoadMoreData = function (isNewSearch) {
+    AttributeSlicer.prototype.raiseLoadMoreData = function (isNewSearch) {
         var _this = this;
         var item = {};
         this.events.raiseEvent("loadMoreData", item, isNewSearch, this.searchString);
@@ -371,7 +371,7 @@ var AdvancedSlicer = (function () {
      * Raises the event 'can
      * '
      */
-    AdvancedSlicer.prototype.raiseCanLoadMoreData = function (isSearch) {
+    AttributeSlicer.prototype.raiseCanLoadMoreData = function (isSearch) {
         if (isSearch === void 0) { isSearch = false; }
         var item = {
             result: false
@@ -382,23 +382,23 @@ var AdvancedSlicer = (function () {
     /**
      * Raises the selectionChanged event
      */
-    AdvancedSlicer.prototype.raiseSelectionChanged = function (newItems, oldItems) {
+    AttributeSlicer.prototype.raiseSelectionChanged = function (newItems, oldItems) {
         this.events.raiseEvent('selectionChanged', newItems, oldItems);
     };
     /**
      * The number of milliseconds before running the search, after a user stops typing.
      */
-    AdvancedSlicer.SEARCH_DEBOUNCE = 500;
+    AttributeSlicer.SEARCH_DEBOUNCE = 500;
     /**
      * The template for this visual
      */
-    AdvancedSlicer.template = "\n        <div class=\"advanced-slicer\">\n            <div class=\"slicer-options\">\n                <input class=\"searchbox\" placeholder=\"Search\" />\n                <div style=\"margin:0;padding:0;margin-top:5px;\">\n                <div class=\"selection-container\">\n                    <div class=\"selections\">\n                        <span class=\"clear-all\">Clear All</span>\n                    </div>\n                </div>\n                <!-- Disabled -->\n                <label style=\"display:none;vertical-align:middle\"><input class=\"check-all\" type=\"checkbox\" style=\"margin-right:5px;vertical-align:middle\"/>&nbsp;Select All</label>\n                </div>\n                <hr/>\n            </div>\n            <div class=\"list\" style=\"overflow:hidden;overflow-y:auto\"></div>\n            <div class='load-spinner' style='transform:scale(0.6);'><div>\n        </div>\n    ".trim().replace(/\n/g, '');
+    AttributeSlicer.template = "\n        <div class=\"advanced-slicer\">\n            <div class=\"slicer-options\">\n                <input class=\"searchbox\" placeholder=\"Search\" />\n                <div style=\"margin:0;padding:0;margin-top:5px;\">\n                <div class=\"selection-container\">\n                    <div class=\"selections\">\n                        <span class=\"clear-all\">Clear All</span>\n                    </div>\n                </div>\n                <!-- Disabled -->\n                <label style=\"display:none;vertical-align:middle\"><input class=\"check-all\" type=\"checkbox\" style=\"margin-right:5px;vertical-align:middle\"/>&nbsp;Select All</label>\n                </div>\n                <hr/>\n            </div>\n            <div class=\"list\" style=\"overflow:hidden;overflow-y:auto\"></div>\n            <div class='load-spinner' style='transform:scale(0.6);'><div>\n        </div>\n    ".trim().replace(/\n/g, '');
     /**
      * The template used to render list items
      */
-    AdvancedSlicer.listItemFactory = function (matchPrefix, match, matchSuffix) {
+    AttributeSlicer.listItemFactory = function (matchPrefix, match, matchSuffix) {
         return $(("\n            <div style=\"white-space:nowrap\" class=\"item\">\n                <label style=\"cursor:pointer\">\n                    <!--<input style=\"vertical-align:middle;cursor:pointer\" type=\"checkbox\">-->\n                    <span style=\"margin-left: 5px;vertical-align:middle\" class=\"display-container\">\n                        <span style=\"display:inline-block;overflow:hidden\" class=\"category-container\">\n                            <span class=\"matchPrefix\">" + (matchPrefix || "") + "</span>\n                            <span class=\"match\">" + (match || "") + "</span>\n                            <span class=\"matchSuffix\">" + (matchSuffix || "") + "</span>\n                        </span>\n                        <span style=\"display:inline-block\" class=\"value-container\">\n                            <span style=\"display:inline-block;width:0px\" class=\"value-display\">&nbsp;<span class=\"value\"></span></span>\n                        </span>\n                    </span>\n                </label>\n            </div>\n        ").trim().replace(/\n/g, ''));
     };
-    return AdvancedSlicer;
+    return AttributeSlicer;
 }());
-exports.AdvancedSlicer = AdvancedSlicer;
+exports.AttributeSlicer = AttributeSlicer;
