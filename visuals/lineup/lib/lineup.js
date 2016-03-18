@@ -11,7 +11,7 @@
      * @constructor
      */
     var LineUp;
-    (function(LineUp, d3, $, undefined) {
+    (function (LineUp, d3, $, undefined) {
 
       function LineUpClass(spec, $container, config) {
         var $defs, scroller;
@@ -23,7 +23,7 @@
         // Uncharted (Dario): Hide default tooltip to avoid undesired artifacts.
         this.tooltip.hide();
         //trigger hover event
-        this.listeners = d3.dispatch('hover', 'change-sortcriteria', 'change-filter', 'columns-changed', 'selected', 'multiselected', 'generate-histogram');
+        this.listeners = d3.dispatch('hover','change-sortcriteria','change-filter', 'columns-changed', 'selected','multiselected', 'generate-histogram');
 
         this.config = $.extend(true, {}, LineUp.defaultConfig, config, {
           //TODO internal stuff, should to be extracted
@@ -31,14 +31,14 @@
             primary: {
               sortedColumn: null,
               sortingOrderAsc: true,
-              prevRowScale: null
+              prevRowScale : null
             }
-          }
-        });
+          }});
         this.storage.config = this.config;
         if (!this.config.svgLayout.addPlusSigns) {
-          this.config.svgLayout.plusSigns = {}; // empty plusSign if no plus signs needed
+          this.config.svgLayout.plusSigns={}; // empty plusSign if no plus signs needed
         }
+
 
 
         //create basic structure
@@ -50,7 +50,7 @@
           $defs.append('defs').attr('class', 'columnheader');
           $defs.append('defs').attr('class', 'column');
           $defs.append('defs').attr('class', 'overlay');
-          this.$body = this.$table.append('g').attr('class', 'body').attr('transform', 'translate(0,' + this.config.htmlLayout.headerHeight + ')');
+          this.$body = this.$table.append('g').attr('class','body').attr('transform', 'translate(0,' + this.config.htmlLayout.headerHeight + ')');
           this.$header = this.$table.append('g').attr('class', 'header');
           this.$bodySVG = this.$headerSVG = this.$table;
 
@@ -60,10 +60,10 @@
           $container.classed('lu-mode-separate', true);
           this.$table = $container;
           this.$headerSVG = this.$table.append('svg').attr('class', 'lu lu-header');
-          this.$headerSVG.attr('height', this.config.htmlLayout.headerHeight);
+          this.$headerSVG.attr('height',this.config.htmlLayout.headerHeight);
           this.$headerSVG.append('defs').attr('class', 'columnheader');
           this.$header = this.$headerSVG.append('g');
-          this.$bodySVG = this.$table.append('div').attr('class', 'lu-wrapper').append('svg').attr('class', 'lu lu-body');
+          this.$bodySVG = this.$table.append('div').attr('class','lu-wrapper').append('svg').attr('class','lu lu-body');
           $defs = this.$bodySVG.append('defs');
           $defs.append('defs').attr('class', 'column');
           $defs.append('defs').attr('class', 'overlay');
@@ -91,9 +91,9 @@
 
 
       LineUp.prototype = LineUpClass.prototype = $.extend(LineUpClass.prototype, LineUp.prototype);
-      LineUp.create = function(storage, $container, options) {
+      LineUp.create = function (storage, $container, options) {
         if (!('storage' in storage)) { // TODO: was '!$.isPlainObject(storage)'
-          storage = {storage: storage};
+          storage = { storage: storage };
 
         }
         var r = new LineUpClass(storage, $container, options);
@@ -101,13 +101,13 @@
         return r;
       };
 
-      LineUp.prototype.scrolled = function(top, left) {
+      LineUp.prototype.scrolled = function (top, left) {
         if (this.config.svgLayout.mode === 'combined') {
           //in single svg mode propagate vertical shift
           this.$header.attr('transform', 'translate(0,' + top + ')');
         } else {
           //in two svg mode propagate horizontal shift
-          this.$header.attr('transform', 'translate(' + -left + ',0)');
+          this.$header.attr('transform', 'translate('+-left+',0)');
         }
       };
 
@@ -140,14 +140,14 @@
            */
           mode: 'combined', //modes: combined vs separate
           rowHeight: 20,
-          rowPadding: 0.2, //padding for scale.rangeBands
+          rowPadding : 0.2, //padding for scale.rangeBands
           rowBarPadding: 2,
           /**
            * number of backup rows to keep to avoid updating on every small scroll thing
            */
           backupScrollRows: 4,
           animationDuration: 1000,
-          addPlusSigns: false,
+          addPlusSigns:false,
           plusSigns: {
             addStackedColumn: {
               title: 'Add stacked column',
@@ -170,12 +170,8 @@
         interaction: {
           //enable the table tooltips
           tooltips: true,
-          multiselect: function() {
-            return false;
-          },
-          rangeselect: function() {
-            return false;
-          }
+          multiselect: function() { return false; },
+          rangeselect: function() { return false; }
         },
         filter: {
           skip: 0,
@@ -192,7 +188,7 @@
         return this;
       };
 
-      LineUp.prototype.changeDataStorage = function(spec) {
+      LineUp.prototype.changeDataStorage = function (spec) {
 //    d3.select('#lugui-table-header-svg').selectAll().remove();
         this.storage = spec.storage;
         this.storage.config = this.config;
@@ -209,7 +205,7 @@
        * @param option
        * @param value
        */
-      LineUp.prototype.changeInteractionOption = function(option, value) {
+      LineUp.prototype.changeInteractionOption = function (option, value) {
         var v = this.config.interaction[option];
         if (v === value) {
           return;
@@ -222,7 +218,7 @@
        * @param option
        * @param value
        */
-      LineUp.prototype.changeRenderingOption = function(option, value) {
+      LineUp.prototype.changeRenderingOption = function (option, value) {
         var v = this.config.renderingOptions[option];
         if (v === value) {
           return;
@@ -230,7 +226,7 @@
         this.config.renderingOptions[option] = value;
         if (option === 'histograms') {
           if (value) {
-            this.storage.resortData({filteredChanged: true});
+            this.storage.resortData({ filteredChanged: true});
           }
         }
         this.updateAll(true);
@@ -239,7 +235,7 @@
       /**
        * the function to start the LineUp visualization
        */
-      LineUp.prototype.startVis = function() {
+      LineUp.prototype.startVis = function () {
         this.assignColors(this.storage.getRawColumns());
         this.headerUpdateRequired = true;
         //initial sort
@@ -247,7 +243,7 @@
         this.updateAll();
       };
 
-      LineUp.prototype.assignColors = function(columns) {
+      LineUp.prototype.assignColors = function (columns) {
         //Color schemes are in config (.columnColors / .grayColor)
 
         // clear map
@@ -256,7 +252,7 @@
 
         var colCounter = 0;
 
-        columns.forEach(function(d) {
+        columns.forEach(function (d) {
           if (d.color) {
             config.colorMapping.set(d.id, d.color);
           } else if ((d instanceof LineUp.LineUpStringColumn) || (d.id === 'rank')) {
@@ -270,15 +266,13 @@
         //console.log(config.colorMapping);
       };
 
-      LineUp.prototype.updateAll = function(stackTransition, bundle) {
+      LineUp.prototype.updateAll = function (stackTransition, bundle) {
         var that = this;
-
         function updateBundle(b) {
           var cols = that.storage.getColumnLayout(b);
           that.updateHeader(cols);
           that.updateBody(cols, that.storage.getData(b), stackTransition || false);
         }
-
         if (bundle) {
           updateBundle(bundle);
         } else {
@@ -292,7 +286,7 @@
        * @param asc
        * @returns {boolean}
        */
-      LineUp.prototype.sortBy = function(column, asc) {
+      LineUp.prototype.sortBy = function (column, asc) {
         column = column || this.storage.primaryKey;
         asc = asc || false;
 
@@ -317,7 +311,7 @@
       /**
        * toggles the stacked rendering of this table
        */
-      LineUp.prototype.toggleStackedRendering = function() {
+      LineUp.prototype.toggleStackedRendering = function () {
         this.config.renderingOptions.stacked = !this.config.renderingOptions.stacked;
         this.updateAll(true);
       };
@@ -325,7 +319,7 @@
       /**
        * toggles whether values are rendered all the time
        */
-      LineUp.prototype.toggleValueRendering = function() {
+      LineUp.prototype.toggleValueRendering = function () {
         this.config.renderingOptions.values = !this.config.renderingOptions.values;
         this.updateAll(true);
       };
@@ -335,7 +329,7 @@
        * @param skip start number
        * @param limit number or rows
        */
-      LineUp.prototype.setLimits = function(skip, limit) {
+      LineUp.prototype.setLimits = function (skip, limit) {
         this.config.filter.skip = skip;
         this.config.filter.limit = limit;
         //trigger resort to apply skip
@@ -349,7 +343,7 @@
        * @param weights
        * @returns {boolean}
        */
-      LineUp.prototype.changeWeights = function(column, weights) {
+      LineUp.prototype.changeWeights = function (column, weights) {
         if (typeof column === 'string') {
           column = this.storage.getColumnByName(column);
         }
@@ -365,7 +359,7 @@
 
           // ATS: Updates for external
           if (!this.config.sorting || !this.config.sorting.external) {
-            this.storage.resortData({key: bundle});
+            this.storage.resortData({ key: bundle });
           }
         }
         this.updateAll(false, bundle);
@@ -377,7 +371,7 @@
        * @param column
        * @param filter
        */
-      LineUp.prototype.changeFilter = function(column, filter) {
+      LineUp.prototype.changeFilter = function (column, filter) {
         if (typeof column === 'string') {
           column = this.storage.getColumnByName(column);
         }
@@ -392,7 +386,7 @@
       /**
        * destroys the DOM elements created by this lineup instance, this should be the last call to this lineup instance
        */
-      LineUp.prototype.destroy = function() {
+      LineUp.prototype.destroy = function () {
         //remove tooltip
         this.tooltip.destroy();
         this.$container.selectAll('*').remove();
@@ -404,11 +398,10 @@
 
     /*global d3, jQuery, _ */
     var LineUp;
-    (function(LineUp, d3, $, _, undefined) {
+    (function (LineUp, d3, $, _, undefined) {
       function fixCSS(id) {
-        return id.replace(/[\s!\'#$%&'\(\)\*\+,\.\/:;<=>\?\@\[\\\]\^`\{\|\}~]/g, '_'); //replace non css stuff to _
+        return  id.replace(/[\s!\'#$%&'\(\)\*\+,\.\/:;<=>\?\@\[\\\]\^`\{\|\}~]/g, '_'); //replace non css stuff to _
       }
-
       /**
        * The mother of all Columns
        * @param desc The descriptor object
@@ -426,14 +419,14 @@
       LineUp.LineUpColumn = LineUpColumn;
 
       LineUpColumn.prototype = $.extend({}, {}, {
-        getValue: function(row) {
+        getValue: function (row) {
           var r = row[this.column];
           if (typeof r === "undefined") {
             return this.missingValue;
           }
           return r;
         },
-        getRawValue: function(row) {
+        getRawValue: function (row) {
           var r = this.getValue(row);
           if (typeof r === 'undefined') {
             return '';
@@ -446,7 +439,6 @@
       function isWildCard(v) {
         return typeof v !== 'number' || isNaN(v);
       }
-
       /**
        * A {@link LineUpColumn} implementation for Numbers
        * @param desc The descriptor object
@@ -465,9 +457,7 @@
         //infer the min max
         var that = this;
         if (isWildCard(this.domain[0]) || isWildCard(this.domain[1])) {
-          var minmax = d3.extent(data, function(row) {
-            return that.getValue(row);
-          });
+          var minmax = d3.extent(data, function(row) { return that.getValue(row); });
           if (isWildCard(this.domain[0])) {
             this.domain[0] = minmax[0];
           }
@@ -480,14 +470,14 @@
       LineUp.LineUpNumberColumn = LineUpNumberColumn;
 
       LineUpNumberColumn.prototype = $.extend({}, LineUpColumn.prototype, {
-        getValue: function(row) {
+        getValue: function (row) {
           var r = LineUpColumn.prototype.getValue.call(this, row);
           if (r === null || typeof r === 'undefined' || r === '' || r.toString().trim().length === 0) {
             r = this.missingValue;
           }
           return +r;
         },
-        getRawValue: function(row) {
+        getRawValue: function (row) {
           var r = LineUpColumn.prototype.getValue.call(this, row);
           if (isNaN(r)) {
             return '';
@@ -508,7 +498,9 @@
 
       LineUp.LineUpStringColumn = LineUpStringColumn;
 
-      LineUpStringColumn.prototype = $.extend({}, LineUpColumn.prototype, {});
+      LineUpStringColumn.prototype = $.extend({}, LineUpColumn.prototype, {
+
+      });
 
       /**
        *A {@link LineUpColumn} implementation for Strings
@@ -522,7 +514,7 @@
         this.categoryColors = d3.scale.category10().range();
         var that = this;
         if (desc.categories) {
-          desc.categories.forEach(function(cat, i) {
+          desc.categories.forEach(function(cat,i) {
             if (typeof cat === 'string') {
               that.categories.push(cat);
             } else {
@@ -532,16 +524,16 @@
           });
         }
         if (this.categories.length === 0) {
-          this.categories = d3.set(data.map(function(row) {
-            return that.getValue(row);
-          })).values();
+          this.categories = d3.set(data.map(function(row) { return that.getValue(row); })).values();
           this.categories.sort();
         }
       }
 
       LineUp.LineUpCategoricalColumn = LineUpCategoricalColumn;
 
-      LineUpCategoricalColumn.prototype = $.extend({}, LineUpColumn.prototype, {});
+      LineUpCategoricalColumn.prototype = $.extend({}, LineUpColumn.prototype, {
+
+      });
 
       /**
        *  --- FROM HERE ON ONLY Layout Columns ---
@@ -556,7 +548,7 @@
         this.parent = desc.parent || null; // or null
         this.columnBundle = "primary";
         //define it here to have a dedicated this pointer
-        this.sortBy = function(a, b) {
+        this.sortBy = function (a, b) {
           a = that.getValue(a);
           b = that.getValue(b);
           return that.safeSortBy(a, b);
@@ -566,19 +558,19 @@
       LineUp.LayoutColumn = LayoutColumn;
 
       LayoutColumn.prototype = $.extend({}, {}, {
-        setColumnWidth: function(newWidth, ignoreParent) {
+        setColumnWidth: function (newWidth, ignoreParent) {
           this.columnWidth = newWidth;
           if (!ignoreParent && this.parent) {
             this.parent.updateWidthFromChild({id: this.id, newWidth: newWidth});
           }
         },
-        getColumnWidth: function() {
+        getColumnWidth: function () {
           return this.columnWidth;
         },
         prepare: function(/*data*/) {
 
         },
-        safeSortBy: function(a, b) {
+        safeSortBy: function (a, b) {
           var an = typeof a === 'number' && isNaN(a);
           var bn = typeof b === 'number' && isNaN(b);
           if (an && bn) {
@@ -593,23 +585,23 @@
           return d3.descending(a, b);
         },
 
-        flattenMe: function(array) {
+        flattenMe: function (array) {
           array.push(this);
         },
-        description: function() {
+        description: function () {
           var res = {};
           res.width = this.columnWidth;
           res.filter = this.filter;
 
           return res;
         },
-        makeCopy: function() {
+        makeCopy: function () {
           return new LayoutColumn(this.description());
         },
-        isFiltered: function() {
+        isFiltered: function () {
           return typeof this.filter !== 'undefined';
         },
-        filterBy: function(/*row*/) {
+        filterBy: function (/*row*/) {
           return true;
         }
       });
@@ -624,26 +616,26 @@
       LineUp.LayoutSingleColumn = LayoutSingleColumn;
 
       LayoutSingleColumn.prototype = $.extend({}, LayoutColumn.prototype, {
-        getValue: function(row, mode) {
+        getValue: function (row, mode) {
           if (mode === 'raw') {
             return this.column.getRawValue(row);
           }
           return this.column.getValue(row);
         },
 
-        getLabel: function() {
+        getLabel: function () {
           return this.column.label;
         },
-        getDataID: function() {
+        getDataID: function () {
           return this.column.id;
         },
 
-        description: function() {
+        description: function () {
           var res = LayoutColumn.prototype.description.call(this);
           res.column = this.columnLink;
           return res;
         },
-        makeCopy: function() {
+        makeCopy: function () {
           var description = this.description();
           var lookup = d3.map();
           lookup.set(this.columnLink, this.column);
@@ -669,16 +661,13 @@
         var that = this;
         this.histgenerator = d3.layout.histogram();
         this.histgenerator.range(this.scale.range());
-        this.histgenerator.value(function(row) {
-          return that.getValue(row);
-        });
+        this.histgenerator.value(function (row) { return that.getValue(row) ;});
         this._hist = [];
       }
-
       LineUp.LayoutNumberColumn = LayoutNumberColumn;
 
       LayoutNumberColumn.prototype = $.extend({}, LayoutSingleColumn.prototype, {
-        mapping: function(newscale) {
+        mapping : function(newscale) {
           if (arguments.length < 1) {
             return this.scale;
           }
@@ -686,7 +675,7 @@
           this.histgenerator.range(newscale.range());
         },
         originalMapping: function() {
-          return d3.scale.linear().clamp(true).domain(this.column.domain).range(this.column.range);
+          return  d3.scale.linear().clamp(true).domain(this.column.domain).range(this.column.range);
         },
         getHist: function(callback) {
           var that = this;
@@ -709,17 +698,15 @@
           }
 
           //remove all the direct values to save space
-          this._hist = this.histgenerator(data).map(function(bin) {
+          this._hist = this.histgenerator(data).map(function (bin) {
             return {
-              x: bin.x,
-              dx: bin.dx,
+              x : bin.x,
+              dx : bin.dx,
               y: bin.y
             };
           });
-          var max = d3.max(this._hist, function(d) {
-            return d.y;
-          });
-          this._hist.forEach(function(d) {
+          var max = d3.max(this._hist, function(d) { return d.y; });
+          this._hist.forEach(function (d) {
             if (max > 0) {
               d.y /= max;
             } else {
@@ -727,14 +714,14 @@
             }
           });
         },
-        binOf: function(row, callback) {
+        binOf : function (row, callback) {
           var that = this;
-          this.getHist(function(hist) {
+          this.getHist(function (hist) {
             var v = that.getValue(row), i;
             if (hist) {
-              for (i = hist.length - 1; i >= 0; --i) {
+              for(i = hist.length -1 ; i>= 0; --i) {
                 var bin = hist[i];
-                if (bin.x <= v && v <= (bin.x + bin.dx)) {
+                if (bin.x <= v && v <= (bin.x+bin.dx)) {
                   callback.call(that, i);
                   return;
                 }
@@ -743,24 +730,24 @@
             callback.call(that, -1);
           });
         },
-        setColumnWidth: function(newWidth, ignoreParent) {
+        setColumnWidth: function (newWidth, ignoreParent) {
           this.value2pixel.range([0, newWidth]);
           LayoutSingleColumn.prototype.setColumnWidth.call(this, newWidth, ignoreParent);
         },
-        getValue: function(row, mode) {
+        getValue: function (row, mode) {
           if (mode === 'raw') {
             return this.column.getRawValue(row);
           }
           return this.scale(this.column.getValue(row));
         },
-        getWidth: function(row) {
+        getWidth: function (row) {
           var r = this.getValue(row);
           if (isNaN(r) || typeof r === 'undefined') {
             return 0;
           }
           return this.value2pixel(r);
         },
-        filterBy: function(row) {
+        filterBy : function (row) {
           var filter = this.filter;
           if (typeof filter === 'undefined' || !this.column) {
             return true;
@@ -776,7 +763,7 @@
           return true;
         },
 
-        description: function() {
+        description: function () {
           var res = LayoutColumn.prototype.description.call(this);
           res.column = this.columnLink;
           res.type = 'number';
@@ -792,7 +779,7 @@
           }
           return res;
         },
-        makeCopy: function() {
+        makeCopy: function () {
           var lookup = d3.map();
           lookup.set(this.columnLink, this.column);
           var res = new LayoutNumberColumn(this.description(), lookup);
@@ -802,11 +789,10 @@
       function LayoutStringColumn(desc, rawColumns) {
         LayoutSingleColumn.call(this, desc, rawColumns);
       }
-
       LineUp.LayoutStringColumn = LayoutStringColumn;
 
       LayoutStringColumn.prototype = $.extend({}, LayoutSingleColumn.prototype, {
-        filterBy: function(row) {
+        filterBy : function (row) {
           var filter = this.filter;
           if (typeof filter === 'undefined' || !this.column) {
             return true;
@@ -821,7 +807,7 @@
           }
           return true;
         },
-        makeCopy: function() {
+        makeCopy: function () {
           var lookup = d3.map();
           lookup.set(this.columnLink, this.column);
           var res = new LayoutStringColumn(this.description(), lookup);
@@ -831,11 +817,10 @@
       function LayoutCategoricalColumn(desc, rawColumns) {
         LayoutSingleColumn.call(this, desc, rawColumns);
       }
-
       LineUp.LayoutCategoricalColumn = LayoutCategoricalColumn;
 
       LayoutCategoricalColumn.prototype = $.extend({}, LayoutSingleColumn.prototype, {
-        filterBy: function(row) {
+        filterBy : function (row) {
           var filter = this.filter;
           if (typeof filter === 'undefined' || !this.column) {
             return true;
@@ -850,7 +835,7 @@
           }
           return true;
         },
-        makeCopy: function() {
+        makeCopy: function () {
           var lookup = d3.map();
           lookup.set(this.columnLink, this.column);
           var res = new LayoutCategoricalColumn(this.description(), lookup);
@@ -860,7 +845,6 @@
       function LayoutCategoricalColorColumn(desc, rawColumns) {
         LayoutSingleColumn.call(this, desc, rawColumns);
       }
-
       LineUp.LayoutCategoricalColorColumn = LayoutCategoricalColorColumn;
 
       LayoutCategoricalColorColumn.prototype = $.extend({}, LayoutSingleColumn.prototype, {
@@ -875,10 +859,10 @@
           }
           return this.column.categoryColors[index];
         },
-        filterBy: function(row) {
+        filterBy : function (row) {
           return LayoutCategoricalColumn.prototype.filterBy.call(this, row);
         },
-        makeCopy: function() {
+        makeCopy: function () {
           var lookup = d3.map();
           lookup.set(this.columnLink, this.column);
           var res = new LayoutCategoricalColorColumn(this.description(), lookup);
@@ -899,13 +883,13 @@
 
 
       LayoutRankColumn.prototype = $.extend({}, LayoutColumn.prototype, {
-        setValue: function(row, d) {
+        setValue: function (row, d) {
           this.values.set(row[this.storage.primaryKey], d);
         },
-        getValue: function(row) {
+        getValue: function (row) {
           return this.values.get(row[this.storage.primaryKey]);
         },
-        filter: function(row) {
+        filter: function (row) {
           var r = this.getValue(row);
           if (typeof r === 'undefined') {
             return true;
@@ -916,18 +900,18 @@
           }
           return true;
         },
-        getLabel: function() {
+        getLabel: function () {
           return 'Rank';
         },
-        getDataID: function() {
+        getDataID: function () {
           return this.id;
         },
-        description: function() {
+        description: function () {
           var res = LayoutColumn.prototype.description.call(this);
           res.type = 'rank';
           return res;
         },
-        makeCopy: function() {
+        makeCopy: function () {
           var description = this.description();
           var res = new LayoutRankColumn(description, null, null, this.column.storage);
           return res;
@@ -946,10 +930,10 @@
       LineUp.LayoutCompositeColumn = LayoutCompositeColumn;
 
       LayoutCompositeColumn.prototype = $.extend({}, LayoutColumn.prototype, {
-        getDataID: function() {
+        getDataID: function () {
           return this.id;
         },
-        getLabel: function() {
+        getLabel: function () {
           return this.label;
         }
       });
@@ -962,13 +946,13 @@
         this.toLayoutColumn = toLayoutColumn;
         this.children = [];
         this.emptyColumns = [];
-        this.scale = d3.scale.linear().domain([0, 1]).range([0, this.columnWidth]);
+        this.scale = d3.scale.linear().domain([0,1]).range([0, this.columnWidth]);
         this.init(desc);
         var that = this;
-        this.sortBy = function(a, b) {
+        this.sortBy = function (a, b) {
           var aAll = 0;
           var bAll = 0;
-          that.children.forEach(function(d) {
+          that.children.forEach(function (d) {
             aAll += d.getWidth(a);
             bAll += d.getWidth(b);
           });
@@ -980,11 +964,11 @@
 
       LayoutStackedColumn.prototype = $.extend({}, LayoutCompositeColumn.prototype, {
 
-        getValue: function(row) {
+        getValue: function (row) {
           // TODO: a caching strategy might work here
           var that = this;
           var all = 0;
-          this.children.forEach(function(d, i) {
+          this.children.forEach(function (d, i) {
             var r = d.getValue(row);
             if (isNaN(r) || typeof r === 'undefined') {
               r = 0;
@@ -993,14 +977,14 @@
           });
           return all;
         },
-        init: function(desc) {
+        init: function (desc) {
           var that = this;
           if (this.childrenLinks.length < 1) {
             this.emptyColumns.push(new LayoutEmptyColumn({parent: that}));
           } else {
             // check if weights or width are given
             if (this.childrenLinks[0].hasOwnProperty("weight")) {
-              this.childrenWeights = this.childrenLinks.map(function(d) {
+              this.childrenWeights = this.childrenLinks.map(function (d) {
                 return +(d.weight || 1);
               });
 
@@ -1008,7 +992,7 @@
 
               if (desc.hasOwnProperty('width')) {
                 // if the stacked column has a width -- normalize to width
-                this.childrenWidths = this.childrenWeights.map(function(d) {
+                this.childrenWidths = this.childrenWeights.map(function (d) {
                   return that.scale(d);
                 });
               } else {
@@ -1018,39 +1002,39 @@
               }
             } else {
               // accumulate weights and map 100px to  weight 1.0
-              this.childrenWidths = this.childrenLinks.map(function(d) {
+              this.childrenWidths = this.childrenLinks.map(function (d) {
                 return +(d.width || 100);
               });
-              this.childrenWeights = this.childrenWidths.map(function(d) {
+              this.childrenWeights = this.childrenWidths.map(function (d) {
                 return d / 100.0;
               });
               this.columnWidth = d3.sum(this.childrenWidths);
               this.scale.domain([0, d3.sum(this.childrenWeights)]).range([0, this.columnWidth]);
             }
-            this.children = this.childrenLinks.map(function(d, i) {
+            this.children = this.childrenLinks.map(function (d, i) {
               d.width = that.childrenWidths[i];
               d.parent = that;
               return that.toLayoutColumn(d);
             });
           }
         },
-        flattenMe: function(array, spec) {
+        flattenMe: function (array, spec) {
           var addEmptyColumns = false;
           if (spec) {
             addEmptyColumns = spec.addEmptyColumns || false;
           }
           array.push(this);
-          this.children.forEach(function(d) {
+          this.children.forEach(function (d) {
             d.flattenMe(array);
           });
 
           if (addEmptyColumns) {
-            this.emptyColumns.forEach(function(d) {
+            this.emptyColumns.forEach(function (d) {
               return d.flattenMe(array);
             });
           }
         },
-        filterBy: function(row) {
+        filterBy: function (row) {
           if (typeof this.filter === 'undefined') {
             return true;
           }
@@ -1062,14 +1046,14 @@
           }
           return true;
         },
-        updateWidthFromChild: function() {
+        updateWidthFromChild: function () {
           var that = this;
 
           // adopt weight and global size
-          this.childrenWidths = this.children.map(function(d) {
+          this.childrenWidths = this.children.map(function (d) {
             return d.getColumnWidth();
           });
-          this.childrenWeights = this.childrenWidths.map(function(d) {
+          this.childrenWeights = this.childrenWidths.map(function (d) {
             return that.scale.invert(d);
           });
 
@@ -1077,35 +1061,35 @@
           this.scale.range([0, this.columnWidth]);
           this.scale.domain([0, d3.sum(this.childrenWeights)]);
         },
-        setColumnWidth: function(newWidth) {
+        setColumnWidth: function (newWidth) {
           var that = this;
           this.columnWidth = newWidth;
           that.scale.range([0, this.columnWidth]);
-          this.childrenWidths = this.childrenWeights.map(function(d) {
+          this.childrenWidths = this.childrenWeights.map(function (d) {
             return that.scale(d);
           });
 //        console.log(this.childrenWidths, this.childrenWeights);
-          this.children.forEach(function(d, i) {
+          this.children.forEach(function (d, i) {
             return d.setColumnWidth(that.childrenWidths[i], true);
           });
         },
-        updateWeights: function(weights) {
+        updateWeights: function (weights) {
           this.childrenWeights = weights;
           this.scale.domain([0, d3.sum(this.childrenWeights)]);
 
           var that = this;
-          this.childrenWidths = this.childrenWeights.map(function(d) {
+          this.childrenWidths = this.childrenWeights.map(function (d) {
             return that.scale(d);
           });
           this.columnWidth = d3.sum(this.childrenWidths);
-          this.children.forEach(function(d, i) {
+          this.children.forEach(function (d, i) {
             return d.setColumnWidth(that.childrenWidths[i], true);
           });
 
           //console.log(this.childrenWeights);
           //console.log(this.childrenWidths);
         },
-        removeChild: function(child) {
+        removeChild: function (child) {
           var indexOfChild = this.children.indexOf(child);
           var that = this;
           this.childrenWeights.splice(indexOfChild, 1);
@@ -1124,7 +1108,7 @@
           }
 
         },
-        addChild: function(child, targetChild, position) {
+        addChild: function (child, targetChild, position) {
           if (!(child instanceof LineUp.LayoutNumberColumn)) {
             return false;
           }
@@ -1154,11 +1138,11 @@
           return true;
 
         },
-        description: function() {
+        description: function () {
           var res = LayoutColumn.prototype.description.call(this);
           res.type = 'stacked';
           var that = this;
-          res.children = this.children.map(function(d, i) {
+          res.children = this.children.map(function (d, i) {
             var r = d.description();
             r.weight = that.childrenWeights[i];
             return r;
@@ -1166,21 +1150,21 @@
           res.label = this.label;
           return res;
         },
-        makeCopy: function() {
+        makeCopy: function () {
           var that = this;
           var description = that.description();
           description.childrenLinks = [];
           var res = new LayoutStackedColumn(description, {}, that.toLayoutColumn);
 
-          res.children = that.children.map(function(d) {
+          res.children = that.children.map(function (d) {
             return d.makeCopy();
           });
-          res.children.forEach(function(d) {
+          res.children.forEach(function (d) {
             d.parent = res;
           });
           res.childrenWeights = this.childrenWeights.slice(0);
           res.scale.domain([0, d3.sum(this.childrenWeights)]);
-          res.childrenWidths = this.childrenWeights.map(function(d) {
+          res.childrenWidths = this.childrenWeights.map(function (d) {
             return that.scale(d);
           });
 
@@ -1199,13 +1183,13 @@
       LineUp.LayoutEmptyColumn = LayoutEmptyColumn;
 
       LayoutEmptyColumn.prototype = $.extend({}, LayoutColumn.prototype, {
-        getLabel: function() {
+        getLabel: function () {
           return this.label;
         },
-        getDataID: function() {
+        getDataID: function () {
           return this.id;
         },
-        getValue: function() {
+        getValue : function() {
           return '';
         }
       });
@@ -1222,25 +1206,25 @@
       LineUp.LayoutActionColumn = LayoutActionColumn;
 
       LayoutActionColumn.prototype = $.extend({}, LayoutColumn.prototype, {
-        getLabel: function() {
+        getLabel: function () {
           return this.label;
         },
-        getDataID: function() {
+        getDataID: function () {
           return this.id;
         },
-        description: function() {
+        description: function () {
           var res = LayoutColumn.prototype.description.call(this);
           res.type = 'actions';
           return res;
         },
-        getValue: function() {
+        getValue : function() {
           return '';
         }
       });
     }(LineUp || (LineUp = {}), d3, jQuery, _));
     /* global d3, jQuery, window, document */
     var LineUp;
-    (function(LineUp, d3, $, undefined) {
+    (function (LineUp, d3, $, undefined) {
       LineUp.prototype = LineUp.prototype || {};
       /**
        * creates a simple popup window with a table
@@ -1284,7 +1268,7 @@
           height: (options.height - 40) + "px"
         }).append("table");
 
-        popup.select(".cancel").on("click", function() {
+        popup.select(".cancel").on("click", function () {
           popupBG.remove();
           popup.remove();
         });
@@ -1292,59 +1276,59 @@
         return {
           popup: popup,
           table: theTable,
-          remove: function() {
+          remove: function () {
             popup.remove();
             popupBG.remove();
           },
-          onOK: function(handler) {
+          onOK: function (handler) {
             return popup.select(".ok").on("click", handler);
           }
         };
       }
 
-      LineUp.prototype.addNewStackedColumnDialog = function() {
+      LineUp.prototype.addNewStackedColumnDialog = function () {
         var that = this;
 
         var popup = createPopup(this.$container, 'Add stacked column:', 'Stacked');
         // list all data rows !
-        var trData = that.storage.getRawColumns().filter(function(d) {
+        var trData = that.storage.getRawColumns().filter(function (d) {
           return (d instanceof LineUp.LineUpNumberColumn);
-        }).map(function(d) {
+        }).map(function (d) {
           return {d: d, isChecked: false, weight: 1.0};
         });
 
         var trs = popup.table.selectAll("tr").data(trData);
         trs.enter().append("tr");
         trs.append("td").attr("class", "checkmark");
-        trs.append("td").attr("class", "datalabel").style("opacity", 0.8).text(function(d) {
+        trs.append("td").attr("class", "datalabel").style("opacity", 0.8).text(function (d) {
           return d.d.label;
         });
         trs.append("td").append("input").attr({
           class: "weightInput",
           type: "text",
-          value: function(d) {
+          value: function (d) {
             return d.weight;
           },
           'disabled': true,
           size: 5
-        }).on("input", function(d) {
+        }).on("input", function (d) {
           d.weight = +this.value;
           redraw();
         });
 
         function redraw() {
           var trs = popup.table.selectAll("tr").data(trData);
-          trs.select(".checkmark").html(function(d) {
+          trs.select(".checkmark").html(function (d) {
                 return (d.isChecked) ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-square-o"></i>';
               })
-              .on("click", function(d) {
+              .on("click", function (d) {
                 d.isChecked = !d.isChecked;
                 redraw();
               });
-          trs.select(".datalabel").style("opacity", function(d) {
+          trs.select(".datalabel").style("opacity", function (d) {
             return d.isChecked ? "1.0" : ".8";
           });
-          trs.select(".weightInput").attr('disabled', function(d) {
+          trs.select(".weightInput").attr('disabled', function (d) {
             return d.isChecked ? null : true;
           });
         }
@@ -1356,7 +1340,7 @@
           return $(that.$container.node()).find("#" + id)[0];
         }
 
-        popup.onOK(function() {
+        popup.onOK(function () {
           var name = getElementById("popupInputText").value;
           if (name.length < 1) {
             window.alert("name must not be empty");
@@ -1364,7 +1348,7 @@
           }
           //console.log(name, trData);
 
-          var allChecked = trData.filter(function(d) {
+          var allChecked = trData.filter(function (d) {
             return d.isChecked;
           });
 
@@ -1372,7 +1356,7 @@
           var desc = {
             label: name,
             width: (Math.max(allChecked.length * 100, 100)),
-            children: allChecked.map(function(d) {
+            children: allChecked.map(function (d) {
               return {column: d.d.column, type: 'number', weight: d.weight};
             })
           };
@@ -1386,34 +1370,34 @@
 
       };
 
-      LineUp.prototype.addNewSingleColumnDialog = function() {
+      LineUp.prototype.addNewSingleColumnDialog = function () {
         var that = this;
         var popup = createPopup(this.$container, 'add single columns', undefined);
         // list all data rows !
         var trData = that.storage.getRawColumns()
             //        .filter(function(d){return (d instanceof LineUpNumberColumn);})
-            .map(function(d) {
+            .map(function (d) {
               return {d: d, isChecked: false, weight: 1.0};
             });
 
         var trs = popup.table.selectAll("tr").data(trData);
         trs.enter().append("tr");
         trs.append("td").attr("class", "checkmark");
-        trs.append("td").attr("class", "datalabel").style("opacity", 0.8).text(function(d) {
+        trs.append("td").attr("class", "datalabel").style("opacity", 0.8).text(function (d) {
           return d.d.label;
         });
 
 
         function redraw() {
           var trs = popup.table.selectAll("tr").data(trData);
-          trs.select(".checkmark").html(function(d) {
+          trs.select(".checkmark").html(function (d) {
                 return '<i class="fa fa-' + ((d.isChecked) ? 'check-' : '') + 'square-o"></i>';
               })
-              .on("click", function(d) {
+              .on("click", function (d) {
                 d.isChecked = !d.isChecked;
                 redraw();
               });
-          trs.select(".datalabel").style("opacity", function(d) {
+          trs.select(".datalabel").style("opacity", function (d) {
             return d.isChecked ? "1.0" : ".8";
           });
         }
@@ -1421,8 +1405,8 @@
         redraw();
 
 
-        popup.onOK(function() {
-          var allChecked = trData.filter(function(d) {
+        popup.onOK(function () {
+          var allChecked = trData.filter(function (d) {
             return d.isChecked;
           });
 
@@ -1433,7 +1417,7 @@
 //            children:allChecked.map(function(d){return {column: d.d.id, weight: d.weight};})
 //        }
 
-          allChecked.forEach(function(d) {
+          allChecked.forEach(function (d) {
             that.storage.addSingleColumn({column: d.d.column});
           });
 
@@ -1448,8 +1432,8 @@
         });
       };
 
-      LineUp.prototype.reweightStackedColumnWidget = function(data, $table) {
-        var toWeight = function(d) {
+      LineUp.prototype.reweightStackedColumnWidget = function (data, $table) {
+        var toWeight = function (d) {
           return d.weight;
         };
         var predictScale = d3.scale.linear().domain([0, d3.max(data, toWeight)]).range([0, 120]);
@@ -1465,26 +1449,26 @@
             .append("input").attr({
           class: "weightInput",
           type: "text",
-          value: function(d) {
+          value: function (d) {
             return d.weight;
           },
           size: 5
-        }).on("input", function(d) {
+        }).on("input", function (d) {
           data[d.index].weight = +this.value;
           redraw();
         });
 
         trs.append("td").append("div").attr("class", "predictBar").style({
-          width: function(d) {
+          width: function (d) {
             return predictScale(d.weight) + "px";
           },
           height: 20 + "px",
-          "background-color": function(d) {
+          "background-color": function (d) {
             return config.colorMapping.get(d.dataID);
           }
         });
 
-        trs.append("td").attr("class", "datalabel").text(function(d) {
+        trs.append("td").attr("class", "datalabel").text(function (d) {
           return d.d;
         });
 
@@ -1492,7 +1476,7 @@
           var trs = $table.selectAll("tr").data(data);
           predictScale.domain([0, d3.max(data, toWeight)]);
           trs.select(".predictBar").transition().style({
-            width: function(d) {
+            width: function (d) {
               return predictScale(d.weight) + "px";
             }
           });
@@ -1501,14 +1485,14 @@
         redraw();
       };
 
-      LineUp.prototype.reweightStackedColumnDialog = function(col) {
+      LineUp.prototype.reweightStackedColumnDialog = function (col) {
         var that = this;
         var popup = createPopup(this.$container, 're-weight column "' + col.label + '"', undefined);
 
         //console.log(col.childrenWeights);
         // list all data rows !
         var trData = col.children
-            .map(function(d, i) {
+            .map(function (d, i) {
               return {
                 d: d.column.label,
                 dataID: d.getDataID(),
@@ -1519,19 +1503,20 @@
 
         this.reweightStackedColumnWidget(trData, popup.table);
 
-        popup.onOK(function() {
+        popup.onOK(function () {
           popup.remove();
-          that.changeWeights(col, trData.map(function(d) {
+          that.changeWeights(col, trData.map(function (d) {
             return d.weight;
           }));
         });
       };
 
-      LineUp.prototype.openMappingEditor = function(selectedColumn, $button) {
+      LineUp.prototype.openMappingEditor = function (selectedColumn, $button) {
         var bak = selectedColumn.mapping(),
             original = selectedColumn.originalMapping();
         var that = this;
         var act = bak;
+
 
 
         var containerHeight = this.$container.node().clientHeight;
@@ -1555,7 +1540,7 @@
             .html(
                 '<div style="font-weight: bold"> change mapping: </div>' +
                 '<div class="mappingArea"></div>' +
-                '<label><input type="checkbox" id="filterIt" value="filterIt">Filter Outliers</label><br>' +
+                '<label><input type="checkbox" id="filterIt" value="filterIt">Filter Outliers</label><br>'+
                 '<button class="cancel"><i class="fa fa-times"></i> cancel</button>' +
                 '<button class="reset"><i class="fa fa-undo"></i> revert</button>' +
                 '<button class="ok"><i class="fa fa-check"></i> ok</button>'
@@ -1564,7 +1549,7 @@
           applyMapping(act);
         });
         $filterIt.node().checked = Array.isArray(selectedColumn.filter);
-        var access = function(row) {
+        var access = function (row) {
           return +selectedColumn.getValue(row, 'raw');
         };
 
@@ -1589,7 +1574,7 @@
 
         var editorOptions = {
           callback: applyMapping,
-          triggerCallback: 'dragend',
+          triggerCallback : 'dragend',
           width: height - 50,
           height: height - 50
         };
@@ -1600,18 +1585,18 @@
           return $(a).not(b).length === 0 && $(b).not(a).length === 0;
         }
 
-        popup.select(".ok").on("click", function() {
+        popup.select(".ok").on("click", function () {
           applyMapping(act);
           popup.remove();
           popupBG.remove();
         });
-        popup.select('.cancel').on('click', function() {
+        popup.select('.cancel').on('click', function () {
           selectedColumn.mapping(bak);
           $button.classed('filtered', !isSame(bak.range(), original.range()) || !isSame(bak.domain(), original.domain()));
           popup.remove();
           popupBG.remove();
         });
-        popup.select('.reset').on('click', function() {
+        popup.select('.reset').on('click', function () {
           act = bak = original;
           applyMapping(original);
           editor = LineUp.mappingEditor(bak, original.domain(), that.storage.rawdata, access, editorOptions);
@@ -1624,7 +1609,7 @@
        * handles the rendering and action of StackedColumn options menu
        * @param selectedColumn -- the stacked column
        */
-      LineUp.prototype.stackedColumnOptionsGui = function(selectedColumn) {
+      LineUp.prototype.stackedColumnOptionsGui = function (selectedColumn) {
         //console.log(selectedColumn);
         var config = this.config;
         var svgOverlay = this.$header.select('.overlay');
@@ -1636,6 +1621,7 @@
           this.stackedColumnModified = null;
           return;
         }
+
 
 
         function removeStackedColumn(col) {
@@ -1686,7 +1672,7 @@
             }
           });
 
-          popup.select('.cancel').on('click', function() {
+          popup.select('.cancel').on('click', function () {
             popup.remove();
             popupBG.remove();
           });
@@ -1711,7 +1697,7 @@
         var stackedOptionsEnter = stackedOptions.enter().append('g')
             .attr({
               'class': 'stackedOption',
-              'transform': function(d) {
+              'transform': function (d) {
                 return 'translate(' + (d.d.offsetX + d.d.columnWidth - menuLength) + ',' + (config.htmlLayout.headerHeight / 2 - 2) + ')';
               }
             });
@@ -1721,32 +1707,32 @@
           width: menuLength,
           height: config.htmlLayout.headerHeight / 2 - 4
         });
-        stackedOptionsEnter.selectAll('text').data(function(d) {
+        stackedOptionsEnter.selectAll('text').data(function (d) {
           return d.o;
         }).enter().append('text')
             .attr({
-              x: function(d, i) {
+              x: function (d, i) {
                 return i * 100 + 5;
               },
               y: config.htmlLayout.headerHeight / 4 - 2
             })
-            .text(function(d) {
+            .text(function (d) {
               return d.name;
             });
 
-        stackedOptions.selectAll('text').on('click', function(d) {
+        stackedOptions.selectAll('text').on('click', function (d) {
           svgOverlay.selectAll('.stackedOption').remove();
           d.action.call(that, selectedColumn);
         });
 
         stackedOptions.transition().attr({
-          'transform': function(d) {
+          'transform': function (d) {
             return 'translate(' + (d.d.offsetX + d.d.columnWidth - menuLength) + ',' + (config.htmlLayout.headerHeight / 2 - 2) + ')';
           }
         });
       };
 
-      LineUp.prototype.openCategoricalFilterPopup = function(column, $button) {
+      LineUp.prototype.openCategoricalFilterPopup = function (column, $button) {
         if (!(column instanceof LineUp.LayoutCategoricalColumn)) {
           //can't filter other than string columns
           return;
@@ -1785,31 +1771,30 @@
 
 
         // list all data rows !
-        var trData = column.column.categories.map(function(d) {
+        var trData = column.column.categories.map(function (d) {
           return {d: d, isChecked: bak.length === 0 || bak.indexOf(d) >= 0};
         });
 
         var trs = popup.select('tbody').selectAll('tr').data(trData);
         trs.enter().append('tr');
         trs.append('td').attr('class', 'checkmark');
-        trs.append('td').attr('class', 'datalabel').text(function(d) {
+        trs.append('td').attr('class', 'datalabel').text(function (d) {
           return d.d;
         });
 
         function redraw() {
           var trs = popup.select('tbody').selectAll('tr').data(trData);
-          trs.select('.checkmark').html(function(d) {
+          trs.select('.checkmark').html(function (d) {
                 return '<i class="fa fa-' + ((d.isChecked) ? 'check-' : '') + 'square-o"></i>';
               })
-              .on('click', function(d) {
+              .on('click', function (d) {
                 d.isChecked = !d.isChecked;
                 redraw();
               });
-          trs.select('.datalabel').style('opacity', function(d) {
+          trs.select('.datalabel').style('opacity', function (d) {
             return d.isChecked ? '1.0' : '.8';
           });
         }
-
         redraw();
 
         function updateData(filter) {
@@ -1823,22 +1808,22 @@
           that.updateBody();
         }
 
-        popup.select('.cancel').on('click', function() {
+        popup.select('.cancel').on('click', function () {
           updateData(bak);
           popup.remove();
           popupBG.remove();
         });
-        popup.select('.reset').on('click', function() {
-          trData.forEach(function(d) {
+        popup.select('.reset').on('click', function () {
+          trData.forEach(function (d) {
             d.isChecked = true;
           });
           redraw();
           updateData(null);
         });
-        popup.select('.ok').on('click', function() {
-          var f = trData.filter(function(d) {
+        popup.select('.ok').on('click', function () {
+          var f = trData.filter(function (d) {
             return d.isChecked;
-          }).map(function(d) {
+          }).map( function (d) {
             return d.d;
           });
           if (f.length === column.column.categories.length) {
@@ -1850,7 +1835,7 @@
         });
       };
 
-      LineUp.prototype.openFilterPopup = function(column, $button) {
+      LineUp.prototype.openFilterPopup = function (column, $button) {
         if (!(column instanceof LineUp.LayoutStringColumn)) {
           //can't filter other than string columns
           return;
@@ -1901,24 +1886,24 @@
           return $(that.$container.node()).find("#" + id)[0];
         }
 
-        popup.select('.cancel').on('click', function() {
+        popup.select('.cancel').on('click', function () {
           getElementById('popupInputText').value = bak;
           updateData(bak);
           popup.remove();
           popupBG.remove();
         });
-        popup.select('.reset').on('click', function() {
+        popup.select('.reset').on('click', function () {
           getElementById('popupInputText').value = '';
           updateData(null);
         });
-        popup.select('.ok').on('click', function() {
+        popup.select('.ok').on('click', function () {
           updateData(getElementById('popupInputText').value);
           popup.remove();
           popupBG.remove();
         });
       };
 
-      LineUp.createTooltip = function(container) {
+      LineUp.createTooltip = function (container) {
         var $container = $(container), $tooltip = $('<div class="lu-tooltip"/>').appendTo($container);
 
         function showTooltip(content, xy) {
@@ -1946,7 +1931,7 @@
           }
           if (xy.y) {
             $tooltip.css({
-              top: xy.y - $container.offset().top + 'px'
+              top: xy.y  - $container.offset().top + 'px'
             });
           }
         }
@@ -1968,7 +1953,7 @@
         };
       };
 
-      LineUp.prototype.initScrolling = function($container, topShift) {
+      LineUp.prototype.initScrolling = function ($container, topShift) {
         var that = this,
             container = $container[0],
             rowHeight = this.config.svgLayout.rowHeight,
@@ -2036,7 +2021,7 @@
         };
       };
 
-      LineUp.prototype.initDragging = function() {
+      LineUp.prototype.initDragging = function () {
         var that = this;
         /*
          * define dragging behaviour for header weights
@@ -2075,7 +2060,7 @@
 
 
         return d3.behavior.drag()
-            .origin(function(d) {
+            .origin(function (d) {
               return d;
             })
             .on('dragstart', dragWeightStarted)
@@ -2087,47 +2072,44 @@
     /* global d3, jQuery */
     var LineUp;
 
-    (function(LineUp, d3, $) {
+    (function (LineUp, d3, $) {
       'use strict';
       function addLine($svg, x1, y1, x2, y2, clazz) {
         return $svg.append("line").attr({
-          x1: x1, y1: y1, x2: x2, y2: y2, 'class': clazz
+          x1 : x1, y1 : y1, x2 : x2, y2: y2, 'class' : clazz
         });
       }
-
       function addText($svg, x, y, text, dy, clazz) {
         dy = dy || null;
         clazz = clazz || null;
         return $svg.append("text").attr({
-          x: x, y: y, dy: dy, 'class': clazz
+          x : x, y : y, dy : dy, 'class' : clazz
         }).text(text);
       }
-
       function addCircle($svg, x, shift, y, radius) {
         shift -= x;
         return $svg
             .append("circle")
             .attr({
-              'class': 'handle',
-              r: radius,
+              'class' : 'handle',
+              r : radius,
               cx: x,
-              cy: y,
-              transform: 'translate(' + shift + ',0)'
+              cy : y,
+              transform : 'translate('+shift+',0)'
             });
       }
-
-      LineUp.mappingEditor = function(scale, dataDomain, data, data_accessor, options) {
+      LineUp.mappingEditor = function (scale, dataDomain, data, data_accessor, options) {
         options = $.extend({
           width: 400,
           height: 400,
           padding: 50,
           radius: 10,
           callback: $.noop,
-          callbackThisArg: null,
+          callbackThisArg : null,
           triggerCallback: 'change' //change, dragend
         }, options);
 
-        var editor = function($root) {
+        var editor = function ($root) {
           var $svg = $root.append('svg').attr({
             'class': 'lugui-me',
             width: options.width,
@@ -2136,14 +2118,14 @@
           //left limit for the axes
           var lowerLimitX = options.padding;
           //right limit for the axes
-          var upperLimitX = options.width - options.padding;
+          var upperLimitX = options.width-options.padding;
           //location for the score axis
           var scoreAxisY = options.padding;
           //location for the raw2pixel value axis
-          var raw2pixelAxisY = options.height - options.padding;
+          var raw2pixelAxisY = options.height-options.padding;
           //this is needed for filtering the shown datalines
           var raw2pixel = d3.scale.linear().domain(dataDomain).range([lowerLimitX, upperLimitX]);
-          var normal2pixel = d3.scale.linear().domain([0, 1]).range([lowerLimitX, upperLimitX]);
+          var normal2pixel = d3.scale.linear().domain([0,1]).range([lowerLimitX,upperLimitX]);
 
           //x coordinate for the score axis lower bound
           var lowerNormalized = normal2pixel(scale.range()[0]);
@@ -2160,32 +2142,28 @@
               .range([lowerNormalized, upperNormalized]);
           var $base = $svg.append('g');
           //upper axis for scored values
-          addLine($base, lowerLimitX, scoreAxisY, upperLimitX, scoreAxisY, 'axis');
+          addLine($base, lowerLimitX,scoreAxisY, upperLimitX, scoreAxisY, 'axis');
           //label for minimum scored value
           addText($base, lowerLimitX, scoreAxisY - 25, 0, '.75em');
           //label for maximum scored value
           addText($base, upperLimitX, scoreAxisY - 25, 1, '.75em');
-          addText($base, options.width / 2, scoreAxisY - 25, 'Score', '.75em', 'centered');
+          addText($base, options.width/2, scoreAxisY -25, 'Score', '.75em','centered');
 
           //lower axis for raw2pixel values
-          addLine($base, lowerLimitX, raw2pixelAxisY, upperLimitX, raw2pixelAxisY, 'axis');
+          addLine($base, lowerLimitX,raw2pixelAxisY, upperLimitX, raw2pixelAxisY, 'axis');
           //label for minimum raw2pixel value
           addText($base, lowerLimitX, raw2pixelAxisY + 20, dataDomain[0], '.75em');
           //label for maximum raw2pixel value
           addText($base, upperLimitX, raw2pixelAxisY + 20, dataDomain[1], '.75em');
-          addText($base, options.width / 2, raw2pixelAxisY + 20, 'Raw', '.75em', 'centered');
+          addText($base, options.width/2, raw2pixelAxisY + 20, 'Raw', '.75em','centered');
 
           //lines that show mapping of individual data items
-          var datalines = $svg.append('g').classed('data', true).selectAll('line').data(data);
+          var datalines = $svg.append('g').classed('data',true).selectAll('line').data(data);
           datalines.enter().append('line')
               .attr({
-                x1: function(d) {
-                  return scale(data_accessor(d));
-                },
+                x1: function (d) { return scale(data_accessor(d)); },
                 y1: scoreAxisY,
-                x2: function(d) {
-                  return raw2pixel(data_accessor(d));
-                },
+                x2: function (d) { return raw2pixel(data_accessor(d)); },
                 y2: raw2pixelAxisY
               }).style('visibility', function(d) {
             var a;
@@ -2201,31 +2179,31 @@
           //line that defines upper bounds for the scale
           var mapperLineUpperBounds = addLine($svg, upperNormalized, scoreAxisY, upperRaw, raw2pixelAxisY, 'bound');
           //label for lower bound of normalized values
-          var lowerBoundNormalizedLabel = addText($svg, lowerLimitX + 5, scoreAxisY - 15, d3.round(normal2pixel.invert(lowerNormalized), 2), '.25em', 'drag').attr('transform', 'translate(' + (lowerNormalized - lowerLimitX) + ',0)');
+          var lowerBoundNormalizedLabel = addText($svg, lowerLimitX + 5, scoreAxisY - 15, d3.round(normal2pixel.invert(lowerNormalized), 2), '.25em', 'drag').attr('transform','translate('+(lowerNormalized-lowerLimitX)+',0)');
           //label for lower bound of raw2pixel values
-          var lowerBoundRawLabel = addText($svg, lowerLimitX + 5, raw2pixelAxisY - 15, d3.round(raw2pixel.invert(lowerRaw), 2), '.25em', 'drag').attr('transform', 'translate(' + (lowerRaw - lowerLimitX) + ',0)');
+          var lowerBoundRawLabel = addText($svg, lowerLimitX + 5, raw2pixelAxisY - 15, d3.round(raw2pixel.invert(lowerRaw), 2), '.25em', 'drag').attr('transform','translate('+(lowerRaw-lowerLimitX)+',0)');
           //label for upper bound of normalized values
-          var upperBoundNormalizedLabel = addText($svg, upperLimitX + 5, scoreAxisY - 15, d3.round(normal2pixel.invert(upperNormalized), 2), '.25em', 'drag').attr('transform', 'translate(' + (upperNormalized - upperLimitX) + ',0)');
+          var upperBoundNormalizedLabel = addText($svg, upperLimitX + 5, scoreAxisY - 15, d3.round(normal2pixel.invert(upperNormalized), 2), '.25em', 'drag').attr('transform','translate('+(upperNormalized-upperLimitX)+',0)');
           //label for upper bound of raw2pixel values
-          var upperBoundRawLabel = addText($svg, upperLimitX + 5, raw2pixelAxisY - 15, d3.round(raw2pixel.invert(upperRaw), 2), '.25em', 'drag').attr('transform', 'translate(' + (upperRaw - upperLimitX) + ',0)');
+          var upperBoundRawLabel = addText($svg, upperLimitX + 5, raw2pixelAxisY - 15, d3.round(raw2pixel.invert(upperRaw), 2), '.25em', 'drag').attr('transform','translate('+(upperRaw-upperLimitX)+',0)');
 
           function createDrag(label, move) {
             return d3.behavior.drag()
-                .on('dragstart', function() {
+                .on('dragstart', function () {
                   d3.select(this)
                       .classed('dragging', true)
                       .attr('r', options.radius * 1.1);
                   label.style('visibility', 'visible');
                 })
                 .on('drag', move)
-                .on('dragend', function() {
+                .on('dragend', function () {
                   d3.select(this)
                       .classed('dragging', false)
                       .attr('r', options.radius);
                   label.style('visibility', null);
                   updateScale(true);
                 })
-                .origin(function() {
+                .origin(function () {
                   var t = d3.transform(d3.select(this).attr('transform'));
                   return {x: t.translate[0], y: t.translate[1]};
                 });
@@ -2233,7 +2211,7 @@
 
           function updateNormalized() {
             scale.range([lowerNormalized, upperNormalized]);
-            datalines.attr('x1', function(d) {
+            datalines.attr('x1', function (d) {
               return scale(data_accessor(d));
             });
             updateScale();
@@ -2242,18 +2220,18 @@
           function updateRaw() {
             var hiddenDatalines, shownDatalines;
             if (lowerRaw < upperRaw) {
-              hiddenDatalines = datalines.filter(function(d) {
+              hiddenDatalines = datalines.filter(function (d) {
                 return (raw2pixel(data_accessor(d)) < lowerRaw || raw2pixel(data_accessor(d)) > upperRaw);
               });
-              shownDatalines = datalines.filter(function(d) {
+              shownDatalines = datalines.filter(function (d) {
                 return !(raw2pixel(data_accessor(d)) < lowerRaw || raw2pixel(data_accessor(d)) > upperRaw);
               });
             }
             else {
-              hiddenDatalines = datalines.filter(function(d) {
+              hiddenDatalines = datalines.filter(function (d) {
                 return (raw2pixel(data_accessor(d)) > lowerRaw || raw2pixel(data_accessor(d)) < upperRaw);
               });
-              shownDatalines = datalines.filter(function(d) {
+              shownDatalines = datalines.filter(function (d) {
                 return !(raw2pixel(data_accessor(d)) > lowerRaw || raw2pixel(data_accessor(d)) < upperRaw);
               });
             }
@@ -2261,7 +2239,7 @@
             scale.domain([raw2pixel.invert(lowerRaw), raw2pixel.invert(upperRaw)]);
             shownDatalines
                 .style('visibility', null)
-                .attr('x1', function(d) {
+                .attr('x1', function (d) {
                   return scale(data_accessor(d));
                 });
             updateScale();
@@ -2269,7 +2247,7 @@
 
           //draggable circle that defines the lower bound of normalized values
           addCircle($svg, lowerLimitX, lowerNormalized, scoreAxisY, options.radius)
-              .call(createDrag(lowerBoundNormalizedLabel, function() {
+              .call(createDrag(lowerBoundNormalizedLabel, function () {
                 if (d3.event.x >= 0 && d3.event.x <= (upperLimitX - lowerLimitX)) {
                   mapperLineLowerBounds.attr('x1', lowerLimitX + d3.event.x);
                   d3.select(this)
@@ -2283,7 +2261,7 @@
               }));
           //draggable circle that defines the upper bound of normalized values
           addCircle($svg, upperLimitX, upperNormalized, scoreAxisY, options.radius)
-              .call(createDrag(upperBoundNormalizedLabel, function() {
+              .call(createDrag(upperBoundNormalizedLabel, function () {
                 if (d3.event.x >= (-1 * (upperLimitX - lowerLimitX)) && d3.event.x <= 0) {
                   mapperLineUpperBounds.attr('x1', upperLimitX + d3.event.x);
                   d3.select(this)
@@ -2297,7 +2275,7 @@
               }));
           //draggable circle that defines the lower bound of raw2pixel values
           addCircle($svg, lowerLimitX, lowerRaw, raw2pixelAxisY, options.radius)
-              .call(createDrag(lowerBoundRawLabel, function() {
+              .call(createDrag(lowerBoundRawLabel, function () {
                 if (d3.event.x >= 0 && d3.event.x <= (upperLimitX - lowerLimitX)) {
                   mapperLineLowerBounds.attr('x2', lowerLimitX + d3.event.x);
                   d3.select(this)
@@ -2311,7 +2289,7 @@
               }));
           //draggable circle that defines the upper bound of raw2pixel values
           addCircle($svg, upperLimitX, upperRaw, raw2pixelAxisY, options.radius)
-              .call(createDrag(upperBoundRawLabel, function() {
+              .call(createDrag(upperBoundRawLabel, function () {
                 if (d3.event.x >= (-1 * (upperLimitX - lowerLimitX)) && d3.event.x <= 0) {
                   mapperLineUpperBounds.attr('x2', upperLimitX + d3.event.x);
                   d3.select(this)
@@ -2341,7 +2319,7 @@
 
     /* global d3, jQuery, _ */
     var LineUp;
-    (function(LineUp, d3, $, _, undefined) {
+    (function (LineUp, d3, $, _, undefined) {
 
       function bundleSetter(bundle) {
         return function setBundle(col) {
@@ -2351,7 +2329,6 @@
           }
         };
       }
-
       /**
        * An implementation of data storage for reading locally
        * @param tableId
@@ -2397,7 +2374,7 @@
         this.layout = layout || LineUpLocalStorage.generateDefaultLayout(this.rawcols);
 
         var colLookup = d3.map();
-        this.rawcols.forEach(function(col) {
+        this.rawcols.forEach(function (col) {
           colLookup.set(col.column, col);
         });
         function toLayoutColumn(desc) {
@@ -2421,13 +2398,13 @@
             layoutColumns: [],
             needsLayout: true,  // this triggers the layout generation at first access to "getColumnLayout"
             data: data,
-            initialSort: true
+            initialSort :true
           };
         });
       }
 
       LineUp.LineUpLocalStorage = LineUpLocalStorage;
-      LineUp.createLocalStorage = function(data, columns, layout, primaryKey, storageConfig) {
+      LineUp.createLocalStorage = function (data, columns, layout, primaryKey, storageConfig) {
         return new LineUpLocalStorage(data, columns, layout, primaryKey, storageConfig);
       };
 
@@ -2436,8 +2413,8 @@
        * @param columns
        * @returns {{primary: (Array|*)}}
        */
-      LineUpLocalStorage.generateDefaultLayout = function(columns) {
-        var layout = columns.map(function(c) {
+      LineUpLocalStorage.generateDefaultLayout = function (columns) {
+        var layout = columns.map(function (c) {
           return {
             column: c.column,
             width: c instanceof LineUp.LineUpStringColumn ? 200 : 100
@@ -2451,10 +2428,10 @@
       LineUpLocalStorage.prototype = $.extend({}, {},
           /** @lends LineUpLocalStorage.prototype */
           {
-            getRawColumns: function() {
+            getRawColumns: function () {
               return this.rawcols;
             },
-            getColumnLayout: function(key) {
+            getColumnLayout: function (key) {
               var _key = key || "primary";
               if (this.bundles[_key].needsLayout) {
                 this.generateLayout(this.layout, _key);
@@ -2464,13 +2441,13 @@
               return this.bundles[_key].layoutColumns;
             },
 
-            isSelected: function(row) {
+            isSelected : function(row) {
               return this.selected.has(row[this.primaryKey]);
             },
-            select: function(row) {
+            select : function(row) {
               this.selected.add(row[this.primaryKey]);
             },
-            selectAll: function(rows) {
+            selectAll : function(rows) {
               var that = this;
               rows.forEach(function(row) {
                 that.selected.add(row[that.primaryKey]);
@@ -2486,7 +2463,7 @@
             selectedRows: function() {
               return this.rawdata.filter(this.isSelected.bind(this));
             },
-            clearSelection: function() {
+            clearSelection : function() {
               this.selected = d3.set();
             },
 
@@ -2494,16 +2471,16 @@
              *  get the data
              *  @returns data
              */
-            getData: function(bundle) {
+            getData: function (bundle) {
               bundle = bundle || "primary";
               return this.bundles[bundle].data;
             },
-            filterData: function(columns) {
+            filterData: function (columns) {
               var flat = [];
-              columns.forEach(function(d) {
+              columns.forEach(function (d) {
                 d.flattenMe(flat);
               });
-              flat = flat.filter(function(d) {
+              flat = flat.filter(function (d) {
                 return d.isFiltered();
               });
               if ($.isFunction(this.config.filter.filter)) {
@@ -2512,14 +2489,14 @@
               if (flat.length === 0) {
                 return this.rawdata;
               } else {
-                return this.rawdata.filter(function(row) {
-                  return flat.every(function(f) {
+                return this.rawdata.filter(function (row) {
+                  return flat.every(function (f) {
                     return f.filterBy(row);
                   });
                 });
               }
             },
-            resortData: function(spec) {
+            resortData: function (spec) {
 
               var _key = spec.key || 'primary', that = this;
               var bundle = this.bundles[_key];
@@ -2532,25 +2509,23 @@
               if (spec.filteredChanged || bundle.initialSort) {
                 //trigger column updates
                 var flat = [];
-                cols.forEach(function(d) {
+                cols.forEach(function (d) {
                   d.flattenMe(flat);
                 });
                 var generator = that.config.histograms && that.config.histograms.generator;
-                flat.forEach(function(col) {
+                flat.forEach(function (col) {
                   col.prepare(bundle.data, that.config.renderingOptions.histograms, generator);
                 });
                 bundle.initialSort = false;
               }
               var primary = this.primaryKey;
-
-              function sort(a, b) {
-                var r = column.sortBy(a, b);
+              function sort(a,b) {
+                var r = column.sortBy(a,b);
                 if (r === 0 || isNaN(r)) { //by default sort by primary key
                   return d3.ascending(a[primary], b[primary]);
                 }
                 return asc ? -r : r;
               }
-
               if (column) {
                 bundle.data.sort(sort);
               }
@@ -2562,15 +2537,15 @@
                 bundle.data = bundle.data.slice(start);
               }
 
-              var rankColumn = bundle.layoutColumns.filter(function(d) {
+              var rankColumn = bundle.layoutColumns.filter(function (d) {
                 return d instanceof LineUp.LayoutRankColumn;
               });
               if (rankColumn.length > 0) {
-                var accessor = function(d, i) {
+                var accessor = function (d, i) {
                   return i;
                 };
                 if (column) {
-                  accessor = function(d) {
+                  accessor = function (d) {
                     return column.getValue(d);
                   };
                 }
@@ -2580,12 +2555,12 @@
             /*
              * assigns the ranks to the data which is expected to be sorted in decreasing order
              * */
-            assignRanks: function(data, accessor, rankColumns) {
+            assignRanks: function (data, accessor, rankColumns) {
 
               var actualRank = 1;
               var actualValue = -1;
 
-              data.forEach(function(row, i) {
+              data.forEach(function (row, i) {
                 if (actualValue === -1) {
                   actualValue = accessor(row, i);
                 }
@@ -2593,12 +2568,12 @@
                   actualRank = i + 1; //we have 1,1,3, not 1,1,2
                   actualValue = accessor(row, i);
                 }
-                rankColumns.forEach(function(r) {
+                rankColumns.forEach(function (r) {
                   r.setValue(row, actualRank);
                 });
               });
             },
-            generateLayout: function(layout, bundle) {
+            generateLayout: function (layout, bundle) {
               var _bundle = bundle || 'primary';
 
               // create Rank Column
@@ -2609,14 +2584,14 @@
 
               //console.log(b.layoutColumns, layout);
               //if there is no rank column create one
-              if (b.layoutColumns.filter(function(d) {
+              if (b.layoutColumns.filter(function (d) {
                     return d instanceof LineUp.LayoutRankColumn;
                   }).length < 1) {
                 b.layoutColumns.unshift(new LineUp.LayoutRankColumn(null, null, null, this));
               }
 
               //if we have row actions and no action column create one
-              if (this.config.svgLayout.rowActions.length > 0 && b.layoutColumns.filter(function(d) {
+              if (this.config.svgLayout.rowActions.length > 0 && b.layoutColumns.filter(function (d) {
                     return d instanceof LineUp.LayoutActionColumn;
                   }).length < 1) {
                 b.layoutColumns.push(new LineUp.LayoutActionColumn());
@@ -2625,7 +2600,7 @@
               //set layout bundle reference
               b.layoutColumns.forEach(bundleSetter(_bundle));
             },
-            addColumn: function(col, bundle, position) {
+            addColumn: function (col, bundle, position) {
               var _bundle = bundle || 'primary';
               var cols = this.bundles[_bundle].layoutColumns, i, c;
               //insert the new column after the first non rank, text column
@@ -2641,20 +2616,20 @@
                 if (position < 0) {
                   position = cols.length + 1 + position;
                 }
-                i = Math.max(0, Math.min(cols.length, position));
+                i =  Math.max(0, Math.min(cols.length, position));
               }
               col.columnBundle = _bundle;
               cols.splice(i, 0, col);
             },
-            addStackedColumn: function(spec, position, bundle) {
-              var _spec = $.extend({type: 'stacked', label: 'Stacked', children: []}, spec);
+            addStackedColumn: function (spec, position, bundle) {
+              var _spec = $.extend({ type: 'stacked', label: 'Stacked', children: []}, spec);
               this.addColumn(this.storageConfig.toLayoutColumn(_spec), bundle, position);
             },
-            addSingleColumn: function(spec, position, bundle) {
+            addSingleColumn: function (spec, position, bundle) {
               this.addColumn(this.storageConfig.toLayoutColumn(spec), bundle, position);
             },
 
-            removeColumn: function(col) {
+            removeColumn: function (col) {
               var headerColumns = this.bundles[col.columnBundle].layoutColumns;
 
               if (col instanceof LineUp.LayoutStackedColumn) {
@@ -2689,7 +2664,7 @@
 
 
             },
-            moveColumn: function(column, targetColumn, position) {
+            moveColumn: function (column, targetColumn, position) {
               var sourceColumns = this.bundles[column.columnBundle].layoutColumns,
                   targetColumns = this.bundles[targetColumn.columnBundle].layoutColumns,
                   targetIndex;
@@ -2732,7 +2707,7 @@
               bundleSetter(targetColumn.columnBundle)(column);
               this.resortData({});
             },
-            copyColumn: function(column, targetColumn, position) {
+            copyColumn: function (column, targetColumn, position) {
               var targetColumns = this.bundles[targetColumn.columnBundle].layoutColumns;
 
               var newColumn = column.makeCopy();
@@ -2759,7 +2734,7 @@
              * @param name
              * @returns {*}
              */
-            getColumnByName: function(name) {
+            getColumnByName: function (name) {
               var cols = this.getColumnLayout();
               for (var i = cols.length - 1; i >= 0; --i) {
                 var col = cols[i];
@@ -2774,20 +2749,20 @@
 
     /* global d3, jQuery, document */
     var LineUp;
-    (function(LineUp, d3, $, undefined) {
+    (function (LineUp, d3, $, undefined) {
       LineUp.prototype = LineUp.prototype || {};
-      LineUp.updateClipPaths = function(headers, svg, prefix, shift, defclass) {
+      LineUp.updateClipPaths = function (headers, svg, prefix, shift, defclass) {
         defclass = defclass || 'column';
         //generate clip paths for the text columns to avoid text overflow
         //see http://stackoverflow.com/questions/11742812/cannot-select-svg-foreignobject-element-in-d3
         //there is a bug in webkit which present camelCase selectors
-        var textClipPath = svg.select('defs.' + defclass).selectAll(function() {
+        var textClipPath = svg.select('defs.' + defclass).selectAll(function () {
           return this.getElementsByTagName('clipPath');
-        }).data(headers, function(d) {
+        }).data(headers, function (d) {
           return d.id;
         });
         textClipPath.enter().append('clipPath')
-            .attr('id', function(d) {
+            .attr('id', function (d) {
               return 'clip-' + prefix + d.id;
             })
             .append('rect').attr({
@@ -2797,10 +2772,10 @@
         textClipPath.exit().remove();
         textClipPath.select('rect')
             .attr({
-              x: function(d) {
+              x: function (d) {
                 return shift ? d.offsetX : null;
               },
-              width: function(d) {
+              width: function (d) {
                 return Math.max(d.getColumnWidth() - 5, 0);
               }
             });
@@ -2808,15 +2783,15 @@
       function updateText(allHeaders, allRows, svg, config, clipSource) {
         // -- the text columns
 
-        var allTextHeaders = allHeaders.filter(function(d) {
-          return d instanceof LineUp.LayoutCategoricalColumn || d instanceof LineUp.LayoutStringColumn || d instanceof LineUp.LayoutRankColumn;
+        var allTextHeaders = allHeaders.filter(function (d) {
+          return d instanceof LineUp.LayoutCategoricalColumn || d instanceof LineUp.LayoutStringColumn|| d instanceof LineUp.LayoutRankColumn;
         });
 
         var rowCenter = (config.svgLayout.rowHeight / 2);
 
         var textRows = allRows.selectAll('.tableData.text')
-            .data(function(d) {
-              var dd = allTextHeaders.map(function(column) {
+            .data(function (d) {
+              var dd = allTextHeaders.map(function (column) {
                 return {
                   value: column.getValue(d),
                   label: column.getValue(d, 'raw'),
@@ -2831,31 +2806,31 @@
         textRows.enter()
             .append('text')
             .attr({
-              'class': function(d) {
+              'class': function (d) {
                 return 'tableData text' + (d.isRank ? ' rank' : '');
               },
               y: rowCenter,
-              'clip-path': function(d) {
+              'clip-path': function (d) {
                 return d.clip;
               }
             });
         textRows.exit().remove();
 
         textRows
-            .attr('x', function(d) {
+            .attr('x', function (d) {
               return d.offsetX;
             })
             .attr({
               // ATS: Added this fix to for updated text rows, they weren't getting updated clip paths
-              'clip-path': function(d) {
+              'clip-path': function (d) {
                 return d.clip;
               }
             })
-            .text(function(d) {
+            .text(function (d) {
               return d.label;
             });
 
-        allRows.selectAll('.tableData.text.rank').text(function(d) {
+        allRows.selectAll('.tableData.text.rank').text(function (d) {
           return d.label;
         });// only changed texts:
         ///// TODO ---- IMPORTANT  ----- DO NOT DELETE
@@ -2872,14 +2847,14 @@
       function updateCategorical(allHeaders, allRows, svg, config) {
         // -- the text columns
 
-        var allTextHeaders = allHeaders.filter(function(d) {
+        var allTextHeaders = allHeaders.filter(function (d) {
           return d instanceof LineUp.LayoutCategoricalColorColumn;
         });
 
-        var icon = (config.svgLayout.rowHeight - config.svgLayout.rowBarPadding * 2);
+        var icon = (config.svgLayout.rowHeight-config.svgLayout.rowBarPadding*2);
         var textRows = allRows.selectAll('.tableData.cat')
-            .data(function(d) {
-              var dd = allTextHeaders.map(function(column) {
+            .data(function (d) {
+              var dd = allTextHeaders.map(function (column) {
                 return {
                   value: column.getValue(d),
                   label: column.getValue(d, 'raw'),
@@ -2896,20 +2871,18 @@
             .attr({
               'class': 'tableData cat',
               y: config.svgLayout.rowBarPadding,
-              height: config.svgLayout.rowHeight - config.svgLayout.rowBarPadding * 2,
+              height: config.svgLayout.rowHeight - config.svgLayout.rowBarPadding*2,
               width: icon
             }).append('title');
         textRows.exit().remove();
 
         textRows
-            .attr('x', function(d) {
+            .attr('x', function (d) {
               return d.offsetX + 2;
             })
-            .style('fill', function(d) {
+            .style('fill',function (d) {
               return d.color;
-            }).select('title').text(function(d) {
-          return d.label;
-        });
+            }).select('title').text(function(d) { return d.label; });
       }
 
       function showStacked(config) {
@@ -2924,12 +2897,12 @@
 
       function updateSingleBars(headers, allRows, config) {
         // -- handle the Single columns  (!! use unflattened headers for filtering)
-        var allSingleBarHeaders = headers.filter(function(d) {
+        var allSingleBarHeaders = headers.filter(function (d) {
           return d.column instanceof LineUp.LineUpNumberColumn;
         });
         var barRows = allRows.selectAll('.tableData.bar')
-            .data(function(d) {
-              var data = allSingleBarHeaders.map(function(column) {
+            .data(function (d) {
+              var data = allSingleBarHeaders.map(function (column) {
                 return {
                   key: column.getDataID(),
                   value: column.getWidth(d),
@@ -2945,20 +2918,20 @@
             .attr({
               'class': 'tableData bar',
               y: config.svgLayout.rowBarPadding,
-              height: config.svgLayout.rowHeight - config.svgLayout.rowBarPadding * 2
+              height: config.svgLayout.rowHeight - config.svgLayout.rowBarPadding*2
             });
         barRows.exit().remove();
 
         barRows
             .attr({
-              x: function(d) {
+              x: function (d) {
                 return d.offsetX;
               },
-              width: function(d) {
+              width: function (d) {
                 return Math.max(+d.value - 2, 0);
               }
             }).style({
-          fill: function(d) {
+          fill: function (d) {
             return config.colorMapping.get(d.key);
           }
         });
@@ -2966,14 +2939,14 @@
 
       function updateStackBars(headers, allRows, _stackTransition, config) {
         // -- RENDER the stacked columns (update, exit, enter)
-        var allStackedHeaders = headers.filter(function(d) {
+        var allStackedHeaders = headers.filter(function (d) {
           return (d instanceof LineUp.LayoutStackedColumn);
         });
 
         // -- render StackColumnGroups
         var stackRows = allRows.selectAll('.tableData.stacked')
-            .data(function(d) {
-              var dd = allStackedHeaders.map(function(column) {
+            .data(function (d) {
+              var dd = allStackedHeaders.map(function (column) {
                 return {key: column.getDataID(), childs: column.children, parent: column, row: d};
               });
               return dd;
@@ -2984,7 +2957,7 @@
             .attr('class', 'tableData stacked');
 
         stackRows
-            .attr('transform', function(d) {
+            .attr('transform', function (d) {
               return 'translate(' + d.parent.offsetX + ',' + 0 + ')';
             });
 
@@ -2995,12 +2968,12 @@
 
         var asStacked = showStacked(config);
 
-        var allStack = stackRows.selectAll('rect').data(function(d) {
+        var allStack = stackRows.selectAll('rect').data(function (d) {
 
               allStackOffset = 0;
               allStackW = 0;
 
-              return d.childs.map(function(child) {
+              return d.childs.map(function (child) {
                 allStackW = child.getWidth(d.row);
 
                 allStackRes = {child: child, width: allStackW, offsetX: allStackOffset};
@@ -3016,19 +2989,19 @@
         allStack.exit().remove();
         allStack.enter().append('rect').attr({
           y: config.svgLayout.rowBarPadding,
-          height: config.svgLayout.rowHeight - config.svgLayout.rowBarPadding * 2
+          height: config.svgLayout.rowHeight - config.svgLayout.rowBarPadding*2
         });
 
         (_stackTransition ? allStack.transition(config.svgLayout.animationDuration) : allStack)
             .attr({
-              x: function(d) {
+              x: function (d) {
                 return d.offsetX;
               },
-              width: function(d) {
+              width: function (d) {
                 return (d.width > 2) ? d.width - 2 : d.width;
               }
             }).style({
-          fill: function(d) {
+          fill: function (d) {
             return config.colorMapping.get(d.child.getDataID());
           }
         });
@@ -3038,50 +3011,48 @@
         var $r = $elem.selectAll('text').data(config.svgLayout.rowActions);
         $r.enter().append('text').append('title');
         $r.exit().remove();
-        $r.attr('x', function(d, i) {
+        $r.attr('x', function (d, i) {
           return i * config.svgLayout.rowHeight;
-        }).text(function(d) {
+        }).text(function (d) {
           return d.icon;
-        }).on('click', function(d) {
+        }).on('click', function (d) {
           d.action.call(this, item.data, d);
-        }).select('title').text(function(d) {
+        }).select('title').text(function (d) {
           return d.name;
         });
       }
 
       function updateActionBars(headers, allRows, config) {
         // -- handle the Single columns  (!! use unflattened headers for filtering)
-        var allActionBarHeaders = headers.filter(function(d) {
+        var allActionBarHeaders = headers.filter(function (d) {
           return (d instanceof LineUp.LayoutActionColumn);
         });
         var actionRows = allRows.selectAll('.tableData.action')
-            .data(function(d) {
-              var dd = allActionBarHeaders.map(function(column) {
-                return {
-                  key: column.getDataID(), value: column.getColumnWidth(d),
+            .data(function (d) {
+              var dd = allActionBarHeaders.map(function (column) {
+                return {key: column.getDataID(), value: column.getColumnWidth(d),
                   data: d,
-                  offsetX: column.offsetX
-                };
+                  offsetX: column.offsetX};
               });
               return dd;
             });
         actionRows.enter()
             .append('g')
             .attr('class', 'tableData action')
-            .each(function(item) {
+            .each(function (item) {
               createActions(d3.select(this), item, config);
             });
 
         actionRows.exit().remove();
 
         actionRows
-            .attr('transform', function(d) {
+            .attr('transform', function (d) {
               return 'translate(' + (d.offsetX + 10) + ',' + (config.svgLayout.rowHeight * 0.5 + 1) + ')';
             });
       }
 
       function createRepr(col, row) {
-        var r = col.getValue(row, 'raw');
+        var r =col.getValue(row, 'raw');
         if (col instanceof LineUp.LayoutNumberColumn || col instanceof LineUp.LayoutStackedColumn) {
           r = (r === null || typeof r === 'undefined' ? 0 : isNaN(r) || r.toString() === '' ? '' : +r);
         }
@@ -3091,7 +3062,7 @@
       function generateTooltip(row, headers, config) {
         var $table = $('<div><table><thead><tr><th>Column</th><th>Value</th></tr></thead><tbody></tbody></table></div>');
         var $body = $table.find('tbody');
-        headers.forEach(function(header) {
+        headers.forEach(function (header) {
           var r = createRepr(header, row);
           if (typeof r === 'undefined') {
             r = '';
@@ -3112,21 +3083,15 @@
             $rows = this.$body.selectAll('.row');
         if (Array.isArray(row)) {
           this.storage.setSelection(row);
-          row = row.map(function(d) {
-            return d[primaryKey];
-          });
+          row = row.map(function(d) { return d[primaryKey]; });
           // ATS: Made this >= 0 instead of > 0, cause it could be at index 0
-          $rows.classed('selected', function(d) {
-            return row.indexOf(d[primaryKey]) >= 0;
-          });
+          $rows.classed('selected', function(d) { return row.indexOf(d[primaryKey]) >= 0; });
         } else if (row) {
           this.storage.setSelection([row]);
-          $rows.classed('selected', function(d) {
-            return d[primaryKey] === row[primaryKey];
-          });
+          $rows.classed('selected',function(d) { return d[primaryKey] === row[primaryKey]; });
         } else {
           this.storage.clearSelection();
-          $rows.classed('selected', false);
+          $rows.classed('selected',false);
         }
       };
       /**
@@ -3134,7 +3099,7 @@
        * @param headers - the headers as in {@link updateHeader}
        * @param data - the data array from {@link LineUpLocalStorage.prototype#getData()}
        */
-      LineUp.prototype.updateBody = function(headers, data, stackTransition) {
+      LineUp.prototype.updateBody = function (headers, data, stackTransition) {
         if (Array.isArray(headers) && headers.length === 0) {
           return;
         }
@@ -3152,13 +3117,13 @@
         stackTransition = stackTransition || false;
 
         var allHeaders = [];
-        headers.forEach(function(d) {
+        headers.forEach(function (d) {
           d.flattenMe(allHeaders);
         });
 
         var datLength = data.length, rawData = data;
         var rowScale = d3.scale.ordinal()
-            .domain(data.map(function(d) {
+            .domain(data.map(function (d) {
               var value = d[primaryKey];
 
               return (value === null || typeof value === 'undefined') ? '' : value;
@@ -3180,7 +3145,7 @@
         }
         // -- handle all row groups
 
-        var allRowsSuper = svg.selectAll('.row').data(data, function(d) {
+        var allRowsSuper = svg.selectAll('.row').data(data, function (d) {
           return d[primaryKey];
         });
         allRowsSuper.exit().remove();
@@ -3188,7 +3153,7 @@
         // --- append ---
         var allRowsSuperEnter = allRowsSuper.enter().append('g').attr({
           'class': 'row',
-          transform: function(d) { //init with its previous position
+          transform: function (d) { //init with its previous position
             var prev = prevRowScale(d[primaryKey]);
             if (typeof prev === 'undefined') { //if not defined from the bottom
               var range = rowScale.range();
@@ -3209,10 +3174,10 @@
 
         //    //--- update ---
         (this.config.renderingOptions.animation ? allRowsSuper.transition().duration(this.config.svgLayout.animationDuration) : allRowsSuper).attr({
-          'transform': function(d) {
+          'transform': function (d) {
             var value = d[primaryKey];
 
-            return 'translate(' + 0 + ',' + (value === null || typeof value === 'undefined' ? 0 : rowScale(value)) + ')';
+            return  'translate(' + 0 + ',' + (value === null || typeof value === 'undefined' ? 0 : rowScale(value)) + ')';
           }
         });
         var asStacked = showStacked(this.config);
@@ -3227,25 +3192,22 @@
             return that.config.numberformat(+v);
           }
 
-          headers.forEach(function(col) {
+          headers.forEach(function (col) {
                 if (col.column instanceof LineUp.LineUpNumberColumn) {
-                  textOverlays.push({
-                    id: col.id, value: col.getValue(row), label: that.config.numberformat(+col.getValue(row, 'raw')),
+                  textOverlays.push({id: col.id, value: col.getValue(row), label: that.config.numberformat(+col.getValue(row,'raw')),
                     x: col.offsetX,
-                    w: col.getColumnWidth()
-                  });
-                } else if (col instanceof LineUp.LayoutStackedColumn) {
+                    w: col.getColumnWidth()});
+                } else if (col instanceof  LineUp.LayoutStackedColumn) {
                   var allStackOffset = 0;
 
-                  col.children.forEach(function(child) {
+                  col.children.forEach(function (child) {
                     var allStackW = child.getWidth(row);
 
                     textOverlays.push({
-                          id: child.id,
-                          label: toValue(child.getValue(row, 'raw')) + ' -> (' + zeroFormat(child.getWidth(row)) + ')',
-                          w: asStacked ? allStackW : child.getColumnWidth(),
-                          x: (allStackOffset + col.offsetX)
-                        }
+                      id: child.id,
+                      label: toValue(child.getValue(row,'raw')) + ' -> (' + zeroFormat(child.getWidth(row)) + ')',
+                      w: asStacked ? allStackW : child.getColumnWidth(),
+                      x: (allStackOffset + col.offsetX)}
                     );
                     if (asStacked) {
                       allStackOffset += allStackW;
@@ -3260,22 +3222,23 @@
         }
 
         function renderOverlays($row, textOverlays, clazz, clipPrefix, clipSource) {
-          $row.selectAll('text.' + clazz).data(textOverlays).enter().append('text').attr({
+          $row.selectAll('text.' + clazz).data(textOverlays).enter().append('text').
+          attr({
             'class': 'tableData ' + clazz,
-            x: function(d) {
+            x: function (d) {
               return d.x;
             },
             y: that.config.svgLayout.rowHeight / 2,
-            'clip-path': function(d) {
+            'clip-path': function (d) {
               return 'url(' + (clipSource || '') + '#clip-' + clipPrefix + d.id + ')';
             }
-          }).text(function(d) {
+          }).text(function (d) {
             return d.label;
           });
         }
 
         allRowsSuper.on({
-          mouseenter: function(row) {
+          mouseenter: function (row) {
             var $row = d3.select(this);
             $row.classed('hover', true);
 //            d3.select(this.parent).classed('hovered', true)
@@ -3285,7 +3248,7 @@
             //generate clip paths for the text columns to avoid text overflow
             //see http://stackoverflow.com/questions/11742812/cannot-select-svg-foreignobject-element-in-d3
             //there is a bug in webkit which present camelCase selectors
-            var textClipPath = that.$bodySVG.select('defs.overlay').selectAll(function() {
+            var textClipPath = that.$bodySVG.select('defs.overlay').selectAll(function () {
               return this.getElementsByTagName('clipPath');
             }).data(textOverlays);
             textClipPath.enter().append('clipPath')
@@ -3293,19 +3256,19 @@
               height: '1000'
             });
             textClipPath.exit().remove();
-            textClipPath.attr('y', shift).attr('id', function(d) {
+            textClipPath.attr('y', shift).attr('id', function (d) {
               return 'clip-M' + d.id;
             });
             textClipPath.select('rect')
                 .attr({
-                  x: function(d) {
+                  x: function (d) {
                     return d.x;
                   },
-                  width: function(d) {
+                  width: function (d) {
                     return Math.max(d.w - 2, 0);
                   }
                 });
-            renderOverlays($row, textOverlays, 'hoveronly', 'M', that.getClipSource.apply(this));
+            renderOverlays($row, textOverlays, 'hoveronly', 'M',  that.getClipSource.apply(this));
 
             function absoluteRowPos(elem) {
               var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
@@ -3317,7 +3280,6 @@
               point = point.matrixTransform(matrix);
               return scrollTop + point.y;
             }
-
             if (that.config.interaction.tooltips) {
               that.tooltip.show(generateTooltip(row, allHeaders, that.config), {
                 x: d3.mouse(that.$container.node())[0] + 10,
@@ -3328,14 +3290,14 @@
             that.hoverHistogramBin(row);
             that.listeners['hover'](row, shift);
           },
-          mousemove: function() {
+          mousemove: function () {
             if (that.config.interaction.tooltips) {
               that.tooltip.move({
                 x: d3.mouse(that.$container.node())[0]
               });
             }
           },
-          mouseleave: function() {
+          mouseleave: function () {
             if (that.config.interaction.tooltips) {
               that.tooltip.hide();
             }
@@ -3344,7 +3306,7 @@
             d3.select(this).classed('hover', false);
             d3.select(this).selectAll('text.hoveronly').remove();
           },
-          click: function(row) {
+          click: function (row) {
             var $row = d3.select(this),
                 selected = that.storage.isSelected(row);
             if (that.config.interaction.multiselect(d3.event)) {
@@ -3370,7 +3332,7 @@
                   } else {
                     allselected = rawData.slice(j, i + 1);
                   }
-                  var toSelect = allRowsSuper.filter(function(d) {
+                  var toSelect = allRowsSuper.filter(function (d) {
                     return allselected.indexOf(d) >= 0;
                   }).classed('selected', true).data();
                   that.storage.selectAll(toSelect);
@@ -3408,14 +3370,13 @@
         updateActionBars(headers, allRows, that.config);
 
         LineUp.updateClipPaths(allHeaders, this.$bodySVG, 'B', true);
-
         //Get and set the clip source to be used for rendering overlays. Scoping context to a related DOM element.
         var clipSource = that.getClipSource.apply(this.$container[0][0]);
         updateText(allHeaders, allRows, svg, that.config, clipSource);
         updateCategorical(allHeaders, allRows, svg, that.config);
         if (that.config.renderingOptions.values) {
           allRowsSuper.classed('values', true);
-          allRowsSuper.each(function(row) {
+          allRowsSuper.each(function (row) {
             var $row = d3.select(this);
             renderOverlays($row, createOverlays(row), 'valueonly', 'B', clipSource);
           });
@@ -3431,20 +3392,20 @@
 
     /* global d3, jQuery */
     var LineUp;
-    (function(LineUp, d3, $, undefined) {
+    (function (LineUp, d3, $, undefined) {
       LineUp.prototype = LineUp.prototype || {};
 
-      LineUp.prototype.layoutHeaders = function(headers) {
+      LineUp.prototype.layoutHeaders = function (headers) {
         var offset = 0;
         var config = this.config,
             headerHeight = config.htmlLayout.headerHeight,
             headerOffset = config.htmlLayout.headerOffset;
 
-        headers.forEach(function(d) {
+        headers.forEach(function (d) {
 //        console.log(d);
           d.offsetX = offset;
           d.offsetY = headerOffset;
-          d.height = headerHeight - headerOffset * 2;
+          d.height = headerHeight - headerOffset*2;
           offset += d.getColumnWidth();
 
 //        console.log(d.getColumnWidth());
@@ -3454,28 +3415,28 @@
 
         //update all the plusSigns shifts
         var shift = offset + 4;
-        d3.values(config.svgLayout.plusSigns).forEach(function(addSign) {
+        d3.values(config.svgLayout.plusSigns).forEach(function (addSign) {
           addSign.x = shift;
           shift += addSign.w + 4;
         });
 
-        headers.filter(function(d) {
+        headers.filter(function (d) {
               return (d instanceof LineUp.LayoutStackedColumn);
             })
-            .forEach(function(d) {
+            .forEach(function (d) {
 
-              d.height = headerHeight / 2 - headerOffset * 2;
+              d.height = headerHeight / 2 - headerOffset*2;
 
               var localOffset = 0;
               var parentOffset = d.offsetX;
               var allChilds = d.children.concat(d.emptyColumns);
-              allChilds.map(function(child) {
+              allChilds.map(function (child) {
                 child.offsetX = parentOffset + localOffset;
                 child.localOffsetX = localOffset;
                 localOffset += child.getColumnWidth();
 
                 child.offsetY = headerHeight / 2 + headerOffset;
-                child.height = headerHeight / 2 - headerOffset * 2;
+                child.height = headerHeight / 2 - headerOffset*2;
               });
             });
         this.totalWidth = shift;
@@ -3485,7 +3446,7 @@
        * Render the given headers
        * @param headers - the array of headers, see {@link LineUpColumn}
        */
-      LineUp.prototype.updateHeader = function(headers) {
+      LineUp.prototype.updateHeader = function (headers) {
         if (Array.isArray(headers) && headers.length === 0) {
           return;
         }
@@ -3505,7 +3466,7 @@
         }
 
         var allHeaderData = [];
-        headers.forEach(function(d) {
+        headers.forEach(function (d) {
           d.flattenMe(allHeaderData, {addEmptyColumns: true});
         });
         //reverse order to render from right to left
@@ -3517,25 +3478,25 @@
 
         // -- Handle the header groups (exit,enter, update)
 
-        var allHeaders = svg.selectAll('.header').data(allHeaderData, function(d) {
+        var allHeaders = svg.selectAll('.header').data(allHeaderData, function (d) {
           return d.id;
         });
         allHeaders.exit().remove();
 
         // --- adding Element to class allHeaders
         var allHeadersEnter = allHeaders.enter().append('g').attr('class', 'header')
-            .classed('emptyHeader', function(d) {
+            .classed('emptyHeader', function (d) {
               return d instanceof LineUp.LayoutEmptyColumn || d instanceof LineUp.LayoutActionColumn;
             })
-            .classed('nestedHeader', function(d) {
+            .classed('nestedHeader', function (d) {
               return d && d.parent instanceof LineUp.LayoutStackedColumn;
             })
-            .call(function() {
+            .call(function () {
               that.addResortDragging(this, config);
             });
 
         // --- changing nodes for allHeaders
-        allHeaders.attr('transform', function(d) {
+        allHeaders.attr('transform', function (d) {
           return 'translate(' + d.offsetX + ',' + d.offsetY + ')';
         });
 
@@ -3544,7 +3505,7 @@
         allHeadersEnter.append('rect').attr({
           'class': 'labelBG',
           y: 0
-        }).style('fill', function(d) {
+        }).style('fill', function (d) {
               if (d instanceof LineUp.LayoutEmptyColumn) {
                 return 'lightgray';
               } else if (d.column && config.colorMapping.has(d.column.id)) {
@@ -3553,7 +3514,7 @@
                 return config.grayColor;
               }
             })
-            .on('click', function(d) {
+            .on('click', function (d) {
               // Uncharted (Dario): Removed click functionality from LayoutRankColumn instances
               if (d3.event.defaultPrevented || d instanceof LineUp.LayoutEmptyColumn || d instanceof LineUp.LayoutActionColumn || d instanceof LineUp.LayoutRankColumn) {
                 return;
@@ -3585,38 +3546,38 @@
 
 
         allHeaders.select('.labelBG').attr({
-          width: function(d) {
+          width: function (d) {
             // Uncharted (Dario): Added safety check to avoid negative values.
             return Math.max(d.getColumnWidth() - 5, 0);
           },
-          height: function(d) {
+          height: function (d) {
             return d.height;
           }
         });
 
         allHeadersEnter.append('g').attr('class', 'hist');
-        var allNumberHeaders = allHeaders.filter(function(d) {
+        var allNumberHeaders = allHeaders.filter(function (d) {
           return d instanceof LineUp.LayoutNumberColumn;
         });
         if (this.config.renderingOptions.histograms) {
-          allNumberHeaders.selectAll('g.hist').each(function(d) {
-            var $this = d3.select(this).attr('transform', 'scale(1,' + (d.height) + ')');
+          allNumberHeaders.selectAll('g.hist').each(function (d) {
+            var $this = d3.select(this).attr('transform','scale(1,'+ (d.height)+')');
             d.getHist(function(h) {
               if (!h) {
                 return;
               }
-              var s = d.value2pixel.copy().range([0, d.value2pixel.range()[1] - 5]);
+              var s = d.value2pixel.copy().range([0, d.value2pixel.range()[1]-5]);
               var $hist = $this.selectAll('rect').data(h);
               $hist.enter().append('rect');
               $hist.attr({
-                x: function(bin) {
+                x : function(bin) {
                   return s(bin.x);
                 },
                 width: function(bin) {
                   return s(bin.dx);
                 },
                 y: function(bin) {
-                  return 1 - bin.y;
+                  return 1-bin.y;
                 },
                 height: function(bin) {
                   return bin.y;
@@ -3631,11 +3592,11 @@
         // -- handle WeightHandle
 
         if (this.config.manipulative) {
-          allHeadersEnter.filter(function(d) {
+          allHeadersEnter.filter(function (d) {
             return !(d instanceof LineUp.LayoutEmptyColumn) && !(d instanceof LineUp.LayoutActionColumn);
           }).append('rect').attr({
             'class': 'weightHandle',
-            x: function(d) {
+            x: function (d) {
               // Uncharted (Dario): Added safety check to avoid negative values.
               return Math.max(d.getColumnWidth() - 5, 0);
             },
@@ -3644,11 +3605,11 @@
           });
 
           allHeaders.select('.weightHandle').attr({
-            x: function(d) {
+            x: function (d) {
               // Uncharted (Dario): Added safety check to avoid negative values.
               return Math.max(d.getColumnWidth() - 5, 0);
             },
-            height: function(d) {
+            height: function (d) {
               return d.height;
             }
           }).call(this.dragWeight); // TODO: adopt dragWeight function !
@@ -3664,24 +3625,24 @@
         //Get and set the clip source to be used for rendering overlays. Scoping context to a related DOM element.
         var clipSource = that.getClipSource.apply(this.$container[0][0]);
         allHeaders.select('.headerLabel')
-            .classed('sortedColumn', function(d) {
+            .classed('sortedColumn', function (d) {
               var sc = config.columnBundles[d.columnBundle].sortedColumn;
               return sc === d;
             })
             .attr({
-              y: function(d) {
+              y: function (d) {
                 if (d instanceof LineUp.LayoutStackedColumn || d.parent != null) {
                   return d.height / 2;
                 }
                 return d.height * 3 / 4;
               },
-              'clip-path': function(d) {
+              'clip-path': function (d) {
                 return 'url('+ clipSource +'#clip-H' + d.id + ')';
               }
-            }).text(function(d) {
+            }).text(function (d) {
           return d.getLabel();
         });
-        allHeaders.select('title').text(function(d) {
+        allHeaders.select('title').text(function (d) {
           return d.getLabel();
         });
 
@@ -3689,20 +3650,20 @@
         // -- handle the Sort Indicator
         allHeadersEnter.append('text').attr({
           'class': 'headerSort',
-          y: function(d) {
+          y: function (d) {
             return d.height / 2;
           },
           x: 2
         });
 
-        allHeaders.select('.headerSort').text(function(d) {
+        allHeaders.select('.headerSort').text(function (d) {
               var sc = config.columnBundles[d.columnBundle].sortedColumn;
               return ((sc === d) ?
                   ((config.columnBundles[d.columnBundle].sortingOrderAsc) ? '\uf0de' : '\uf0dd')
                   : '');
             })
             .attr({
-              y: function(d) {
+              y: function (d) {
                 return d.height / 2;
               }
             });
@@ -3714,20 +3675,20 @@
             {
               'class': 'stackedColumnInfo',
               text: '\uf1de',
-              filter: function(d) {
+              filter: function (d) {
                 return d instanceof LineUp.LayoutStackedColumn ? [d] : [];
               },
-              action: function(d) {
+              action: function (d) {
                 that.stackedColumnOptionsGui(d);
               }
             },
             {
               'class': 'singleColumnDelete',
               text: '\uf014',
-              filter: function(d) {
+              filter: function (d) {
                 return (d instanceof LineUp.LayoutStackedColumn || d instanceof LineUp.LayoutEmptyColumn || d instanceof LineUp.LayoutActionColumn) ? [] : [d];
               },
-              action: function(d) {
+              action: function (d) {
                 that.storage.removeColumn(d);
                 that.listeners['columns-changed'](that);
                 that.headerUpdateRequired = true;
@@ -3737,11 +3698,11 @@
             {
               'class': 'singleColumnFilter',
               text: '\uf0b0',
-              filter: function(d) {
+              filter: function (d) {
                 return (d.column) ? [d] : [];
               },
               offset: config.htmlLayout.buttonWidth,
-              action: function(d) {
+              action: function (d) {
                 if (d instanceof LineUp.LayoutStringColumn) {
                   that.openFilterPopup(d, d3.select(this));
                 } else if (d instanceof LineUp.LayoutCategoricalColumn) {
@@ -3753,7 +3714,7 @@
             }
           ];
 
-          buttons.forEach(function(button) {
+          buttons.forEach(function (button) {
             var $button = allHeaders.selectAll('.' + button.class).data(button.filter);
             $button.exit().remove();
             $button.enter().append('text')
@@ -3761,7 +3722,7 @@
                 .text(button.text)
                 .on('click', button.action);
             $button.attr({
-              x: function(d) {
+              x: function (d) {
                 return d.getColumnWidth() - config.htmlLayout.buttonRightPadding - (button.offset || 0);
               },
               y: config.htmlLayout.buttonTopPadding
@@ -3785,32 +3746,28 @@
         });
 
         addColumnButton.attr({
-          'transform': function(d) {
+          'transform': function (d) {
             return 'translate(' + d.x + ',' + d.y + ')';
           }
         });
 
-        addColumnButtonEnter.append("title").text(function(d) {
-          return d.title;
-        });
+        addColumnButtonEnter.append("title").text(function(d) { return d.title; });
 
         addColumnButtonEnter
-            .filter(function(d) {
-              return !d.render;
-            })
+            .filter(function(d) { return !d.render; })
             .append('rect').attr({
               x: 0,
               y: 0,
               rx: 5,
               ry: 5,
-              width: function(d) {
+              width: function (d) {
                 return d.w;
               },
-              height: function(d) {
+              height: function (d) {
                 return d.h;
               }
             })
-            .on('click', function(d) {
+            .on('click', function (d) {
               if ($.isFunction(d.action)) {
                 d.action.call(that, d);
               } else {
@@ -3819,14 +3776,12 @@
             });
 
         addColumnButtonEnter
-            .filter(function(d) {
-              return !d.render;
-            })
+            .filter(function(d) { return !d.render; })
             .append('text').attr({
-              x: function(d) {
+              x: function (d) {
                 return d.w / 2;
               },
-              y: function(d) {
+              y: function (d) {
                 return d.h / 2;
               }
             })
@@ -3836,13 +3791,11 @@
 
 
         addColumnButtonEnter
-            .filter(function(d) {
-              return !!d.render;
-            })
+            .filter(function(d) { return !!d.render; })
             .append(function(d) {
               return d.render.call(that, d);
             })
-            .on('click', function(d) {
+            .on('click', function (d) {
               if ($.isFunction(d.action)) {
                 d.action.call(that, d);
               } else {
@@ -3851,21 +3804,21 @@
             });
       };
 
-      LineUp.prototype.hoverHistogramBin = function(row) {
+      LineUp.prototype.hoverHistogramBin = function (row) {
         if (!this.config.renderingOptions.histograms) {
           return;
         }
         var $hists = this.$header.selectAll('g.hist');
-        $hists.selectAll('rect').classed('hover', false);
+        $hists.selectAll('rect').classed('hover',false);
         if (row) {
           this.$header.selectAll('g.hist').each(function(d) {
             if (d instanceof LineUp.LayoutNumberColumn) {
               var that = this;
-              d.getHist(function(hist) {
+              d.getHist(function (hist) {
                 if (hist) {
                   d.binOf(row, function(bin) {
                     if (bin >= 0) {
-                      d3.select(that).select('rect:nth-child(' + (bin + 1) + ')').classed('hover', true);
+                      d3.select(that).select('rect:nth-child('+(bin+1)+')').classed('hover',true);
                     }
                   });
                 }
@@ -3879,7 +3832,7 @@
 // ===============
 
 
-      LineUp.prototype.addResortDragging = function(xss) {
+      LineUp.prototype.addResortDragging = function (xss) {
         if (!this.config.manipulative) {
           return;
         }
@@ -3918,23 +3871,23 @@
 
           dragHeaderEnter.append('rect').attr({
             class: 'labelBG',
-            width: function(d) {
+            width: function (d) {
               return d.getColumnWidth();
             },
-            height: function(d) {
+            height: function (d) {
               return d.height;
             }
           });
 
           var x = d3.event.x;
           var y = d3.event.y;
-          dragHeader.attr('transform', function() {
+          dragHeader.attr('transform', function () {
             return 'translate(' + (d3.event.x + 3) + ',' + (d3.event.y - 10) + ')';
           });
 
 
           var allHeaderData = [];
-          that.storage.getColumnLayout().forEach(function(d) {
+          that.storage.getColumnLayout().forEach(function (d) {
             d.flattenMe(allHeaderData, {addEmptyColumns: true});
           });
 
@@ -3943,21 +3896,9 @@
             if (x > header.offsetX && (x - header.offsetX) < header.getColumnWidth()) {
               if (y > header.offsetY && (y - header.offsetY) < header.height) {
                 if ((x - header.offsetX < header.getColumnWidth() / 2)) {
-                  return {
-                    column: header,
-                    insert: 'l',
-                    tickX: (header.offsetX),
-                    tickY: (header.offsetY),
-                    tickH: header.height
-                  };
+                  return {column: header, insert: 'l', tickX: (header.offsetX), tickY: (header.offsetY), tickH: header.height};
                 } else {
-                  return {
-                    column: header,
-                    insert: 'r',
-                    tickX: (header.offsetX + header.getColumnWidth()),
-                    tickY: (header.offsetY),
-                    tickH: header.height
-                  };
+                  return {column: header, insert: 'r', tickX: (header.offsetX + header.getColumnWidth()), tickY: (header.offsetY), tickH: header.height};
                 }
               }
             }
@@ -3982,13 +3923,13 @@
           });
 
           columnTick.attr({
-            x: function(d) {
+            x: function (d) {
               return d.tickX - 5;
             },
-            y: function(d) {
+            y: function (d) {
               return d.tickY;
             },
-            height: function(d) {
+            height: function (d) {
               return d.tickH;
             }
           });
@@ -4040,7 +3981,7 @@
       };
 
 
-      LineUp.prototype.addNewEmptyStackedColumn = function() {
+      LineUp.prototype.addNewEmptyStackedColumn = function () {
         this.storage.addStackedColumn(null, -1);
         this.headerUpdateRequired = true;
         this.listeners['columns-changed'](this);
@@ -4048,7 +3989,7 @@
       };
 
 
-      LineUp.prototype.clearSelection = function() {
+      LineUp.prototype.clearSelection = function () {
         this.select();
       };
 
@@ -4061,9 +4002,9 @@
       LineUp.prototype.getClipSource = function() {
         if (this.ownerDocument &&
             this.ownerDocument.documentURI !== this.ownerDocument.baseURI) {
-              return this.ownerDocument.documentURI;
-            }
-          return '';
+          return this.ownerDocument.documentURI;
+        }
+        return '';
       };
 
       /**
@@ -4072,7 +4013,7 @@
        * @param change.column - the changed column, see {@link LineUpColumn}
        * @param change.value - the new column width
        */
-      LineUp.prototype.reweightHeader = function(change) {
+      LineUp.prototype.reweightHeader = function (change) {
 //    console.log(change);
         change.column.setColumnWidth(change.value);
         this.headerUpdateRequired = true;
@@ -4082,9 +4023,8 @@
 
     return LineUp;
   }
-
   if (typeof define === "function" && define.amd) {
-    define(['jquery', 'd3', 'underscore'], LineUpLoader);
+    define(['jquery','d3','underscore'], LineUpLoader);
   } else if (typeof module === "object" && module.exports) {
     // ATS: newer versions of jquery expect to be called with a window object
     var __jq = require('jquery');
