@@ -36,6 +36,9 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
     // Stores our current set of data.
     private _data : ITableSorterVisualRow[];
 
+    // used to keep track of `persistProperties` calls
+    private persistPropertiesTimeout : number;
+
     /**
      * The default settings for the visual
      */
@@ -230,7 +233,7 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
                         }
                     ]
                 };
-                this.host.persistProperties(objects);
+                this.callPersistProperties(objects);
             }
         });
         this.dimensions = { width: options.viewport.width, height: options.viewport.height };
@@ -582,9 +585,29 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
                 this.selectionManager.clear();
             }
 
-            this.host.persistProperties(objects);
+            this.callPersistProperties(objects);
         }
     }, 100);
+
+    /**
+     * Calling `persistProperties` multiple times during the same cycle causes `nested transactions` errors.
+     * To alleviate this issue a timeout is used as a mechanism that assumes that the last call to `persistProperties`
+     * contains the final and correct objects to be stored.
+     *
+     * @method callPersistProperties
+     * @param {Object} objects - The object to be stored.
+     */
+    private callPersistProperties(objects : Object) : void {
+        if (this.persistPropertiesTimeout !== null) {
+            clearTimeout(this.persistPropertiesTimeout);
+            this.persistPropertiesTimeout = null;
+        }
+
+        this.persistPropertiesTimeout = setTimeout(() => {
+            this.host.persistProperties(objects);
+            this.persistPropertiesTimeout = null;
+        });
+    }
 }
 
 /**
