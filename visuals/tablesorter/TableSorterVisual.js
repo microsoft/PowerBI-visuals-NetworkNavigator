@@ -410,7 +410,7 @@ var TableSorterVisual = (function (_super) {
                 table: {
                     rows: {
                         for: { in: 'Values' },
-                        dataReductionAlgorithm: { window: { count: 100 } }
+                        dataReductionAlgorithm: { window: { count: 500 } }
                     },
                     rowCount: { preferred: { min: 1 } }
                 }
