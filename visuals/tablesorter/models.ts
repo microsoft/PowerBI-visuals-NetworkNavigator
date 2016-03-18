@@ -1,7 +1,7 @@
 /**
  * The line up row
  */
-export interface ILineUpRow {
+export interface ITableSorterRow {
 
     /**
      * Data for each column in the row
@@ -19,12 +19,12 @@ export interface ILineUpRow {
     selected: boolean;
 
     /**
-     * Returns true if this lineup row equals another
+     * Returns true if this table sorter row equals another
      */
-    equals(b: ILineUpRow): boolean;
+    equals(b: ITableSorterRow): boolean;
 }
 
-export interface ILineUpSort {
+export interface ITableSorterSort {
     /**
      * The column that was sorted
      */
@@ -48,9 +48,9 @@ export interface ILineUpSort {
 }
 
 /**
- * Rerepents a column in lineup
+ * Rerepents a column in table sorter
  */
-export interface ILineUpColumn {
+export interface ITableSorterColumn {
     /**
      * The field name of the column
      */
@@ -88,18 +88,18 @@ export interface ILineUpColumn {
 }
 
 /**
- * Represents the configuration of a lineup instance
+ * Represents the configuration of a table sorter instance
  */
-export interface ILineUpConfiguration {
+export interface ITableSorterConfiguration {
     /**
      * The primary key of the layout
      */
     primaryKey: string;
 
     /**
-     * The list of columns for lineup
+     * The list of columns for table sorter
      */
-    columns: ILineUpColumn[];
+    columns: ITableSorterColumn[];
 
     /**
      * The layout of the columns
@@ -107,15 +107,15 @@ export interface ILineUpConfiguration {
     layout?: any;
 
     /**
-     * The sort of the lineup
+     * The sort of the table sorter
      */
-    sort?: ILineUpSort;
+    sort?: ITableSorterSort;
 }
 
 /**
- * Represents settings in lineup
+ * Represents settings in table sorter
  */
-export interface ILineUpSettings {
+export interface ITableSorterSettings {
     selection?: {
 
         /**
@@ -151,7 +151,7 @@ export interface ILineUpSettings {
         histograms?: boolean;
 
         /**
-         * Should animation be used when transitioning states in lineup
+         * Should animation be used when transitioning states in table sorter
          */
         animation?: boolean;
 
@@ -163,7 +163,7 @@ export interface ILineUpSettings {
 }
 
 /**
- * Provides the data provider interface for lineup
+ * Provides the data provider interface for table sorter
  */
 export interface IDataProvider {
 
@@ -180,23 +180,23 @@ export interface IDataProvider {
     /**
      * Generates a histogram for the values, each value must be between 0-1
      */
-    generateHistogram(column: ILineUpColumn, options: IQueryOptions) : PromiseLike<number[]>;
+    generateHistogram(column: ITableSorterColumn, options: IQueryOptions) : PromiseLike<number[]>;
 
     /**
      * Called when the data should be sorted
      */
-    sort?: (sort: ILineUpSort) => void;
+    sort?: (sort: ITableSorterSort) => void;
 
     /**
      * Called when the data is filtered
      */
-    filter?: (filter: ILineUpFilter) => void;
+    filter?: (filter: ITableSorterFilter) => void;
 }
 
 /**
  * Represents a filter
  */
-export interface ILineUpFilter {
+export interface ITableSorterFilter {
     column: string;
     value: string | {
         domain: [number, number];
@@ -219,12 +219,12 @@ export interface IQueryOptions {
     /**
      * The query to run
      */
-    query?: ILineUpFilter[];
+    query?: ITableSorterFilter[];
 
     /**
      * The current sort
      */
-    sort?: ILineUpSort[];
+    sort?: ITableSorterSort[];
 }
 
 /**
@@ -239,5 +239,5 @@ export interface IQueryResult {
     /**
      * The matching results
      */
-    results: ILineUpRow[];
+    results: ITableSorterRow[];
 }

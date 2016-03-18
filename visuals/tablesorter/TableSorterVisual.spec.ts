@@ -1,11 +1,11 @@
 import { Utils as SpecUtils } from "../../base/spec/visualHelpers";
 import { expect } from "chai";
-import { LineUp } from "./LineUp";
-import { ILineUpSettings, ILineUpRow, ILineUpColumn } from "./models";
-import { default as LineUpVisual  } from "./LineUpVisual";
+import { TableSorter } from "./TableSorter";
+import { ITableSorterSettings, ITableSorterRow, ITableSorterColumn } from "./models";
+import { default as TableSorterVisual  } from "./TableSorterVisual";
 import * as $ from "jquery";
 
-describe('LineUpVisual', () => {
+describe('TableSorterVisual', () => {
     var parentEle;
     beforeEach(() => {
         global['d3'] = require("d3");
@@ -21,7 +21,7 @@ describe('LineUpVisual', () => {
     });
 
     let createVisual = () => {
-        let instance = new LineUpVisual(true, {
+        let instance = new TableSorterVisual(true, {
             presentation: {
                 animation: false
             }
@@ -40,15 +40,15 @@ describe('LineUpVisual', () => {
         expect(createVisual()).to.not.be.undefined;
     });
 
-    it('should remove columns from LineUp.configuration if columns are removed from PBI', () => {
+    it('should remove columns from TableSorter.configuration if columns are removed from PBI', () => {
         let { instance } = createVisual();
 
         // Load initial data
         instance.update(SpecUtils.createUpdateOptionsWithData());
-        expect(instance.lineup.configuration.columns.length).to.be.equal(2);
+        expect(instance.tableSorter.configuration.columns.length).to.be.equal(2);
 
         // Pretend that we had an existing config
-        var config = instance.lineup.configuration;
+        var config = instance.tableSorter.configuration;
         var newOptions = SpecUtils.createUpdateOptionsWithSmallData();
         newOptions.dataViews[0].metadata = <any>{
             objects: {
@@ -62,20 +62,20 @@ describe('LineUpVisual', () => {
         instance.update(newOptions);
 
         // Make sure it removed the extra column
-        expect(instance.lineup.configuration.columns.length).to.be.equal(1);
+        expect(instance.tableSorter.configuration.columns.length).to.be.equal(1);
     });
 
-    it('should remove sort from LineUp.configuration if columns are removed from PBI', () => {
+    it('should remove sort from TableSorter.configuration if columns are removed from PBI', () => {
         let { instance } = createVisual();
 
         // Load initial data
         var data = SpecUtils.createUpdateOptionsWithData();
         instance.update(data);
-        expect(instance.lineup.configuration.columns.length).to.be.equal(2);
+        expect(instance.tableSorter.configuration.columns.length).to.be.equal(2);
 
         // Pretend that we had an existing config
         var newOptions = SpecUtils.createUpdateOptionsWithSmallData();
-        var config = instance.lineup.configuration;
+        var config = instance.tableSorter.configuration;
 
         // Add a sort to the missing data, which in this case is the second column in the original data
         config.sort = {
@@ -96,6 +96,6 @@ describe('LineUpVisual', () => {
         instance.update(newOptions);
 
         // Make sure it removed the extra column
-        expect(instance.lineup.configuration.sort).to.be.undefined;
+        expect(instance.tableSorter.configuration.sort).to.be.undefined;
     });
 });

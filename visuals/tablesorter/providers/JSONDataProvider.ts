@@ -1,4 +1,4 @@
-import { IDataProvider, IQueryOptions, IQueryResult, ILineUpColumn, ILineUpSort } from "../models";
+import { IDataProvider, IQueryOptions, IQueryResult, ITableSorterColumn, ITableSorterSort } from "../models";
 
 /**
  * A Data provider for a simple json array
@@ -36,7 +36,7 @@ export class JSONDataProvider implements IDataProvider {
     /**
      * Generates a histogram for this data set
      */
-    public generateHistogram(column: ILineUpColumn, options: IQueryOptions) : Promise<number[]> {
+    public generateHistogram(column: ITableSorterColumn, options: IQueryOptions) : Promise<number[]> {
         return new Promise<number[]>((resolve) => {
             let final = this.getFilteredData(options);
             let values : number[] = final.map(n => n[column.column]);
@@ -78,7 +78,7 @@ export class JSONDataProvider implements IDataProvider {
             };
 
             let minMax = {};
-            const calcStackedValue = (item, sortToCheck : ILineUpSort, minMax: { [col: string] : { min:number, max: number}}) => {
+            const calcStackedValue = (item, sortToCheck : ITableSorterSort, minMax: { [col: string] : { min:number, max: number}}) => {
                 let columns = sortToCheck.stack.columns;
                 if (columns) {
                     return columns.reduce((a, v) => {

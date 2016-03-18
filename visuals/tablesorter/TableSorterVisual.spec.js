@@ -1,9 +1,9 @@
 "use strict";
 var visualHelpers_1 = require("../../base/spec/visualHelpers");
 var chai_1 = require("chai");
-var LineUpVisual_1 = require("./LineUpVisual");
+var TableSorterVisual_1 = require("./TableSorterVisual");
 var $ = require("jquery");
-describe('LineUpVisual', function () {
+describe('TableSorterVisual', function () {
     var parentEle;
     beforeEach(function () {
         global['d3'] = require("d3");
@@ -17,7 +17,7 @@ describe('LineUpVisual', function () {
         parentEle = null;
     });
     var createVisual = function () {
-        var instance = new LineUpVisual_1.default(true, {
+        var instance = new TableSorterVisual_1.default(true, {
             presentation: {
                 animation: false
             }
@@ -33,13 +33,13 @@ describe('LineUpVisual', function () {
     it('should load', function () {
         chai_1.expect(createVisual()).to.not.be.undefined;
     });
-    it('should remove columns from LineUp.configuration if columns are removed from PBI', function () {
+    it('should remove columns from TableSorter.configuration if columns are removed from PBI', function () {
         var instance = createVisual().instance;
         // Load initial data
         instance.update(visualHelpers_1.Utils.createUpdateOptionsWithData());
-        chai_1.expect(instance.lineup.configuration.columns.length).to.be.equal(2);
+        chai_1.expect(instance.tableSorter.configuration.columns.length).to.be.equal(2);
         // Pretend that we had an existing config
-        var config = instance.lineup.configuration;
+        var config = instance.tableSorter.configuration;
         var newOptions = visualHelpers_1.Utils.createUpdateOptionsWithSmallData();
         newOptions.dataViews[0].metadata = {
             objects: {
@@ -51,17 +51,17 @@ describe('LineUpVisual', function () {
         // Run update again with new options
         instance.update(newOptions);
         // Make sure it removed the extra column
-        chai_1.expect(instance.lineup.configuration.columns.length).to.be.equal(1);
+        chai_1.expect(instance.tableSorter.configuration.columns.length).to.be.equal(1);
     });
-    it('should remove sort from LineUp.configuration if columns are removed from PBI', function () {
+    it('should remove sort from TableSorter.configuration if columns are removed from PBI', function () {
         var instance = createVisual().instance;
         // Load initial data
         var data = visualHelpers_1.Utils.createUpdateOptionsWithData();
         instance.update(data);
-        chai_1.expect(instance.lineup.configuration.columns.length).to.be.equal(2);
+        chai_1.expect(instance.tableSorter.configuration.columns.length).to.be.equal(2);
         // Pretend that we had an existing config
         var newOptions = visualHelpers_1.Utils.createUpdateOptionsWithSmallData();
-        var config = instance.lineup.configuration;
+        var config = instance.tableSorter.configuration;
         // Add a sort to the missing data, which in this case is the second column in the original data
         config.sort = {
             // This column is removed in the "Small" dataset
@@ -78,6 +78,6 @@ describe('LineUpVisual', function () {
         // Run update again with new options
         instance.update(newOptions);
         // Make sure it removed the extra column
-        chai_1.expect(instance.lineup.configuration.sort).to.be.undefined;
+        chai_1.expect(instance.tableSorter.configuration.sort).to.be.undefined;
     });
 });

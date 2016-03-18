@@ -1,11 +1,11 @@
 require("../../base/testSetup");
 
 import { expect } from "chai";
-import { LineUp } from "./LineUp";
-import { ILineUpSettings, ILineUpRow, ILineUpColumn, IDataProvider } from "./models";
+import { TableSorter } from "./TableSorter";
+import { ITableSorterSettings, ITableSorterRow, ITableSorterColumn, IDataProvider } from "./models";
 import * as $ from "jquery";
 
-describe('LineUp', () => {
+describe('TableSorter', () => {
     var parentEle;
     beforeEach(() => {
         global['$'] = require("jquery");
@@ -25,7 +25,7 @@ describe('LineUp', () => {
         let ele = $('<div>');
         parentEle.append(ele);
         var result = {
-            instance: new LineUp(ele),
+            instance: new TableSorter(ele),
             element: ele
         };
         result.instance.settings = {
@@ -37,7 +37,7 @@ describe('LineUp', () => {
     };
 
     var createFakeData = () => {
-        let rows: ILineUpRow[] = [];
+        let rows: ITableSorterRow[] = [];
         for (var i = 0; i < 100; i++) {
             (function(myId) {
                 rows.push({
@@ -143,7 +143,7 @@ describe('LineUp', () => {
         };
     };
 
-    var loadInstanceWithSettings = (settings: ILineUpSettings) => {
+    var loadInstanceWithSettings = (settings: ITableSorterSettings) => {
         let { instance, element } = createInstance();
         let { data } = createFakeData();
 
@@ -177,7 +177,7 @@ describe('LineUp', () => {
         });
         it('should load some merge new settings', () => {
             let { instance } = createInstance();
-            let newSettings: ILineUpSettings = {
+            let newSettings: ITableSorterSettings = {
                 presentation: {
                     histograms: false
                 }
@@ -218,7 +218,7 @@ describe('LineUp', () => {
             it("should call the event when a column header is clicked", () => {
                 let { instance, element } = createInstance();
                 let called = false;
-                instance.events.on(LineUp.EVENTS.SORT_CHANGED, (item) => {
+                instance.events.on(TableSorter.EVENTS.SORT_CHANGED, (item) => {
                     called = true;
                 });
                 let providerInfo = createProvider(createFakeData().data);
@@ -234,7 +234,7 @@ describe('LineUp', () => {
 
             it("should call the event with the correct params", () => {
                 let { instance, element } = createInstance();
-                instance.events.on(LineUp.EVENTS.SORT_CHANGED, (colName) => {
+                instance.events.on(TableSorter.EVENTS.SORT_CHANGED, (colName) => {
                     expect(colName).to.equal("col1");
                 });
 
@@ -252,7 +252,7 @@ describe('LineUp', () => {
             it("should call the event when a row is clicked", () => {
                 let { instance, element } = createInstance();
                 let called = false;
-                instance.events.on(LineUp.EVENTS.SELECTION_CHANGED, (selection) => {
+                instance.events.on(TableSorter.EVENTS.SELECTION_CHANGED, (selection) => {
                     called = true;
                     expect(selection.length).to.be.equal(1);
                     expect(selection.col1).to.be.equal("FAKE_0"); // Very first row
@@ -277,7 +277,7 @@ describe('LineUp', () => {
                     row.click();
 
                     let called = false;
-                    instance.events.on(LineUp.EVENTS.SELECTION_CHANGED, (selection) => {
+                    instance.events.on(TableSorter.EVENTS.SELECTION_CHANGED, (selection) => {
                         called = true;
                         expect(selection.length).to.be.equal(0);
                     });
@@ -450,7 +450,7 @@ describe('LineUp', () => {
                 let {instance, data, dataLoaded } = loadInstanceWithStackedColumns();
                 return dataLoaded.then(() => {
                     let called = false;
-                    instance.events.on(LineUp.EVENTS.CONFIG_CHANGED, () => {
+                    instance.events.on(TableSorter.EVENTS.CONFIG_CHANGED, () => {
                         called = true;
                     });
 

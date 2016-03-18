@@ -13,18 +13,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 /// <reference path="../../base/references.d.ts"/>
 var VisualBase_1 = require("../../base/VisualBase");
 var Utils_1 = require("../../base/Utils");
-var LineUp_1 = require("./LineUp");
+var TableSorter_1 = require("./TableSorter");
 var JSONDataProvider_1 = require("./providers/JSONDataProvider");
 var SelectionId = powerbi.visuals.SelectionId;
 var SelectionManager = powerbi.visuals.utility.SelectionManager;
 var VisualDataRoleKind = powerbi.VisualDataRoleKind;
 var colors = require("../../base/powerbi/colors");
-var LineUpVisual = (function (_super) {
-    __extends(LineUpVisual, _super);
+var TableSorterVisual = (function (_super) {
+    __extends(TableSorterVisual, _super);
     /**
      * The constructor for the visual
      */
-    function LineUpVisual(noCss, initialSettings) {
+    function TableSorterVisual(noCss, initialSettings) {
         var _this = this;
         if (noCss === void 0) { noCss = false; }
         _super.call(this);
@@ -37,8 +37,8 @@ var LineUpVisual = (function (_super) {
          * Resizer function to resize lineup
          */
         this.lineupResizer = _.debounce(function () {
-            if (_this.lineup && _this.lineup.lineupImpl) {
-                _this.lineup.lineupImpl.updateBody();
+            if (_this.tableSorter && _this.tableSorter.lineupImpl) {
+                _this.tableSorter.lineupImpl.updateBody();
             }
         }, 100);
         /**
@@ -46,7 +46,7 @@ var LineUpVisual = (function (_super) {
          */
         this.onSelectionChanged = _.debounce(function (rows) {
             var filter;
-            var _a = _this.lineup.settings.selection, singleSelect = _a.singleSelect, multiSelect = _a.multiSelect;
+            var _a = _this.tableSorter.settings.selection, singleSelect = _a.singleSelect, multiSelect = _a.multiSelect;
             if (singleSelect || multiSelect) {
                 if (rows && rows.length) {
                     var expr = rows[0].filterExpr;
@@ -94,19 +94,19 @@ var LineUpVisual = (function (_super) {
         this.initialSettings = initialSettings || {};
     }
     /** This is called once when the visual is initialially created */
-    LineUpVisual.prototype.init = function (options) {
+    TableSorterVisual.prototype.init = function (options) {
         var _this = this;
         _super.prototype.init.call(this, options, this.template, true);
         this.host = options.host;
         this.selectionManager = new SelectionManager({
             hostServices: options.host
         });
-        this.lineup = new LineUp_1.LineUp(this.element.find(".lineup"));
-        this.lineup.settings = this.initialSettings;
-        this.lineup.events.on("selectionChanged", function (rows) { return _this.onSelectionChanged(rows); });
-        this.lineup.events.on(LineUp_1.LineUp.EVENTS.FILTER_CHANGED, function (filter) { return _this.onFilterChanged(filter); });
-        this.lineup.events.on(LineUp_1.LineUp.EVENTS.CLEAR_SELECTION, function () { return _this.onSelectionChanged(); });
-        this.lineup.events.on("configurationChanged", function (config) {
+        this.tableSorter = new TableSorter_1.TableSorter(this.element.find(".lineup"));
+        this.tableSorter.settings = this.initialSettings;
+        this.tableSorter.events.on("selectionChanged", function (rows) { return _this.onSelectionChanged(rows); });
+        this.tableSorter.events.on(TableSorter_1.TableSorter.EVENTS.FILTER_CHANGED, function (filter) { return _this.onFilterChanged(filter); });
+        this.tableSorter.events.on(TableSorter_1.TableSorter.EVENTS.CLEAR_SELECTION, function () { return _this.onSelectionChanged(); });
+        this.tableSorter.events.on("configurationChanged", function (config) {
             if (!_this.loadingData) {
                 var objects = {
                     merge: [
@@ -125,7 +125,7 @@ var LineUpVisual = (function (_super) {
         this.dimensions = { width: options.viewport.width, height: options.viewport.height };
     };
     /** Update is called for data updates, resizes & formatting changes */
-    LineUpVisual.prototype.update = function (options) {
+    TableSorterVisual.prototype.update = function (options) {
         this.loadingData = true;
         _super.prototype.update.call(this, options);
         // Assume that data updates won't happen when resizing
@@ -148,7 +148,7 @@ var LineUpVisual = (function (_super) {
     /**
      * Enumerates the instances for the objects that appear in the power bi panel
      */
-    LineUpVisual.prototype.enumerateObjectInstances = function (options) {
+    TableSorterVisual.prototype.enumerateObjectInstances = function (options) {
         var instances = _super.prototype.enumerateObjectInstances.call(this, options) || [{
                 selector: null,
                 objectName: options.objectName,
@@ -156,15 +156,15 @@ var LineUpVisual = (function (_super) {
             }];
         if (options.objectName === 'layout') {
             $.extend(true, instances[0].properties, {
-                layout: JSON.stringify(this.lineup.configuration)
+                layout: JSON.stringify(this.tableSorter.configuration)
             });
         }
         else {
-            $.extend(true, instances[0].properties, this.lineup.settings[options.objectName]);
+            $.extend(true, instances[0].properties, this.tableSorter.settings[options.objectName]);
         }
         return instances;
     };
-    Object.defineProperty(LineUpVisual.prototype, "dimensions", {
+    Object.defineProperty(TableSorterVisual.prototype, "dimensions", {
         /**
          * Getter for dimensions
          */
@@ -181,13 +181,13 @@ var LineUpVisual = (function (_super) {
     /**
      * Gets the css used for this element
      */
-    LineUpVisual.prototype.getCss = function () {
-        return this.noCss ? [] : _super.prototype.getCss.call(this).concat([require("!css!sass!./css/LineUp.scss"), require("!css!sass!./css/LineUpVisual.scss")]);
+    TableSorterVisual.prototype.getCss = function () {
+        return this.noCss ? [] : _super.prototype.getCss.call(this).concat([require("!css!sass!./css/TableSorter.scss"), require("!css!sass!./css/TableSorterVisual.scss")]);
     };
     /**
      * Gets a lineup config from the data view
      */
-    LineUpVisual.prototype.getConfigFromDataView = function () {
+    TableSorterVisual.prototype.getConfigFromDataView = function () {
         var newColArr = this.dataViewTable.columns.slice(0).map(function (c) {
             return {
                 label: c.displayName,
@@ -265,7 +265,7 @@ var LineUpVisual = (function (_super) {
     /**
      * Converts the data from power bi to a data we can use
      */
-    LineUpVisual.converter = function (view, config, selectedIds) {
+    TableSorterVisual.converter = function (view, config, selectedIds) {
         var data = [];
         if (view && view.table) {
             var table = view.table;
@@ -299,7 +299,7 @@ var LineUpVisual = (function (_super) {
     /**
      * Updates the height of the wrapper to fill the remaining space
      */
-    LineUpVisual.prototype.updateWrapperHeight = function () {
+    TableSorterVisual.prototype.updateWrapperHeight = function () {
         var wrapper = this.element.find(".lu-wrapper");
         var header = this.element.find(".lu-header");
         if (wrapper.length && header.length) {
@@ -311,33 +311,33 @@ var LineUpVisual = (function (_super) {
     /**
      * Event listener for when the visual data's changes
      */
-    LineUpVisual.prototype.checkDataChanged = function () {
+    TableSorterVisual.prototype.checkDataChanged = function () {
         var _this = this;
         if (this.dataViewTable) {
             var config = this.getConfigFromDataView();
-            var newData = LineUpVisual.converter(this.dataView, config, this.selectionManager.getSelectionIds());
+            var newData = TableSorterVisual.converter(this.dataView, config, this.selectionManager.getSelectionIds());
             var selectedRows = newData.filter(function (n) { return n.selected; });
-            this.lineup.configuration = config;
+            this.tableSorter.configuration = config;
             if (Utils_1.default.hasDataChanged(newData, this._data, function (a, b) { return a.identity.equals(b.identity); })) {
                 this._data = newData;
-                this.lineup.count = this._data.length;
-                this.lineup.dataProvider = new MyDataProvider(newData, function () { return !!_this.dataView.metadata.segment; }, function () {
+                this.tableSorter.count = this._data.length;
+                this.tableSorter.dataProvider = new MyDataProvider(newData, function () { return !!_this.dataView.metadata.segment; }, function () {
                     _this.waitingForMoreData = true;
                     _this.host.loadMoreData();
                 }, function (sort) { return _this.onSorted(sort); }, function (filter) { return _this.onFilterChanged(filter); });
             }
-            this.lineup.selection = selectedRows;
+            this.tableSorter.selection = selectedRows;
         }
     };
     /**
      * Listener for when the visual settings changed
      */
-    LineUpVisual.prototype.checkSettingsChanged = function () {
+    TableSorterVisual.prototype.checkSettingsChanged = function () {
         if (this.dataView) {
             // Store this to compare
-            var oldSettings = $.extend(true, {}, this.lineup.settings);
+            var oldSettings = $.extend(true, {}, this.tableSorter.settings);
             // Make sure we have the default values
-            var updatedSettings = $.extend(true, {}, this.lineup.settings, LineUpVisual.VISUAL_DEFAULT_SETTINGS, this.initialSettings || {});
+            var updatedSettings = $.extend(true, {}, this.tableSorter.settings, TableSorterVisual.VISUAL_DEFAULT_SETTINGS, this.initialSettings || {});
             // Copy over new values
             var newObjs = $.extend(true, {}, this.dataView.metadata.objects);
             if (newObjs) {
@@ -350,23 +350,23 @@ var LineUpVisual = (function (_super) {
                     }
                 }
             }
-            this.lineup.settings = updatedSettings;
+            this.tableSorter.settings = updatedSettings;
         }
     };
     /**
      * Gets called when a filter is changed.
      */
-    LineUpVisual.prototype.onFilterChanged = function (filter) {
-        var mySettings = this.lineup.settings;
+    TableSorterVisual.prototype.onFilterChanged = function (filter) {
+        var mySettings = this.tableSorter.settings;
         if (VisualBase_1.VisualBase.EXPERIMENTAL_ENABLED && mySettings.experimental && mySettings.experimental.serverSideFiltering) {
             return true;
         }
     };
     /**
-     * Listens for lineup to be sorted
+     * Listens for table sorter to be sorted
      */
-    LineUpVisual.prototype.onSorted = function (sort) {
-        var mySettings = this.lineup.settings;
+    TableSorterVisual.prototype.onSorted = function (sort) {
+        var mySettings = this.tableSorter.settings;
         if (VisualBase_1.VisualBase.EXPERIMENTAL_ENABLED && mySettings.experimental && mySettings.experimental.serverSideSorting) {
             var args = null;
             if (sort) {
@@ -387,7 +387,7 @@ var LineUpVisual = (function (_super) {
     /**
      * The default settings for the visual
      */
-    LineUpVisual.VISUAL_DEFAULT_SETTINGS = $.extend(true, {}, LineUp_1.LineUp.DEFAULT_SETTINGS, {
+    TableSorterVisual.VISUAL_DEFAULT_SETTINGS = $.extend(true, {}, TableSorter_1.TableSorter.DEFAULT_SETTINGS, {
         presentation: {
             columnColors: function (idx) {
                 return colors[idx % colors.length];
@@ -401,7 +401,7 @@ var LineUpVisual = (function (_super) {
     /**
      * The set of capabilities for the visual
      */
-    LineUpVisual.capabilities = $.extend(true, {}, VisualBase_1.VisualBase.capabilities, {
+    TableSorterVisual.capabilities = $.extend(true, {}, VisualBase_1.VisualBase.capabilities, {
         dataRoles: [{
                 name: 'Values',
                 kind: VisualDataRoleKind.Grouping
@@ -510,7 +510,7 @@ var LineUpVisual = (function (_super) {
                 properties: {
                     serverSideSorting: {
                         displayName: "Server Side Sorting",
-                        description: "If true, lineup will use PowerBI services to sort the data, rather than doing it client side",
+                        description: "If true, Table Sorter will use PowerBI services to sort the data, rather than doing it client side",
                         type: { bool: true }
                     } /*,
                     serverSideFiltering: {
@@ -525,13 +525,13 @@ var LineUpVisual = (function (_super) {
             custom: {}
         }
     });
-    LineUpVisual = __decorate([
+    TableSorterVisual = __decorate([
         Utils_1.Visual(require("./build.js").output.PowerBI)
-    ], LineUpVisual);
-    return LineUpVisual;
+    ], TableSorterVisual);
+    return TableSorterVisual;
 }(VisualBase_1.VisualBase));
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = LineUpVisual;
+exports.default = TableSorterVisual;
 /**
  * The data provider for our lineup instance
  */
