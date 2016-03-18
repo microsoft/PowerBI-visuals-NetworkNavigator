@@ -80,6 +80,10 @@ export class TimeBrush {
     public set dimensions(value: any) {
         $.extend(this._dimensions, value);
         this.resizeElements();
+        if (this._range) {
+            this.brush.extent(<any>this._range);
+            this.brush(d3.select(this.element.find(".brush")[0]));
+        }
     }
 
     /**
@@ -98,10 +102,8 @@ export class TimeBrush {
                     return true;
                 } else {
                     // Check each date
-                    range.forEach((v, i) => {
-                        if (v.getTime() !== this._range[i].getTime()) {
-                            return true;
-                        }
+                    return range.some((v, i) => {
+                        return v.getTime() !== this._range[i].getTime();
                     });
                 }
             }

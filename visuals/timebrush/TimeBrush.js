@@ -4,14 +4,7 @@ var $ = require("jquery");
 var _ = require("lodash");
 var d3 = require("d3");
 var DEBOUNCE_TIME = 1000;
-/**
-* Represents a timebrush
-*/
-/* @Mixin(EventEmitter)*/
 var TimeBrush = (function () {
-    /**
-     * Constructor for the timebrush
-     */
     function TimeBrush(element, dimensions) {
         this._dimensions = { width: 500, height: 500 };
         this._eventEmitter = new EventEmitter_1.default();
@@ -27,15 +20,9 @@ var TimeBrush = (function () {
         }
     }
     Object.defineProperty(TimeBrush.prototype, "data", {
-        /**
-         * Returns the data contained in this timebrush
-         */
         get: function () {
             return this._data;
         },
-        /**
-         * Setter for the data
-         */
         set: function (data) {
             this._data = data || [];
             this.x.domain(d3.extent(this._data.map(function (d) { return d.date; })));
@@ -46,10 +33,6 @@ var TimeBrush = (function () {
         configurable: true
     });
     Object.defineProperty(TimeBrush.prototype, "events", {
-        /**
-         * Gets an event emitter by which events can be listened to
-         * Note: Would be nice if we could mixin EventEmitter
-         */
         get: function () {
             return this._eventEmitter;
         },
@@ -57,44 +40,34 @@ var TimeBrush = (function () {
         configurable: true
     });
     Object.defineProperty(TimeBrush.prototype, "dimensions", {
-        /**
-         * Gets the dimensions of this timebrush
-         */
         get: function () {
             return this._dimensions;
         },
-        /**
-         * Sets the dimensions of this timebrush
-         */
         set: function (value) {
             $.extend(this._dimensions, value);
             this.resizeElements();
+            if (this._range) {
+                this.brush.extent(this._range);
+                this.brush(d3.select(this.element.find(".brush")[0]));
+            }
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TimeBrush.prototype, "selectedRange", {
-        /**
-         * Sets the currently selected range of dates
-         */
         set: function (range) {
             function selectedRangeChanged() {
                 var _this = this;
-                // One is set, other is unset
                 if ((!range || !this._range) && (range || this._range)) {
                     return true;
                 }
                 if (range && this._range) {
-                    // Length of Array Changed
                     if (range.length !== this._range.length) {
                         return true;
                     }
                     else {
-                        // Check each date
-                        range.forEach(function (v, i) {
-                            if (v.getTime() !== _this._range[i].getTime()) {
-                                return true;
-                            }
+                        return range.some(function (v, i) {
+                            return v.getTime() !== _this._range[i].getTime();
                         });
                     }
                 }
@@ -114,9 +87,6 @@ var TimeBrush = (function () {
         enumerable: true,
         configurable: true
     });
-    /**
-     * Builds the initial timescale
-     */
     TimeBrush.prototype.buildTimeScale = function () {
         var _this = this;
         this.svg = d3.select(this.element[0]).append("svg");
@@ -134,9 +104,6 @@ var TimeBrush = (function () {
         }, DEBOUNCE_TIME);
         this.brush = d3.svg.brush().on("brush", brushed);
     };
-    /**
-     * Resizes all the elements in the graph
-     */
     TimeBrush.prototype.resizeElements = function () {
         var _this = this;
         var margin = { top: 0, right: 10, bottom: 20, left: 10 }, width = this._dimensions.width - margin.left - margin.right, height = this._dimensions.height - margin.top - margin.bottom;
@@ -170,7 +137,6 @@ var TimeBrush = (function () {
         this.context
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         this.brush.x(this.x);
-        // Need to recreate the brush element for some reason
         d3.selectAll(this.element.find(".x.brush").toArray()).remove();
         this.brushEle = this.context.append("g")
             .attr("class", "x brush")
