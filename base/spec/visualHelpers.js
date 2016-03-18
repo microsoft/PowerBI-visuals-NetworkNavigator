@@ -80,7 +80,9 @@ exports.Utils = {
         };
     },
     createFakeHost: function () {
-        return {};
+        return {
+            persistProperties: function () { }
+        };
     },
     createFakeInitOptions: function () {
         var element = exports.Utils.createElement();

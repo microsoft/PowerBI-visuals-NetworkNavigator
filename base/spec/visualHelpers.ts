@@ -86,7 +86,9 @@ export var Utils = {
     },
 
     createFakeHost: () => {
-        return <powerbi.IVisualHostServices>{};
+        return <powerbi.IVisualHostServices>{
+            persistProperties: <any>function() {}
+        };
     },
 
     createFakeInitOptions: () => {
