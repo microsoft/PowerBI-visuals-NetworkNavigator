@@ -147,9 +147,9 @@ var AttributeSlicer = (function () {
                 this.loadingSearch = true;
                 this.element.find(".searchbox").val(this.searchString);
                 this.loadingSearch = false;
-                this._data = newData;
-                this.updateSelectAllButtonState();
             }
+            this._data = newData;
+            this.updateSelectAllButtonState();
         },
         enumerable: true,
         configurable: true

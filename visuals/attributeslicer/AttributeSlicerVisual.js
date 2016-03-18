@@ -80,6 +80,9 @@ var AttributeSlicer = (function (_super) {
             else if (newData && Utils_1.default.hasDataChanged(newData.slice(0), this.mySlicer.data, function (a, b) { return a.match === b.match && a.renderedValue === b.renderedValue; })) {
                 this.mySlicer.data = newData;
             }
+            else if (!newData) {
+                this.mySlicer.data = [];
+            }
             this.mySlicer.showValues = !!categorical && !!categorical.values && categorical.values.length > 0;
             var sortedColumns = this.dataView.metadata.columns.filter(function (c) { return !!c.sort; });
             if (sortedColumns.length) {
@@ -210,7 +213,7 @@ var AttributeSlicer = (function (_super) {
             },
         ],
         dataViewMappings: [{
-                conditions: [{ 'Category': { max: 1, min: 1 }, 'Values': { max: 1, min: 0 } }],
+                conditions: [{ 'Category': { max: 1, min: 0 }, 'Values': { max: 1, min: 0 } }],
                 categorical: {
                     categories: {
                         for: { in: 'Category' },
