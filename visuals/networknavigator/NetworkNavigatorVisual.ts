@@ -1,5 +1,5 @@
 /// <reference path="../../base/references.d.ts"/>
-import { ForceGraph, IForceGraphData, IForceGraphLink, IForceGraphNode } from "./ForceGraph";
+import { NetworkNavigator as NetworkNavigatorImpl, INetworkNavigatorData, INetworkNavigatorLink, INetworkNavigatorNode } from "./NetworkNavigator";
 import { ExternalCssResource, VisualBase } from "../../base/VisualBase";
 import { default as Utils, Visual } from "../../base/Utils";
 import IVisual = powerbi.IVisual;
@@ -22,9 +22,9 @@ const colors = require("../../base/powerbi/colors");
 declare var _;
 
 @Visual(JSON.parse(require("./build.json")).output.PowerBI)
-export default class GraphVisual extends VisualBase implements IVisual {
+export default class NetworkNavigator extends VisualBase implements IVisual {
     private dataViewTable: DataViewTable;
-    private myGraph: ForceGraph;
+    private myNetworkNavigator: NetworkNavigatorImpl;
     private host : IVisualHostServices;
     private interactivityService : IInteractivityService;
 
@@ -77,7 +77,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
      */
     private selectionManager: utility.SelectionManager;
 
-    private static DEFAULT_SETTINGS: GraphVisualSettings = {
+    private static DEFAULT_SETTINGS: NetworkNavigatorVisualSettings = {
         layout: {
             animate: true,
             maxNodeCount: 0,
@@ -93,19 +93,19 @@ export default class GraphVisual extends VisualBase implements IVisual {
     };
 
     public static capabilities: VisualCapabilities = $.extend(true, {}, VisualBase.capabilities, {
-        dataRoles: Object.keys(GraphVisual.DATA_ROLES).map(n => ({ 
-            name: GraphVisual.DATA_ROLES[n].name,
-            displayName: GraphVisual.DATA_ROLES[n].displayName,
+        dataRoles: Object.keys(NetworkNavigator.DATA_ROLES).map(n => ({ 
+            name: NetworkNavigator.DATA_ROLES[n].name,
+            displayName: NetworkNavigator.DATA_ROLES[n].displayName,
             kind: powerbi.VisualDataRoleKind.Grouping
         })),
         dataViewMappings: [{
             table: {
                 rows: {
-                    select: Object.keys(GraphVisual.DATA_ROLES).map(n => ({ bind: { to: GraphVisual.DATA_ROLES[n].name }}))
+                    select: Object.keys(NetworkNavigator.DATA_ROLES).map(n => ({ bind: { to: NetworkNavigator.DATA_ROLES[n].name }}))
                 }
             },
-            conditions: [Object.keys(GraphVisual.DATA_ROLES).reduce((a, b) => {
-                a[GraphVisual.DATA_ROLES[b].name] = { min: 0, max: 1 }; 
+            conditions: [Object.keys(NetworkNavigator.DATA_ROLES).reduce((a, b) => {
+                a[NetworkNavigator.DATA_ROLES[b].name] = { min: 0, max: 1 }; 
                 return a; 
             }, {})]
         }],
@@ -176,7 +176,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
         }
     });
 
-    private settings: GraphVisualSettings = $.extend(true, {}, GraphVisual.DEFAULT_SETTINGS);
+    private settings: NetworkNavigatorVisualSettings = $.extend(true, {}, NetworkNavigator.DEFAULT_SETTINGS);
 
     // private template : string = `
     //     <div class="load-container load5">
@@ -189,7 +189,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
     /** This is called once when the visual is initialially created */
     public init(options: VisualInitOptions): void {
         super.init(options, this.template);
-        this.myGraph = new ForceGraph(this.element.find("#node_graph"), 500, 500);
+        this.myNetworkNavigator = new NetworkNavigatorImpl(this.element.find("#node_graph"), 500, 500);
         this.host = options.host;
         this.interactivityService = new InteractivityService(this.host);
         this.attachEvents();
@@ -206,15 +206,15 @@ export default class GraphVisual extends VisualBase implements IVisual {
 
         if (dataViewTable) {
             if ((forceDataReload || this.hasDataChanged(this.dataViewTable, dataViewTable))) {
-                var parsedData = GraphVisual.converter(dataView, this.settings);
-                this.myGraph.setData(parsedData);
+                var parsedData = NetworkNavigator.converter(dataView, this.settings);
+                this.myNetworkNavigator.setData(parsedData);
             }
             var selectedIds = this.selectionManager.getSelectionIds();
-            var data = this.myGraph.getData();
+            var data = this.myNetworkNavigator.getData();
             if (data && data.nodes && data.nodes.length) {
                 var updated = false;
                 data.nodes.forEach((n) => {
-                    var isSelected = !!_.find(selectedIds, (id : SelectionId) => id.equals((<ForceGraphSelectableNode>n).identity));
+                    var isSelected = !!_.find(selectedIds, (id : SelectionId) => id.equals((<NetworkNavigatorSelectableNode>n).identity));
                     if (isSelected !== n.selected) {
                         n.selected = isSelected;
                         updated = true;
@@ -222,20 +222,20 @@ export default class GraphVisual extends VisualBase implements IVisual {
                 });
 
                 if (updated) {
-                    this.myGraph.redrawSelection();
+                    this.myNetworkNavigator.redrawSelection();
                 }
                 
-                this.myGraph.redrawLabels();
+                this.myNetworkNavigator.redrawLabels();
             }
         }
 
 
         this.dataViewTable = dataViewTable;
 
-        var currentDimensions = this.myGraph.dimensions;
+        var currentDimensions = this.myNetworkNavigator.dimensions;
         if (currentDimensions.width !== options.viewport.width ||
             currentDimensions.height !== options.viewport.height) {
-            this.myGraph.dimensions = { width: options.viewport.width, height: options.viewport.height };
+            this.myNetworkNavigator.dimensions = { width: options.viewport.width, height: options.viewport.height };
             this.element.css({ width: options.viewport.width, height: options.viewport.height });
         }
     }
@@ -256,10 +256,10 @@ export default class GraphVisual extends VisualBase implements IVisual {
     /**
      * Converts the data view into an internal data structure
      */
-    public static converter(dataView: DataView, settings: GraphVisualSettings): IForceGraphData<ForceGraphSelectableNode> {
+    public static converter(dataView: DataView, settings: NetworkNavigatorVisualSettings): INetworkNavigatorData<NetworkNavigatorSelectableNode> {
         var nodeList = [];
-        var nodeMap : { [name: string] : ForceGraphSelectableNode } = {};
-        var linkList : IForceGraphLink[] = [];
+        var nodeMap : { [name: string] : NetworkNavigatorSelectableNode } = {};
+        var linkList : INetworkNavigatorLink[] = [];
         var table = dataView.table;
         
         var colMap = {};
@@ -276,7 +276,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
         // target - array index into node
         // value - The number of times that the link has been made, ie, I emailed bob@gmail.com 10 times, so value would be 10
 
-        var roles = GraphVisual.DATA_ROLES;
+        var roles = NetworkNavigator.DATA_ROLES;
         var sourceIdx = colMap[roles.source.name];
         var sourceColorIdx = colMap[roles.sourceColor.name];
         var sourceLabelColorIdx = colMap[roles.sourceLabelColor.name];
@@ -290,7 +290,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
         var sourceField = dataView.categorical.categories[0].identityFields[sourceIdx];
         var targetField = dataView.categorical.categories[0].identityFields[targetIdx];
 
-        function getNode(id: string, identity: powerbi.DataViewScopeIdentity, isSource: boolean, color: string = "gray", labelColor = undefined, group: number = 0) : ForceGraphSelectableNode {
+        function getNode(id: string, identity: powerbi.DataViewScopeIdentity, isSource: boolean, color: string = "gray", labelColor = undefined, group: number = 0) : NetworkNavigatorSelectableNode {
             var node = nodeMap[id];
             // var expr = identity.expr;
             var expr = powerbi.data.SQExprBuilder.equal(isSource ? sourceField : targetField, powerbi.data.SQExprBuilder.text(id));
@@ -344,7 +344,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
      * Gets the inline css used for this element
      */
     protected getCss() : string[] {
-        return super.getCss().concat([require("!css!sass!./css/GraphVisual.scss")]);
+        return super.getCss().concat([require("!css!sass!./css/NetworkNavigatorVisual.scss")]);
     }
 
     /**
@@ -358,7 +358,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
             var newObjects = dataView.metadata.objects;
 
             // Merge in the settings
-            $.extend(true, this.settings, GraphVisual.DEFAULT_SETTINGS, newObjects ? newObjects : {}, {
+            $.extend(true, this.settings, NetworkNavigator.DEFAULT_SETTINGS, newObjects ? newObjects : {}, {
                 layout: {
                     defaultLabelColor: newObjects &&
                         newObjects["layout"] &&
@@ -369,7 +369,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
 
             // There were some changes to the layout
             if (!_.isEqual(oldSettings.layout, this.settings.layout)) {
-                this.myGraph.configuration = $.extend(true, {}, this.settings.layout);
+                this.myNetworkNavigator.configuration = $.extend(true, {}, this.settings.layout);
             }
             
             if (oldSettings.layout.maxNodeCount !== this.settings.layout.maxNodeCount) {
@@ -405,19 +405,19 @@ export default class GraphVisual extends VisualBase implements IVisual {
      * Attaches the line up events to lineup
      */
     private attachEvents() {
-        if (this.myGraph) {
+        if (this.myNetworkNavigator) {
             // Cleans up events
             if (this.listener) {
                 this.listener.destroy();
             }
-            this.listener = this.myGraph.events.on("selectionChanged", (node) => this.onNodeSelected(node));
+            this.listener = this.myNetworkNavigator.events.on("selectionChanged", (node) => this.onNodeSelected(node));
         }
     }
 
     /**
      * Gets called when a node is selected
      */
-    private onNodeSelected = _.debounce((node: ForceGraphSelectableNode) => {
+    private onNodeSelected = _.debounce((node: NetworkNavigatorSelectableNode) => {
         var filter = null;
         if (node) {
             filter = powerbi.data.SemanticFilter.fromSQExpr(node.filterExpr);
@@ -460,7 +460,7 @@ export default class GraphVisual extends VisualBase implements IVisual {
 /**
  * Represents the settings for this visual
  */
-interface GraphVisualSettings {
+interface NetworkNavigatorVisualSettings {
     layout?: {
         animate?: boolean;
         maxNodeCount?: number;
@@ -478,7 +478,7 @@ interface GraphVisualSettings {
 /**
  * The lineup data
  */
-interface ForceGraphSelectableNode extends powerbi.visuals.SelectableDataPoint, IForceGraphNode {
+interface NetworkNavigatorSelectableNode extends powerbi.visuals.SelectableDataPoint, INetworkNavigatorNode {
 
     /**
      * The nodes index into the node list

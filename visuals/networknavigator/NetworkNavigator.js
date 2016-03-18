@@ -5,11 +5,11 @@ var $ = require("jquery");
  * Class which represents the force graph
  */
 /* @Mixin(EventEmitter) */
-var ForceGraph = (function () {
+var NetworkNavigator = (function () {
     /**
-     * Constructor for the force graph
+     * Constructor for the network navigator
      */
-    function ForceGraph(element, width, height) {
+    function NetworkNavigator(element, width, height) {
         var _this = this;
         if (width === void 0) { width = 500; }
         if (height === void 0) { height = 500; }
@@ -56,9 +56,9 @@ var ForceGraph = (function () {
             .size([width, height]);
         this.vis = this.svg.append('svg:g');
     }
-    Object.defineProperty(ForceGraph.prototype, "dimensions", {
+    Object.defineProperty(NetworkNavigator.prototype, "dimensions", {
         /**
-         * Returns the dimensions of this graph
+         * Returns the dimensions of this network navigator
          */
         get: function () {
             return this._dimensions;
@@ -82,9 +82,9 @@ var ForceGraph = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(ForceGraph.prototype, "configuration", {
+    Object.defineProperty(NetworkNavigator.prototype, "configuration", {
         /**
-         * Returns the configuration of this graph
+         * Returns the configuration of this network navigator
          */
         get: function () {
             return this._configuration;
@@ -130,7 +130,7 @@ var ForceGraph = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(ForceGraph.prototype, "data", {
+    Object.defineProperty(NetworkNavigator.prototype, "data", {
         /**
          * Alias for getData
          */
@@ -147,9 +147,9 @@ var ForceGraph = (function () {
         configurable: true
     });
     /**
-     * Redraws the force graph
+     * Redraws the force network navigator
      */
-    ForceGraph.prototype.redraw = function () {
+    NetworkNavigator.prototype.redraw = function () {
         if (this.vis && d3.event) {
             var zoomEvt = d3.event;
             this.vis.attr("transform", "translate(" + zoomEvt.translate + ") scale(" + zoomEvt.scale + ")");
@@ -158,13 +158,13 @@ var ForceGraph = (function () {
     /**
      * Gets the data associated with this graph
      */
-    ForceGraph.prototype.getData = function () {
+    NetworkNavigator.prototype.getData = function () {
         return this.graph;
     };
     /**
      * Sets the data for this force graph
      */
-    ForceGraph.prototype.setData = function (graph) {
+    NetworkNavigator.prototype.setData = function (graph) {
         var _this = this;
         var me = this;
         this.graph = graph;
@@ -308,14 +308,14 @@ var ForceGraph = (function () {
     /**
      * Redraws the selections on the nodes
      */
-    ForceGraph.prototype.redrawSelection = function () {
+    NetworkNavigator.prototype.redrawSelection = function () {
         this.vis.selectAll(".node circle")
             .style("stroke-width", function (d) { return d.selected ? 1 : 0; });
     };
     /**
      * Redraws the node labels
      */
-    ForceGraph.prototype.redrawLabels = function () {
+    NetworkNavigator.prototype.redrawLabels = function () {
         var _this = this;
         this.vis.selectAll(".node .node-label")
             .attr("fill", function (d) { return d.labelColor || _this.configuration.defaultLabelColor; })
@@ -324,7 +324,7 @@ var ForceGraph = (function () {
     /**
      * Filters the nodes to the given string
      */
-    ForceGraph.prototype.filterNodes = function (text, animate) {
+    NetworkNavigator.prototype.filterNodes = function (text, animate) {
         if (animate === void 0) { animate = true; }
         var test = "";
         var temp = this.vis.selectAll(".node circle");
@@ -345,7 +345,7 @@ var ForceGraph = (function () {
     /**
      * Updates the selection based on the given node
      */
-    ForceGraph.prototype.updateSelection = function (n) {
+    NetworkNavigator.prototype.updateSelection = function (n) {
         if (n !== this._selectedNode) {
             if (this._selectedNode) {
                 this._selectedNode.selected = false;
@@ -364,6 +364,6 @@ var ForceGraph = (function () {
         this.events.raiseEvent('selectionChanged', this._selectedNode);
         this.redrawSelection();
     };
-    return ForceGraph;
+    return NetworkNavigator;
 }());
-exports.ForceGraph = ForceGraph;
+exports.NetworkNavigator = NetworkNavigator;

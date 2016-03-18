@@ -64,15 +64,15 @@ $(function() {
         }
     }
 
-    function loadForceGraph() {
+    function loadNetworkNavigator() {
         try {
-            var forceGraphEle = $('#force-graph');
-            var forcegraph = new ForceGraph(forceGraphEle, forceGraphEle.width(), forceGraphEle.height());
+            var networkNavigatorEle = $('#network-navigator');
+            var networkNavigator = new NetworkNavigator(networkNavigatorEle, networkNavigatorEle.width(), networkNavigatorEle.height());
             $.getJSON('forcegraphdata.json', function(data) {
-                forcegraph.data = data;
+                networkNavigator.data = data;
             });
             var selectedNodeEle = $('#selected-node');
-            forcegraph.events.on("selectionChanged", function(node) {
+            networkNavigator.events.on("selectionChanged", function(node) {
                 selectedNodeEle.text(node ? node.name : "");
             });
         } catch (e) {
@@ -213,7 +213,7 @@ $(function() {
     loadSlicer();
     loadTimebrush();
     loadDocumentViewer();
-    loadForceGraph();
+    loadNetworkNavigator();
     loadLineUp();
     loadFreeText();
 });

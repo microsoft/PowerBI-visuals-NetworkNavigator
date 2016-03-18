@@ -7,55 +7,55 @@ var __extends = (this && this.__extends) || function (d, b) {
 var React = require("react");
 var ReactDOM = require("react-dom");
 var $ = require("jquery");
-var ForceGraph_1 = require("./ForceGraph");
+var NetworkNavigator_1 = require("./NetworkNavigator");
 ;
 /**
  * Thin wrapper around LineUp
  */
-var ForceGraph = (function (_super) {
-    __extends(ForceGraph, _super);
-    function ForceGraph() {
+var NetworkNavigator = (function (_super) {
+    __extends(NetworkNavigator, _super);
+    function NetworkNavigator() {
         _super.apply(this, arguments);
     }
-    ForceGraph.prototype.componentDidMount = function () {
+    NetworkNavigator.prototype.componentDidMount = function () {
         var _this = this;
         this.node = ReactDOM.findDOMNode(this);
-        this.forcegraph = new ForceGraph_1.ForceGraph($(this.node));
-        this.forcegraph.events.on("selectionChanged", function (node) {
+        this.networkNavigator = new NetworkNavigator_1.NetworkNavigator($(this.node));
+        this.networkNavigator.events.on("selectionChanged", function (node) {
             if (_this.props.onSelectionChanged) {
                 _this.props.onSelectionChanged(node);
             }
         });
-        this.forcegraph.dimensions = { width: $(this.node).width(), height: $(this.node).height() };
+        this.networkNavigator.dimensions = { width: $(this.node).width(), height: $(this.node).height() };
         this.renderContent();
     };
-    ForceGraph.prototype.componentWillReceiveProps = function (newProps) {
+    NetworkNavigator.prototype.componentWillReceiveProps = function (newProps) {
         this.renderContent(newProps);
     };
     /**
      * Renders this component
      */
-    ForceGraph.prototype.render = function () {
+    NetworkNavigator.prototype.render = function () {
         return React.createElement("div", {style: { width: "100%", height: "100%" }});
     };
-    ForceGraph.prototype.renderContent = function (props) {
+    NetworkNavigator.prototype.renderContent = function (props) {
         // if called from `componentWillReceiveProps`, then we use the new
         // props, otherwise use what we already have.
         props = props || this.props;
         if (this.selectionListener) {
             this.selectionListener.destroy();
         }
-        this.forcegraph.data = props.graph;
+        this.networkNavigator.data = props.graph;
         if (props.config) {
-            this.forcegraph.configuration = props.config;
+            this.networkNavigator.configuration = props.config;
         }
         if (props.onSelectionChanged) {
-            this.selectionListener = this.forcegraph.events.on("selectionChanged", function (rows) { return props.onSelectionChanged(rows); });
+            this.selectionListener = this.networkNavigator.events.on("selectionChanged", function (rows) { return props.onSelectionChanged(rows); });
         }
         else if (this.selectionListener) {
             this.selectionListener.destroy();
         }
     };
-    return ForceGraph;
+    return NetworkNavigator;
 }(React.Component));
-exports.ForceGraph = ForceGraph;
+exports.NetworkNavigator = NetworkNavigator;

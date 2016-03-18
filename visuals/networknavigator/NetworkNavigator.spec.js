@@ -1,9 +1,9 @@
 "use strict";
 require("../../base/testSetup");
 var chai_1 = require("chai");
-var ForceGraph_1 = require("./ForceGraph");
+var NetworkNavigator_1 = require("./NetworkNavigator");
 var $ = require("jquery");
-describe("ForceGraph", function () {
+describe("NetworkNavigator", function () {
     var parentEle;
     beforeEach(function () {
         global['$'] = require("jquery");
@@ -21,7 +21,7 @@ describe("ForceGraph", function () {
         var ele = $('<div>');
         parentEle.append(ele);
         var result = {
-            instance: new ForceGraph_1.ForceGraph(ele),
+            instance: new NetworkNavigator_1.NetworkNavigator(ele),
             element: ele
         };
         result.instance.configuration = {
