@@ -41,6 +41,55 @@ var LineUpVisual = (function (_super) {
                 _this.lineup.lineupImpl.updateBody();
             }
         }, 100);
+        /**
+         * Selects the given rows
+         */
+        this.onSelectionChanged = _.debounce(function (rows) {
+            var filter;
+            var _a = _this.lineup.settings.selection, singleSelect = _a.singleSelect, multiSelect = _a.multiSelect;
+            if (singleSelect || multiSelect) {
+                if (rows && rows.length) {
+                    var expr = rows[0].filterExpr;
+                    // If we are allowing multiSelect
+                    if (rows.length > 0 && multiSelect) {
+                        rows.slice(1).forEach(function (r) {
+                            expr = powerbi.data.SQExprBuilder.or(expr, r.filterExpr);
+                        });
+                    }
+                    filter = powerbi.data.SemanticFilter.fromSQExpr(expr);
+                }
+                var objects = {
+                    merge: [
+                        {
+                            objectName: "general",
+                            selector: undefined,
+                            properties: {
+                                "filter": filter
+                            }
+                        }
+                    ]
+                };
+                // rows are what are currently selected in lineup
+                if (rows && rows.length) {
+                    var smSelectedIds = _this.selectionManager.getSelectionIds();
+                    var unselectedRows = smSelectedIds.filter(function (n) {
+                        return rows.filter(function (m) { return m.identity.equals(n); }).length === 0;
+                    });
+                    var newSelectedRows = rows.filter(function (n) {
+                        return smSelectedIds.filter(function (m) { return m.equals(n.identity); }).length === 0;
+                    });
+                    // This should work, but there is a bug with selectionManager
+                    // newSelectedRows.concat(unselectedRows).forEach((r) => this.selectionManager.select(r.identity, true));
+                    // HACK
+                    _this.selectionManager.clear();
+                    rows.forEach(function (r) { return _this.selectionManager.select(r.identity, true); });
+                }
+                else {
+                    _this.selectionManager.clear();
+                }
+                _this.host.persistProperties(objects);
+            }
+        }, 100);
         this.noCss = noCss;
         this.initialSettings = initialSettings || {};
     }
@@ -333,56 +382,6 @@ var LineUpVisual = (function (_super) {
             this.waitingForSort = true;
             this.host.onCustomSort(args);
             return true;
-        }
-    };
-    /**
-     * Selects the given rows
-     */
-    LineUpVisual.prototype.onSelectionChanged = function (rows) {
-        var _this = this;
-        var filter;
-        var _a = this.lineup.settings.selection, singleSelect = _a.singleSelect, multiSelect = _a.multiSelect;
-        if (singleSelect || multiSelect) {
-            if (rows && rows.length) {
-                var expr = rows[0].filterExpr;
-                // If we are allowing multiSelect
-                if (rows.length > 0 && multiSelect) {
-                    rows.slice(1).forEach(function (r) {
-                        expr = powerbi.data.SQExprBuilder.or(expr, r.filterExpr);
-                    });
-                }
-                filter = powerbi.data.SemanticFilter.fromSQExpr(expr);
-            }
-            var objects = {
-                merge: [
-                    {
-                        objectName: "general",
-                        selector: undefined,
-                        properties: {
-                            "filter": filter
-                        }
-                    }
-                ]
-            };
-            // rows are what are currently selected in lineup
-            if (rows && rows.length) {
-                var smSelectedIds = this.selectionManager.getSelectionIds();
-                var unselectedRows = smSelectedIds.filter(function (n) {
-                    return rows.filter(function (m) { return m.identity.equals(n); }).length === 0;
-                });
-                var newSelectedRows = rows.filter(function (n) {
-                    return smSelectedIds.filter(function (m) { return m.equals(n.identity); }).length === 0;
-                });
-                // This should work, but there is a bug with selectionManager
-                // newSelectedRows.concat(unselectedRows).forEach((r) => this.selectionManager.select(r.identity, true));
-                // HACK
-                this.selectionManager.clear();
-                rows.forEach(function (r) { return _this.selectionManager.select(r.identity, true); });
-            }
-            else {
-                this.selectionManager.clear();
-            }
-            this.host.persistProperties(objects);
         }
     };
     /**

@@ -534,7 +534,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     /**
      * Selects the given rows
      */
-    private onSelectionChanged(rows? : ILineUpVisualRow[]) {
+    private onSelectionChanged = _.debounce((rows? : ILineUpVisualRow[]) => {
         var filter;
         let { singleSelect, multiSelect } = this.lineup.settings.selection;
         if (singleSelect || multiSelect) {
@@ -584,7 +584,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
 
             this.host.persistProperties(objects);
         }
-    }
+    }, 100);
 }
 
 /**

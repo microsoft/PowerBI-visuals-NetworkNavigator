@@ -83,6 +83,17 @@ var TimeBrush = (function (_super) {
         }
     };
     /**
+     * Enumerates the instances for the objects that appear in the power bi panel
+     */
+    TimeBrush.prototype.enumerateObjectInstances = function (options) {
+        var instances = _super.prototype.enumerateObjectInstances.call(this, options) || [{
+                selector: null,
+                objectName: options.objectName,
+                properties: {}
+            }];
+        return instances;
+    };
+    /**
      * Converts the data view into a time scale
      */
     TimeBrush.converter = function (dataView) {

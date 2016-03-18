@@ -224,7 +224,7 @@ var FreeTextSearchVisual = (function (_super) {
      * Gets the inline css used for this element
      */
     FreeTextSearchVisual.prototype.getCss = function () {
-        return _super.prototype.getCss.call(this).concat([require("!css!sass!../advancedslicer/css/AdvancedSlicer.scss")]);
+        return _super.prototype.getCss.call(this).concat([require("!css!sass!../attributeslicer/css/AttributeSlicer.scss")]);
     };
     /**
      * The set of capabilities for the visual

@@ -1,0 +1,16 @@
+{
+    "output": {
+        "PowerBI": {
+            "visualName": "NetworkNavigator",
+            "projectId": "1550434005853",
+            "icon": "icon.png",
+            "entry": "NetworkNavigatorVisual.ts"
+        },
+        "component": {
+            "entry": "NetworkNavigator.ts"
+        },
+        "react": {
+            "entry": "NetworkNavigatorReact.tsx"
+        }
+    }
+}
