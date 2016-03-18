@@ -102,10 +102,8 @@ export class TimeBrush {
                     return true;
                 } else {
                     // Check each date
-                    range.forEach((v, i) => {
-                        if (v.getTime() !== this._range[i].getTime()) {
-                            return true;
-                        }
+                    return range.some((v, i) => {
+                        return v.getTime() !== this._range[i].getTime();
                     });
                 }
             }
