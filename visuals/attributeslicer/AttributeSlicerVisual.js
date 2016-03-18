@@ -11,16 +11,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 /// <reference path="../../base/references.d.ts"/>
-var AdvancedSlicer_1 = require("./AdvancedSlicer");
+var AttributeSlicer_1 = require("./AttributeSlicer");
 var VisualBase_1 = require("../../base/VisualBase");
 var Utils_1 = require("../../base/Utils");
 var SelectionId = powerbi.visuals.SelectionId;
 var VisualDataRoleKind = powerbi.VisualDataRoleKind;
 var data = powerbi.data;
 var SelectionManager = powerbi.visuals.utility.SelectionManager;
-var AdvancedSlicerVisual = (function (_super) {
-    __extends(AdvancedSlicerVisual, _super);
-    function AdvancedSlicerVisual() {
+var AttributeSlicer = (function (_super) {
+    __extends(AttributeSlicer, _super);
+    function AttributeSlicer() {
         var _this = this;
         _super.apply(this, arguments);
         /**
@@ -38,11 +38,11 @@ var AdvancedSlicerVisual = (function (_super) {
     /**
      * Called when the visual is being initialized
      */
-    AdvancedSlicerVisual.prototype.init = function (options) {
+    AttributeSlicer.prototype.init = function (options) {
         var _this = this;
         _super.prototype.init.call(this, options, '<div></div>');
         this.host = options.host;
-        this.mySlicer = new AdvancedSlicer_1.AdvancedSlicer(this.element);
+        this.mySlicer = new AttributeSlicer_1.AttributeSlicer(this.element);
         this.mySlicer.serverSideSearch = false;
         this.mySlicer.showSelections = true;
         this.selectionManager = new SelectionManager({ hostServices: this.host });
@@ -53,13 +53,13 @@ var AdvancedSlicerVisual = (function (_super) {
     /**
      * Called when the visual is being updated
      */
-    AdvancedSlicerVisual.prototype.update = function (options) {
+    AttributeSlicer.prototype.update = function (options) {
         _super.prototype.update.call(this, options);
         this.mySlicer.dimensions = options.viewport;
         this.dataView = options.dataViews && options.dataViews[0];
         if (this.dataView) {
             var categorical = this.dataView && this.dataView.categorical;
-            var newData = AdvancedSlicerVisual.converter(this.dataView, this.selectionManager);
+            var newData = AttributeSlicer.converter(this.dataView, this.selectionManager);
             if (this.loadDeferred && this.mySlicer.data) {
                 var added_1 = [];
                 var anyRemoved = false;
@@ -94,7 +94,7 @@ var AdvancedSlicerVisual = (function (_super) {
     /**
      * Converts the given dataview into a list of listitems
      */
-    AdvancedSlicerVisual.converter = function (dataView, selectionManager) {
+    AttributeSlicer.converter = function (dataView, selectionManager) {
         var converted;
         var selectedIds = selectionManager.getSelectionIds() || [];
         var categorical = dataView && dataView.categorical;
@@ -129,7 +129,7 @@ var AdvancedSlicerVisual = (function (_super) {
     /**
      * Enumerates the instances for the objects that appear in the power bi panel
      */
-    AdvancedSlicerVisual.prototype.enumerateObjectInstances = function (options) {
+    AttributeSlicer.prototype.enumerateObjectInstances = function (options) {
         var instances = _super.prototype.enumerateObjectInstances.call(this, options) || [{
                 selector: null,
                 objectName: options.objectName,
@@ -140,13 +140,13 @@ var AdvancedSlicerVisual = (function (_super) {
     /**
      * Gets the inline css used for this element
      */
-    AdvancedSlicerVisual.prototype.getCss = function () {
-        return _super.prototype.getCss.call(this).concat([require("!css!sass!./css/AdvancedSlicerVisual.scss")]);
+    AttributeSlicer.prototype.getCss = function () {
+        return _super.prototype.getCss.call(this).concat([require("!css!sass!./css/AttributeSlicerVisual.scss")]);
     };
     /**
      * Listener for when loading more data
      */
-    AdvancedSlicerVisual.prototype.onLoadMoreData = function (item) {
+    AttributeSlicer.prototype.onLoadMoreData = function (item) {
         if (this.dataView.metadata.segment) {
             if (this.loadDeferred) {
                 this.loadDeferred.reject();
@@ -159,7 +159,7 @@ var AdvancedSlicerVisual = (function (_super) {
     /**
      * Updates the data filter based on the selection
      */
-    AdvancedSlicerVisual.prototype.updateSelectionFilter = function () {
+    AttributeSlicer.prototype.updateSelectionFilter = function () {
         var filter;
         if (this.selectionManager.hasSelection()) {
             var selectors = this.selectionManager.getSelectionIds().map(function (id) { return id.getSelector(); });
@@ -197,7 +197,7 @@ var AdvancedSlicerVisual = (function (_super) {
     /**
      * The set of capabilities for the visual
      */
-    AdvancedSlicerVisual.capabilities = $.extend(true, {}, VisualBase_1.VisualBase.capabilities, {
+    AttributeSlicer.capabilities = $.extend(true, {}, VisualBase_1.VisualBase.capabilities, {
         dataRoles: [
             {
                 name: 'Category',
@@ -243,10 +243,10 @@ var AdvancedSlicerVisual = (function (_super) {
             }
         }
     });
-    AdvancedSlicerVisual = __decorate([
+    AttributeSlicer = __decorate([
         Utils_1.Visual(require("./build").output.PowerBI)
-    ], AdvancedSlicerVisual);
-    return AdvancedSlicerVisual;
+    ], AttributeSlicer);
+    return AttributeSlicer;
 }(VisualBase_1.VisualBase));
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = AdvancedSlicerVisual;
+exports.default = AttributeSlicer;

@@ -1,10 +1,10 @@
 require("../../base/testSetup");
 
 import { expect } from "chai";
-import { AdvancedSlicer } from "./AdvancedSlicer";
+import { AttributeSlicer } from "./AttributeSlicer";
 import * as $ from "jquery";
 
-describe("AdvancedSlicer", () => {
+describe("AttributeSlicer", () => {
     var parentEle;
     beforeEach(() => {
         global['$'] = require("jquery");
@@ -24,7 +24,7 @@ describe("AdvancedSlicer", () => {
         let ele = $('<div>');
         parentEle.append(ele);
         var result = {
-            instance: new AdvancedSlicer(ele),
+            instance: new AttributeSlicer(ele),
             element: ele
         };
         return result;

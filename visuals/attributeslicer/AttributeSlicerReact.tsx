@@ -1,9 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 const $ = require("jquery");
-import { AdvancedSlicer as AdvancedSlicerImpl } from "./AdvancedSlicer";
+import { AttributeSlicer as AttributeSlicerImpl } from "./AttributeSlicer";
 
-export interface IAdvancedSlicerProps {
+export interface IAttributeSlicerProps {
     data: any[];
     serverSideSearch?: boolean;
     dimensions?: { width: number; height: number };
@@ -15,24 +15,24 @@ export interface IAdvancedSlicerProps {
     onSelectionChanged(newItems: any[], oldItems: any[]) : any;
 };
 
-export interface IAdvancedSlicerState { }
+export interface IAttributeSlicerState { }
 
 /**
  * Thin wrapper around LineUp
  */
-export class AdvancedSlicer extends React.Component<IAdvancedSlicerProps, IAdvancedSlicerState> {
-    private mySlicer: AdvancedSlicerImpl;
+export class AttributeSlicer extends React.Component<IAttributeSlicerProps, IAttributeSlicerState> {
+    private mySlicer: AttributeSlicerImpl;
     private node: any;
-    public props : IAdvancedSlicerProps;
+    public props : IAttributeSlicerProps;
 
     componentDidMount() {
         this.node = ReactDOM.findDOMNode(this);
-        this.mySlicer = new AdvancedSlicerImpl($(this.node));
+        this.mySlicer = new AttributeSlicerImpl($(this.node));
         this.attachEvents();
         this.renderContent();
     }
 
-    componentWillReceiveProps(newProps : IAdvancedSlicerProps) {
+    componentWillReceiveProps(newProps : IAttributeSlicerProps) {
         this.renderContent(newProps);
     }
 
@@ -59,7 +59,7 @@ export class AdvancedSlicer extends React.Component<IAdvancedSlicerProps, IAdvan
         this.mySlicer.events.on("selectionChanged", guardedEventer("onSelectionChanged"));
     }
 
-    private renderContent(props? : IAdvancedSlicerProps) {
+    private renderContent(props? : IAttributeSlicerProps) {
         // if called from `componentWillReceiveProps`, then we use the new
         // props, otherwise use what we already have.
         props = props || this.props;

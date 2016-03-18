@@ -3,7 +3,7 @@ $(function() {
     function loadSlicer() {
         try {
             var slicerEle = $('#advanced-slicer');
-            var slicer = new AdvancedSlicer(slicerEle);
+            var slicer = new AttributeSlicer(slicerEle);
             slicer.serverSideSearch = false;
             slicer.showSelections = true;
             slicer.events.on('canLoadMoreData', function() { return false; });

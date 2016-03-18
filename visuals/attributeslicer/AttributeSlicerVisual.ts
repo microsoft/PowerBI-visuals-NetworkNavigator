@@ -1,5 +1,5 @@
 /// <reference path="../../base/references.d.ts"/>
-import { AdvancedSlicer, SlicerItem } from "./AdvancedSlicer";
+import { AttributeSlicer as AttributeSlicerImpl, SlicerItem } from "./AttributeSlicer";
 import { VisualBase, ExternalCssResource } from "../../base/VisualBase";
 import { default as Utils, Visual } from "../../base/Utils";
 import IVisual = powerbi.IVisual;
@@ -15,7 +15,7 @@ import VisualObjectInstance = powerbi.VisualObjectInstance;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 
 @Visual(require("./build").output.PowerBI)
-export default class AdvancedSlicerVisual extends VisualBase implements IVisual {
+export default class AttributeSlicer extends VisualBase implements IVisual {
 
     /**
      * The current dataView
@@ -38,9 +38,9 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
     private selectionManager: SelectionManager;
 
     /**
-     * My AdvancedSlicer
+     * My AttributeSlicer
      */
-    private mySlicer : AdvancedSlicer;
+    private mySlicer : AttributeSlicerImpl;
 
     /**
      * The set of capabilities for the visual
@@ -112,7 +112,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
     public init(options: powerbi.VisualInitOptions): void {
         super.init(options, '<div></div>');
         this.host = options.host;
-        this.mySlicer = new AdvancedSlicer(this.element);
+        this.mySlicer = new AttributeSlicerImpl(this.element);
         this.mySlicer.serverSideSearch = false;
         this.mySlicer.showSelections = true;
         this.selectionManager = new SelectionManager({ hostServices: this.host });
@@ -132,7 +132,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
         this.dataView = options.dataViews && options.dataViews[0];
         if (this.dataView) {
             var categorical = this.dataView && this.dataView.categorical;
-            var newData = AdvancedSlicerVisual.converter(this.dataView, this.selectionManager);
+            var newData = AttributeSlicer.converter(this.dataView, this.selectionManager);
             if (this.loadDeferred && this.mySlicer.data) {
 
                 let added = [];
@@ -219,7 +219,7 @@ export default class AdvancedSlicerVisual extends VisualBase implements IVisual 
      * Gets the inline css used for this element
      */
     protected getCss() : string[] {
-        return super.getCss().concat([require("!css!sass!./css/AdvancedSlicerVisual.scss")]);
+        return super.getCss().concat([require("!css!sass!./css/AttributeSlicerVisual.scss")]);
     }
 
     /**
