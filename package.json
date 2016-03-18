@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test:timebrush": "gulp test:timebrush",
-    "test:lineup": "gulp test:lineup",
+    "test:tablesorter": "gulp test:tablesorter",
     "test:freetext": "gulp test:freetext",
-    "test:forcegraph": "gulp test:forcegraph",
+    "test:networknavigator": "gulp test:networknavigator",
     "test:documentviewer": "gulp test:documentviewer",
-    "test:advancedslicer": "gulp test:advancedslicer",
+    "test:attributeslicer": "gulp test:attributeslicer",
     "test": "npm-run-all 'test:*'"
   },
   "author": "",

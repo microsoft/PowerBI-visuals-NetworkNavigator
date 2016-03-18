@@ -4,7 +4,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var AdvancedSlicer_1 = require("../advancedslicer/AdvancedSlicer");
+var AttributeSlicer_1 = require("../attributeslicer/AttributeSlicer");
 /**
  * Implements a free text search
  */
@@ -143,5 +143,5 @@ var FreeTextSearch = (function (_super) {
      */
     FreeTextSearch.DEFAULT_PROVIDERS = require('./providers');
     return FreeTextSearch;
-}(AdvancedSlicer_1.AdvancedSlicer));
+}(AttributeSlicer_1.AttributeSlicer));
 exports.FreeTextSearch = FreeTextSearch;

@@ -3,7 +3,7 @@ $(function() {
     function loadSlicer() {
         try {
             var slicerEle = $('#advanced-slicer');
-            var slicer = new AdvancedSlicer(slicerEle);
+            var slicer = new AttributeSlicer(slicerEle);
             slicer.serverSideSearch = false;
             slicer.showSelections = true;
             slicer.events.on('canLoadMoreData', function() { return false; });
@@ -64,15 +64,15 @@ $(function() {
         }
     }
 
-    function loadForceGraph() {
+    function loadNetworkNavigator() {
         try {
-            var forceGraphEle = $('#force-graph');
-            var forcegraph = new ForceGraph(forceGraphEle, forceGraphEle.width(), forceGraphEle.height());
+            var networkNavigatorEle = $('#network-navigator');
+            var networkNavigator = new NetworkNavigator(networkNavigatorEle, networkNavigatorEle.width(), networkNavigatorEle.height());
             $.getJSON('forcegraphdata.json', function(data) {
-                forcegraph.data = data;
+                networkNavigator.data = data;
             });
             var selectedNodeEle = $('#selected-node');
-            forcegraph.events.on("selectionChanged", function(node) {
+            networkNavigator.events.on("selectionChanged", function(node) {
                 selectedNodeEle.text(node ? node.name : "");
             });
         } catch (e) {
@@ -80,10 +80,10 @@ $(function() {
         }
     }
 
-    function loadLineUp() {
+    function loadTableSorter() {
         try {
-            var lineUpEle = $('#line-up');
-            var lineup = new LineUp(lineUpEle);
+            var tableSorterEle = $('#table-sorter');
+            var tableSorter = new TableSorter(tableSorterEle);
             $.getJSON('lineupdata.json', function(data) {
                 // var columns = [];
                 // for (var col in data[0]) {
@@ -137,8 +137,8 @@ $(function() {
                     }
                     return col;
                 });
-                lineup.count = 100;
-                lineup.settings = {
+                tableSorter.count = 100;
+                tableSorter.settings = {
                     sorting: {
                         external: true
                     },
@@ -146,11 +146,11 @@ $(function() {
                         external: true
                     }
                 };
-                lineup.configuration = {
+                tableSorter.configuration = {
                     primaryKey: "schoolname",
                     columns: cols
                 };
-                lineup.dataProvider = new LineUp.PROVIDERS.JSON(data);
+                tableSorter.dataProvider = new TableSorter.PROVIDERS.JSON(data);
             });
         } catch (e) {
             console.error(e);
@@ -213,7 +213,7 @@ $(function() {
     loadSlicer();
     loadTimebrush();
     loadDocumentViewer();
-    loadForceGraph();
-    loadLineUp();
+    loadNetworkNavigator();
+    loadTableSorter();
     loadFreeText();
 });

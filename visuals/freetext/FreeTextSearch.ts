@@ -1,10 +1,10 @@
 import { ISearchProvider, ISearchProviderStatic, IQuery, IQueryResult } from "./providers/ISearchProvider";
-import { AdvancedSlicer, SlicerItem } from "../advancedslicer/AdvancedSlicer";
+import { AttributeSlicer, SlicerItem } from "../attributeslicer/AttributeSlicer";
 
 /**
  * Implements a free text search
  */
-export class FreeTextSearch extends AdvancedSlicer {
+export class FreeTextSearch extends AttributeSlicer {
     /**
      * The default skip amount for free text search
      */
