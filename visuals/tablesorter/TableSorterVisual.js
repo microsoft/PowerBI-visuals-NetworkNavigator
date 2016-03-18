@@ -50,17 +50,33 @@ var TableSorterVisual = (function (_super) {
                     }
                     filter = powerbi.data.SemanticFilter.fromSQExpr(expr);
                 }
-                var objects = {
-                    merge: [
-                        {
-                            objectName: "general",
-                            selector: undefined,
-                            properties: {
-                                "filter": filter
+                var objects = {};
+                if (filter) {
+                    $.extend(objects, {
+                        merge: [
+                            {
+                                objectName: "general",
+                                selector: undefined,
+                                properties: {
+                                    "filter": filter
+                                }
                             }
-                        }
-                    ]
-                };
+                        ]
+                    });
+                }
+                else {
+                    $.extend(objects, {
+                        remove: [
+                            {
+                                objectName: "general",
+                                selector: undefined,
+                                properties: {
+                                    "filter": filter
+                                }
+                            }
+                        ]
+                    });
+                }
                 // rows are what are currently selected in lineup
                 if (rows && rows.length) {
                     var smSelectedIds = _this.selectionManager.getSelectionIds();
@@ -79,7 +95,7 @@ var TableSorterVisual = (function (_super) {
                 else {
                     _this.selectionManager.clear();
                 }
-                _this.callPersistProperties(objects);
+                _this.host.persistProperties(objects);
             }
         }, 100);
         this.noCss = noCss;
@@ -98,20 +114,26 @@ var TableSorterVisual = (function (_super) {
         this.tableSorter.events.on("selectionChanged", function (rows) { return _this.onSelectionChanged(rows); });
         this.tableSorter.events.on(TableSorter_1.TableSorter.EVENTS.FILTER_CHANGED, function (filter) { return _this.onFilterChanged(filter); });
         this.tableSorter.events.on(TableSorter_1.TableSorter.EVENTS.CLEAR_SELECTION, function () { return _this.onSelectionChanged(); });
+        /**
+         * Simple function to update the configuration with pbi
+         */
+        var configurationUpdater = _.debounce(function (config) {
+            var objects = {
+                merge: [
+                    {
+                        objectName: "layout",
+                        properties: {
+                            "layout": JSON.stringify(config)
+                        },
+                        selector: undefined,
+                    }
+                ]
+            };
+            _this.host.persistProperties(objects);
+        }, 100);
         this.tableSorter.events.on("configurationChanged", function (config) {
             if (!_this.loadingData) {
-                var objects = {
-                    merge: [
-                        {
-                            objectName: "layout",
-                            properties: {
-                                "layout": JSON.stringify(config)
-                            },
-                            selector: undefined,
-                        }
-                    ]
-                };
-                _this.callPersistProperties(objects);
+                configurationUpdater(config);
             }
         });
         this.dimensions = { width: options.viewport.width, height: options.viewport.height };
@@ -364,25 +386,6 @@ var TableSorterVisual = (function (_super) {
             this.host.onCustomSort(args);
             return true;
         }
-    };
-    /**
-     * Calling `persistProperties` multiple times during the same cycle causes `nested transactions` errors.
-     * To alleviate this issue a timeout is used as a mechanism that assumes that the last call to `persistProperties`
-     * contains the final and correct objects to be stored.
-     *
-     * @method callPersistProperties
-     * @param {Object} objects - The object to be stored.
-     */
-    TableSorterVisual.prototype.callPersistProperties = function (objects) {
-        var _this = this;
-        if (this.persistPropertiesTimeout !== null) {
-            clearTimeout(this.persistPropertiesTimeout);
-            this.persistPropertiesTimeout = null;
-        }
-        this.persistPropertiesTimeout = setTimeout(function () {
-            _this.host.persistProperties(objects);
-            _this.persistPropertiesTimeout = null;
-        });
     };
     /**
      * The default settings for the visual

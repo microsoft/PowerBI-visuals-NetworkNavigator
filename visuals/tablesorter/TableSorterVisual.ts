@@ -220,22 +220,31 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
         this.tableSorter.events.on("selectionChanged", (rows) => this.onSelectionChanged(rows));
         this.tableSorter.events.on(TableSorter.EVENTS.FILTER_CHANGED, (filter) => this.onFilterChanged(filter));
         this.tableSorter.events.on(TableSorter.EVENTS.CLEAR_SELECTION, () => this.onSelectionChanged());
+        
+        /**
+         * Simple function to update the configuration with pbi
+         */
+        const configurationUpdater = _.debounce((config) => {
+            const objects: powerbi.VisualObjectInstancesToPersist = {
+                merge: [
+                    <VisualObjectInstance>{
+                        objectName: "layout",
+                        properties: {
+                            "layout": JSON.stringify(config)
+                        },
+                        selector: undefined,
+                    }
+                ]
+            };
+            this.host.persistProperties(objects);
+        }, 100);
+        
         this.tableSorter.events.on("configurationChanged", (config) => {
             if (!this.loadingData) {
-                const objects: powerbi.VisualObjectInstancesToPersist = {
-                    merge: [
-                        <VisualObjectInstance>{
-                            objectName: "layout",
-                            properties: {
-                                "layout": JSON.stringify(config)
-                            },
-                            selector: undefined,
-                        }
-                    ]
-                };
-                this.callPersistProperties(objects);
+                configurationUpdater(config);
             }
         });
+        
         this.dimensions = { width: options.viewport.width, height: options.viewport.height };
     }
 
@@ -531,19 +540,34 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
                 }
                 filter = powerbi.data.SemanticFilter.fromSQExpr(expr);
             }
-
-            var objects: powerbi.VisualObjectInstancesToPersist = {
-                merge: [
-                    <powerbi.VisualObjectInstance>{
-                        objectName: "general",
-                        selector: undefined,
-                        properties: {
-                            "filter": filter
+            
+            var objects: powerbi.VisualObjectInstancesToPersist = { };
+            if (filter) {
+                $.extend(objects, {
+                    merge: [
+                        <powerbi.VisualObjectInstance>{
+                            objectName: "general",
+                            selector: undefined,
+                            properties: {
+                                "filter": filter
+                            }
                         }
-                    }
-                ]
-            };
-
+                    ]
+                });
+            } else {
+                $.extend(objects, {
+                    remove: [
+                        <VisualObjectInstance>{
+                            objectName: "general",
+                            selector: undefined,
+                            properties: {
+                                "filter": filter
+                            }
+                        }
+                    ]
+                });
+            }
+            
             // rows are what are currently selected in lineup
             if (rows && rows.length) {
                 var smSelectedIds = this.selectionManager.getSelectionIds();
@@ -564,29 +588,9 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
                 this.selectionManager.clear();
             }
 
-            this.callPersistProperties(objects);
+            this.host.persistProperties(objects);
         }
     }, 100);
-
-    /**
-     * Calling `persistProperties` multiple times during the same cycle causes `nested transactions` errors.
-     * To alleviate this issue a timeout is used as a mechanism that assumes that the last call to `persistProperties`
-     * contains the final and correct objects to be stored.
-     *
-     * @method callPersistProperties
-     * @param {Object} objects - The object to be stored.
-     */
-    private callPersistProperties(objects : Object) : void {
-        if (this.persistPropertiesTimeout !== null) {
-            clearTimeout(this.persistPropertiesTimeout);
-            this.persistPropertiesTimeout = null;
-        }
-
-        this.persistPropertiesTimeout = setTimeout(() => {
-            this.host.persistProperties(objects);
-            this.persistPropertiesTimeout = null;
-        });
-    }
 }
 
 /**
