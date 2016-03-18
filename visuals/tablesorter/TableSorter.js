@@ -8,18 +8,18 @@ var LineUpLib = require("./lib/lineup");
 /**
  * Thin wrapper around the lineup library
  */
-var LineUp = (function () {
+var TableSorter = (function () {
     /**
      * Constructor for the lineups
      */
-    function LineUp(element) {
+    function TableSorter(element) {
         var _this = this;
         /**
          * The set of options used to query for new data
          */
         this.queryOptions = {
             offset: 0,
-            count: LineUp.DEFAULT_COUNT
+            count: TableSorter.DEFAULT_COUNT
         };
         /**
          * The template for the grid
@@ -30,7 +30,7 @@ var LineUp = (function () {
          */
         this._loadingData = false;
         this._selectedRows = [];
-        this._settings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS);
+        this._settings = $.extend(true, {}, TableSorter.DEFAULT_SETTINGS);
         /**
          * The configuration for the lineup viewer
          */
@@ -66,7 +66,7 @@ var LineUp = (function () {
         element.append(this.element);
         this.loadingData = true;
     }
-    Object.defineProperty(LineUp.prototype, "loadingData", {
+    Object.defineProperty(TableSorter.prototype, "loadingData", {
         get: function () {
             return this._loadingData;
         },
@@ -80,19 +80,19 @@ var LineUp = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(LineUp.prototype, "count", {
+    Object.defineProperty(TableSorter.prototype, "count", {
         /**
          * The number of the results to return
          */
-        get: function () { return this.queryOptions.count || LineUp.DEFAULT_COUNT; },
+        get: function () { return this.queryOptions.count || TableSorter.DEFAULT_COUNT; },
         set: function (value) {
-            this.queryOptions.count = value || LineUp.DEFAULT_COUNT;
+            this.queryOptions.count = value || TableSorter.DEFAULT_COUNT;
         },
         enumerable: true,
         configurable: true
     });
     ;
-    Object.defineProperty(LineUp.prototype, "dataProvider", {
+    Object.defineProperty(TableSorter.prototype, "dataProvider", {
         get: function () {
             return this._dataProvider;
         },
@@ -116,7 +116,7 @@ var LineUp = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(LineUp.prototype, "events", {
+    Object.defineProperty(TableSorter.prototype, "events", {
         /**
          * Gets the events object
          */
@@ -126,7 +126,7 @@ var LineUp = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(LineUp.prototype, "settings", {
+    Object.defineProperty(TableSorter.prototype, "settings", {
         /**
          * Gets the settings
          */
@@ -137,7 +137,7 @@ var LineUp = (function () {
          * Sets the settings
          */
         set: function (value) {
-            var newSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS, value);
+            var newSettings = $.extend(true, {}, TableSorter.DEFAULT_SETTINGS, value);
             var singleSelect = newSettings.selection.singleSelect;
             var multiSelect = newSettings.selection.multiSelect;
             /** Apply the settings to lineup */
@@ -158,7 +158,7 @@ var LineUp = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(LineUp.prototype, "selection", {
+    Object.defineProperty(TableSorter.prototype, "selection", {
         /**
          * Gets the current selection
          */
@@ -177,7 +177,7 @@ var LineUp = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(LineUp.prototype, "configuration", {
+    Object.defineProperty(TableSorter.prototype, "configuration", {
         /**
          * Gets this configuration
          */
@@ -197,7 +197,7 @@ var LineUp = (function () {
     /**
      * Derives the desciption for the given column
      */
-    LineUp.createConfigurationFromData = function (data) {
+    TableSorter.createConfigurationFromData = function (data) {
         var EXCLUDED_DATA_COLS = {
             selected: true,
             equals: true,
@@ -218,7 +218,7 @@ var LineUp = (function () {
         }
         function isNumeric(v) {
             // Assume that if null or undefined, it is numeric
-            return v === 0 || v === null || v === undefined || LineUp.isNumeric(v);
+            return v === 0 || v === null || v === undefined || TableSorter.isNumeric(v);
         }
         function analyzeColumn(columnName) {
             var minMax = { min: Number.MAX_VALUE, max: 0 };
@@ -255,7 +255,7 @@ var LineUp = (function () {
     /**
      * Gets the sort from lineup
      */
-    LineUp.prototype.getSortFromLineUp = function () {
+    TableSorter.prototype.getSortFromLineUp = function () {
         if (this.lineupImpl && this.lineupImpl.storage) {
             var primary = this.lineupImpl.storage.config.columnBundles.primary;
             var col = primary.sortedColumn;
@@ -285,7 +285,7 @@ var LineUp = (function () {
     /**
      * Runs the current query against the data provider
      */
-    LineUp.prototype.runQuery = function (newQuery) {
+    TableSorter.prototype.runQuery = function (newQuery) {
         var _this = this;
         if (newQuery) {
             this.queryOptions.offset = 0;
@@ -310,7 +310,7 @@ var LineUp = (function () {
                     // We've moved the offset
                     _this.queryOptions.offset += r.count;
                     //derive a description file
-                    var desc = _this.configuration || LineUp.createConfigurationFromData(_this._data);
+                    var desc = _this.configuration || TableSorter.createConfigurationFromData(_this._data);
                     // Primary Key needs to always be ID
                     desc.primaryKey = "id";
                     var spec = {};
@@ -370,7 +370,7 @@ var LineUp = (function () {
     /**
      * Generates the histogram for lineup
      */
-    LineUp.prototype.generateHistogram = function (columnImpl, callback) {
+    TableSorter.prototype.generateHistogram = function (columnImpl, callback) {
         var column = this.getColumnByName(columnImpl.column.id);
         this.dataProvider.generateHistogram(column, this.queryOptions).then(function (h) {
             var perc = 1 / h.length;
@@ -385,13 +385,13 @@ var LineUp = (function () {
     /**
      * Retrieves our columns by name
      */
-    LineUp.prototype.getColumnByName = function (colName) {
+    TableSorter.prototype.getColumnByName = function (colName) {
         return this.configuration && this.configuration.columns && this.configuration.columns.filter(function (c) { return c.column === colName; })[0];
     };
     /**
      * Updates the selected state of each row, and returns all the selected rows
      */
-    LineUp.prototype.updateRowSelection = function (sels) {
+    TableSorter.prototype.updateRowSelection = function (sels) {
         if (this._data) {
             this._data.forEach(function (d) { return d.selected = false; });
         }
@@ -400,7 +400,7 @@ var LineUp = (function () {
     /**
      * Saves the current layout
      */
-    LineUp.prototype.saveConfiguration = function () {
+    TableSorter.prototype.saveConfiguration = function () {
         if (!this.savingConfiguration) {
             this.savingConfiguration = true;
             //full spec
@@ -419,7 +419,7 @@ var LineUp = (function () {
     /**
      * Applies our external config to lineup
      */
-    LineUp.prototype.applyConfigurationToLineup = function () {
+    TableSorter.prototype.applyConfigurationToLineup = function () {
         if (this.lineupImpl) {
             var currentSort = this.getSortFromLineUp();
             if (this.configuration && this.configuration.sort && (!currentSort || !_.isEqual(currentSort, this.configuration.sort))) {
@@ -433,7 +433,7 @@ var LineUp = (function () {
     /**
      * Checks to see if more data should be loaded based on the viewport
      */
-    LineUp.prototype.checkLoadMoreData = function (scroll) {
+    TableSorter.prototype.checkLoadMoreData = function (scroll) {
         // truthy this.dataView.metadata.segment means there is more data to be loaded
         var scrollElement = $(this.lineupImpl.$container.node()).find('div.lu-wrapper')[0];
         var scrollHeight = scrollElement.scrollHeight;
@@ -449,13 +449,13 @@ var LineUp = (function () {
     /**
      * Listener for when the lineup columns are changed.
      */
-    LineUp.prototype.onLineUpColumnsChanged = function () {
+    TableSorter.prototype.onLineUpColumnsChanged = function () {
         this.saveConfiguration();
     };
     /**
      * Listener for line up being sorted
      */
-    LineUp.prototype.onLineUpSorted = function (column, asc) {
+    TableSorter.prototype.onLineUpSorted = function (column, asc) {
         if (!this.sortingFromConfig) {
             this.saveConfiguration();
             this.raiseSortChanged(column, asc);
@@ -472,7 +472,7 @@ var LineUp = (function () {
     /**
      * Listener for lineup being filtered
      */
-    LineUp.prototype.onLineUpFiltered = function (column) {
+    TableSorter.prototype.onLineUpFiltered = function (column) {
         var colName = column.column && column.column.column;
         var ourColumn = this.configuration.columns.filter(function (n) { return n.column === colName; })[0];
         var filter;
@@ -505,53 +505,53 @@ var LineUp = (function () {
     /**
      * Raises the configuration changed event
      */
-    LineUp.prototype.raiseConfigurationChanged = function (configuration) {
-        this.events.raiseEvent(LineUp.EVENTS.CONFIG_CHANGED, configuration);
+    TableSorter.prototype.raiseConfigurationChanged = function (configuration) {
+        this.events.raiseEvent(TableSorter.EVENTS.CONFIG_CHANGED, configuration);
     };
     /**
      * Raises the filter changed event
      */
-    LineUp.prototype.raiseSortChanged = function (column, asc) {
-        this.events.raiseEvent(LineUp.EVENTS.SORT_CHANGED, column, asc);
+    TableSorter.prototype.raiseSortChanged = function (column, asc) {
+        this.events.raiseEvent(TableSorter.EVENTS.SORT_CHANGED, column, asc);
     };
     /**
      * Raises the filter changed event
      */
-    LineUp.prototype.raiseFilterChanged = function (filter) {
-        this.events.raiseEvent(LineUp.EVENTS.FILTER_CHANGED, filter);
+    TableSorter.prototype.raiseFilterChanged = function (filter) {
+        this.events.raiseEvent(TableSorter.EVENTS.FILTER_CHANGED, filter);
     };
     /**
      * Raises the selection changed event
      */
-    LineUp.prototype.raiseSelectionChanged = function (rows) {
-        this.events.raiseEvent(LineUp.EVENTS.SELECTION_CHANGED, rows);
+    TableSorter.prototype.raiseSelectionChanged = function (rows) {
+        this.events.raiseEvent(TableSorter.EVENTS.SELECTION_CHANGED, rows);
     };
     /**
      * Raises the load more data event
      */
-    LineUp.prototype.raiseLoadMoreData = function () {
-        this.events.raiseEvent(LineUp.EVENTS.LOAD_MORE_DATA);
+    TableSorter.prototype.raiseLoadMoreData = function () {
+        this.events.raiseEvent(TableSorter.EVENTS.LOAD_MORE_DATA);
     };
     /**
      * Raises the load more data event
      */
-    LineUp.prototype.raiseClearSelection = function () {
-        this.events.raiseEvent(LineUp.EVENTS.CLEAR_SELECTION);
+    TableSorter.prototype.raiseClearSelection = function () {
+        this.events.raiseEvent(TableSorter.EVENTS.CLEAR_SELECTION);
     };
     /**
      * A quick reference for the providers
      */
-    LineUp.PROVIDERS = {
+    TableSorter.PROVIDERS = {
         JSON: JSONDataProvider_1.JSONDataProvider
     };
     /**
      * The default count amount
      */
-    LineUp.DEFAULT_COUNT = 100;
+    TableSorter.DEFAULT_COUNT = 100;
     /**
      * The list of events that we expose
      */
-    LineUp.EVENTS = {
+    TableSorter.EVENTS = {
         SORT_CHANGED: "sortChanged",
         FILTER_CHANGED: "filterChanged",
         CONFIG_CHANGED: "configurationChanged",
@@ -562,7 +562,7 @@ var LineUp = (function () {
     /**
      * Represents the settings
      */
-    LineUp.DEFAULT_SETTINGS = {
+    TableSorter.DEFAULT_SETTINGS = {
         selection: {
             singleSelect: false,
             multiSelect: true
@@ -579,7 +579,7 @@ var LineUp = (function () {
     /**
      * Returns true if the given object is numeric
      */
-    LineUp.isNumeric = function (obj) { return (obj - parseFloat(obj) + 1) >= 0; };
-    return LineUp;
+    TableSorter.isNumeric = function (obj) { return (obj - parseFloat(obj) + 1) >= 0; };
+    return TableSorter;
 }());
-exports.LineUp = LineUp;
+exports.TableSorter = TableSorter;

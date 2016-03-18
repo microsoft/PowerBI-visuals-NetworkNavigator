@@ -7,35 +7,35 @@ var __extends = (this && this.__extends) || function (d, b) {
 var React = require("react");
 var ReactDOM = require("react-dom");
 var $ = require("jquery");
-var LineUp_1 = require("./LineUp");
+var TableSorter_1 = require("./TableSorter");
 ;
 /**
- * Thin wrapper around LineUp
+ * Thin wrapper around TableSorter
  */
-var LineUp = (function (_super) {
-    __extends(LineUp, _super);
-    function LineUp() {
+var TableSorter = (function (_super) {
+    __extends(TableSorter, _super);
+    function TableSorter() {
         _super.apply(this, arguments);
     }
-    LineUp.prototype.componentDidMount = function () {
+    TableSorter.prototype.componentDidMount = function () {
         this.node = ReactDOM.findDOMNode(this);
-        this.lineup = new LineUp_1.LineUp($(this.node));
+        this.tableSorter = new TableSorter_1.TableSorter($(this.node));
         this.attachEvents();
         this.renderContent();
     };
-    LineUp.prototype.componentWillReceiveProps = function (newProps) {
+    TableSorter.prototype.componentWillReceiveProps = function (newProps) {
         this.renderContent(newProps);
     };
     /**
      * Renders this component
      */
-    LineUp.prototype.render = function () {
+    TableSorter.prototype.render = function () {
         return React.createElement("div", {style: { width: "100%", height: "100%" }});
     };
     /**
      * Attaches the events
      */
-    LineUp.prototype.attachEvents = function () {
+    TableSorter.prototype.attachEvents = function () {
         var _this = this;
         var guardedEventer = function (evtName) {
             return function () {
@@ -48,31 +48,31 @@ var LineUp = (function (_super) {
                 }
             };
         };
-        this.lineup.events.on(LineUp_1.LineUp.EVENTS.SELECTION_CHANGED, guardedEventer('onSelectionChanged'));
-        this.lineup.events.on(LineUp_1.LineUp.EVENTS.LOAD_MORE_DATA, guardedEventer('onLoadMoreData'));
-        this.lineup.events.on(LineUp_1.LineUp.EVENTS.FILTER_CHANGED, guardedEventer('onFilterChanged'));
-        this.lineup.events.on(LineUp_1.LineUp.EVENTS.SORT_CHANGED, guardedEventer('onSortChanged'));
+        this.tableSorter.events.on(TableSorter_1.TableSorter.EVENTS.SELECTION_CHANGED, guardedEventer('onSelectionChanged'));
+        this.tableSorter.events.on(TableSorter_1.TableSorter.EVENTS.LOAD_MORE_DATA, guardedEventer('onLoadMoreData'));
+        this.tableSorter.events.on(TableSorter_1.TableSorter.EVENTS.FILTER_CHANGED, guardedEventer('onFilterChanged'));
+        this.tableSorter.events.on(TableSorter_1.TableSorter.EVENTS.SORT_CHANGED, guardedEventer('onSortChanged'));
     };
-    LineUp.prototype.renderContent = function (props) {
+    TableSorter.prototype.renderContent = function (props) {
         // if called from `componentWillReceiveProps`, then we use the new
         // props, otherwise use what we already have.
         props = props || this.props;
-        this.lineup.settings = this.getSettingsFromProps(props);
-        this.lineup.count = props.count || 100;
+        this.tableSorter.settings = this.getSettingsFromProps(props);
+        this.tableSorter.count = props.count || 100;
         if (props.provider && props.cols) {
-            var config = this.lineup.configuration || {
+            var config = this.tableSorter.configuration || {
                 primaryKey: props.cols[0].column,
                 columns: []
             };
             config.columns = props.cols;
-            this.lineup.configuration = config;
+            this.tableSorter.configuration = config;
         }
-        this.lineup.dataProvider = props.provider;
+        this.tableSorter.dataProvider = props.provider;
     };
     /**
-     * Converts the lineup props to settings
+     * Converts the tablesorter props to settings
      */
-    LineUp.prototype.getSettingsFromProps = function (props) {
+    TableSorter.prototype.getSettingsFromProps = function (props) {
         return {
             selection: {
                 singleSelect: props.singleSelect,
@@ -86,6 +86,6 @@ var LineUp = (function (_super) {
             },
         };
     };
-    return LineUp;
+    return TableSorter;
 }(React.Component));
-exports.LineUp = LineUp;
+exports.TableSorter = TableSorter;

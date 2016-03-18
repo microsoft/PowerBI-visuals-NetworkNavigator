@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test:timebrush": "gulp test:timebrush",
-    "test:lineup": "gulp test:lineup",
+    "test:tablesorter": "gulp test:tablesorter",
     "test:freetext": "gulp test:freetext",
     "test:networknavigator": "gulp test:networknavigator",
     "test:documentviewer": "gulp test:documentviewer",

@@ -80,10 +80,10 @@ $(function() {
         }
     }
 
-    function loadLineUp() {
+    function loadTableSorter() {
         try {
-            var lineUpEle = $('#line-up');
-            var lineup = new LineUp(lineUpEle);
+            var tableSorterEle = $('#table-sorter');
+            var tableSorter = new TableSorter(tableSorterEle);
             $.getJSON('lineupdata.json', function(data) {
                 // var columns = [];
                 // for (var col in data[0]) {
@@ -137,8 +137,8 @@ $(function() {
                     }
                     return col;
                 });
-                lineup.count = 100;
-                lineup.settings = {
+                tableSorter.count = 100;
+                tableSorter.settings = {
                     sorting: {
                         external: true
                     },
@@ -146,11 +146,11 @@ $(function() {
                         external: true
                     }
                 };
-                lineup.configuration = {
+                tableSorter.configuration = {
                     primaryKey: "schoolname",
                     columns: cols
                 };
-                lineup.dataProvider = new LineUp.PROVIDERS.JSON(data);
+                tableSorter.dataProvider = new TableSorter.PROVIDERS.JSON(data);
             });
         } catch (e) {
             console.error(e);
@@ -214,6 +214,6 @@ $(function() {
     loadTimebrush();
     loadDocumentViewer();
     loadNetworkNavigator();
-    loadLineUp();
+    loadTableSorter();
     loadFreeText();
 });

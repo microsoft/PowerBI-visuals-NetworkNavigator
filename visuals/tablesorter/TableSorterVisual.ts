@@ -1,8 +1,8 @@
 /// <reference path="../../base/references.d.ts"/>
 import { ExternalCssResource, VisualBase } from "../../base/VisualBase";
 import { default as Utils, Visual } from "../../base/Utils";
-import { LineUp  } from "./LineUp";
-import { ILineUpRow, ILineUpSettings, ILineUpColumn, ILineUpConfiguration, IQueryOptions, IQueryResult, ILineUpSort, ILineUpFilter } from "./models";
+import { TableSorter  } from "./TableSorter";
+import { ITableSorterRow, ITableSorterSettings, ITableSorterColumn, ITableSorterConfiguration, IQueryOptions, IQueryResult, ITableSorterSort, ITableSorterFilter } from "./models";
 import { JSONDataProvider } from "./providers/JSONDataProvider";
 
 
@@ -23,23 +23,23 @@ import VisualDataRoleKind = powerbi.VisualDataRoleKind;
 const colors = require("../../base/powerbi/colors");
 
 @Visual(require("./build.js").output.PowerBI)
-export default class LineUpVisual extends VisualBase implements IVisual {
+export default class TableSorterVisual extends VisualBase implements IVisual {
     private dataViewTable: DataViewTable;
     private dataView: powerbi.DataView;
     private host : IVisualHostServices;
-    public lineup: LineUp;
+    public tableSorter: TableSorter;
     private selectionManager : SelectionManager;
     private waitingForMoreData : boolean;
     private waitingForSort : boolean;
     private loadingData : boolean;
 
     // Stores our current set of data.
-    private _data : ILineUpVisualRow[];
+    private _data : ITableSorterVisualRow[];
 
     /**
      * The default settings for the visual
      */
-    private static VISUAL_DEFAULT_SETTINGS : ILineUpVisualSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS, {
+    private static VISUAL_DEFAULT_SETTINGS : ITableSorterVisualSettings = $.extend(true, {}, TableSorter.DEFAULT_SETTINGS, {
         presentation: {
             columnColors: (idx) => {
                 return colors[idx % colors.length]  
@@ -163,7 +163,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 properties: {
                     serverSideSorting: {
                         displayName: "Server Side Sorting",
-                        description: "If true, lineup will use PowerBI services to sort the data, rather than doing it client side",
+                        description: "If true, Table Sorter will use PowerBI services to sort the data, rather than doing it client side",
                         type: { bool: true }
                     }/*,
                     serverSideFiltering: {
@@ -198,7 +198,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     /**
      * The constructor for the visual
      */
-    public constructor(noCss: boolean = false, initialSettings: ILineUpSettings) {
+    public constructor(noCss: boolean = false, initialSettings: ITableSorterSettings) {
         super();
         this.noCss = noCss;
         this.initialSettings = initialSettings || {};
@@ -212,12 +212,12 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         this.selectionManager = new SelectionManager({
             hostServices: options.host
         });
-        this.lineup = new LineUp(this.element.find(".lineup"));
-        this.lineup.settings = this.initialSettings;
-        this.lineup.events.on("selectionChanged", (rows) => this.onSelectionChanged(rows));
-        this.lineup.events.on(LineUp.EVENTS.FILTER_CHANGED, (filter) => this.onFilterChanged(filter));
-        this.lineup.events.on(LineUp.EVENTS.CLEAR_SELECTION, () => this.onSelectionChanged());
-        this.lineup.events.on("configurationChanged", (config) => {
+        this.tableSorter = new TableSorter(this.element.find(".lineup"));
+        this.tableSorter.settings = this.initialSettings;
+        this.tableSorter.events.on("selectionChanged", (rows) => this.onSelectionChanged(rows));
+        this.tableSorter.events.on(TableSorter.EVENTS.FILTER_CHANGED, (filter) => this.onFilterChanged(filter));
+        this.tableSorter.events.on(TableSorter.EVENTS.CLEAR_SELECTION, () => this.onSelectionChanged());
+        this.tableSorter.events.on("configurationChanged", (config) => {
             if (!this.loadingData) {
                 const objects: powerbi.VisualObjectInstancesToPersist = {
                     merge: [
@@ -271,10 +271,10 @@ export default class LineUpVisual extends VisualBase implements IVisual {
         }];
         if (options.objectName === 'layout') {
             $.extend(true, instances[0].properties, {
-                layout: JSON.stringify(this.lineup.configuration)
+                layout: JSON.stringify(this.tableSorter.configuration)
             });
         } else {
-            $.extend(true, instances[0].properties, this.lineup.settings[options.objectName]);
+            $.extend(true, instances[0].properties, this.tableSorter.settings[options.objectName]);
         }
         return instances;
     }
@@ -283,8 +283,8 @@ export default class LineUpVisual extends VisualBase implements IVisual {
      * Resizer function to resize lineup
      */
     private lineupResizer = _.debounce(() => {
-        if(this.lineup && this.lineup.lineupImpl) {
-            this.lineup.lineupImpl.updateBody();
+        if(this.tableSorter && this.tableSorter.lineupImpl) {
+            this.tableSorter.lineupImpl.updateBody();
         }
     }, 100);
     
@@ -308,21 +308,21 @@ export default class LineUpVisual extends VisualBase implements IVisual {
      * Gets the css used for this element
      */
     protected getCss() : string[] {
-        return this.noCss ? [] : super.getCss().concat([require("!css!sass!./css/LineUp.scss"), require("!css!sass!./css/LineUpVisual.scss")]);
+        return this.noCss ? [] : super.getCss().concat([require("!css!sass!./css/TableSorter.scss"), require("!css!sass!./css/TableSorterVisual.scss")]);
     }
     
     /**
      * Gets a lineup config from the data view
      */
-    private getConfigFromDataView() : ILineUpConfiguration {
-        var newColArr : ILineUpColumn[] = this.dataViewTable.columns.slice(0).map((c) => {
+    private getConfigFromDataView() : ITableSorterConfiguration {
+        var newColArr : ITableSorterColumn[] = this.dataViewTable.columns.slice(0).map((c) => {
             return {
                 label: c.displayName,
                 column: c.displayName,
                 type: c.type.numeric ? "number" : "string",
             };
         });
-        let config : ILineUpConfiguration = null;
+        let config : ITableSorterConfiguration = null;
         if (this.dataView.metadata && this.dataView.metadata.objects && this.dataView.metadata.objects['layout']) {
             let configStr = this.dataView.metadata.objects['layout']['layout'];
             if (configStr) {
@@ -361,7 +361,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                 config.layout['primary'] = config.layout['primary'].filter(removedColumnFilter);
             }
 
-            Utils.listDiff<ILineUpColumn>(config.columns.slice(0), newColArr, {
+            Utils.listDiff<ITableSorterColumn>(config.columns.slice(0), newColArr, {
                 /**
                  * Returns true if item one equals item two
                  */
@@ -398,8 +398,8 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     /**
      * Converts the data from power bi to a data we can use
      */
-    private static converter(view: DataView, config: ILineUpConfiguration, selectedIds: any) {
-        var data : ILineUpVisualRow[] = [];
+    private static converter(view: DataView, config: ITableSorterConfiguration, selectedIds: any) {
+        var data : ITableSorterVisualRow[] = [];
         if (view && view.table) {
             var table = view.table;
             table.rows.forEach((row, rowIndex) => {
@@ -414,10 +414,10 @@ export default class LineUpVisual extends VisualBase implements IVisual {
 
                 // The below is busted > 100
                 //var identity = SelectionId.createWithId(this.dataViewTable.identity[rowIndex]);
-                let result : ILineUpVisualRow = {
+                let result : ITableSorterVisualRow = {
                     id: newId.key + rowIndex,
                     identity: newId,
-                    equals: (b) => (<ILineUpVisualRow>b).identity.equals(newId),
+                    equals: (b) => (<ITableSorterVisualRow>b).identity.equals(newId),
                     filterExpr: identity && identity.expr,
                     selected: !!_.find(selectedIds, (id : SelectionId) => id.equals(newId))
                 };
@@ -449,25 +449,25 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     private checkDataChanged() {
         if (this.dataViewTable) {
             let config = this.getConfigFromDataView();
-            let newData = LineUpVisual.converter(this.dataView, config, this.selectionManager.getSelectionIds());
+            let newData = TableSorterVisual.converter(this.dataView, config, this.selectionManager.getSelectionIds());
             let selectedRows = newData.filter(n => n.selected);
 
-            this.lineup.configuration = config;
+            this.tableSorter.configuration = config;
             if (Utils.hasDataChanged(newData, this._data, (a, b) => a.identity.equals(b.identity))) {
                 this._data = newData;
-                this.lineup.count = this._data.length;
-                this.lineup.dataProvider = new MyDataProvider(
+                this.tableSorter.count = this._data.length;
+                this.tableSorter.dataProvider = new MyDataProvider(
                     newData,
                     () => !!this.dataView.metadata.segment,
                     () => {
                         this.waitingForMoreData = true;
                         this.host.loadMoreData();
                     },
-                    (sort?: ILineUpSort) => this.onSorted(sort),
-                    (filter?: ILineUpFilter) => this.onFilterChanged(filter));
+                    (sort?: ITableSorterSort) => this.onSorted(sort),
+                    (filter?: ITableSorterFilter) => this.onFilterChanged(filter));
             }
 
-            this.lineup.selection = selectedRows;
+            this.tableSorter.selection = selectedRows;
         }
     }
 
@@ -477,13 +477,13 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     private checkSettingsChanged() {
         if (this.dataView) {
             // Store this to compare
-            var oldSettings : ILineUpVisualSettings = $.extend(true, {}, this.lineup.settings);
+            var oldSettings : ITableSorterVisualSettings = $.extend(true, {}, this.tableSorter.settings);
 
             // Make sure we have the default values
-            var updatedSettings : ILineUpVisualSettings = $.extend(true, {}, this.lineup.settings, LineUpVisual.VISUAL_DEFAULT_SETTINGS, this.initialSettings || {});
+            var updatedSettings : ITableSorterVisualSettings = $.extend(true, {}, this.tableSorter.settings, TableSorterVisual.VISUAL_DEFAULT_SETTINGS, this.initialSettings || {});
 
             // Copy over new values
-            var newObjs = $.extend(true, {}, <ILineUpVisualSettings>this.dataView.metadata.objects);
+            var newObjs = $.extend(true, {}, <ITableSorterVisualSettings>this.dataView.metadata.objects);
             if (newObjs) {
                 for (var section in newObjs) {
                     var values = newObjs[section];
@@ -494,7 +494,7 @@ export default class LineUpVisual extends VisualBase implements IVisual {
                     }
                 }
             }
-            this.lineup.settings = updatedSettings;
+            this.tableSorter.settings = updatedSettings;
         }
     }
 
@@ -502,17 +502,17 @@ export default class LineUpVisual extends VisualBase implements IVisual {
      * Gets called when a filter is changed.
      */
     private onFilterChanged(filter: any) : boolean {
-        const mySettings = <ILineUpVisualSettings>this.lineup.settings;
+        const mySettings = <ITableSorterVisualSettings>this.tableSorter.settings;
         if (VisualBase.EXPERIMENTAL_ENABLED && mySettings.experimental && mySettings.experimental.serverSideFiltering) {
             return true;
         }
     }
 
     /**
-     * Listens for lineup to be sorted
+     * Listens for table sorter to be sorted
      */
-    private onSorted(sort?: ILineUpSort) : boolean {
-        const mySettings = <ILineUpVisualSettings>this.lineup.settings;
+    private onSorted(sort?: ITableSorterSort) : boolean {
+        const mySettings = <ITableSorterVisualSettings>this.tableSorter.settings;
         if (VisualBase.EXPERIMENTAL_ENABLED && mySettings.experimental && mySettings.experimental.serverSideSorting) {
             let args: powerbi.CustomSortEventArgs = null;
             if (sort) {
@@ -534,9 +534,9 @@ export default class LineUpVisual extends VisualBase implements IVisual {
     /**
      * Selects the given rows
      */
-    private onSelectionChanged = _.debounce((rows? : ILineUpVisualRow[]) => {
+    private onSelectionChanged = _.debounce((rows? : ITableSorterVisualRow[]) => {
         var filter;
-        let { singleSelect, multiSelect } = this.lineup.settings.selection;
+        let { singleSelect, multiSelect } = this.tableSorter.settings.selection;
         if (singleSelect || multiSelect) {
             if (rows && rows.length) {
                 var expr = rows[0].filterExpr;
@@ -597,7 +597,7 @@ interface IVisualBaseSettingWithValue<T> extends powerbi.data.DataViewObjectProp
 /**
  * The lineup data
  */
-interface ILineUpVisualRow extends ILineUpRow, powerbi.visuals.SelectableDataPoint {
+interface ITableSorterVisualRow extends ITableSorterRow, powerbi.visuals.SelectableDataPoint {
 
     /**
      * The expression that will exactly match this row
@@ -608,7 +608,7 @@ interface ILineUpVisualRow extends ILineUpRow, powerbi.visuals.SelectableDataPoi
 /**
  * Has some extra settings for the visual
  */
-interface ILineUpVisualSettings extends ILineUpSettings {
+interface ITableSorterVisualSettings extends ITableSorterSettings {
     experimental?: {
         serverSideSorting?: boolean;
         serverSideFiltering?: boolean;
@@ -622,8 +622,8 @@ interface ILineUpVisualSettings extends ILineUpSettings {
 class MyDataProvider extends JSONDataProvider {
 
     private onLoadMoreData: Function;
-    private onSorted: (sort?: ILineUpSort) => boolean;
-    private onFiltered: (filter?: ILineUpFilter) => boolean;
+    private onSorted: (sort?: ITableSorterSort) => boolean;
+    private onFiltered: (filter?: ITableSorterFilter) => boolean;
     private sortChanged = false;
     private filterChanged = false;
     private hasMoreData;
@@ -632,8 +632,8 @@ class MyDataProvider extends JSONDataProvider {
         data: any[],
         hasMoreData: () => boolean,
         onLoadMoreData: Function,
-        onSorted: (sort?: ILineUpSort) => boolean,
-        onFiltered: (filter?: ILineUpFilter) => boolean) {
+        onSorted: (sort?: ITableSorterSort) => boolean,
+        onFiltered: (filter?: ITableSorterFilter) => boolean) {
         super(data);
         this.onLoadMoreData = onLoadMoreData;
         this.onSorted = onSorted;
@@ -672,14 +672,14 @@ class MyDataProvider extends JSONDataProvider {
     /**
      * Called when the data should be sorted
      */
-    public sort(sort? : ILineUpSort) {
+    public sort(sort? : ITableSorterSort) {
         this.sortChanged = this.onSorted(sort);
     }
 
     /**
      * Called when the data is filtered
      */
-    public filter(filter? : ILineUpFilter) {
+    public filter(filter? : ITableSorterFilter) {
         this.filterChanged = this.onFiltered(filter);
     }
 }

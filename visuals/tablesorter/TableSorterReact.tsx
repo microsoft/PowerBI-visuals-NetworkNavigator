@@ -1,12 +1,12 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 const $ = require("jquery");
-import { LineUp as LineUpImpl } from "./LineUp";
-import { ILineUpRow, ILineUpColumn, ILineUpSettings, ILineUpConfiguration, IDataProvider, IQueryOptions, IQueryResult } from "./models";
+import { TableSorter as TableSorterImpl } from "./TableSorter";
+import { ITableSorterRow, ITableSorterColumn, ITableSorterSettings, ITableSorterConfiguration, IDataProvider, IQueryOptions, IQueryResult } from "./models";
 import { JSONDataProvider } from "./providers/JSONDataProvider";
 
-export interface LineUpProps {
-    cols: ILineUpColumn[],
+export interface TableSorterProps {
+    cols: ITableSorterColumn[],
     provider: IDataProvider;
     multiSelect?: boolean;
     count?: number;
@@ -17,31 +17,31 @@ export interface LineUpProps {
     showAnimations?: boolean;
     showStacked?: boolean;
     onSortChanged?: (column: string, asc: boolean) => void;
-    onSelectionChanged?: (selectedRows: ILineUpRow[]) => void;
+    onSelectionChanged?: (selectedRows: ITableSorterRow[]) => void;
     onFilterChanged?: (filter: { column: string; value: string|{ domain: [number,number];range:[number,number]}}) => void;
     onLoadMoreData?: () => void;
 };
 
-export interface LineUpState { }
+export interface TableSorterState { }
 
 /**
- * Thin wrapper around LineUp
+ * Thin wrapper around TableSorter
  */
-export class LineUp extends React.Component<LineUpProps, LineUpState> {
-    private lineup: LineUpImpl;
+export class TableSorter extends React.Component<TableSorterProps, TableSorterState> {
+    private tableSorter: TableSorterImpl;
     private node: any;
     private selectionListener : any;
     private canLoadListener : any;
-    public props : LineUpProps;
+    public props : TableSorterProps;
 
     componentDidMount() {
         this.node = ReactDOM.findDOMNode(this);
-        this.lineup = new LineUpImpl($(this.node));
+        this.tableSorter = new TableSorterImpl($(this.node));
         this.attachEvents();
         this.renderContent();
     }
 
-    componentWillReceiveProps(newProps : LineUpProps) {
+    componentWillReceiveProps(newProps : TableSorterProps) {
         this.renderContent(newProps);
     }
 
@@ -63,34 +63,34 @@ export class LineUp extends React.Component<LineUpProps, LineUpState> {
                 }
             };
         };
-        this.lineup.events.on(LineUpImpl.EVENTS.SELECTION_CHANGED, guardedEventer('onSelectionChanged'));
-        this.lineup.events.on(LineUpImpl.EVENTS.LOAD_MORE_DATA, guardedEventer('onLoadMoreData'));
-        this.lineup.events.on(LineUpImpl.EVENTS.FILTER_CHANGED, guardedEventer('onFilterChanged'));
-        this.lineup.events.on(LineUpImpl.EVENTS.SORT_CHANGED, guardedEventer('onSortChanged'));
+        this.tableSorter.events.on(TableSorterImpl.EVENTS.SELECTION_CHANGED, guardedEventer('onSelectionChanged'));
+        this.tableSorter.events.on(TableSorterImpl.EVENTS.LOAD_MORE_DATA, guardedEventer('onLoadMoreData'));
+        this.tableSorter.events.on(TableSorterImpl.EVENTS.FILTER_CHANGED, guardedEventer('onFilterChanged'));
+        this.tableSorter.events.on(TableSorterImpl.EVENTS.SORT_CHANGED, guardedEventer('onSortChanged'));
     }
 
-    private renderContent(props? : LineUpProps) {
+    private renderContent(props? : TableSorterProps) {
         // if called from `componentWillReceiveProps`, then we use the new
         // props, otherwise use what we already have.
         props = props || this.props;
 
-        this.lineup.settings = this.getSettingsFromProps(props);
-        this.lineup.count = props.count || 100;
+        this.tableSorter.settings = this.getSettingsFromProps(props);
+        this.tableSorter.count = props.count || 100;
         if (props.provider && props.cols) {
-            let config : ILineUpConfiguration = this.lineup.configuration || {
+            let config : ITableSorterConfiguration = this.tableSorter.configuration || {
                 primaryKey: props.cols[0].column,
                 columns: []
             };
             config.columns = props.cols;
-            this.lineup.configuration = config;
+            this.tableSorter.configuration = config;
         }
-        this.lineup.dataProvider = props.provider;
+        this.tableSorter.dataProvider = props.provider;
     }
 
     /**
-     * Converts the lineup props to settings
+     * Converts the tablesorter props to settings
      */
-    private getSettingsFromProps(props: LineUpProps) : ILineUpSettings {
+    private getSettingsFromProps(props: TableSorterProps) : ITableSorterSettings {
         return {
             selection: {
                 singleSelect: props.singleSelect,

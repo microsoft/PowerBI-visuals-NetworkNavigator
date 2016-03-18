@@ -3,14 +3,14 @@ import { default as Utils } from "../../base/Utils";
 import { JSONDataProvider } from "./providers/JSONDataProvider";
 import * as _  from "lodash";
 import * as d3 from "d3";
-import { IQueryOptions, IQueryResult, IDataProvider, ILineUpColumn, ILineUpRow, ILineUpSettings, ILineUpConfiguration, ILineUpSort } from "./models";
+import { IQueryOptions, IQueryResult, IDataProvider, ITableSorterColumn, ITableSorterRow, ITableSorterSettings, ITableSorterConfiguration, ITableSorterSort } from "./models";
 const $ = require("jquery");
 const LineUpLib = require("./lib/lineup");
 
 /**
  * Thin wrapper around the lineup library
  */
-export class LineUp {
+export class TableSorter {
 
     /**
      * A quick reference for the providers
@@ -46,7 +46,7 @@ export class LineUp {
      */
     private queryOptions : IQueryOptions = {
         offset: 0,
-        count: LineUp.DEFAULT_COUNT
+        count: TableSorter.DEFAULT_COUNT
     };
 
     /**
@@ -62,22 +62,22 @@ export class LineUp {
     /**
      * THe current set of data in this lineup
      */
-    private _data: ILineUpRow[];
+    private _data: ITableSorterRow[];
 
     /**
      * The list of columns
      */
-    private columns: ILineUpColumn[];
+    private columns: ITableSorterColumn[];
 
     /**
      * The current configuration of the LineUp instance
      */
-    private _configuration: ILineUpConfiguration;
+    private _configuration: ITableSorterConfiguration;
 
     /**
      * The list of rows
      */
-    private rows: ILineUpRow[];
+    private rows: ITableSorterRow[];
 
     /**
      * Whether or not we are currently saving the configuration
@@ -97,7 +97,7 @@ export class LineUp {
     /**
      * Represents the settings
      */
-    public static DEFAULT_SETTINGS: ILineUpSettings = {
+    public static DEFAULT_SETTINGS: ITableSorterSettings = {
         selection: {
             singleSelect: false,
             multiSelect: true
@@ -169,14 +169,14 @@ export class LineUp {
         this._loadingData = value;
     }
 
-    private _selectedRows: ILineUpRow[] = [];
+    private _selectedRows: ITableSorterRow[] = [];
     private _eventEmitter: EventEmitter;
-    private _settings: ILineUpSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS);
+    private _settings: ITableSorterSettings = $.extend(true, {}, TableSorter.DEFAULT_SETTINGS);
 
     /**
      * The configuration for the lineup viewer
      */
-    private lineUpConfig : ILineUpSettings = <any>{
+    private lineUpConfig : ITableSorterSettings = <any>{
         svgLayout: {
             mode: 'separate'
         },
@@ -217,9 +217,9 @@ export class LineUp {
     /**
      * The number of the results to return
      */
-    public get count(): number { return this.queryOptions.count || LineUp.DEFAULT_COUNT };
+    public get count(): number { return this.queryOptions.count || TableSorter.DEFAULT_COUNT };
     public set count(value: number) {
-        this.queryOptions.count = value || LineUp.DEFAULT_COUNT;
+        this.queryOptions.count = value || TableSorter.DEFAULT_COUNT;
     }
 
     /**
@@ -272,7 +272,7 @@ export class LineUp {
     /**
      * Sets the selection of lineup
      */
-    public set selection(value: ILineUpRow[]) {
+    public set selection(value: ITableSorterRow[]) {
         this._selectedRows = this.updateRowSelection(value);
         if (this.lineupImpl) {
             this.lineupImpl.select(value);
@@ -282,8 +282,8 @@ export class LineUp {
     /**
      * Sets the settings
      */
-    public set settings(value: ILineUpSettings) {
-        var newSettings: ILineUpSettings = $.extend(true, {}, LineUp.DEFAULT_SETTINGS, value);
+    public set settings(value: ITableSorterSettings) {
+        var newSettings: ITableSorterSettings = $.extend(true, {}, TableSorter.DEFAULT_SETTINGS, value);
 
         var singleSelect = newSettings.selection.singleSelect;
         var multiSelect = newSettings.selection.multiSelect;
@@ -310,14 +310,14 @@ export class LineUp {
     /**
      * Gets this configuration
      */
-    public get configuration(): ILineUpConfiguration {
+    public get configuration(): ITableSorterConfiguration {
         return this._configuration;
     }
 
     /**
      * Sets the column configuration that is used
      */
-    public set configuration(value: ILineUpConfiguration) {
+    public set configuration(value: ITableSorterConfiguration) {
         this._configuration = value;
 
         this.applyConfigurationToLineup();
@@ -326,7 +326,7 @@ export class LineUp {
     /**
      * Derives the desciption for the given column
      */
-    public static createConfigurationFromData(data: ILineUpRow[]): ILineUpConfiguration {
+    public static createConfigurationFromData(data: ITableSorterRow[]): ITableSorterConfiguration {
         interface IMinMax {
             min?: number;
             max?: number;
@@ -354,7 +354,7 @@ export class LineUp {
 
         function isNumeric(v) {
             // Assume that if null or undefined, it is numeric
-            return v === 0 || v === null || v === undefined || LineUp.isNumeric(v);
+            return v === 0 || v === null || v === undefined || TableSorter.isNumeric(v);
         }
 
         function analyzeColumn(columnName: string) {
@@ -366,8 +366,8 @@ export class LineUp {
             return {allNumeric, minMax};
         }
 
-        function createLineUpColumn(colName: string): ILineUpColumn {
-            const result: ILineUpColumn = { column: colName, type: 'string' };
+        function createLineUpColumn(colName: string): ITableSorterColumn {
+            const result: ITableSorterColumn = { column: colName, type: 'string' };
             let { allNumeric, minMax } = analyzeColumn(colName);
 
             if (allNumeric) {
@@ -387,7 +387,7 @@ export class LineUp {
         }
 
         const dataColNames = getDataColumnNames();
-        const columns: ILineUpColumn[] = getDataColumnNames().map(createLineUpColumn);
+        const columns: ITableSorterColumn[] = getDataColumnNames().map(createLineUpColumn);
         return {
             primaryKey: "id",
             columns
@@ -397,7 +397,7 @@ export class LineUp {
     /**
      * Gets the sort from lineup
      */
-    public getSortFromLineUp() : ILineUpSort {
+    public getSortFromLineUp() : ITableSorterSort {
         if (this.lineupImpl && this.lineupImpl.storage) {
             var primary = this.lineupImpl.storage.config.columnBundles.primary;
             var col = primary.sortedColumn;
@@ -458,7 +458,7 @@ export class LineUp {
                     this.queryOptions.offset += r.count;
 
                     //derive a description file
-                    var desc = this.configuration || LineUp.createConfigurationFromData(this._data);
+                    var desc = this.configuration || TableSorter.createConfigurationFromData(this._data);
                     
                     // Primary Key needs to always be ID
                     desc.primaryKey = "id";
@@ -480,13 +480,13 @@ export class LineUp {
                             // This only works for single columns and not grouped columns
                             this.onLineUpSorted(column && column.column && column.column.id, asc);
                         });
-                        this.lineupImpl.listeners.on("multiselected.lineup", (rows: ILineUpRow[]) => {
+                        this.lineupImpl.listeners.on("multiselected.lineup", (rows: ITableSorterRow[]) => {
                             if (this.settings.selection.multiSelect) {
                                 this._selectedRows = this.updateRowSelection(rows);
                                 this.raiseSelectionChanged(rows);
                             }
                         });
-                        this.lineupImpl.listeners.on("selected.lineup", (row: ILineUpRow) => {
+                        this.lineupImpl.listeners.on("selected.lineup", (row: ITableSorterRow) => {
                             if (this.settings.selection.singleSelect && !this.settings.selection.multiSelect) {
                                 this._selectedRows = this.updateRowSelection(row ? [row] : []);
                                 this.raiseSelectionChanged(this.selection)
@@ -547,7 +547,7 @@ export class LineUp {
     /**
      * Updates the selected state of each row, and returns all the selected rows
      */
-    private updateRowSelection(sels: ILineUpRow[]) {
+    private updateRowSelection(sels: ITableSorterRow[]) {
         if (this._data) {
             this._data.forEach((d) => d.selected = false);
         }
@@ -561,7 +561,7 @@ export class LineUp {
         if (!this.savingConfiguration) {
             this.savingConfiguration = true;
             //full spec
-            var s: ILineUpConfiguration = $.extend({}, {}, this.lineupImpl.spec.dataspec);
+            var s: ITableSorterConfiguration = $.extend({}, {}, this.lineupImpl.spec.dataspec);
             //create current layout
             var descs = this.lineupImpl.storage.getColumnLayout()
                 .map(((d) => d.description()));
@@ -678,42 +678,42 @@ export class LineUp {
     /**
      * Raises the configuration changed event
      */
-    private raiseConfigurationChanged(configuration: ILineUpConfiguration) {
-        this.events.raiseEvent(LineUp.EVENTS.CONFIG_CHANGED, configuration);
+    private raiseConfigurationChanged(configuration: ITableSorterConfiguration) {
+        this.events.raiseEvent(TableSorter.EVENTS.CONFIG_CHANGED, configuration);
     }
 
     /**
      * Raises the filter changed event
      */
     private raiseSortChanged(column: string, asc: boolean) {
-        this.events.raiseEvent(LineUp.EVENTS.SORT_CHANGED, column, asc);
+        this.events.raiseEvent(TableSorter.EVENTS.SORT_CHANGED, column, asc);
     }
 
     /**
      * Raises the filter changed event
      */
     private raiseFilterChanged(filter: any) {
-        this.events.raiseEvent(LineUp.EVENTS.FILTER_CHANGED, filter);
+        this.events.raiseEvent(TableSorter.EVENTS.FILTER_CHANGED, filter);
     }
 
     /**
      * Raises the selection changed event
      */
-    private raiseSelectionChanged(rows: ILineUpRow[]) {
-        this.events.raiseEvent(LineUp.EVENTS.SELECTION_CHANGED, rows);
+    private raiseSelectionChanged(rows: ITableSorterRow[]) {
+        this.events.raiseEvent(TableSorter.EVENTS.SELECTION_CHANGED, rows);
     }
 
     /**
      * Raises the load more data event
      */
     private raiseLoadMoreData() {
-        this.events.raiseEvent(LineUp.EVENTS.LOAD_MORE_DATA);
+        this.events.raiseEvent(TableSorter.EVENTS.LOAD_MORE_DATA);
     }
 
     /**
      * Raises the load more data event
      */
     private raiseClearSelection() {
-        this.events.raiseEvent(LineUp.EVENTS.CLEAR_SELECTION);
+        this.events.raiseEvent(TableSorter.EVENTS.CLEAR_SELECTION);
     }
 }

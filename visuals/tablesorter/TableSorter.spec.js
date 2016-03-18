@@ -1,9 +1,9 @@
 "use strict";
 require("../../base/testSetup");
 var chai_1 = require("chai");
-var LineUp_1 = require("./LineUp");
+var TableSorter_1 = require("./TableSorter");
 var $ = require("jquery");
-describe('LineUp', function () {
+describe('TableSorter', function () {
     var parentEle;
     beforeEach(function () {
         global['$'] = require("jquery");
@@ -21,7 +21,7 @@ describe('LineUp', function () {
         var ele = $('<div>');
         parentEle.append(ele);
         var result = {
-            instance: new LineUp_1.LineUp(ele),
+            instance: new TableSorter_1.TableSorter(ele),
             element: ele
         };
         result.instance.settings = {
@@ -192,7 +192,7 @@ describe('LineUp', function () {
             it("should call the event when a column header is clicked", function () {
                 var _a = createInstance(), instance = _a.instance, element = _a.element;
                 var called = false;
-                instance.events.on(LineUp_1.LineUp.EVENTS.SORT_CHANGED, function (item) {
+                instance.events.on(TableSorter_1.TableSorter.EVENTS.SORT_CHANGED, function (item) {
                     called = true;
                 });
                 var providerInfo = createProvider(createFakeData().data);
@@ -206,7 +206,7 @@ describe('LineUp', function () {
             });
             it("should call the event with the correct params", function () {
                 var _a = createInstance(), instance = _a.instance, element = _a.element;
-                instance.events.on(LineUp_1.LineUp.EVENTS.SORT_CHANGED, function (colName) {
+                instance.events.on(TableSorter_1.TableSorter.EVENTS.SORT_CHANGED, function (colName) {
                     chai_1.expect(colName).to.equal("col1");
                 });
                 var providerInfo = createProvider(createFakeData().data);
@@ -222,7 +222,7 @@ describe('LineUp', function () {
             it("should call the event when a row is clicked", function () {
                 var _a = createInstance(), instance = _a.instance, element = _a.element;
                 var called = false;
-                instance.events.on(LineUp_1.LineUp.EVENTS.SELECTION_CHANGED, function (selection) {
+                instance.events.on(TableSorter_1.TableSorter.EVENTS.SELECTION_CHANGED, function (selection) {
                     called = true;
                     chai_1.expect(selection.length).to.be.equal(1);
                     chai_1.expect(selection.col1).to.be.equal("FAKE_0"); // Very first row
@@ -243,7 +243,7 @@ describe('LineUp', function () {
                     var row = element.find(".row").first();
                     row.click();
                     var called = false;
-                    instance.events.on(LineUp_1.LineUp.EVENTS.SELECTION_CHANGED, function (selection) {
+                    instance.events.on(TableSorter_1.TableSorter.EVENTS.SELECTION_CHANGED, function (selection) {
                         called = true;
                         chai_1.expect(selection.length).to.be.equal(0);
                     });
@@ -385,7 +385,7 @@ describe('LineUp', function () {
                 var _a = loadInstanceWithStackedColumns(), instance = _a.instance, data = _a.data, dataLoaded = _a.dataLoaded;
                 return dataLoaded.then(function () {
                     var called = false;
-                    instance.events.on(LineUp_1.LineUp.EVENTS.CONFIG_CHANGED, function () {
+                    instance.events.on(TableSorter_1.TableSorter.EVENTS.CONFIG_CHANGED, function () {
                         called = true;
                     });
                     // Ghetto: Manually say that the columns have changed, usually happens if you drag/drop add columns
