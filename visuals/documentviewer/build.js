@@ -1,4 +1,4 @@
-{
+module.exports = {
     "output": {
         "PowerBI": {
             "visualName": "DocumentViewerVisual",
@@ -13,4 +13,4 @@
             "entry": "DocumentViewerReact.tsx"
         }
     }
-}
+};

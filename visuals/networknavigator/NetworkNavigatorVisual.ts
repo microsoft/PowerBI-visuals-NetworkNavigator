@@ -21,7 +21,7 @@ import utility = powerbi.visuals.utility;
 const colors = require("../../base/powerbi/colors");
 declare var _;
 
-@Visual(JSON.parse(require("./build.json")).output.PowerBI)
+@Visual(require("./build").output.PowerBI)
 export default class NetworkNavigator extends VisualBase implements IVisual {
     private dataViewTable: DataViewTable;
     private myNetworkNavigator: NetworkNavigatorImpl;

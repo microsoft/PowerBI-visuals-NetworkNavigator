@@ -10,7 +10,7 @@ import VisualInitOptions = powerbi.VisualInitOptions;
 import VisualUpdateOptions = powerbi.VisualUpdateOptions;
 import VisualDataRoleKind = powerbi.VisualDataRoleKind;
 
-@Visual(JSON.parse(require("./build.json")).output.PowerBI)
+@Visual(require("./build").output.PowerBI)
 export default class DocumentViewerVisual extends VisualBase implements IVisual {
 
     /**

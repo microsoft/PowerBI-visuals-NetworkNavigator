@@ -1,4 +1,4 @@
-{
+module.exports = {
     "version": {
         "major": "0",
         "minor": "90",
@@ -22,4 +22,4 @@
             "entry": "NetworkNavigatorReact.tsx"
         }
     }
-}
+};
