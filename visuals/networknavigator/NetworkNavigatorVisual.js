@@ -414,7 +414,7 @@ var NetworkNavigator = (function (_super) {
         }
     });
     NetworkNavigator = __decorate([
-        Utils_1.Visual(JSON.parse(require("./build.json")).output.PowerBI)
+        Utils_1.Visual(require("./build").output.PowerBI)
     ], NetworkNavigator);
     return NetworkNavigator;
 }(VisualBase_1.VisualBase));
