@@ -1,7 +1,7 @@
 module.exports = {
     "version": {
         "major": "0",
-        "minor": "90",
+        "minor": "9",
         "patch": "3"
     },
     "output": {
