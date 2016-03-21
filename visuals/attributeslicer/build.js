@@ -2,7 +2,7 @@ module.exports = {
     "version": {
         "major": "0",
         "minor": "90",
-        "patch": "0"   
+        "patch": "1"
     },
     "output": {
         "PowerBI": {
@@ -22,5 +22,9 @@ module.exports = {
             "entry": "AttributeSlicerReact.tsx"
         }
     },
-    "lintFiles": ["AttributeSlicer.ts", "AttributeSlicerReact.tsx", "AttributeSlicerVisual.ts"]
+    "lintFiles": [
+        "AttributeSlicer.ts",
+        "AttributeSlicerReact.tsx",
+        "AttributeSlicerVisual.ts"
+    ]
 };
