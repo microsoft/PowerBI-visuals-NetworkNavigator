@@ -49,7 +49,7 @@ module.exports = function (gulp) {
         /**
          * Builds the scripts for use for with powerbi
          */
-        gulp.task(`${buildName}:scripts`, [`${buildName}:css`, `compile:${project}:ts`], function() {
+        gulp.task(`${buildName}:scripts`, [`${buildName}:css`], function() {
             var output = config.output.PowerBI;
             var webpackConfig = require(baseDir + 'webpack.config.dev.js');
             webpackConfig.entry = path.join(baseDir, 'visuals', project, output.entry);
