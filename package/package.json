@@ -1,8 +1,8 @@
 {
     "build": "11.0.9168.916",
-    "version": "0.90.0",
+    "version": "%PROJECT_VERSION%",
     "author": {
-        "name": "Microsoft",
+        "name": "Microsoft (experimental)",
         "email": "pbicvsupport@microsoft.com"
     },
     "licenseTerms": "https://powerbi.microsoft.com/en-us/visuals-gallery-terms/",
