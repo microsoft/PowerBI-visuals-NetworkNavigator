@@ -1,5 +1,9 @@
-{
-    "version": "0.90.0",
+module.exports = {
+    "version": {
+        "major": "0",
+        "minor": "90",
+        "patch": "0"   
+    },
     "output": {
         "PowerBI": {
             "visualName": "NetworkNavigator",
@@ -18,4 +22,4 @@
             "entry": "NetworkNavigatorReact.tsx"
         }
     }
-}
+};

@@ -105,6 +105,11 @@ export default class AttributeSlicer extends VisualBase implements IVisual {
     });
 
     private loadDeferred : JQueryDeferred<SlicerItem[]>;
+    
+    /**
+     * The current category that the user added
+     */
+    private currentCategory;
 
     /**
      * Called when the visual is being initialized
@@ -131,7 +136,16 @@ export default class AttributeSlicer extends VisualBase implements IVisual {
 
         this.dataView = options.dataViews && options.dataViews[0];
         if (this.dataView) {
-            var categorical = this.dataView && this.dataView.categorical;
+            const categorical = this.dataView && this.dataView.categorical;
+            const catName = categorical && categorical.categories.length && categorical.categories[0].source.queryName;
+            
+            // if the user has changed the categories, then selection is done for
+            if (this.currentCategory !== categorical.categories[0].source.queryName) {
+                this.mySlicer.selectedItems = [];
+            }
+            
+            this.currentCategory = catName;
+            
             var newData = AttributeSlicer.converter(this.dataView, this.selectionManager);
             if (this.loadDeferred && this.mySlicer.data) {
 
@@ -166,6 +180,7 @@ export default class AttributeSlicer extends VisualBase implements IVisual {
             }
         } else {
             this.mySlicer.data = [];
+            this.mySlicer.selectedItems = [];
         }
     }
 

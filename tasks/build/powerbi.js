@@ -70,7 +70,7 @@ module.exports = function (gulp) {
                 .pipe(replace("%PROJECT_DISPLAY_NAME%", output.displayName || output.visualName))
                 .pipe(replace("%PROJECT_ID%", output.projectId))
                 .pipe(replace("%PROJECT_DESCRIPTION%", output.description))
-                .pipe(replace("%PROJECT_VERSION%", config.version || "0.0.1"))
+                .pipe(replace("%PROJECT_VERSION%", prettyPrintVersion(config.version)))
                 .pipe(modify({
                     fileModifier: function(file, contents) {
                         var pkg = JSON.parse(contents.toString());
@@ -138,9 +138,10 @@ module.exports = function (gulp) {
          * Zips up the visual
          */
         gulp.task(`${buildName}:zip`, function() {
+            var version = prettyPrintVersion(config.version);
             var output = config.output.PowerBI;
             return gulp.src([paths.buildDirPowerBI + "/**/*"])
-                .pipe(zip(output.visualName + ".pbiviz"))
+                .pipe(zip(`${output.visualName}_${version}.pbiviz`))
                 .pipe(gulp.dest(paths.buildDirPowerBI));
         });
 
@@ -182,6 +183,16 @@ module.exports = function (gulp) {
     gulp.task("build:powerbi", function(callback) {
         return sequence.apply(this, [projects.map(n => `build:${n.name}:powerbi`)].concat(callback));
     });
+}
+
+/**
+ * Pretty prints a version object in the format: { major: number, minor: number, patch: number }
+ */
+function prettyPrintVersion(v) {
+    if (v) {
+        return `${v.major || "0"}.${v.minor || "0"}.${v.patch || "1"}`;
+    }
+    return "0.0.1";
 }
 
 function string_src(filename, string) {

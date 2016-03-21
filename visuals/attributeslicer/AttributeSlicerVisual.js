@@ -59,6 +59,12 @@ var AttributeSlicer = (function (_super) {
         this.dataView = options.dataViews && options.dataViews[0];
         if (this.dataView) {
             var categorical = this.dataView && this.dataView.categorical;
+            var catName = categorical && categorical.categories.length && categorical.categories[0].source.queryName;
+            // if the user has changed the categories, then selection is done for
+            if (this.currentCategory !== categorical.categories[0].source.queryName) {
+                this.mySlicer.selectedItems = [];
+            }
+            this.currentCategory = catName;
             var newData = AttributeSlicer.converter(this.dataView, this.selectionManager);
             if (this.loadDeferred && this.mySlicer.data) {
                 var added_1 = [];
@@ -92,6 +98,7 @@ var AttributeSlicer = (function (_super) {
         }
         else {
             this.mySlicer.data = [];
+            this.mySlicer.selectedItems = [];
         }
     };
     /**

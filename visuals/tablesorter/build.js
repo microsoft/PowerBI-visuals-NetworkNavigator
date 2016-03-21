@@ -1,5 +1,9 @@
 module.exports = {
-    "version": "0.90.0",
+    "version": {
+        "major": "0",
+        "minor": "90",
+        "patch": "1"   
+    },
     "output": {
         "PowerBI": {
             "visualName": "TableSorter",
