@@ -4,6 +4,7 @@ var $ = require("jquery");
 var _ = require("lodash");
 var d3 = require("d3");
 var DEBOUNCE_TIME = 1000;
+var TICK_WIDTH = 100;
 /**
 * Represents a timebrush
 */
@@ -168,7 +169,7 @@ var TimeBrush = (function () {
             .attr("height", height);
         this.xAxis
             .attr("transform", "translate(0," + height + ")")
-            .call(d3.svg.axis().scale(this.x).orient("bottom"));
+            .call(d3.svg.axis().scale(this.x).orient("bottom").ticks(this.dimensions.width / TICK_WIDTH));
         this.context
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         this.brush.x(this.x);
