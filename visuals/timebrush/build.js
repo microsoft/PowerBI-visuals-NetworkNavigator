@@ -1,8 +1,8 @@
 module.exports = {
     "version": {
         "major": "0",
-        "minor": "90",
-        "patch": "3"
+        "minor": "9",
+        "patch": "4"
     },
     "output": {
         "PowerBI": {
