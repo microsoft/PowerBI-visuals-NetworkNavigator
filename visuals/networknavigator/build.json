@@ -1,5 +1,9 @@
 {
-    "version": "0.90.0",
+    "version": {
+        "major": "0",
+        "minor": "90",
+        "patch": "0"   
+    },
     "output": {
         "PowerBI": {
             "visualName": "NetworkNavigator",
