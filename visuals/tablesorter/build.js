@@ -2,7 +2,7 @@ module.exports = {
     "version": {
         "major": "0",
         "minor": "90",
-        "patch": "2"   
+        "patch": "3"
     },
     "output": {
         "PowerBI": {
@@ -22,5 +22,8 @@ module.exports = {
             "entry": "TableSorterReact"
         }
     },
-    "lintFiles": ["TableSorterVisual.ts", "TableSorter.ts"]
+    "lintFiles": [
+        "TableSorterVisual.ts",
+        "TableSorter.ts"
+    ]
 };

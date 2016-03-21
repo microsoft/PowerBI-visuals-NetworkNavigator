@@ -60,7 +60,7 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
     public static capabilities: VisualCapabilities = $.extend(true, {}, VisualBase.capabilities, {
         dataRoles: [{
             name: 'Values',
-            kind: VisualDataRoleKind.Grouping
+            kind: VisualDataRoleKind.GroupingOrMeasure
         }],
         dataViewMappings: [{
             table: {
@@ -409,7 +409,7 @@ export default class TableSorterVisual extends VisualBase implements IVisual {
             table.rows.forEach((row, rowIndex) => {
                 let identity;
                 let newId;
-                if (view.categorical && view.categorical.categories.length) {
+                if (view.categorical && view.categorical.categories && view.categorical.categories.length) {
                     identity = view.categorical.categories[0].identity[rowIndex];
                     newId = SelectionId.createWithId(identity);
                 } else {
