@@ -15,7 +15,7 @@ module.exports =function(gulp) {
         /**
          * Builds the bare component
          */
-        gulp.task(`build:${project}:component`, [`build:${project}:css`, `compile:${project}:ts`], function() {
+        gulp.task(`build:${project}:component`, [`build:${project}:css`], function() {
             var output = config.output.component;
             if (output) {
                 var webpackConfig = require('../../webpack.config.dev.js');
