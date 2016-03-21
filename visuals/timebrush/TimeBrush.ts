@@ -4,6 +4,7 @@ import * as _ from "lodash";
 import * as d3 from "d3";
 
 const DEBOUNCE_TIME = 1000;
+const TICK_WIDTH = 100;
 
 /**
 * Represents a timebrush
@@ -191,7 +192,7 @@ export class TimeBrush {
 
         this.xAxis
             .attr("transform", "translate(0," + height + ")")
-            .call(d3.svg.axis().scale(this.x).orient("bottom"));
+            .call(d3.svg.axis().scale(this.x).orient("bottom").ticks(this.dimensions.width / TICK_WIDTH));
 
         this.context
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
