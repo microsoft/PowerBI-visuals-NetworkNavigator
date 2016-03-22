@@ -230,11 +230,11 @@ export default class TimeBrush extends VisualBase implements IVisual {
         "YYYY/MM/DD HH:mm:ss",
         "YYYY/MM/DD HH:mm",
         "YYYY/MM/DD",
+        "YYYY",
         "HH:mm:ss",
         "HH:mm",
         "MM",
-        "DD",
-        "YYYY"
+        "DD"
     ];
     
     /**
@@ -248,7 +248,6 @@ export default class TimeBrush extends VisualBase implements IVisual {
         if (typeof dateValue === "string" && dateValue) {
             dateValue = dateValue.replace(/-/g, "/");
             const parsedDate = moment(dateValue, TimeBrush.MOMENT_FORMATS);
-            parsedDate.add((new Date().getTimezoneOffset() + 60) * 60 * 1000, "milliseconds");
             dateValue = parsedDate.toDate();
         }
         

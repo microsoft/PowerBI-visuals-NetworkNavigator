@@ -49,6 +49,13 @@ describe('TimeBrushVisual', () => {
             
             // TODO: Time??
         });
+        it("should coerce time '12:33' as the correct date object", () => {
+            let result = TimeBrushVisual.coerceDate('12:33');
+            expect(result.getHours()).to.eq(12);
+            expect(result.getMinutes()).to.eq(33); // Months start at 0
+            
+            // TODO: Time??
+        });
         it("should coerce day 22", () => {
             let result = TimeBrushVisual.coerceDate(22);
             expect(result.getDate()).to.eq(22);
