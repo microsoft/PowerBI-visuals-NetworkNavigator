@@ -21,6 +21,8 @@ import SQExpr = powerbi.data.SQExpr;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import DataViewCategoryColumn = powerbi.DataViewCategoryColumn;
 
+const moment = require("moment");
+
 @Visual(require("./build.js").output.PowerBI)
 export default class TimeBrush extends VisualBase implements IVisual {
 
@@ -218,6 +220,24 @@ export default class TimeBrush extends VisualBase implements IVisual {
     }
     
     /**
+     * The formats for moment to test
+     */
+    public static MOMENT_FORMATS = [
+        moment.ISO_8601,
+        "MM/DD/YYYY HH:mm:ss",
+        "MM/DD/YYYY HH:mm",
+        "MM/DD/YYYY",
+        "YYYY/MM/DD HH:mm:ss",
+        "YYYY/MM/DD HH:mm",
+        "YYYY/MM/DD",
+        "HH:mm:ss",
+        "HH:mm",
+        "MM",
+        "DD",
+        "YYYY"
+    ];
+    
+    /**
      * Coerces the given date value into a date object
      */
     public static coerceDate(dateValue: any) : Date {
@@ -225,8 +245,11 @@ export default class TimeBrush extends VisualBase implements IVisual {
             return;
         }
             
-        if (typeof dateValue === "string") {
-            dateValue = new Date((Date.parse(dateValue) + ((new Date().getTimezoneOffset() + 60) * 60 * 1000)))
+        if (typeof dateValue === "string" && dateValue) {
+            dateValue = dateValue.replace(/-/g, "/");
+            const parsedDate = moment(dateValue, TimeBrush.MOMENT_FORMATS);
+            parsedDate.add((new Date().getTimezoneOffset() + 60) * 60 * 1000, "milliseconds");
+            dateValue = parsedDate.toDate();
         }
         
         // Assume it is just a year
