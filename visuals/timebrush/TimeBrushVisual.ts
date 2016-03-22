@@ -118,6 +118,7 @@ export default class TimeBrush extends VisualBase implements IVisual {
                 // Stash this bad boy for later, so we can filter the time column
                 if (dataViewCategorical && dataViewCategorical.categories) {
                     this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
+                    this.timeColumnIdentity['ref'] = "Date";
                 }
 
                 var item: any = dataView.metadata.objects;
