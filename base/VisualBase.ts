@@ -175,19 +175,25 @@ export class VisualBase implements powerbi.IVisual {
             rule = null,
             i = sheet.length, j, toReturn = {};
         while( 0 <= --i ){
-            rule = sheet[i]['rules'] || sheet[i]['cssRules'] || [];
-            j = rule.length;
-            while( 0 <= --j ){
-                if( rule[j].constructor.name === 'CSSFontFaceRule' ||
-                    rule[j].constructor.toString().indexOf('CSSFontFaceRule') >= 0){ // rule[j].slice(0, 10).toLowerCase() === '@font-face'
-                    //o[ rule[j].style.fontFamily ] = rule[j].style.src;
-                    const style = rule[j].style;
-                    let fontFamily = style.fontFamily;
-                    if (!fontFamily && style.getPropertyValue) {
-                        fontFamily = style.getPropertyValue('font-family');    
-                    }
-                    toReturn[fontFamily] = rule[j];
-                };
+            try {
+                rule = sheet[i]['rules'] || sheet[i]['cssRules'] || [];
+                j = rule.length;
+                while( 0 <= --j ){
+                    if( rule[j].constructor.name === 'CSSFontFaceRule' ||
+                        rule[j].constructor.toString().indexOf('CSSFontFaceRule') >= 0){ // rule[j].slice(0, 10).toLowerCase() === '@font-face'
+                        //o[ rule[j].style.fontFamily ] = rule[j].style.src;
+                        const style = rule[j].style;
+                        let fontFamily = style.fontFamily;
+                        if (!fontFamily && style.getPropertyValue) {
+                            fontFamily = style.getPropertyValue('font-family');    
+                        }
+                        toReturn[fontFamily] = rule[j];
+                    };
+                }
+            } catch (e) {
+                if (e.name !== 'SecurityError') {
+                    throw e;
+                }
             }
         }
         return toReturn;
