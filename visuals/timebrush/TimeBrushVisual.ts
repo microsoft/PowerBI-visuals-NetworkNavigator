@@ -19,12 +19,13 @@ import SelectionManager = powerbi.visuals.utility.SelectionManager;
 import VisualDataRoleKind = powerbi.VisualDataRoleKind;
 import SQExpr = powerbi.data.SQExpr;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
+import DataViewCategoryColumn = powerbi.DataViewCategoryColumn;
 
 @Visual(require("./build.js").output.PowerBI)
 export default class TimeBrush extends VisualBase implements IVisual {
 
     private host : IVisualHostServices;
-    private timeColumnIdentity: SQExpr;
+    private timeColumn: DataViewCategoryColumn;
     private timeBrush: TimeBrushImpl;
 
     /**
@@ -97,7 +98,7 @@ export default class TimeBrush extends VisualBase implements IVisual {
         this.element.append($(this.template));
         this.host = options.host;
         this.timeBrush = new TimeBrushImpl(this.element.find(".timebrush"), { width: options.viewport.width, height: options.viewport.height });
-        this.timeBrush.events.on("rangeSelected", (range) => this.onTimeRangeSelected(range));
+        this.timeBrush.events.on("rangeSelected", (range, items) => this.onTimeRangeSelected(range, items));
     }
 
     /** Update is called for data updates, resizes & formatting changes */
@@ -117,8 +118,7 @@ export default class TimeBrush extends VisualBase implements IVisual {
 
                 // Stash this bad boy for later, so we can filter the time column
                 if (dataViewCategorical && dataViewCategorical.categories) {
-                    this.timeColumnIdentity = dataViewCategorical.categories[0].identityFields[0];
-                    this.timeColumnIdentity['ref'] = "Date";
+                    this.timeColumn = dataViewCategorical.categories[0];
                 }
 
                 var item: any = dataView.metadata.objects;
@@ -127,8 +127,8 @@ export default class TimeBrush extends VisualBase implements IVisual {
                     && item.general.filter.whereItems && item.general.filter.whereItems[0].condition) {
                     var filterStartDate = item.general.filter.whereItems[0].condition.lower.value;
                     var filterEndDate = item.general.filter.whereItems[0].condition.upper.value;
-                    startDate = new Date(filterStartDate.getTime());
-                    endDate = new Date(filterEndDate.getTime());
+                    startDate = TimeBrush.coerceDate(filterStartDate);
+                    endDate = TimeBrush.coerceDate(filterEndDate);
 
                     // If the selection has changed at all, then set it
                     var currentSelection = this.timeBrush.selectedRange;
@@ -171,6 +171,7 @@ export default class TimeBrush extends VisualBase implements IVisual {
                     let coercedDate = TimeBrush.coerceDate(date);
                     return coercedDate ? {
                         date: coercedDate,
+                        rawDate: date,
                         value: dataViewCategorical.values[0].values[i],
                         identity: SelectionId.createWithId(dataViewCategorical.categories[0].identity[i])
                     } : null;
@@ -244,14 +245,26 @@ export default class TimeBrush extends VisualBase implements IVisual {
      * Raised when the time range is selected
      * @param range undefined means no range, otherwise should be [startDate, endDate]
      */
-    private onTimeRangeSelected(range: Date[]) {
+    private onTimeRangeSelected(range: Date[], items: TimeBrushVisualDataItem[]) {
         var filter;
         if (range && range.length === 2) {
-            var filterExpr = powerbi.data.SQExprBuilder.between(
-                this.timeColumnIdentity,
-                powerbi.data.SQExprBuilder.dateTime(range[0]),
-                powerbi.data.SQExprBuilder.dateTime(range[1]));
-            filter = powerbi.data.SemanticFilter.fromSQExpr(filterExpr);
+            const sourceType = this.timeColumn.source.type;
+            let filterExpr;
+            let builderType = "text";
+            if (sourceType === powerbi.ValueType.fromDescriptor({ integer: true })) {
+                builderType = "integer";
+            } else if (sourceType === powerbi.ValueType.fromDescriptor({ numeric: true })) {
+                builderType = "decimal";
+            } else if (sourceType === powerbi.ValueType.fromDescriptor({ dateTime: true })) {
+                builderType = "dateTime";
+            }
+            
+            filter = powerbi.data.SemanticFilter.fromSQExpr(
+                powerbi.data.SQExprBuilder.between(
+                    this.timeColumn.identityFields[0],
+                    powerbi.data.SQExprBuilder[builderType](items[0].rawDate),
+                    powerbi.data.SQExprBuilder[builderType](items[1].rawDate))
+            );
         }
         var objects: powerbi.VisualObjectInstancesToPersist = {
             merge: [
@@ -288,4 +301,9 @@ interface TimeBrushVisualDataItem extends TimeBrushDataItem {
      * The identity for this individual selection item
      */
     identity: SelectionId;
+    
+    /**
+     * The raw unparsed date for this item
+     */
+    rawDate: any;
 }

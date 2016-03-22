@@ -146,7 +146,32 @@ export class TimeBrush {
             .attr("class", "x axis");
 
         var brushed = _.debounce(() => {
-            this.events.raiseEvent("rangeSelected", this.brush.empty() ? [] : this.brush.extent());
+            const dateRange = this.brush.empty() ? [] : this.brush.extent();
+            let items = [];
+            if (dateRange && dateRange.length) {
+                let lowerItem : TimeBrushDataItem;
+                let upperItem : TimeBrushDataItem;
+                this.data.forEach(item => {
+                    if (!lowerItem) {
+                        lowerItem = item;
+                    }
+                    if (!upperItem) {
+                        upperItem = item;
+                    }
+                    
+                    if (Math.abs(dateRange[0].getTime() - item.date.getTime()) <
+                        Math.abs(dateRange[0].getTime() - lowerItem.date.getTime())) {
+                        lowerItem = item;
+                    }
+                    
+                    if (Math.abs(dateRange[1].getTime() - item.date.getTime()) <
+                        Math.abs(dateRange[1].getTime() - upperItem.date.getTime())) {
+                        upperItem = item;
+                    }
+                });
+                items = [lowerItem, upperItem];
+            }
+            this.events.raiseEvent("rangeSelected", dateRange, items);
         }, DEBOUNCE_TIME);
 
         this.brush = d3.svg.brush().on("brush", brushed);
