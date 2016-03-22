@@ -137,10 +137,12 @@ export default class AttributeSlicer extends VisualBase implements IVisual {
         this.dataView = options.dataViews && options.dataViews[0];
         if (this.dataView) {
             const categorical = this.dataView && this.dataView.categorical;
-            const catName = categorical && categorical.categories.length && categorical.categories[0].source.queryName;
+            const categories = categorical && categorical.categories;
+            const hasCategories = !!(categories && categories.length > 0);
+            const catName = hasCategories && categorical.categories[0].source.queryName;
             
             // if the user has changed the categories, then selection is done for
-            if (this.currentCategory !== categorical.categories[0].source.queryName) {
+            if (!hasCategories || this.currentCategory !== categorical.categories[0].source.queryName) {
                 this.mySlicer.selectedItems = [];
             }
             
@@ -168,7 +170,7 @@ export default class AttributeSlicer extends VisualBase implements IVisual {
                 delete this.loadDeferred;
             } else if (newData && Utils.hasDataChanged(newData.slice(0), this.mySlicer.data, (a, b) => a.match === b.match && a.renderedValue === b.renderedValue)) {
                 this.mySlicer.data = newData;
-            } else if (!newData) {
+            } else if (!newData || newData.length === 0) {
                 this.mySlicer.data = [];
             }
             this.mySlicer.showValues = !!categorical && !!categorical.values && categorical.values.length > 0;
