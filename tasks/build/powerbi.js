@@ -141,7 +141,7 @@ module.exports = function (gulp) {
             var version = prettyPrintVersion(config.version);
             var output = config.output.PowerBI;
             return gulp.src([paths.buildDirPowerBI + "/**/*"])
-                .pipe(zip(`${output.visualName}_${version}.pbiviz`))
+                .pipe(zip(`${output.visualName}.pbiviz`))
                 .pipe(gulp.dest(paths.buildDirPowerBI));
         });
 
