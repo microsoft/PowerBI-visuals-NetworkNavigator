@@ -7,6 +7,7 @@ module.exports = function(project) {
         styles: [rootDir + 'visuals/' + project + '/**/*\.{scss,sass}'],
         test: [rootDir + 'visuals/' + project + '/**/*\.spec\.{ts,js}'],
         buildDir:  rootDir + 'dist/' + project,
+        buildArtifacts:  rootDir + 'dist/' + project + '/**/*.*',
         buildDirComponentCSS:  rootDir + 'dist/' + project + "/component",
         buildDirComponentJS:  rootDir + 'dist/' + project + "/component",
         buildDirReactCSS:  rootDir + 'dist/' + project + "/react",
