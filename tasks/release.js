@@ -8,6 +8,7 @@ const filter = require('gulp-filter');
 const tag_version = require('gulp-tag-version');
 const sequence = require("gulp-sequence");
 const projects = require("./projects");
+const addsrc = require("gulp-add-src");
 const fs = require("fs");
 
 module.exports = function(gulp) {
@@ -29,6 +30,10 @@ module.exports = function(gulp) {
                 .pipe(bump({type: importance}))
                 // save it back to filesystem 
                 .pipe(gulp.dest('./'))
+                
+                // Add our build file to be commited
+                .pipe(addsrc(paths.projectDir + "/build.js"))
+                
                 // commit the changed version number 
                 .pipe(git.commit('Bump versions'))
         
