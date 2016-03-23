@@ -25,17 +25,6 @@ module.exports = function(gulp) {
         });
         
         /**
-         * Bumps the version of the project
-         */
-        gulp.task(`build:${project}:bump`, function() {
-            // increment version 
-            let newVer = config.version;
-            newVer.patch = (parseInt(newVer.patch, 10) + 1) + "";
-            let prettyPrinted =  JSON.stringify(config, null, 4);//.split("\n").map(n =>"\n");
-            fs.writeFileSync(paths.projectDir + "/build.js", "module.exports = " + prettyPrinted + ";");
-        });
-        
-        /**
          * Build task for a given component
          */
         gulp.task(`build:${project}`, function(callback) {
