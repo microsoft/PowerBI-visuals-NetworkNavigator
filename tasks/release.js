@@ -30,12 +30,12 @@ module.exports = function(gulp) {
                 // save it back to filesystem 
                 .pipe(gulp.dest('./'))
                 // commit the changed version number 
-               /* .pipe(git.commit('Bump versions'))
+                .pipe(git.commit('Bump versions'))
         
                 // read only one file to get the version number 
                 .pipe(filter('package.json'))
                 // **tag it in the repository** 
-                .pipe(tag_version())*/;
+                .pipe(tag_version());
         }
         
         /**
