@@ -1,0 +1,1 @@
+module.exports = process.env.BUILD_TARGET == "release" ? require("./webpack.config.prod") : require("./webpack.config.dev");

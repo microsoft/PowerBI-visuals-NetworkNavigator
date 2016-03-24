@@ -1,19 +1,20 @@
 "use strict";
 const rootDir = __dirname + "/../";
-module.exports = function(project) {
+module.exports = function() {
+    var srcDir = rootDir + 'src/';
     return  {
-        projectDir: rootDir + 'visuals/' + project,
-        scripts: [rootDir + 'visuals/' + project + '/**/*\.{js,ts}'],
-        styles: [rootDir + 'visuals/' + project + '/**/*\.{scss,sass}'],
-        test: [rootDir + 'visuals/' + project + '/**/*\.spec\.{ts,js}'],
-        buildDir:  rootDir + 'dist/' + project,
-        buildArtifacts:  rootDir + 'dist/' + project + '/**/*.*',
-        buildDirComponentCSS:  rootDir + 'dist/' + project + "/component",
-        buildDirComponentJS:  rootDir + 'dist/' + project + "/component",
-        buildDirReactCSS:  rootDir + 'dist/' + project + "/react",
-        buildDirReactJS:  rootDir + 'dist/' + project + "/react",
-        buildDirPowerBI: rootDir + 'dist/' + project + '/powerbi',
-        buildDirPowerBiResources: rootDir + 'dist/' + project + '/powerbi/resources',
+        projectDir: srcDir,
+        scripts: [srcDir + '/**/*\.{js,ts}'],
+        styles: [srcDir + '/**/*\.{scss,sass}'],
+        test: [srcDir + '/**/*\.spec\.{ts,js}'],
+        buildDir:  rootDir + 'dist/',
+        buildArtifacts:  rootDir + 'dist/' + '/**/*.*',
+        buildDirComponentCSS:  rootDir + 'dist/' + "/component",
+        buildDirComponentJS:  rootDir + 'dist/' + "/component",
+        buildDirReactCSS:  rootDir + 'dist/' + "/react",
+        buildDirReactJS:  rootDir + 'dist/' + "/react",
+        buildDirPowerBI: rootDir + 'dist/' + '/powerbi',
+        buildDirPowerBiResources: rootDir + 'dist/' + '/powerbi/resources',
         packageDir: [rootDir + 'package']
     };
 }

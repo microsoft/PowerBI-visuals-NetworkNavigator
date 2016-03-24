@@ -7,23 +7,11 @@ const exec = require('child_process').exec;
 const gutil = require("gulp-util");
 const sequence = require("gulp-sequence");
 const webserver = require('gulp-webserver');
-const projects = require("./projects");
+const projectConfig = require("./project");
 
 module.exports = function(gulp) {
-    projects.forEach(projectConfig => {
-        const project = projectConfig.name;
-        const paths = projectConfig.paths;
-        
-        /**
-         * Starts the demo
-         */
-        gulp.task(`demo:${project}`, function(cb) {
-            gulp.watch([paths.scripts, paths.styles], [`build:${project}:component`]);
-            sequence(`clean:${project}`, `build:${project}:component`, 'demo-server', cb);
-        });
-    });
-    
-    let allPaths = paths("*");
+    const project = projectConfig.name;
+    const paths = projectConfig.paths;
     
     /**
      * Starts the demo server
@@ -53,11 +41,12 @@ module.exports = function(gulp) {
             }));
     });
 
+    
     /**
      * Starts the demo
      */
-    gulp.task('demo', function(cb) {
-        gulp.watch([allPaths.scripts, allPaths.styles], ['build:component']);
-        sequence('clean', 'build:component', 'demo-server', cb);
+    gulp.task(`demo`, function(cb) {
+        gulp.watch([paths.scripts, paths.styles], [`build:component`]);
+        sequence(`clean`, `build:component`, 'demo-server', cb);
     });
 };

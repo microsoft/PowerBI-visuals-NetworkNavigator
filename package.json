@@ -4,13 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:timebrush": "gulp test:timebrush",
-    "test:tablesorter": "gulp test:tablesorter",
-    "test:freetext": "gulp test:freetext",
-    "test:networknavigator": "gulp test:networknavigator",
-    "test:documentviewer": "gulp test:documentviewer",
-    "test:attributeslicer": "gulp test:attributeslicer",
-    "test": "npm-run-all 'test:*'"
+    "test": "gulp test"
   },
   "author": "",
   "license": "ISC",

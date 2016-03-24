@@ -1,15 +1,15 @@
 module.exports = function (wallaby) {
   return {
     files: [
-      'visuals/**/*.ts',
-      'visuals/**/*.js',
+      'src/**/*.ts',
+      'src/**/*.js',
       'base/**/*.ts',
       'base/**/*.js',
-      { pattern: 'visuals/**/*.spec.ts', ignore: true }
+      { pattern: 'src/**/*.spec.ts', ignore: true }
     ],
 
     tests: [
-      'visuals/**/*.spec.ts'
+      'src/**/*.spec.ts'
     ],
     env: {
       type: 'node'
