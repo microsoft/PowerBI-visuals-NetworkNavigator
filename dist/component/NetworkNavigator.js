@@ -1,1 +1,496 @@
-!function(t,e){if("object"==typeof exports&&"object"==typeof module)module.exports=e(require("jQuery"));else if("function"==typeof define&&define.amd)define(["jQuery"],e);else{var i=e("object"==typeof exports?require("jQuery"):t.jQuery);for(var n in i)("object"==typeof exports?exports:t)[n]=i[n]}}(this,function(t){return function(t){function e(n){if(i[n])return i[n].exports;var r=i[n]={exports:{},id:n,loaded:!1};return t[n].call(r.exports,r,r.exports,e),r.loaded=!0,r.exports}var i={};return e.m=t,e.c=i,e.p="",e(0)}([function(t,e,i){"use strict";var n=i(1),r=i(2),o=function(){function t(t,e,i){var o=this;e===void 0&&(e=500),i===void 0&&(i=500),this._configuration={animate:!0,linkDistance:10,linkStrength:2,charge:-120,gravity:.1,labels:!1,minZoom:.1,maxZoom:100,defaultLabelColor:"blue"},this.events=new n["default"],this.template='\n        <div class="graph-container">\n            <div class="button-bar">\n                <ul>\n                    <li class="filter-box" title="Filter Nodes">\n                        <input type="text" placeholder="Enter text filter" class="search-filter-box"/>\n                    </li>\n                    <li class="clear-selection" title="Clear filter and selection">\n                        <a>\n                            <span class="fa-stack">\n                                <i class="fa fa-check fa-stack-1x"></i>\n                                <i class="fa fa-ban fa-stack-2x"></i>\n                            </span>\n                        </a>\n                    </li>\n                </ul>\n            </div>\n            <div class="svg-container">\n            </div>\n        </div>\n    '.trim().replace(/\n/g,""),this.element=r(this.template),t.append(this.element),this.svgContainer=this.element.find(".svg-container");var s=this.element.find(".search-filter-box");this.element.find(".clear-selection").on("click",function(){s.val(""),o.filterNodes(s.val()),o.updateSelection(void 0)}),s.on("input",function(){o.filterNodes(s.val())}),this.dimensions={width:e,height:i},this.svg=d3.select(this.svgContainer[0]).append("svg").attr("width",e).attr("height",i),this.force=d3.layout.force().linkDistance(10).linkStrength(2).gravity(.1).charge(-120).size([e,i]),this.vis=this.svg.append("svg:g")}return Object.defineProperty(t.prototype,"dimensions",{get:function(){return this._dimensions},set:function(t){this._dimensions={width:t.width||this.dimensions.width,height:t.height||this.dimensions.height},this.force&&(this.force.size([this.dimensions.width,this.dimensions.height]),this.force.resume(),this.element.css({width:this.dimensions.width,height:this.dimensions.height}),this.svgContainer.css({width:this.dimensions.width,height:this.dimensions.height}),this.svg.attr({width:this.dimensions.width,height:this.dimensions.height}))},enumerable:!0,configurable:!0}),Object.defineProperty(t.prototype,"configuration",{get:function(){return this._configuration},set:function(t){var e=this;if(t=r.extend(!0,{},this._configuration,t),this.force){var i,n=function(i,n){return t[i]!==e._configuration[i]?(e.force[i](t[i]||n),!0):void 0};i=i||n("linkDistance",10),i=i||n("linkStrength",2),i=i||n("charge",-120),i=i||n("gravity",.1),t.minZoom===this._configuration.minZoom&&t.maxZoom===this._configuration.maxZoom||this.zoom.scaleExtent([t.minZoom,t.maxZoom]),i&&this.configuration.animate?this.force.start():this.configuration.animate||this.force.stop(),t.labels!==this._configuration.labels&&this.vis.selectAll(".node text").style("opacity",t.labels?100:0)}this._configuration=t},enumerable:!0,configurable:!0}),Object.defineProperty(t.prototype,"data",{get:function(){return this.getData()},set:function(t){this.setData(t)},enumerable:!0,configurable:!0}),t.prototype.redraw=function(){if(this.vis&&d3.event){var t=d3.event;this.vis.attr("transform","translate("+t.translate+") scale("+t.scale+")")}},t.prototype.getData=function(){return this.graph},t.prototype.setData=function(t){var e=this,i=this;this.graph=t,this.zoom=d3.behavior.zoom().scaleExtent([this._configuration.minZoom,this._configuration.maxZoom]).on("zoom",function(){return e.redraw()});var n=d3.behavior.drag().origin(function(t){return t}).on("dragstart",function(t){d3.event.sourceEvent.stopPropagation(),d3.select(this).classed("dragging",!0),i.force.start()}).on("drag",function(t){var e=d3.event;d3.select(this).attr("cx",t.x=e.x).attr("cy",t.y=e.y)}).on("dragend",function(t){d3.select(this).classed("dragging",!1)});this.svg.remove(),this.svg=d3.select(this.svgContainer[0]).append("svg").attr("width",this.dimensions.width).attr("height",this.dimensions.height).attr("preserveAspectRatio","xMidYMid meet").attr("pointer-events","all").call(this.zoom),this.vis=this.svg.append("svg:g");var r=t.nodes.slice(),o=[],s=[];t.links.forEach(function(t){var e=r[t.source],i=r[t.target],n=t.value,a={};r.push(a),o.push({source:e,target:a},{source:a,target:i}),s.push([e,a,i,n])}),this.force.nodes(r).links(o),this.configuration.animate&&this.force.start(),this.vis.append("svg:defs").selectAll("marker").data(["end"]).enter().append("svg:marker").attr("id",String).attr("viewBox","0 -5 10 10").attr("refX",15).attr("refY",0).attr("markerWidth",7).attr("markerHeight",7).attr("orient","auto").append("svg:path").attr("d","M0,-5L10,0L0,5");var a=this.vis.selectAll(".link").data(s).enter().append("line").attr("class","link").style("stroke","gray").style("stroke-width",function(t){var e=.15+t[3]/500;return e>3?3:e}).attr("id",function(t){return t[0].name.replace(/\./g,"_").replace(/@/g,"_")+"_"+t[2].name.replace(/\./g,"_").replace(/@/g,"_")}),c=this.vis.selectAll(".node").data(t.nodes).enter().append("g").call(n).attr("class","node");if(c.append("svg:circle").attr("r",function(t){return Math.log(100*(t.num||1))}).style("fill",function(t){return t.color}).style("stroke","red").style("stroke-width",function(t){return t.selected?1:0}).style("opacity",1),c.on("click",function(t){e.events.raiseEvent("nodeClicked",t),e.updateSelection(t)}),c.on("mouseover",function(){d3.select(e.svgContainer.find("svg text")[0]).style("opacity","100")}),c.on("mouseout",function(){e._configuration.labels||d3.select(e.svgContainer.find("svg text")[0]).style("opacity","0")}),a.append("svg:text").text(function(t){return"yes"}).attr("fill","black").attr("stroke","black").attr("font-size","5pt").attr("stroke-width","0.5px").attr("class","linklabel").attr("text-anchor","middle").style("opacity",function(){return 100}),a.on("click",function(t){console.log(t)}),c.append("svg:text").attr("class","node-label").text(function(t){return t.name}).attr("fill",function(t){return t.labelColor||e.configuration.defaultLabelColor}).attr("stroke",function(t){return t.labelColor||e.configuration.defaultLabelColor}).attr("font-size","5pt").attr("stroke-width","0.5px").style("opacity",this._configuration.labels?100:0),!this.configuration.animate){var l=0;for(this.force.start();this.force.alpha()>.01&&150>l;)this.force.tick(),l+=1;this.force.stop(),a.attr("x1",function(t){return t[0].x}).attr("y1",function(t){return t[0].y}).attr("x2",function(t){return t[2].x}).attr("y2",function(t){return t[2].y}),c.attr("transform",function(t){return"translate("+t.x+","+t.y+")"})}this.force.on("tick",function(){e.configuration.animate&&(a.attr("x1",function(t){return t[0].x}).attr("y1",function(t){return t[0].y}).attr("x2",function(t){return t[2].x}).attr("y2",function(t){return t[2].y}),c.attr("transform",function(t){return"translate("+t.x+","+t.y+")"}))})},t.prototype.redrawSelection=function(){this.vis.selectAll(".node circle").style("stroke-width",function(t){return t.selected?1:0})},t.prototype.redrawLabels=function(){var t=this;this.vis.selectAll(".node .node-label").attr("fill",function(e){return e.labelColor||t.configuration.defaultLabelColor}).attr("stroke",function(e){return e.labelColor||t.configuration.defaultLabelColor})},t.prototype.filterNodes=function(t,e){e===void 0&&(e=!0);var i=this.vis.selectAll(".node circle");e&&(i=i.transition().duration(500).delay(100)),i.attr("transform",function(e){var i=1;return t&&e.name.indexOf(t)>=0&&(i=3),"scale("+i+")"})},t.prototype.updateSelection=function(t){t!==this._selectedNode?(this._selectedNode&&(this._selectedNode.selected=!1),t&&(t.selected=!0),this._selectedNode=t):(this._selectedNode&&(this._selectedNode.selected=!1),this._selectedNode=void 0),this.events.raiseEvent("selectionChanged",this._selectedNode),this.redrawSelection()},t}();e.NetworkNavigator=o},function(t,e){"use strict";var i=function(){function t(){this.listeners={}}return t.prototype.on=function(t,e){var i=this,n=this.listeners[t]=this.listeners[t]||[];return n.push(e),{destroy:function(){i.off(t,e)}}},t.prototype.off=function(t,e){var i=this.listeners[t];if(i){var n=i.indexOf(e);n>=0&&i.splice(n,1)}},t.prototype.raiseEvent=function(t){for(var e=this,i=[],n=1;n<arguments.length;n++)i[n-1]=arguments[n];var r=this.listeners[t];r&&r.forEach(function(t){t.apply(e,i)})},t}();Object.defineProperty(e,"__esModule",{value:!0}),e["default"]=i},function(e,i){e.exports=t}])});
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory(require("jQuery"));
+	else if(typeof define === 'function' && define.amd)
+		define(["jQuery"], factory);
+	else {
+		var a = typeof exports === 'object' ? factory(require("jQuery")) : factory(root["jQuery"]);
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
+})(this, function(__WEBPACK_EXTERNAL_MODULE_2__) {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var EventEmitter_1 = __webpack_require__(1);
+	var $ = __webpack_require__(2);
+	/**
+	 * Class which represents the force graph
+	 */
+	/* @Mixin(EventEmitter) */
+	var NetworkNavigator = (function () {
+	    /**
+	     * Constructor for the network navigator
+	     */
+	    function NetworkNavigator(element, width, height) {
+	        var _this = this;
+	        if (width === void 0) { width = 500; }
+	        if (height === void 0) { height = 500; }
+	        this._configuration = {
+	            animate: true,
+	            linkDistance: 10,
+	            linkStrength: 2,
+	            charge: -120,
+	            gravity: .1,
+	            labels: false,
+	            minZoom: .1,
+	            maxZoom: 100,
+	            defaultLabelColor: "blue"
+	        };
+	        /**
+	         * The event emitter for this graph
+	         */
+	        this.events = new EventEmitter_1.default();
+	        /**
+	         * My template string
+	         */
+	        this.template = "\n        <div class=\"graph-container\">\n            <div class=\"button-bar\">\n                <ul>\n                    <li class=\"filter-box\" title=\"Filter Nodes\">\n                        <input type=\"text\" placeholder=\"Enter text filter\" class=\"search-filter-box\"/>\n                    </li>\n                    <li class=\"clear-selection\" title=\"Clear filter and selection\">\n                        <a>\n                            <span class=\"fa-stack\">\n                                <i class=\"fa fa-check fa-stack-1x\"></i>\n                                <i class=\"fa fa-ban fa-stack-2x\"></i>\n                            </span>\n                        </a>\n                    </li>\n                </ul>\n            </div>\n            <div class=\"svg-container\">\n            </div>\n        </div>\n    ".trim().replace(/\n/g, "");
+	        this.element = $(this.template);
+	        element.append(this.element);
+	        this.svgContainer = this.element.find(".svg-container");
+	        var filterBox = this.element.find(".search-filter-box");
+	        this.element.find(".clear-selection").on("click", function () {
+	            filterBox.val('');
+	            _this.filterNodes(filterBox.val());
+	            _this.updateSelection(undefined);
+	        });
+	        filterBox.on('input', function () {
+	            _this.filterNodes(filterBox.val());
+	        });
+	        this.dimensions = { width: width, height: height };
+	        this.svg = d3.select(this.svgContainer[0]).append("svg")
+	            .attr("width", width)
+	            .attr("height", height);
+	        this.force = d3.layout.force()
+	            .linkDistance(10)
+	            .linkStrength(2)
+	            .gravity(.1)
+	            .charge(-120)
+	            .size([width, height]);
+	        this.vis = this.svg.append('svg:g');
+	    }
+	    Object.defineProperty(NetworkNavigator.prototype, "dimensions", {
+	        /**
+	         * Returns the dimensions of this network navigator
+	         */
+	        get: function () {
+	            return this._dimensions;
+	        },
+	        /**
+	         * Setter for the dimensions
+	         */
+	        set: function (newDimensions) {
+	            this._dimensions = {
+	                width: newDimensions.width || this.dimensions.width,
+	                height: newDimensions.height || this.dimensions.height
+	            };
+	            if (this.force) {
+	                this.force.size([this.dimensions.width, this.dimensions.height]);
+	                this.force.resume();
+	                this.element.css({ width: this.dimensions.width, height: this.dimensions.height });
+	                this.svgContainer.css({ width: this.dimensions.width, height: this.dimensions.height });
+	                this.svg.attr({ width: this.dimensions.width, height: this.dimensions.height });
+	            }
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(NetworkNavigator.prototype, "configuration", {
+	        /**
+	         * Returns the configuration of this network navigator
+	         */
+	        get: function () {
+	            return this._configuration;
+	        },
+	        /**
+	         * Setter for the configuration
+	         */
+	        set: function (newConfig) {
+	            var _this = this;
+	            newConfig = $.extend(true, {}, this._configuration, newConfig);
+	            if (this.force) {
+	                var runStart;
+	                /**
+	                 * Updates the config value if necessary, and returns true if it was updated
+	                 */
+	                var updateForceConfig = function (name, defaultValue) {
+	                    if (newConfig[name] !== _this._configuration[name]) {
+	                        _this.force[name](newConfig[name] || defaultValue);
+	                        return true;
+	                    }
+	                };
+	                runStart = runStart || updateForceConfig("linkDistance", 10);
+	                runStart = runStart || updateForceConfig("linkStrength", 2);
+	                runStart = runStart || updateForceConfig("charge", -120);
+	                runStart = runStart || updateForceConfig("gravity", .1);
+	                if (newConfig.minZoom !== this._configuration.minZoom ||
+	                    newConfig.maxZoom !== this._configuration.maxZoom) {
+	                    this.zoom.scaleExtent([newConfig.minZoom, newConfig.maxZoom]);
+	                }
+	                if (runStart && this.configuration.animate) {
+	                    this.force.start();
+	                }
+	                else if (!this.configuration.animate) {
+	                    this.force.stop();
+	                }
+	                if (newConfig.labels !== this._configuration.labels) {
+	                    this.vis.selectAll(".node text")
+	                        .style("opacity", newConfig.labels ? 100 : 0);
+	                }
+	            }
+	            this._configuration = newConfig;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(NetworkNavigator.prototype, "data", {
+	        /**
+	         * Alias for getData
+	         */
+	        get: function () {
+	            return this.getData();
+	        },
+	        /**
+	         * Alias for setData
+	         */
+	        set: function (graph) {
+	            this.setData(graph);
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    /**
+	     * Redraws the force network navigator
+	     */
+	    NetworkNavigator.prototype.redraw = function () {
+	        if (this.vis && d3.event) {
+	            var zoomEvt = d3.event;
+	            this.vis.attr("transform", "translate(" + zoomEvt.translate + ") scale(" + zoomEvt.scale + ")");
+	        }
+	    };
+	    /**
+	     * Gets the data associated with this graph
+	     */
+	    NetworkNavigator.prototype.getData = function () {
+	        return this.graph;
+	    };
+	    /**
+	     * Sets the data for this force graph
+	     */
+	    NetworkNavigator.prototype.setData = function (graph) {
+	        var _this = this;
+	        var me = this;
+	        this.graph = graph;
+	        this.zoom = d3.behavior.zoom()
+	            .scaleExtent([this._configuration.minZoom, this._configuration.maxZoom])
+	            .on("zoom", function () { return _this.redraw(); });
+	        var drag = d3.behavior.drag()
+	            .origin(function (d) { return d; })
+	            .on("dragstart", function (d) {
+	            d3.event.sourceEvent.stopPropagation();
+	            d3.select(this).classed("dragging", true);
+	            me.force.start();
+	        })
+	            .on("drag", function (d) {
+	            var evt = d3.event;
+	            d3.select(this).attr("cx", d.x = evt.x).attr("cy", d.y = evt.y);
+	        })
+	            .on("dragend", function (d) {
+	            d3.select(this).classed("dragging", false);
+	        });
+	        this.svg.remove();
+	        this.svg = d3.select(this.svgContainer[0]).append("svg")
+	            .attr("width", this.dimensions.width)
+	            .attr("height", this.dimensions.height)
+	            .attr("preserveAspectRatio", "xMidYMid meet")
+	            .attr("pointer-events", "all")
+	            .call(this.zoom);
+	        this.vis = this.svg.append('svg:g');
+	        var nodes = graph.nodes.slice();
+	        var links = [];
+	        var bilinks = [];
+	        graph.links.forEach(function (link) {
+	            var s = nodes[link.source];
+	            var t = nodes[link.target];
+	            var w = link.value;
+	            var i = {}; // intermediate node
+	            nodes.push(i);
+	            links.push({ source: s, target: i }, { source: i, target: t });
+	            bilinks.push([s, i, t, w]);
+	        });
+	        this.force.nodes(nodes).links(links);
+	        // If we have animation on, then start that beast
+	        if (this.configuration.animate) {
+	            this.force.start();
+	        }
+	        this.vis.append("svg:defs").selectAll("marker")
+	            .data(["end"])
+	            .enter()
+	            .append("svg:marker")
+	            .attr("id", String)
+	            .attr("viewBox", "0 -5 10 10")
+	            .attr("refX", 15)
+	            .attr("refY", 0)
+	            .attr("markerWidth", 7)
+	            .attr("markerHeight", 7)
+	            .attr("orient", "auto")
+	            .append("svg:path")
+	            .attr("d", "M0,-5L10,0L0,5");
+	        var link = this.vis.selectAll(".link")
+	            .data(bilinks)
+	            .enter().append("line")
+	            .attr("class", "link")
+	            .style("stroke", "gray")
+	            .style("stroke-width", function (d) {
+	            var w = 0.15 + (d[3] / 500);
+	            return (w > 3) ? 3 : w;
+	        })
+	            .attr("id", function (d) {
+	            return d[0].name.replace(/\./g, '_').replace(/@/g, '_') + '_' +
+	                d[2].name.replace(/\./g, '_').replace(/@/g, '_');
+	        });
+	        var node = this.vis.selectAll(".node")
+	            .data(graph.nodes)
+	            .enter().append("g")
+	            .call(drag)
+	            .attr("class", "node");
+	        node.append("svg:circle")
+	            .attr("r", function (d) { return Math.log(((d.num || 1) * 100)); })
+	            .style("fill", function (d) { return d.color; })
+	            .style("stroke", "red")
+	            .style("stroke-width", function (d) { return d.selected ? 1 : 0; })
+	            .style("opacity", 1);
+	        node.on("click", function (n) {
+	            _this.events.raiseEvent("nodeClicked", n);
+	            _this.updateSelection(n);
+	        });
+	        node.on("mouseover", function () {
+	            d3.select(_this.svgContainer.find("svg text")[0]).style("opacity", "100");
+	        });
+	        node.on("mouseout", function () {
+	            if (!_this._configuration.labels) {
+	                d3.select(_this.svgContainer.find("svg text")[0]).style("opacity", "0");
+	            }
+	        });
+	        link.append("svg:text")
+	            .text(function (d) { return 'yes'; })
+	            .attr("fill", "black")
+	            .attr("stroke", "black")
+	            .attr("font-size", "5pt")
+	            .attr("stroke-width", "0.5px")
+	            .attr("class", "linklabel")
+	            .attr("text-anchor", "middle")
+	            .style("opacity", function () {
+	            return 100;
+	        });
+	        link.on("click", function (n) { console.log(n); });
+	        node.append("svg:text")
+	            .attr("class", "node-label")
+	            .text(function (d) { return d.name; })
+	            .attr("fill", function (d) { return d.labelColor || _this.configuration.defaultLabelColor; })
+	            .attr("stroke", function (d) { return d.labelColor || _this.configuration.defaultLabelColor; })
+	            .attr("font-size", "5pt")
+	            .attr("stroke-width", "0.5px")
+	            .style("opacity", this._configuration.labels ? 100 : 0);
+	        // If we are not animating, then play the force quickly
+	        if (!this.configuration.animate) {
+	            var k = 0;
+	            this.force.start();
+	            // Alpha measures the amount of movement
+	            while ((this.force.alpha() > 1e-2) && (k < 150)) {
+	                this.force.tick();
+	                k = k + 1;
+	            }
+	            this.force.stop();
+	            link.attr("x1", function (d) { return d[0].x; })
+	                .attr("y1", function (d) { return d[0].y; })
+	                .attr("x2", function (d) { return d[2].x; })
+	                .attr("y2", function (d) { return d[2].y; });
+	            node.attr("transform", function (d) { return ("translate(" + d.x + "," + d.y + ")"); });
+	        }
+	        this.force.on("tick", function () {
+	            if (_this.configuration.animate) {
+	                link.attr("x1", function (d) { return d[0].x; })
+	                    .attr("y1", function (d) { return d[0].y; })
+	                    .attr("x2", function (d) { return d[2].x; })
+	                    .attr("y2", function (d) { return d[2].y; });
+	                node.attr("transform", function (d) { return ("translate(" + d.x + "," + d.y + ")"); });
+	            }
+	        });
+	    };
+	    /**
+	     * Redraws the selections on the nodes
+	     */
+	    NetworkNavigator.prototype.redrawSelection = function () {
+	        this.vis.selectAll(".node circle")
+	            .style("stroke-width", function (d) { return d.selected ? 1 : 0; });
+	    };
+	    /**
+	     * Redraws the node labels
+	     */
+	    NetworkNavigator.prototype.redrawLabels = function () {
+	        var _this = this;
+	        this.vis.selectAll(".node .node-label")
+	            .attr("fill", function (d) { return d.labelColor || _this.configuration.defaultLabelColor; })
+	            .attr("stroke", function (d) { return d.labelColor || _this.configuration.defaultLabelColor; });
+	    };
+	    /**
+	     * Filters the nodes to the given string
+	     */
+	    NetworkNavigator.prototype.filterNodes = function (text, animate) {
+	        if (animate === void 0) { animate = true; }
+	        var test = "";
+	        var temp = this.vis.selectAll(".node circle");
+	        if (animate) {
+	            temp = temp
+	                .transition()
+	                .duration(500)
+	                .delay(100);
+	        }
+	        temp.attr("transform", function (d) {
+	            var scale = 1;
+	            if (text && d.name.indexOf(text) >= 0) {
+	                scale = 3;
+	            }
+	            return "scale(" + scale + ")";
+	        });
+	    };
+	    /**
+	     * Updates the selection based on the given node
+	     */
+	    NetworkNavigator.prototype.updateSelection = function (n) {
+	        if (n !== this._selectedNode) {
+	            if (this._selectedNode) {
+	                this._selectedNode.selected = false;
+	            }
+	            if (n) {
+	                n.selected = true;
+	            }
+	            this._selectedNode = n;
+	        }
+	        else {
+	            if (this._selectedNode) {
+	                this._selectedNode.selected = false;
+	            }
+	            this._selectedNode = undefined;
+	        }
+	        this.events.raiseEvent('selectionChanged', this._selectedNode);
+	        this.redrawSelection();
+	    };
+	    return NetworkNavigator;
+	}());
+	exports.NetworkNavigator = NetworkNavigator;
+
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+	"use strict";
+	/**
+	 * A mixin that adds support for event emitting
+	 */
+	var EventEmitter = (function () {
+	    function EventEmitter() {
+	        this.listeners = {};
+	    }
+	    /**
+	     * Adds an event listener for the given event
+	     */
+	    EventEmitter.prototype.on = function (name, handler) {
+	        var _this = this;
+	        var listeners = this.listeners[name] = this.listeners[name] || [];
+	        listeners.push(handler);
+	        return {
+	            destroy: function () {
+	                _this.off(name, handler);
+	            }
+	        };
+	    };
+	    /**
+	     * Removes an event listener for the given event
+	     */
+	    EventEmitter.prototype.off = function (name, handler) {
+	        var listeners = this.listeners[name];
+	        if (listeners) {
+	            var idx = listeners.indexOf(handler);
+	            if (idx >= 0) {
+	                listeners.splice(idx, 1);
+	            }
+	        }
+	    };
+	    /**
+	     * Raises the given event
+	     */
+	    /*protected*/ EventEmitter.prototype.raiseEvent = function (name) {
+	        var _this = this;
+	        var args = [];
+	        for (var _i = 1; _i < arguments.length; _i++) {
+	            args[_i - 1] = arguments[_i];
+	        }
+	        var listeners = this.listeners[name];
+	        if (listeners) {
+	            listeners.forEach(function (l) {
+	                l.apply(_this, args);
+	            });
+	        }
+	    };
+	    return EventEmitter;
+	}());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = EventEmitter;
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
+
+/***/ }
+/******/ ])
+});
+;
