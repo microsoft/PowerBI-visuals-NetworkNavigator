@@ -1,0 +1,6 @@
+@import "../../../base/powerbi/css/main";
+@import "./Base";
+
+svg text {
+    @extend .regularFont;
+}
