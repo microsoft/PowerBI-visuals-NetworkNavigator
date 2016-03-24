@@ -1,4 +1,4 @@
-import EventEmitter from '../../base/EventEmitter';
+import EventEmitter from '../base/EventEmitter';
 const $ = require("jquery");
 import * as _ from "lodash";
 

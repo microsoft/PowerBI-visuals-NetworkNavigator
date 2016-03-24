@@ -1,7 +1,7 @@
-/// <reference path="../../base/references.d.ts"/>
+/// <reference path="../base/references.d.ts"/>
 import { NetworkNavigator as NetworkNavigatorImpl, INetworkNavigatorData, INetworkNavigatorLink, INetworkNavigatorNode } from "./NetworkNavigator";
-import { ExternalCssResource, VisualBase } from "../../base/VisualBase";
-import { default as Utils, Visual } from "../../base/Utils";
+import { ExternalCssResource, VisualBase } from "../base/VisualBase";
+import { default as Utils, Visual } from "../base/Utils";
 import IVisual = powerbi.IVisual;
 import DataViewTable = powerbi.DataViewTable;
 import IVisualHostServices = powerbi.IVisualHostServices;
@@ -18,7 +18,7 @@ import SelectionId = powerbi.visuals.SelectionId;
 import SelectionManager = powerbi.visuals.utility.SelectionManager;
 import VisualDataRoleKind = powerbi.VisualDataRoleKind;
 import utility = powerbi.visuals.utility;
-const colors = require("../../base/powerbi/colors");
+const colors = require("../base/powerbi/colors");
 declare var _;
 
 @Visual(require("./build").output.PowerBI)

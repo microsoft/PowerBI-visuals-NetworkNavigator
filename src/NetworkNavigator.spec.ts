@@ -1,4 +1,4 @@
-require("../../base/testSetup");
+require("../base/testSetup");
 
 import { expect } from "chai";
 import { NetworkNavigator, INetworkNavigatorData, INetworkNavigatorNode, INetworkNavigatorLink } from "./NetworkNavigator";

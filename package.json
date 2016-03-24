@@ -1,6 +1,6 @@
 {
-  "name": "PBIVisuals",
-  "version": "1.0.0",
+  "name": "NetworkNavigator",
+  "version": "0.9.3",
   "description": "",
   "main": "index.js",
   "scripts": {
