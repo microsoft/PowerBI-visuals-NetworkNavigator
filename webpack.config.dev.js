@@ -35,7 +35,6 @@ module.exports = {
     },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.NoErrorsPlugin(),
         new webpack.ProvidePlugin({
             'Promise': 'exports?global.Promise!es6-promise'
         })
