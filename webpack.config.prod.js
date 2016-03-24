@@ -33,7 +33,7 @@ module.exports = {
         "react-dom": 'ReactDOM'
     },
     plugins: [
-        new webpack.optimize.UglifyJsPlugin({
+/*        new webpack.optimize.UglifyJsPlugin({
             compress: {
                 sequences     : true,  // join consecutive statemets with the “comma operator”
                 properties    : true,  // optimize property access: a["foo"] → a.foo
@@ -54,7 +54,7 @@ module.exports = {
                 side_effects  : true,  // drop side-effect-free statements
                 warnings      : true,  // warn about potentially dangerous optimizations/code
             }
-        }),
+        }),*/
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.NoErrorsPlugin(),
         new webpack.ProvidePlugin({
