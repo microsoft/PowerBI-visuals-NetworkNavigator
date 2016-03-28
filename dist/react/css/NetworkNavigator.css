@@ -89,7 +89,7 @@ html, body {
 .button-bar a {
   text-decoration: none;
   color: #888;
-  display: block;
+  display: inline-block;
   transition: .3s color;
   cursor: pointer;
   border: 1px solid #ccc;
@@ -97,9 +97,13 @@ html, body {
   background-color: white;
   overflow: hidden;
   height: 100%;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  vertical-align: middle; }
   .button-bar a .fa-stack {
-    font-size: .5em; }
+    font-size: .5em;
+    margin-top: -.25em; }
+    .button-bar a .fa-stack .fa-ban {
+      line-height: inherit; }
 
 .add-column .fa-plus-circle, .add-stacked-column .fa-plus-circle {
   margin: .5em;
@@ -138,6 +142,6 @@ html, body {
   font-size: .7em; }
 
 .search-filter-box {
-  vertical-align: bottom;
+  vertical-align: middle;
   border: 1px solid #ccc;
   height: 100%; }

@@ -288,16 +288,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                /**
 	                 * Updates the config value if necessary, and returns true if it was updated
 	                 */
-	                var updateForceConfig = function (name, defaultValue) {
+	                var updateForceConfig = function (name, defaultValue, maxValue) {
 	                    if (newConfig[name] !== _this._configuration[name]) {
-	                        _this.force[name](newConfig[name] || defaultValue);
+	                        var newValue = maxValue ? Math.min(newConfig[name], maxValue) : newConfig[name];
+	                        _this.force[name](newValue || defaultValue);
 	                        return true;
 	                    }
 	                };
 	                runStart = runStart || updateForceConfig("linkDistance", 10);
-	                runStart = runStart || updateForceConfig("linkStrength", 2);
+	                runStart = runStart || updateForceConfig("linkStrength", 2, 20);
 	                runStart = runStart || updateForceConfig("charge", -120);
-	                runStart = runStart || updateForceConfig("gravity", .1);
+	                runStart = runStart || updateForceConfig("gravity", .1, 10);
 	                if (newConfig.minZoom !== this._configuration.minZoom ||
 	                    newConfig.maxZoom !== this._configuration.maxZoom) {
 	                    this.zoom.scaleExtent([newConfig.minZoom, newConfig.maxZoom]);
