@@ -82,7 +82,7 @@ html, body {
 .button-bar a {
   text-decoration: none;
   color: #888;
-  display: block;
+  display: inline-block;
   transition: .3s color;
   cursor: pointer;
   border: 1px solid #ccc;
@@ -91,9 +91,15 @@ html, body {
   overflow: hidden;
   height: 100%;
   box-sizing: border-box;
+  vertical-align: middle;
 
   .fa-stack {
       font-size: .5em;
+      margin-top: -.25em;
+      
+      .fa-ban {
+          line-height: inherit;
+      }
   }
 }
 
@@ -149,7 +155,7 @@ html, body {
 }
 
 .search-filter-box {
-    vertical-align: bottom;
+    vertical-align: middle;
     border: 1px solid #ccc;
     height: 100%;
 }
