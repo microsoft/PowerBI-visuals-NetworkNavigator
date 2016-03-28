@@ -230,7 +230,10 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                 this.myNetworkNavigator.redrawLabels();
             }
         } else {
-            this.myNetworkNavigator.setData({});
+            this.myNetworkNavigator.setData({
+                links: [],
+                nodes: []
+            });
         }
 
         this.dataViewTable = dataViewTable;
