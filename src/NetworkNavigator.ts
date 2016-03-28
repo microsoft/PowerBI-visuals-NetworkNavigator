@@ -134,17 +134,18 @@ export class NetworkNavigator {
             /**
              * Updates the config value if necessary, and returns true if it was updated
              */
-            var updateForceConfig = (name: string, defaultValue: any) => {
+            var updateForceConfig = (name: string, defaultValue: any, maxValue?: any) => {
                 if (newConfig[name] !== this._configuration[name]) {
-                    this.force[name](newConfig[name] || defaultValue);
+                    let newValue = maxValue ? Math.min(newConfig[name], maxValue) : newConfig[name];
+                    this.force[name](newValue || defaultValue);
                     return true;
                 }
             };
 
             runStart = runStart || updateForceConfig("linkDistance", 10);
-            runStart = runStart || updateForceConfig("linkStrength", 2);
+            runStart = runStart || updateForceConfig("linkStrength", 2, 20);
             runStart = runStart || updateForceConfig("charge", -120);
-            runStart = runStart || updateForceConfig("gravity", .1);
+            runStart = runStart || updateForceConfig("gravity", .1, 10);
 
             if (newConfig.minZoom !== this._configuration.minZoom ||
                 newConfig.maxZoom !== this._configuration.maxZoom) {
