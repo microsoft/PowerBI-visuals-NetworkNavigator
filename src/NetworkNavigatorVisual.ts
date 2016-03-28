@@ -204,13 +204,15 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         var dataViewTable = dataView && dataView.table;
         var forceDataReload = this.updateSettings(options);
 
-        if (dataViewTable) {
-            if ((forceDataReload || this.hasDataChanged(this.dataViewTable, dataViewTable))) {
-                var parsedData = NetworkNavigator.converter(dataView, this.settings);
-                this.myNetworkNavigator.setData(parsedData);
-            }
-            var selectedIds = this.selectionManager.getSelectionIds();
-            var data = this.myNetworkNavigator.getData();
+        // Assume that if the dimensions changed, thats all that did        
+        if (!_.isEqual(this.myNetworkNavigator.dimensions, options.viewport)) {
+            this.myNetworkNavigator.dimensions = { width: options.viewport.width, height: options.viewport.height };
+            this.element.css({ width: options.viewport.width, height: options.viewport.height });
+        } else if (dataViewTable) {
+            const parsedData = NetworkNavigator.converter(dataView, this.settings);
+            this.myNetworkNavigator.setData(parsedData);
+            const selectedIds = this.selectionManager.getSelectionIds();
+            const data = this.myNetworkNavigator.getData();
             if (data && data.nodes && data.nodes.length) {
                 var updated = false;
                 data.nodes.forEach((n) => {
@@ -227,17 +229,11 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                 
                 this.myNetworkNavigator.redrawLabels();
             }
+        } else {
+            this.myNetworkNavigator.setData({});
         }
-
 
         this.dataViewTable = dataViewTable;
-
-        var currentDimensions = this.myNetworkNavigator.dimensions;
-        if (currentDimensions.width !== options.viewport.width ||
-            currentDimensions.height !== options.viewport.height) {
-            this.myNetworkNavigator.dimensions = { width: options.viewport.width, height: options.viewport.height };
-            this.element.css({ width: options.viewport.width, height: options.viewport.height });
-        }
     }
     
     /**
