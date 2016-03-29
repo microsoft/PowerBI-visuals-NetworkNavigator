@@ -4,11 +4,12 @@
 This is a base project for developing Essex's visuals. 
 
 #Getting Started
+* Fork this repo
 * Install *gulp* globally by running `npm install -g gulp`
 * Run `npm install` on the project directory
-* Create a folder with some project name, under the `visuals` directory.
-* If you are creating a PowerBI version of the component
-    * Create a new class file, and name it the name of your visual, and put the following in it:
+* The `src` directory contains all of the visual's code.
+    * If you are creating a PowerBI version of the component
+        * Create a new class file, and name it the name of your visual, and put the following in it:
 
 ```
 import { VisualBase } from "../../base/VisualBase"; // Provides some base functionality
@@ -89,12 +90,12 @@ export default class LineUpVisual extends VisualBase implements IVisual {
 * Review the Power BI [Visuals Getting Started](https://github.com/Microsoft/PowerBI-visuals/wiki).
 
 #Building
-* Running `gulp build:<projectFolder>` will do the following:
-  * Creates a `.pbiviz` file in the `dist\<projectFolder>\powerbi` directory. 
+* Running `gulp build` will do the following:
+  * Creates a `.pbiviz` file in the `dist\powerbi` directory. 
     * Go to [Power BI](https://app.powerbi.com/), and to import your new visual.
-  * Creates a webpacked version of your react class (if you defined *react* in your build.json property file) and puts it in the `dist\<projectFolder>\react` folder.
-  * Creates a webpacked version of your plain component class (if you defined *component* in your build.json file) and puts it in the `dist\<projectFolder>\component` folder.
-* You can also build all components by running `gulp build`.  To run specific builds for the different versions of components, you can append `:<type>` to the command to limit the build scope.  For example, if you only want to build the to build all of the react versions of your components, you would run `gulp build:react`, to build the react version of a single component, you would run run `gulp build:myComponent:react`.
+  * Creates a webpacked version of your react class (if you defined *react* in your build.json property file) and puts it in the `dist\react` folder.
+  * Creates a webpacked version of your plain component class (if you defined *component* in your build.json file) and puts it in the `dist\component` folder.
+* To run specific builds for the different versions of your component, you can append `:<type>` to the command to limit the build scope.  For example, if you only want to build the react version of your component, you would run `gulp build:react`.
 
 #Demo
-* Running `gulp demo:<projectFolder>` will create a demo server/webpage which will show the given component being run in standalone mode.
+* Running `gulp demo` will create a demo server/webpage which will show the given component being run in standalone mode.
