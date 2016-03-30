@@ -24,6 +24,7 @@ export class NetworkNavigator {
         labels: false,
         minZoom: .1,
         maxZoom: 100,
+        caseInsensitive: true,
         defaultLabelColor: "blue"
     };
 
@@ -162,6 +163,10 @@ export class NetworkNavigator {
             if (newConfig.labels !== this._configuration.labels) {
                 this.vis.selectAll(".node text")
                     .style("opacity", newConfig.labels ? 100 : 0);
+            }
+            
+            if (newConfig.caseInsensitive !== this._configuration.caseInsensitive) {
+                this.filterNodes(this.element.find(".search-filter-box").val());
             }
         }
 
@@ -395,13 +400,24 @@ export class NetworkNavigator {
                 .duration(500)
                 .delay(100);
         }
+        const pretty = (val: string) => ((val || "") + "");
         temp.attr("transform", (d) => {
             let scale = 1;
-            if (text && d.name.indexOf(text) >= 0) {
+            const searchStr = d.name || "";
+            const flags = this.configuration.caseInsensitive ? "i" : "";
+            let regex = new RegExp(NetworkNavigator.escapeRegExp(text), flags);
+            if (text && regex.test(pretty(searchStr))) {
                 scale = 3;
             }
             return `scale(${scale})`;
         });
+    }
+    
+    /**
+     * Escapes RegExp
+     */
+    private static escapeRegExp(str: string) {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     }
 
     /**
@@ -506,4 +522,5 @@ export interface INetworkNavigatorConfiguration {
     minZoom?: number;
     maxZoom?: number;
     defaultLabelColor?: string;
+    caseInsensitive?: boolean;
 }

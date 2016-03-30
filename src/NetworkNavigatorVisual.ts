@@ -78,6 +78,9 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     private selectionManager: utility.SelectionManager;
 
     private static DEFAULT_SETTINGS: NetworkNavigatorVisualSettings = {
+        search: {
+            caseInsensitive: true  
+        },
         layout: {
             animate: true,
             maxNodeCount: 0,
@@ -123,6 +126,15 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                         }
                     },
                 },
+            },
+            search: {
+                displayName: "Search",
+                properties: {
+                    caseInsensitive: {
+                        displayName: "Case Insensitive",
+                        type: { bool: true }
+                    }
+                }
             },
             layout: {
                 displayName: "Layout",
@@ -248,7 +260,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             objectName: options.objectName,
             properties: {}
         }];
-        $.extend(true, instances[0].properties, this.settings[options.objectName]);
+        $.extend(true, instances[0].properties, this.settings[options.objectName]);  
         return instances;
     }
 
@@ -367,8 +379,8 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             });
 
             // There were some changes to the layout
-            if (!_.isEqual(oldSettings.layout, this.settings.layout)) {
-                this.myNetworkNavigator.configuration = $.extend(true, {}, this.settings.layout);
+            if (!_.isEqual(oldSettings, this.settings)) {
+                this.myNetworkNavigator.configuration = $.extend(true, {}, this.settings.search, this.settings.layout);
             }
             
             if (oldSettings.layout.maxNodeCount !== this.settings.layout.maxNodeCount) {
@@ -460,6 +472,9 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
  * Represents the settings for this visual
  */
 interface NetworkNavigatorVisualSettings {
+    search?: {
+        caseInsensitive?: boolean;  
+    };
     layout?: {
         animate?: boolean;
         maxNodeCount?: number;
