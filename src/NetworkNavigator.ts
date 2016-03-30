@@ -55,7 +55,7 @@ export class NetworkNavigator {
             <div class="svg-container">
             </div>
         </div>
-    `.trim().replace(/\n/g, "");
+    `.trim().replace(/[\r\n]/g, "");
 
     /**
      * The svg container

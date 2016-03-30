@@ -31,6 +31,7 @@ html, body {
 }
 
 .graph-container {
+    font-size: 20px;
     position: relative;
 
     .button-bar {
@@ -95,7 +96,7 @@ html, body {
 
   .fa-stack {
       font-size: .5em;
-      margin-top: -.25em;
+    //   margin-top: -.25em;
       
       .fa-ban {
           line-height: inherit;
@@ -127,12 +128,13 @@ html, body {
     // height: 50px;
     // line-height: 50px;
     font-size: 1.4em;
+    margin-right: -.25em;
+    display: inline-block;
   }
 
   /* Option 1 - Display Inline */
-  .button-bar li {
-    display: inline-block;
-    margin-right: -4px;
+  .button-bar li:last-child {
+      margin-right: 0;
   }
 
   /* Options 2 - Float
@@ -154,8 +156,11 @@ html, body {
     font-size: .7em;
 }
 
-.search-filter-box {
-    vertical-align: middle;
-    border: 1px solid #ccc;
-    height: 100%;
+.filter-box {
+    .search-filter-box {
+        vertical-align: middle;
+        border: 1px solid #ccc;
+        height: 100%;
+        font-size: .75em;
+    }
 }
