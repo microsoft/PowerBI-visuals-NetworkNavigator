@@ -9,6 +9,9 @@ module.exports = function() {
         test: [srcDir + '/**/*\.spec\.{ts,js}'],
         buildDir:  rootDir + 'dist/',
         buildArtifacts:  rootDir + 'dist/' + '/**/*.*',
+        getBuildDir: function(type) {
+            return rootDir + 'dist/' + type;
+        },
         buildDirComponentCSS:  rootDir + 'dist/' + "/component",
         buildDirComponentJS:  rootDir + 'dist/' + "/component",
         buildDirReactCSS:  rootDir + 'dist/' + "/react",

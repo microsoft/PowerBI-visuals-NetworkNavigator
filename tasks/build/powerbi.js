@@ -26,7 +26,7 @@ module.exports = function (gulp) {
     /**
      * Builds the css for the visual
      */
-    gulp.task(`${buildName}:css`, [`${baseBuildName}:css`], function() {
+    gulp.task(`${buildName}:package_css`, [`${buildName}:css`], function() {
         var output = config.output.PowerBI;
         if (output && output.icon) {
             var base64Contents = new Buffer(fs.readFileSync(paths.projectDir + '/' + output.icon), 'binary').toString('base64');
@@ -48,7 +48,7 @@ module.exports = function (gulp) {
     /**
      * Builds the scripts for use for with powerbi
      */
-    gulp.task(`${buildName}:scripts`, [`${buildName}:css`], function() {
+    gulp.task(`${buildName}:scripts`, [`${buildName}:package_css`], function() {
         var output = config.output.PowerBI;
         var webpackConfig = require(baseDir + 'webpack.config');
         webpackConfig.entry = path.join(baseDir, 'src', output.entry);
@@ -167,7 +167,7 @@ module.exports = function (gulp) {
      */
     gulp.task(`${buildName}:post_clean`, function(cb) {
         // You can use multiple globbing patterns as you would with `gulp.src`
-        del.sync([paths.buildDirPowerBI + "/package.json", paths.buildDirPowerBiResources]);
+        del.sync([paths.buildDirPowerBI + "/css", paths.buildDirPowerBI + "/package.json", paths.buildDirPowerBiResources]);
         cb();
     });
 
