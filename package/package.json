@@ -3,7 +3,7 @@
     "version": "%PROJECT_VERSION%",
     "author": {
         "name": "Microsoft (experimental)",
-        "email": "pbicvsupport@microsoft.com"
+        "email": "msrvizsupport@microsoft.com"
     },
     "licenseTerms": "https://powerbi.microsoft.com/en-us/visuals-gallery-terms/",
     "privacyTerms": "https://privacy.microsoft.com/en-US/privacystatement/",
