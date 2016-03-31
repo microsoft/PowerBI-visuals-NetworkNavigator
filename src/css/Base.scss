@@ -31,7 +31,7 @@ html, body {
 }
 
 .graph-container {
-    font-size: 20px;
+    font-size: 12px;
     position: relative;
 
     .button-bar {
@@ -66,7 +66,6 @@ html, body {
 }
 .button-bar li {
   font-family: 'Oswald', sans-serif;
-  font-size: 1.2em;
   border-bottom: 1px solid #888;
 
   &:first-of-type a, &:first-of-type input {
@@ -96,10 +95,11 @@ html, body {
 
   .fa-stack {
       font-size: .5em;
+      margin: .5em;
     //   margin-top: -.25em;
       
-      .fa-ban {
-          line-height: inherit;
+      .fa-check {
+          line-height: 2em;
       }
   }
 }
@@ -123,13 +123,17 @@ html, body {
 
 // @media screen and (min-width: 600px) {
   .button-bar li {
+      box-sizing: border-box;
     // width: 120px;
     border-bottom: none;
     // height: 50px;
     // line-height: 50px;
-    font-size: 1.4em;
     margin-right: -.25em;
     display: inline-block;
+    height: 100%;
+    a {
+        height: 100%;
+    }
   }
 
   /* Option 1 - Display Inline */
@@ -152,15 +156,14 @@ html, body {
   */
 // }
 
-#node_graph .button-bar {
-    font-size: .7em;
-}
-
 .filter-box {
     .search-filter-box {
         vertical-align: middle;
         border: 1px solid #ccc;
         height: 100%;
-        font-size: .75em;
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-size: 1em;
     }
 }
