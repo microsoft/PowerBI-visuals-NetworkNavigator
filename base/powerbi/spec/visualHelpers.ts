@@ -1,5 +1,5 @@
 /// <reference path="../references.d.ts"/>
-require("../testSetup");
+require("../../testSetup");
 global['powerbi'] = {
     visuals: {
         utility: {
