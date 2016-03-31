@@ -210,6 +210,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            labels: false,
 	            minZoom: .1,
 	            maxZoom: 100,
+	            caseInsensitive: true,
 	            defaultLabelColor: "blue"
 	        };
 	        /**
@@ -219,7 +220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * My template string
 	         */
-	        this.template = "\n        <div class=\"graph-container\">\n            <div class=\"button-bar\">\n                <ul>\n                    <li class=\"filter-box\" title=\"Filter Nodes\">\n                        <input type=\"text\" placeholder=\"Enter text filter\" class=\"search-filter-box\"/>\n                    </li>\n                    <li class=\"clear-selection\" title=\"Clear filter and selection\">\n                        <a>\n                            <span class=\"fa-stack\">\n                                <i class=\"fa fa-check fa-stack-1x\"></i>\n                                <i class=\"fa fa-ban fa-stack-2x\"></i>\n                            </span>\n                        </a>\n                    </li>\n                </ul>\n            </div>\n            <div class=\"svg-container\">\n            </div>\n        </div>\n    ".trim().replace(/\n/g, "");
+	        this.template = "\n        <div class=\"graph-container\">\n            <div class=\"button-bar\">\n                <ul>\n                    <li class=\"filter-box\" title=\"Filter Nodes\">\n                        <input type=\"text\" placeholder=\"Enter text filter\" class=\"search-filter-box\"/>\n                    </li>\n                    <li class=\"clear-selection\" title=\"Clear filter and selection\">\n                        <a>\n                            <span class=\"fa-stack\">\n                                <i class=\"fa fa-check fa-stack-1x\"></i>\n                                <i class=\"fa fa-ban fa-stack-2x\"></i>\n                            </span>\n                        </a>\n                    </li>\n                </ul>\n            </div>\n            <div class=\"svg-container\">\n            </div>\n        </div>\n    ".trim().replace(/[\r\n]/g, "");
 	        this.element = $(this.template);
 	        element.append(this.element);
 	        this.svgContainer = this.element.find(".svg-container");
@@ -313,6 +314,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (newConfig.labels !== this._configuration.labels) {
 	                    this.vis.selectAll(".node text")
 	                        .style("opacity", newConfig.labels ? 100 : 0);
+	                }
+	                if (newConfig.caseInsensitive !== this._configuration.caseInsensitive) {
+	                    this.filterNodes(this.element.find(".search-filter-box").val());
 	                }
 	            }
 	            this._configuration = newConfig;
@@ -515,6 +519,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Filters the nodes to the given string
 	     */
 	    NetworkNavigator.prototype.filterNodes = function (text, animate) {
+	        var _this = this;
 	        if (animate === void 0) { animate = true; }
 	        var test = "";
 	        var temp = this.vis.selectAll(".node circle");
@@ -524,13 +529,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	                .duration(500)
 	                .delay(100);
 	        }
+	        var pretty = function (val) { return ((val || "") + ""); };
 	        temp.attr("transform", function (d) {
 	            var scale = 1;
-	            if (text && d.name.indexOf(text) >= 0) {
+	            var searchStr = d.name || "";
+	            var flags = _this.configuration.caseInsensitive ? "i" : "";
+	            var regex = new RegExp(NetworkNavigator.escapeRegExp(text), flags);
+	            if (text && regex.test(pretty(searchStr))) {
 	                scale = 3;
 	            }
 	            return "scale(" + scale + ")";
 	        });
+	    };
+	    /**
+	     * Escapes RegExp
+	     */
+	    NetworkNavigator.escapeRegExp = function (str) {
+	        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 	    };
 	    /**
 	     * Updates the selection based on the given node
