@@ -1,6 +1,6 @@
 /// <reference path="./references.d.ts"/>
-import { ExternalCssResource, VisualBase } from "../base/VisualBase";
-import { Visual } from "../base/Utils";
+import { ExternalCssResource, VisualBase } from "../base/powerbi/VisualBase";
+import { Visual } from "../base/powerbi/Utils";
 import { DocumentViewer, IDocumentViewerData, IDocumentViewerDocument } from "./DocumentViewer";
 
 import IVisual = powerbi.IVisual;

@@ -26,7 +26,7 @@ module.exports = function (gulp) {
     /**
      * Builds the css for the visual
      */
-    gulp.task(`${buildName}:package_css`, [`${buildName}:css`], function() {
+    gulp.task(`${buildName}:package_css`, function() {
         var output = config.output.PowerBI;
         if (output && output.icon) {
             var base64Contents = new Buffer(fs.readFileSync(paths.projectDir + '/' + output.icon), 'binary').toString('base64');

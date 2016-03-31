@@ -1,4 +1,4 @@
-/// <reference path="../../base/references.d.ts"/>
+/// <reference path="../references.d.ts"/>
 require("../testSetup");
 global['powerbi'] = {
     visuals: {

@@ -18,6 +18,6 @@ module.exports = function() {
         buildDirReactJS:  rootDir + 'dist/' + "/react",
         buildDirPowerBI: rootDir + 'dist/' + '/powerbi',
         buildDirPowerBiResources: rootDir + 'dist/' + '/powerbi/resources',
-        packageDir: [rootDir + 'package']
+        packageDir: [__dirname + '/build/package']
     };
 }

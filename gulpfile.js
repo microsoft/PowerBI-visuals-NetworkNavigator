@@ -6,5 +6,4 @@ require("./tasks/compile")(gulp);
 require("./tasks/clean")(gulp);
 require("./tasks/test")(gulp);
 require("./tasks/lint")(gulp);
-require("./tasks/demo")(gulp);
 require("./tasks/release")(gulp);
