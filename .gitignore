@@ -12,11 +12,11 @@
 *~
 
 # Build Artifacts
-/build
+/build/
+/dist/
 base/*.js
 base/*.d.ts
 base/spec/*.js
 base/spec/*.d.js
 src/*.js
 src/*.d.ts
-!src/build.js
