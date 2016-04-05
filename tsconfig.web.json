@@ -10,7 +10,7 @@
     "power-bi",
     "node_modules",
     "build",
-    "typings/browser",
-    "typings/browser.d.ts"
+    "typings/main",
+    "typings/main.d.ts"
   ]
 }

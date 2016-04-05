@@ -10,7 +10,7 @@ module.exports = {
     module: {
         loaders: [
             // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
-            { test: /\.(tsx|ts)?$/, loader: 'ts-loader', exclude: '.d.ts' },
+            { test: /\.(tsx|ts)?$/, loader: 'ts-loader?configFileName=tsconfig.web.json', exclude: '.d.ts' },
             {
                 test: /\.scss$/,
                 loaders: ["style", "css", "sass"]

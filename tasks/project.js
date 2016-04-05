@@ -1,17 +1,7 @@
 "use strict";
-var baseDir = __dirname + "/../";
-const fs = require("fs");
-const pkg = JSON.parse(fs.readFileSync("package.json"));
-const paths = require("./paths");
-
-var buildConfig;
-if (fs.existsSync(baseDir + 'src/build.json')) {
-    buildConfig = JSON.parse(fs.readFileSync(baseDir + 'src/build.json').toString());
-} else {
-    buildConfig = require(baseDir + './src/build.js');
-}
-module.exports = {
-    name: pkg.name,
-    buildConfig: buildConfig,
-    paths: paths()
-};
+var path = require("path");
+var baseDir = path.join(__dirname, '..');
+var name = require(path.join(baseDir, "package.json")).name;
+var paths = require("./paths")();
+var buildConfig = require(path.join(baseDir, 'src/build'));
+module.exports = { name: name, buildConfig: buildConfig, paths: paths };
