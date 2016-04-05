@@ -14,9 +14,7 @@
 # Build Artifacts
 /build/
 /dist/
-base/*.js
-base/*.d.ts
-base/spec/*.js
-base/spec/*.d.js
-src/*.js
-src/*.d.ts
+*.js
+*.d.ts
+!/base/powerbi/powerbi.d.ts
+!/base/powerbi/references.d.ts

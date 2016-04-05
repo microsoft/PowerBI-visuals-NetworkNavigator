@@ -1,4 +1,0 @@
-*.js
-*.d.ts
-!powerbi.d.ts
-!references.d.ts
