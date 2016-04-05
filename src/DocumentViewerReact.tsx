@@ -1,10 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-const $ = require("jquery");
+import * as $ from "jquery";
 import { DocumentViewer as DocumentViewerImpl, IDocumentViewerDocument } from "./DocumentViewer";
 
 export interface IDocumentViewerProps {
-    data: IDocumentViewerDocument[]
+    data: IDocumentViewerDocument[];
 };
 
 export interface IDocumentViewerState { }
@@ -13,28 +13,28 @@ export interface IDocumentViewerState { }
  * Thin wrapper around LineUp
  */
 export class DocumentViewer extends React.Component<IDocumentViewerProps, IDocumentViewerState> {
+    public props: IDocumentViewerProps;
     private documentViewer: DocumentViewerImpl;
     private node: any;
-    public props : IDocumentViewerProps;
 
-    componentDidMount() {
+    public componentDidMount(): void {
         this.node = ReactDOM.findDOMNode(this);
         this.documentViewer = new DocumentViewerImpl($(this.node));
         this.renderContent();
     }
 
-    componentWillReceiveProps(newProps : IDocumentViewerProps) {
+    public componentWillReceiveProps(newProps: IDocumentViewerProps): void {
         this.renderContent(newProps);
     }
 
     /**
      * Renders this component
      */
-    render() {
-        return <div style={{width:"100%", height:"100%"}}></div>;
+    public render(): JSX.Element {
+        return (<div style={{ height: "100%", width: "100%" }}></div>);
     }
 
-    private renderContent(props? : IDocumentViewerProps) {
+    private renderContent(props?: IDocumentViewerProps): void {
         // if called from `componentWillReceiveProps`, then we use the new
         // props, otherwise use what we already have.
         props = props || this.props;

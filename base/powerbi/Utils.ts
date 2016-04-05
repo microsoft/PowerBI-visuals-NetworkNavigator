@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 function applyMixins(derivedCtor: any, baseCtors: any[]) {
     baseCtors.forEach(baseCtor => {
         Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
@@ -58,7 +60,7 @@ export default class Utils {
         }
 
         // If there are any elements in newdata that arent in the old data
-        return _.any(newData, n => !_.any(oldData, m => equality(m, n)));
+        return _.some(newData, n => !_.some(oldData, m => equality(m, n)));
     }
 
 
@@ -127,7 +129,7 @@ export default class Utils {
 /**
  * Processes a difference found in a list
  */
-interface IDiffProcessor<M> {
+export interface IDiffProcessor<M> {
 
     /**
      * Returns true if item one equals item two

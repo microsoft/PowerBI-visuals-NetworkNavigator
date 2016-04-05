@@ -1,10 +1,20 @@
-const DOMPurify = require("./purify");
-const $ = require("jquery");
+import * as $ from "jquery";
+import DOMPurify = require("dompurify");
 
 /**
  * A simple document viewer which maps field names to values
  */
 export class DocumentViewer {
+
+    /**
+     * The html string template for this visual
+     */
+    private static template: string = `
+        <div>
+            <div class="table"></div>
+            <div class="error"></div>
+        </div>
+    `.trim();
 
     /**
      * Our table element
@@ -14,17 +24,7 @@ export class DocumentViewer {
     /**
      * The element
      */
-    private element; JQuery;
-
-    /**
-     * The html string template for this visual
-     */
-    private static template = `
-        <div>
-            <div class="table"></div>
-            <div class="error"></div>
-        </div>
-    `.trim();
+    private element: JQuery;
 
     /**
      * Constructor for the DocumentViewer
@@ -41,24 +41,24 @@ export class DocumentViewer {
     public set data(data: IDocumentViewerDocument[]) {
         this.tableElement.empty();
 
-        var error;
+        let error;
         if (data.length === 1) {
-            var eles = data.map((doc) => {
-                var docEle = $(`
+            let eles = data.map((doc: IDocumentViewerDocument) => {
+                let docEle = $(`
                     <div class="document">
                     </div>
                 `.trim());
 
                 docEle.append(
-                    doc.items.map((item) => {
-                        var newEle = $(`
+                    doc.items.map((item: IDocumentViewerData) => {
+                        let newEle = $(`
                             <div>
                                 <div class="column-label">${item.name}:&nbsp;</div>
                                 <div class="contents ${item.type.html ? "html" : "text"}"></div>
                             </div>
                         `);
 
-                        var contents = newEle.find('.contents');
+                        let contents = newEle.find(".contents");
                         if (item.type.html) {
                             contents.append(`<div>${DOMPurify.sanitize(item.value, { SAFE_FOR_JQUERY: true })}</div>`);
                         } else {
@@ -89,7 +89,7 @@ export interface IDocumentViewerDocument {
     /**
      * The items of the document
      */
-    items: IDocumentViewerData[]
+    items: IDocumentViewerData[];
 }
 
 /**

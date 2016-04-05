@@ -1,16 +1,23 @@
 {
-  "name": "PBIVisuals",
-  "version": "1.0.0",
+  "name": "essex.widget.template",
+  "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
+  "typings": "src/index.d.ts",
   "scripts": {
-    "test": "gulp test"
+    "typings": "typings install",
+    "tsc": "tsc",
+    "lint": "tslint 'src/**/*[!.d].{ts,tsx}'",
+    "karma:tdd": "karma start --tdd",
+    "karma:once": "karma start",
+    "test": "npm-run-all --sequential typings --parallel tsc lint karma:once"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "babel": "5.8.3",
+    "babel-cli": "6.x",
     "del": "2.2.0",
+    "dompurify": "^0.7.4",
     "gulp": "3.9.0",
     "gulp-concat": "2.6.0",
     "gulp-git": "^1.7.0",
@@ -23,7 +30,7 @@
     "moment": "^2.12.0"
   },
   "devDependencies": {
-    "babel-loader": "5.1.2",
+    "babel-loader": "6.x",
     "chai": "3.4.1",
     "css-loader": "0.23.1",
     "d3": "3.5.12",
@@ -47,15 +54,28 @@
     "jquery": "2.2.0",
     "jsdom": "7.2.2",
     "json-loader": "0.5.4",
+    "karma": "^0.13.22",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.2.3",
+    "karma-mocha": "^0.2.2",
+    "karma-mocha-reporter": "^2.0.0",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "karma-sinon-chai": "^1.2.0",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^1.7.0",
+    "lolex": "^1.4.0",
     "mocha": "2.3.4",
     "mocha-jsdom": "1.0.0",
     "node-sass": "3.4.2",
-    "npm-run-all": "^1.5.1",
+    "npm-run-all": "^1.7.0",
+    "phantomjs-prebuilt": "^2.1.7",
     "raw-loader": "0.5.1",
     "react": "0.14.6",
     "react-dom": "0.14.6",
     "repeat-string": "^1.5.2",
     "sass-loader": "3.1.2",
+    "sinon": "^1.17.3",
+    "sinon-chai": "^2.8.0",
     "style-loader": "0.13.0",
     "ts-loader": "0.7.2",
     "ts-node": "0.5.5",
@@ -65,5 +85,8 @@
     "wallaby-webpack": "0.0.16",
     "webpack": "1.12.9",
     "yargs": "3.31.0"
+  },
+  "publishConfig": {
+    "registry": "http://essex-private-npm.westus.cloudapp.azure.com:4873/"
   }
 }

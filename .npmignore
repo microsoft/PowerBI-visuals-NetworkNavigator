@@ -1,0 +1,15 @@
+.DS_Store
+*.ts
+*.tsx
+/wercker.yml
+/webpack.config*.js
+/tasks/
+/tsconfig.json
+/tsfmt.json
+/tslint.json
+/typings.json
+/.*
+!src/*.d.ts
+!base/*.d.ts
+src/*.spec.*
+base/*.spec.*
