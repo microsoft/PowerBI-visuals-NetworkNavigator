@@ -1,7 +1,6 @@
 "use strict";
 var del = require('del');
 var fs = require("fs");
-var typescript = require('gulp-typescript');
 var zip = require('gulp-zip');
 var sequence = require('gulp-sequence');
 var path = require("path");
@@ -17,12 +16,12 @@ const projectConfig = require("../project");
  */
 module.exports = function (gulp) {
     const project = projectConfig.name;
-    const config = projectConfig.buildConfig; 
+    const config = projectConfig.buildConfig;
     const paths = projectConfig.paths;
     const baseDir = __dirname + "/../../";
     const baseBuildName = "build";
     const buildName = "build:powerbi";
-    
+
     /**
      * Builds the css for the visual
      */
@@ -32,9 +31,9 @@ module.exports = function (gulp) {
             var base64Contents = new Buffer(fs.readFileSync(paths.projectDir + '/' + output.icon), 'binary').toString('base64');
             var mimeType = "image/png";
             if (output.icon.indexOf(".svg") >= 0) {
-                mimeType = "image/svg+xml";    
+                mimeType = "image/svg+xml";
             }
-            
+
             return string_src('project.css', `
             .visual-icon.${output.visualName + output.projectId}{
                 background-image: url(data:${mimeType};base64,${base64Contents});
@@ -84,7 +83,7 @@ module.exports = function (gulp) {
                             file: "resources/" + output.icon
                         });
                     }
-                    
+
                     if (output.thumbnail) {
                         pkg.images = pkg.images || {};
                         pkg.images.thumbnail = {
@@ -96,7 +95,7 @@ module.exports = function (gulp) {
                             file: "resources/" + output.thumbnail
                         });
                     }
-                    
+
                     if (output.screenshot) {
                         pkg.images = pkg.images || {};
                         pkg.images.screenshots = [{
