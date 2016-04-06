@@ -30,7 +30,7 @@ module.exports = function(gulp) {
      * Syncs this repo with the base project
      */
     gulp.task('sync:upstream', function(cb) {
-        git.pull('__upstream', 'master', {args: '--rebase'}, function (err) {
+        git.merge('__upstream/master', function (err) {
             if (err) throw err;
             cb();
         });
