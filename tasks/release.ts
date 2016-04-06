@@ -17,11 +17,6 @@ module.exports = function(gulp) {
     const paths = projectConfig.paths;
 
     function inc(importance) {
-        // increment version
-        let newVer = config.version;
-        newVer[importance] = (parseInt(newVer[importance], 10) + 1) + "";
-        let prettyPrinted =  JSON.stringify(config, null, 4);//.split("\n").map(n =>"\n");
-        fs.writeFileSync(paths.projectDir + "/build.json", prettyPrinted);
 
         // get all the files to bump version in
         return gulp.src(['./package.json'])
@@ -75,34 +70,5 @@ module.exports = function(gulp) {
         return gulp.src(['./package.json'])
             // **tag it in the repository**
             .pipe(tag_version());;
-    });
-
-    /**
-     * Releases the version of the project
-     */
-    gulp.task(`release_build`, function(cb) {
-        process.env.BUILD_TARGET = "release";
-        return sequence(`build`, cb);
-    });
-
-    /**
-     * Releases the version of the project
-     */
-    gulp.task(`release:patch`, function(cb) {
-        return release("patch", cb);
-    });
-
-    /**
-     * Releases the version of the project
-     */
-    gulp.task(`release:minor`, function(cb) {
-        return release("minor", cb);
-    });
-
-    /**
-     * Releases the version of the project
-     */
-    gulp.task(`release:major`, function(cb) {
-        return release("major", cb);
     });
 };

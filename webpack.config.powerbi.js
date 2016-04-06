@@ -17,7 +17,7 @@ module.exports = {
             },
             {
                 test: /\.json$/,
-                loader: 'raw-loader'
+                loader: 'json-loader'
             }
         ],
     },
@@ -25,9 +25,7 @@ module.exports = {
         jquery: "jQuery",
         d3: "d3",
         underscore: "_",
-        react: 'React',
-        "lodash": "_",
-        "react-dom": 'ReactDOM'
+        "lodash": "_"
     },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),

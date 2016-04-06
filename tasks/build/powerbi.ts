@@ -18,6 +18,7 @@ module.exports = function (gulp) {
     const project = projectConfig.name;
     const config = projectConfig.buildConfig;
     const paths = projectConfig.paths;
+    const projectVersion = projectConfig.version;
     const baseDir = __dirname + "/../../";
     const baseBuildName = "build";
     const buildName = "build:powerbi";
@@ -49,7 +50,7 @@ module.exports = function (gulp) {
      */
     gulp.task(`${buildName}:scripts`, [`${buildName}:package_css`], function() {
         var output = config.output.PowerBI;
-        var webpackConfig = require(baseDir + 'webpack.config');
+        var webpackConfig = require(baseDir + 'webpack.config.powerbi');
         webpackConfig.entry = path.join(baseDir, 'src', output.entry);
         return gulp.src(paths.scripts)
             .pipe(webpack(webpackConfig))
@@ -68,7 +69,7 @@ module.exports = function (gulp) {
             .pipe(replace("%PROJECT_DISPLAY_NAME%", output.displayName || output.visualName))
             .pipe(replace("%PROJECT_ID%", output.projectId))
             .pipe(replace("%PROJECT_DESCRIPTION%", output.description))
-            .pipe(replace("%PROJECT_VERSION%", prettyPrintVersion(config.version)))
+            .pipe(replace("%PROJECT_VERSION%", projectVersion))
             .pipe(modify({
                 fileModifier: function(file, contents) {
                     var pkg = JSON.parse(contents.toString());
@@ -136,7 +137,6 @@ module.exports = function (gulp) {
      * Zips up the visual
      */
     gulp.task(`${buildName}:zip`, function() {
-        var version = prettyPrintVersion(config.version);
         var output = config.output.PowerBI;
         return gulp.src([paths.buildDirPowerBI + "/**/*"])
             .pipe(zip(`${project}.pbiviz`))
