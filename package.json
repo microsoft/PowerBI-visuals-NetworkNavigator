@@ -20,7 +20,8 @@
     "tag": "gulp commit_artifacts tag",
     "release:patch": "npm-run-all --sequential bump:patch build tag",
     "release:minor": "npm-run-all --sequential bump:minor build tag",
-    "release:major": "npm-run-all --sequential bump:major build tag"
+    "release:major": "npm-run-all --sequential bump:major build tag",
+    "sync": "gulp sync"
   },
   "author": "",
   "license": "ISC",

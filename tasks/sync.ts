@@ -29,17 +29,27 @@ module.exports = function(gulp) {
     /**
      * Syncs this repo with the base project
      */
+    gulp.task('sync:fetch_upstream', function(cb) {
+        git.fetch('__upstream', 'master', function (err) {
+            if (err) throw err;
+            cb();
+        });
+    });
+    
+    /**
+     * Syncs this repo with the base project
+     */
     gulp.task('sync:upstream', function(cb) {
         git.merge('__upstream/master', function (err) {
             if (err) throw err;
             cb();
         });
-    })
+    });
     
     /**
      * Syncs changes
      */
     gulp.task('sync', function(cb){
-        return sequence('addremote', 'sync:upstream', cb);
+        return sequence('addremote', 'sync:fetch_upstream', 'sync:upstream', cb);
     });
 };
