@@ -5,6 +5,7 @@
     "experimentalDecorators": true,
     "jsx": "react"
   },
+  "compileOnSave": false,
   "exclude": [
     "power-bi",
     "node_modules",

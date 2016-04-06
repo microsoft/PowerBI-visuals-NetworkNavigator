@@ -62,7 +62,6 @@ module.exports = function(gulp) {
      */
     gulp.task(`build`, function(callback) {
         var toBuild = [];
-        toBuild.push(`clean`);
         Array.prototype.push.apply(toBuild, componentBuildCommands);
         return sequence.apply(this, toBuild.concat(callback));
     });

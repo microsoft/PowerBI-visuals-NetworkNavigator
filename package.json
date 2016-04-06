@@ -5,13 +5,14 @@
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "scripts": {
+    "clean": "rimraf dist",
     "typings": "typings install",
     "tsc": "tsc",
     "pbibundle": "gulp",
     "lint": "tslint 'src/**/*[!.d].{ts,tsx}'",
     "karma:tdd": "karma start --tdd",
     "karma:once": "karma start",
-    "test": "npm-run-all --sequential typings tsc --parallel lint karma:once --sequential pbibundle"
+    "test": "npm-run-all --sequential clean typings tsc --parallel lint karma:once --sequential pbibundle"
   },
   "author": "",
   "license": "ISC",
