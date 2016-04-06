@@ -3,14 +3,13 @@
     "target": "es5",
     "module": "commonjs",
     "experimentalDecorators": true,
-    "jsx": "react",
-    "declaration": true
+    "jsx": "react"
   },
   "exclude": [
     "power-bi",
     "node_modules",
     "build",
-    "typings/browser",
-    "typings/browser.d.ts"
+    "typings/browser.d.ts",
+    "typings/browser"
   ]
 }

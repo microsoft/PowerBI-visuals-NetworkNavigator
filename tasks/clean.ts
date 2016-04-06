@@ -12,7 +12,7 @@ module.exports = function(gulp) {
     // A gulpfile is just another node program and you can use any package available on npm
     gulp.task(`clean`, function(cb) {
         // You can use multiple globbing patterns as you would with `gulp.src`
-        del.sync([paths.buildDir]);
+        //del.sync([paths.buildDir]);
         cb();
     });
 };
