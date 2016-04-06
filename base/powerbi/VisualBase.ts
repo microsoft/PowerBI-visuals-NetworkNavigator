@@ -2,6 +2,7 @@
 import VisualCapabilities = powerbi.VisualCapabilities;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import VisualObjectInstance = powerbi.VisualObjectInstance;
+import * as $ from "jquery";
 
 export class VisualBase implements powerbi.IVisual {
     protected element: JQuery;
@@ -10,10 +11,10 @@ export class VisualBase implements powerbi.IVisual {
     private _sandboxed: boolean;
     private width: number;
     private height: number;
-    
+
     // TODO: Switch this to a build config
     public static EXPERIMENTAL_ENABLED = false;
-    
+
     /**
      * True if the sandbox is enabled by default
      */
@@ -49,7 +50,7 @@ export class VisualBase implements powerbi.IVisual {
         if (addCssToParent) {
             this.container.append(this.getCss().map((css) => $("<st" + "yle>" + css + "</st" + "yle>")));
         }
-        
+
         this.element.append($("<st" + "yle>" + this.getCss().join("\n") + "</st" + "yle>"));
 
         if (template) {
@@ -63,7 +64,7 @@ export class VisualBase implements powerbi.IVisual {
     public update(options: powerbi.VisualUpdateOptions) {
         this.width = options.viewport.width;
         this.height = options.viewport.height;
-        
+
         const dataView = options.dataViews && options.dataViews[0];
         if (dataView) {
             if (VisualBase.EXPERIMENTAL_ENABLED) {
@@ -93,23 +94,23 @@ export class VisualBase implements powerbi.IVisual {
             }];
         }
     }
-    
+
     /**
      * Sets the sandboxed state
      */
     public set sandboxed(value: boolean) {
         this._sandboxed = value;
         this.element.detach();
-        
+
         if (this.parent) {
-            this.parent.remove();            
+            this.parent.remove();
         }
         if (value) {
             this.parent = $(`<iframe style="width:${this.width}px;height:${this.height}px;border:0;margin:0;padding:0" frameBorder="0"/>`);
-            
+
             // Important that this happens first, otherwise there might not be a body
             this.container.append(this.parent);
-            
+
             if(typeof navigator !== "undefined" && navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
                 // If you append the element without doing this, the iframe will load after you've appended it and remove everything that you added
                 this.parent[0].onload = () => {
@@ -129,9 +130,9 @@ export class VisualBase implements powerbi.IVisual {
             this.container.append(this.parent);
         }
     }
-    
+
     /**
-     * 
+     *
      */
     public get sandboxed() {
         return this._sandboxed;
@@ -164,12 +165,12 @@ export class VisualBase implements powerbi.IVisual {
     protected getExternalCssResources() : ExternalCssResource[] {
         return [];
     }
-    
+
     private HACK_fonts() {
         let faces = this.HACK_getFontFaces();
         this.element.prepend($("<st" + "yle>" + (Object.keys(faces).map(n => faces[n].cssText)).join("\n") + "</st" + "yle>"));
     }
- 
+
     private HACK_getFontFaces(obj?) {
         var sheet = document.styleSheets,
             rule = null,
@@ -185,7 +186,7 @@ export class VisualBase implements powerbi.IVisual {
                         const style = rule[j].style;
                         let fontFamily = style.fontFamily;
                         if (!fontFamily && style.getPropertyValue) {
-                            fontFamily = style.getPropertyValue('font-family');    
+                            fontFamily = style.getPropertyValue('font-family');
                         }
                         toReturn[fontFamily] = rule[j];
                     };
@@ -197,7 +198,7 @@ export class VisualBase implements powerbi.IVisual {
             }
         }
         return toReturn;
-    }   
+    }
     // private HACK_getFontFaces(obj?) {
     //     var o = obj || {},
     //         sheet = document.styleSheets,

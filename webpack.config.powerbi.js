@@ -9,19 +9,15 @@ module.exports = {
     },
     module: {
         loaders: [
-            {
-                test: /.js$/,
-                loaders: ['babel']
-            },
             // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
-            { test: /\.tsx?$/, loader: 'ts-loader', exclude: '.d.ts' },
+            { test: /\.(tsx|ts)?$/, loader: 'ts-loader?configFileName=tsconfig.web.json', exclude: '.d.ts' },
             {
                 test: /\.scss$/,
                 loaders: ["style", "css", "sass"]
             },
             {
                 test: /\.json$/,
-                loader: 'raw-loader'
+                loader: 'json-loader'
             }
         ],
     },
@@ -29,9 +25,7 @@ module.exports = {
         jquery: "jQuery",
         d3: "d3",
         underscore: "_",
-        react: 'React',
-        "lodash": "_",
-        "react-dom": 'ReactDOM'
+        "lodash": "_"
     },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),

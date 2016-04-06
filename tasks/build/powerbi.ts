@@ -1,10 +1,9 @@
-"use strict";
+import * as fs from "fs";
+import * as path from "path";
+
 var del = require('del');
-var fs = require("fs");
-var typescript = require('gulp-typescript');
 var zip = require('gulp-zip');
 var sequence = require('gulp-sequence');
-var path = require("path");
 var gutil = require("gulp-util");
 var webpack = require('gulp-webpack');
 var replace = require("gulp-replace");
@@ -17,24 +16,25 @@ const projectConfig = require("../project");
  */
 module.exports = function (gulp) {
     const project = projectConfig.name;
-    const config = projectConfig.buildConfig; 
+    const config = projectConfig.buildConfig;
     const paths = projectConfig.paths;
+    const projectVersion = projectConfig.version;
     const baseDir = __dirname + "/../../";
     const baseBuildName = "build";
     const buildName = "build:powerbi";
-    
+
     /**
      * Builds the css for the visual
      */
     gulp.task(`${buildName}:package_css`, function() {
         var output = config.output.PowerBI;
         if (output && output.icon) {
-            var base64Contents = new Buffer(fs.readFileSync(paths.projectDir + '/' + output.icon), 'binary').toString('base64');
+            var base64Contents = new Buffer(fs.readFileSync(path.join(paths.projectDir, output.icon), 'binary')).toString('base64');
             var mimeType = "image/png";
             if (output.icon.indexOf(".svg") >= 0) {
-                mimeType = "image/svg+xml";    
+                mimeType = "image/svg+xml";
             }
-            
+
             return string_src('project.css', `
             .visual-icon.${output.visualName + output.projectId}{
                 background-image: url(data:${mimeType};base64,${base64Contents});
@@ -50,7 +50,7 @@ module.exports = function (gulp) {
      */
     gulp.task(`${buildName}:scripts`, [`${buildName}:package_css`], function() {
         var output = config.output.PowerBI;
-        var webpackConfig = require(baseDir + 'webpack.config');
+        var webpackConfig = require(baseDir + 'webpack.config.powerbi');
         webpackConfig.entry = path.join(baseDir, 'src', output.entry);
         return gulp.src(paths.scripts)
             .pipe(webpack(webpackConfig))
@@ -69,7 +69,7 @@ module.exports = function (gulp) {
             .pipe(replace("%PROJECT_DISPLAY_NAME%", output.displayName || output.visualName))
             .pipe(replace("%PROJECT_ID%", output.projectId))
             .pipe(replace("%PROJECT_DESCRIPTION%", output.description))
-            .pipe(replace("%PROJECT_VERSION%", prettyPrintVersion(config.version)))
+            .pipe(replace("%PROJECT_VERSION%", projectVersion))
             .pipe(modify({
                 fileModifier: function(file, contents) {
                     var pkg = JSON.parse(contents.toString());
@@ -84,7 +84,7 @@ module.exports = function (gulp) {
                             file: "resources/" + output.icon
                         });
                     }
-                    
+
                     if (output.thumbnail) {
                         pkg.images = pkg.images || {};
                         pkg.images.thumbnail = {
@@ -96,7 +96,7 @@ module.exports = function (gulp) {
                             file: "resources/" + output.thumbnail
                         });
                     }
-                    
+
                     if (output.screenshot) {
                         pkg.images = pkg.images || {};
                         pkg.images.screenshots = [{
@@ -137,7 +137,6 @@ module.exports = function (gulp) {
      * Zips up the visual
      */
     gulp.task(`${buildName}:zip`, function() {
-        var version = prettyPrintVersion(config.version);
         var output = config.output.PowerBI;
         return gulp.src([paths.buildDirPowerBI + "/**/*"])
             .pipe(zip(`${project}.pbiviz`))

@@ -1,0 +1,24 @@
+# Temp Files
+*~
+.DS_Store
+
+# Build/Bundling Files
+/webpack.*
+/tasks/
+/typings/
+
+# Dotfiles
+/.*
+
+# Project Configuration
+*.json
+!package.json
+*.conf.js
+
+# Tests
+*.spec.*
+
+# Typescript Source
+*.ts
+*.tsx
+!*.d.ts
