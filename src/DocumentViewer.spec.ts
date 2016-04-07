@@ -1,3 +1,4 @@
+import "../base/testSetup";
 import { expect } from "chai";
 
 describe("The Document Viewer", () => {

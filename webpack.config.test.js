@@ -22,10 +22,7 @@ module.exports = {
         ],
     },
     externals: {
-        jquery: "jQuery",
-        d3: "d3",
-        underscore: "_",
-        "lodash": "_"
+        "jsdom": ""
     },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
