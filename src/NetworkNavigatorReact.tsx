@@ -3,6 +3,8 @@ import * as ReactDOM from "react-dom";
 const $ = require("jquery");
 import { NetworkNavigator as NetworkNavigatorImpl, INetworkNavigatorData, INetworkNavigatorNode, INetworkNavigatorConfiguration } from "./NetworkNavigator";
 
+require("./css/NetworkNavigator.scss");
+
 export interface INetworkNavigatorProps {
     graph: INetworkNavigatorData<INetworkNavigatorNode>;
     config?: INetworkNavigatorConfiguration;
