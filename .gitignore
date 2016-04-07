@@ -1,6 +1,22 @@
-node_modules
-/build
-.vscode
+# Installed Modules
+/node_modules/
+/typings/
+
+# Temp Files
 .DS_Store
 /.scripts
 /dump
+
+# IDE / Editors
+.vscode
+*~
+
+# Build Artifacts
+/build/
+/dist/
+*.js
+!/*.js
+*.d.ts
+!/src/references.d.ts
+!/base/powerbi/powerbi.d.ts
+!/base/powerbi/references.d.ts

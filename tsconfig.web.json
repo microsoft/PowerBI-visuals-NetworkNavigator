@@ -6,12 +6,11 @@
     "jsx": "react",
     "declaration": true
   },
-  "compileOnSave": false,
   "exclude": [
     "power-bi",
     "node_modules",
     "build",
-    "typings/browser.d.ts",
-    "typings/browser"
+    "typings/main",
+    "typings/main.d.ts"
   ]
 }

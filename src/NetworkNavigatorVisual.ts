@@ -1,7 +1,7 @@
-/// <reference path="../base/references.d.ts"/>
+/// <reference path="../base/powerbi/references.d.ts"/>
 import { NetworkNavigator as NetworkNavigatorImpl, INetworkNavigatorData, INetworkNavigatorLink, INetworkNavigatorNode } from "./NetworkNavigator";
-import { ExternalCssResource, VisualBase } from "../base/VisualBase";
-import { default as Utils, Visual } from "../base/Utils";
+import { ExternalCssResource, VisualBase } from "../base/powerbi/VisualBase";
+import { default as Utils, Visual } from "../base/powerbi/Utils";
 import IVisual = powerbi.IVisual;
 import DataViewTable = powerbi.DataViewTable;
 import IVisualHostServices = powerbi.IVisualHostServices;
@@ -471,7 +471,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
 /**
  * Represents the settings for this visual
  */
-interface NetworkNavigatorVisualSettings {
+export interface NetworkNavigatorVisualSettings {
     search?: {
         caseInsensitive?: boolean;  
     };
@@ -492,7 +492,7 @@ interface NetworkNavigatorVisualSettings {
 /**
  * The lineup data
  */
-interface NetworkNavigatorSelectableNode extends powerbi.visuals.SelectableDataPoint, INetworkNavigatorNode {
+export interface NetworkNavigatorSelectableNode extends powerbi.visuals.SelectableDataPoint, INetworkNavigatorNode {
 
     /**
      * The nodes index into the node list
