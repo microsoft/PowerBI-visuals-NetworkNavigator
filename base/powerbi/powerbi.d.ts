@@ -83,7 +83,7 @@ declare module powerbi {
         getFieldType(fieldName: string): string;
         isGeoshapable(fieldRefName: string): boolean;
     }
-    function createGeoTaggingAnalyzerService(getLocalized: (string) => string): IGeoTaggingAnalyzerService;
+    function createGeoTaggingAnalyzerService(getLocalized: (str: string) => string): IGeoTaggingAnalyzerService;
     class GeoTaggingAnalyzerService implements IGeoTaggingAnalyzerService {
         private GeotaggingString_Continent;
         private GeotaggingString_Continents;
@@ -122,7 +122,7 @@ declare module powerbi {
         private GeotaggingString_Territories;
         private GeotaggingString_VRMBackCompat_CountryRegion;
         private GeotaggingString_VRMBackCompat_StateOrProvince;
-        constructor(getLocalized: (string) => string);
+        constructor(getLocalized: (str: string) => string);
         isLongitudeOrLatitude(fieldRefName: string): boolean;
         isGeographic(fieldRefName: string): boolean;
         isGeocodable(fieldRefName: string): boolean;
@@ -695,7 +695,7 @@ declare module powerbi {
          * @return A new array with those values overriden
          * or undefined if no overrides are necessary.
          */
-        function overrideArray<T, TArray>(prototype: TArray, override: (T) => T): TArray;
+        function overrideArray<T, TArray>(prototype: TArray, override: (t: T) => T): TArray;
     }
 }
 interface ScriptErrorInfo {
@@ -1471,7 +1471,7 @@ declare module jsCommon {
          * Otherwise returns the specified array.
          */
         function emptyToNull<T>(array: T[]): T[];
-        function indexOf<T>(array: T[], predicate: (T) => boolean): number;
+        function indexOf<T>(array: T[], predicate: (t: T) => boolean): number;
         /**
          * Returns a copy of the array rotated by the specified offset.
          */
@@ -4031,7 +4031,7 @@ declare module powerbi.data {
 declare module powerbi.data {
     import IStringResourceProvider = jsCommon.IStringResourceProvider;
     type DisplayNameGetter = ((resourceProvider: IStringResourceProvider) => string) | string;
-    function createDisplayNameGetter(displayNameKey: string): (IStringResourceProvider) => string;
+    function createDisplayNameGetter(displayNameKey: string): (provider: IStringResourceProvider) => string;
     function getDisplayName(displayNameGetter: data.DisplayNameGetter, resourceProvider: jsCommon.IStringResourceProvider): string;
 }
 declare module powerbi.data {

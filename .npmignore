@@ -22,3 +22,7 @@
 *.ts
 *.tsx
 !*.d.ts
+
+# Tests Helpers
+/base/testSetup.js
+/base/powerbi/spec/*.*

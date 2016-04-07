@@ -14,7 +14,7 @@ const projectConfig = require("../project");
 /**
  * Defines all of the tasks
  */
-module.exports = function (gulp) {
+module.exports = function (gulp: any) {
     const project = projectConfig.name;
     const config = projectConfig.buildConfig;
     const paths = projectConfig.paths;
@@ -71,7 +71,7 @@ module.exports = function (gulp) {
             .pipe(replace("%PROJECT_DESCRIPTION%", output.description))
             .pipe(replace("%PROJECT_VERSION%", projectVersion))
             .pipe(modify({
-                fileModifier: function(file, contents) {
+                fileModifier: function(file: string, contents: string) {
                     var pkg = JSON.parse(contents.toString());
                     if (output.icon) {
                         pkg.images = pkg.images || {};
@@ -119,7 +119,7 @@ module.exports = function (gulp) {
      */
     gulp.task(`${buildName}:package_images`, function() {
         var output = config.output.PowerBI;
-        var imagePaths = [];
+        var imagePaths: string[] = [];
         if (output.icon) {
             imagePaths.push(output.icon);
         }
@@ -146,7 +146,7 @@ module.exports = function (gulp) {
     /**
      * Task to create an empty ts file
      */
-    gulp.task(`${buildName}:create_empty_ts`, function(cb) {
+    gulp.task(`${buildName}:create_empty_ts`, function(cb: Function) {
         fs.writeFileSync(paths.buildDirPowerBiResources + "/project.ts", "/** See project.js **/");
         cb();
     });
@@ -154,7 +154,7 @@ module.exports = function (gulp) {
     /**
      * Task to create an empty ts file
      */
-    gulp.task(`${buildName}:pre_clean`, function(cb) {
+    gulp.task(`${buildName}:pre_clean`, function(cb: Function) {
         // You can use multiple globbing patterns as you would with `gulp.src`
         del.sync([paths.buildDirPowerBI]);
         cb();
@@ -164,7 +164,7 @@ module.exports = function (gulp) {
     /**
      * Task to create an empty ts file
      */
-    gulp.task(`${buildName}:post_clean`, function(cb) {
+    gulp.task(`${buildName}:post_clean`, function(cb: Function) {
         // You can use multiple globbing patterns as you would with `gulp.src`
         del.sync([paths.buildDirPowerBI + "/css", paths.buildDirPowerBI + "/package.json", paths.buildDirPowerBiResources]);
         cb();
@@ -173,7 +173,7 @@ module.exports = function (gulp) {
     /**
      * Packages the visualization in a pbiviz
      */
-    gulp.task(`${buildName}`, function(cb) {
+    gulp.task(`${buildName}`, function(cb: Function) {
         sequence(`${buildName}:pre_clean`, `${buildName}:scripts`, `${buildName}:package_json`, `${buildName}:package_images`, `${buildName}:create_empty_ts`, `${buildName}:zip`, `${buildName}:post_clean`, cb);
     });
 }
@@ -181,14 +181,14 @@ module.exports = function (gulp) {
 /**
  * Pretty prints a version object in the format: { major: number, minor: number, patch: number }
  */
-function prettyPrintVersion(v) {
+function prettyPrintVersion(v: { major: string; minor: string; patch: string }) {
     if (v) {
         return `${v.major || "0"}.${v.minor || "0"}.${v.patch || "1"}`;
     }
     return "0.0.1";
 }
 
-function string_src(filename, string) {
+function string_src(filename: string, string: string) {
   var src = require('stream').Readable({ objectMode: true })
   src._read = function () {
     this.push(new gutil.File({ cwd: "", base: "", path: filename, contents: new Buffer(string) }))

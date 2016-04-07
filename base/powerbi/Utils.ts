@@ -9,7 +9,7 @@ function applyMixins(derivedCtor: any, baseCtors: any[]) {
 }
 
 function Mixin(ctor: any) {
-    return function(me) {
+    return function(me: Function) {
         applyMixins(me, ctor);
     };
 }
@@ -17,13 +17,13 @@ function Mixin(ctor: any) {
 /**
  * Registers a visual in the power bi system
  */
-export function Visual(config) {
+export function Visual(config: { visualName: string; projectId: string }) {
     return function(ctor: any) {
-        (function (powerbi) {
-            var visuals;
-            (function (visuals) {
-                var plugins;
-                (function (plugins) {
+        (function (powerbi: any) {
+            let visuals: any;
+            (function (visuals: any) {
+                let plugins: any;
+                (function (plugins: any) {
                     var name = config.visualName + config.projectId;
                     plugins[name] = {
                         name: name,
@@ -134,20 +134,20 @@ export interface IDiffProcessor<M> {
     /**
      * Returns true if item one equals item two
      */
-    equals(one: M, two: M);
+    equals(one: M, two: M) : boolean;
 
     /**
      * Gets called when the given item was removed
      */
-    onRemove?(item: M);
+    onRemove?(item: M) : void;
 
     /**
      * Gets called when the given item was added
      */
-    onAdd?(item: M);
+    onAdd?(item: M) : void;
 
     /**
      * Gets called when the given item was updated
      */
-    onUpdate?(oldVersion: M, newVersion : M);
+    onUpdate?(oldVersion: M, newVersion : M) : void;
 }

@@ -45,7 +45,7 @@ export class VisualBase implements powerbi.IVisual {
         this.element = $("<div/>");
         this.sandboxed = VisualBase.DEFAULT_SANDBOX_ENABLED;
         const promises = this.getExternalCssResources().map((resource) => this.buildExternalCssLink(resource));
-        $.when.apply($, promises).then((...styles) => this.element.append(styles.map((s)=> $(s))));
+        $.when.apply($, promises).then((...styles: string[]) => this.element.append(styles.map((s)=> $(s))));
 
         if (addCssToParent) {
             this.container.append(this.getCss().map((css) => $("<st" + "yle>" + css + "</st" + "yle>")));
@@ -171,10 +171,10 @@ export class VisualBase implements powerbi.IVisual {
         this.element.prepend($("<st" + "yle>" + (Object.keys(faces).map(n => faces[n].cssText)).join("\n") + "</st" + "yle>"));
     }
 
-    private HACK_getFontFaces(obj?) {
+    private HACK_getFontFaces(obj?: any) {
         var sheet = document.styleSheets,
-            rule = null,
-            i = sheet.length, j, toReturn = {};
+            rule: any = null,
+            i = sheet.length, j: any, toReturn = {};
         while( 0 <= --i ){
             try {
                 rule = sheet[i]['rules'] || sheet[i]['cssRules'] || [];
@@ -242,7 +242,7 @@ if (powerbi.visuals.utility.SelectionManager.prototype['selectInternal'] ) {
     powerbi.visuals.utility.SelectionManager.prototype['selectInternal'] = function(selectionId: powerbi.visuals.SelectionId, multiSelect: boolean) {
         if (powerbi.visuals.utility.SelectionManager.containsSelection(this.selectedIds, selectionId)) {
             this.selectedIds = multiSelect
-                ? this.selectedIds.filter(d => !powerbi.data.Selector.equals(d.getSelector(), selectionId.getSelector()))
+                ? this.selectedIds.filter((d: any) => !powerbi.data.Selector.equals(d.getSelector(), selectionId.getSelector()))
                 : this.selectedIds.length > 1
                     ? [selectionId] : [];
         } else {
