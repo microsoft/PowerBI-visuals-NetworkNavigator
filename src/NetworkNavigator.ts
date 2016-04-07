@@ -1,12 +1,16 @@
-import EventEmitter from '../base/EventEmitter';
-const $ = require("jquery");
-import * as _ from "lodash";
+import EventEmitter from "../base/EventEmitter";
+import * as $ from "jquery";
 
 /**
  * Class which represents the force graph
  */
 /* @Mixin(EventEmitter) */
 export class NetworkNavigator {
+    /**
+     * The event emitter for this graph
+     */
+    public events = new EventEmitter();
+
     private element: JQuery;
     private svg: any;
     private vis: any;
@@ -14,8 +18,8 @@ export class NetworkNavigator {
     private zoom: any;
     private graph: INetworkNavigatorData<INetworkNavigatorNode>;
     private _dimensions: { width: number; height: number; };
-    private _selectedNode : INetworkNavigatorNode;
-    private _configuration : INetworkNavigatorConfiguration = {
+    private _selectedNode: INetworkNavigatorNode;
+    private _configuration: INetworkNavigatorConfiguration = {
         animate: true,
         linkDistance: 10,
         linkStrength: 2,
@@ -25,13 +29,8 @@ export class NetworkNavigator {
         minZoom: .1,
         maxZoom: 100,
         caseInsensitive: true,
-        defaultLabelColor: "blue"
+        defaultLabelColor: "blue",
     };
-
-    /**
-     * The event emitter for this graph
-     */
-    public events = new EventEmitter();
 
     /**
      * My template string
@@ -72,11 +71,11 @@ export class NetworkNavigator {
         this.svgContainer = this.element.find(".svg-container");
         const filterBox = this.element.find(".search-filter-box");
         this.element.find(".clear-selection").on("click", () => {
-            filterBox.val('');
+            filterBox.val("");
             this.filterNodes(filterBox.val());
             this.updateSelection(undefined);
         });
-        filterBox.on('input', () => {
+        filterBox.on("input", () => {
             this.filterNodes(filterBox.val());
         });
 
@@ -90,7 +89,7 @@ export class NetworkNavigator {
             .gravity(.1)
             .charge(-120)
             .size([width, height]);
-        this.vis = this.svg.append('svg:g');
+        this.vis = this.svg.append("svg:g");
     }
 
     /**
@@ -106,7 +105,7 @@ export class NetworkNavigator {
     public set dimensions(newDimensions) {
         this._dimensions = {
             width: newDimensions.width || this.dimensions.width,
-            height: newDimensions.height || this.dimensions.height
+            height: newDimensions.height || this.dimensions.height,
         };
         if (this.force) {
             this.force.size([this.dimensions.width, this.dimensions.height]);
@@ -130,12 +129,12 @@ export class NetworkNavigator {
     public set configuration(newConfig) {
         newConfig = $.extend(true, {}, this._configuration, newConfig);
         if (this.force) {
-            var runStart;
+            let runStart: boolean;
 
             /**
              * Updates the config value if necessary, and returns true if it was updated
              */
-            var updateForceConfig = (name: string, defaultValue: any, maxValue?: any, minValue?: any) => {
+            let updateForceConfig = (name: string, defaultValue: any, maxValue?: any, minValue?: any) => {
                 if (newConfig[name] !== this._configuration[name]) {
                     let newValue = maxValue ? Math.min(newConfig[name], maxValue) : newConfig[name];
                     newValue = minValue ? Math.max(newValue, minValue) : newValue;
@@ -164,7 +163,7 @@ export class NetworkNavigator {
                 this.vis.selectAll(".node text")
                     .style("opacity", newConfig.labels ? 100 : 0);
             }
-            
+
             if (newConfig.caseInsensitive !== this._configuration.caseInsensitive) {
                 this.filterNodes(this.element.find(".search-filter-box").val());
             }
@@ -176,7 +175,7 @@ export class NetworkNavigator {
     /**
      * Alias for getData
      */
-    public get data() : INetworkNavigatorData<INetworkNavigatorNode> {
+    public get data(): INetworkNavigatorData<INetworkNavigatorNode> {
         return this.getData();
     }
 
@@ -188,11 +187,18 @@ export class NetworkNavigator {
     }
 
     /**
+     * Escapes RegExp
+     */
+    private static escapeRegExp(str: string) {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    }
+
+    /**
      * Redraws the force network navigator
      */
     public redraw() {
         if (this.vis && d3.event) {
-            var zoomEvt = <any>d3.event;
+            let zoomEvt = <any>d3.event;
             this.vis.attr("transform", `translate(${zoomEvt.translate}) scale(${zoomEvt.scale})`);
         }
     }
@@ -200,7 +206,7 @@ export class NetworkNavigator {
     /**
      * Gets the data associated with this graph
      */
-    public getData() : INetworkNavigatorData<INetworkNavigatorNode> {
+    public getData(): INetworkNavigatorData<INetworkNavigatorNode> {
         return this.graph;
     }
 
@@ -208,26 +214,26 @@ export class NetworkNavigator {
      * Sets the data for this force graph
      */
     public setData(graph: INetworkNavigatorData<INetworkNavigatorNode>) {
-        var me = this;
+        let me = this;
         this.graph = graph;
 
         this.zoom = d3.behavior.zoom()
             .scaleExtent([this._configuration.minZoom, this._configuration.maxZoom])
             .on("zoom", () => this.redraw());
 
-        var drag = d3.behavior.drag()
-            .origin(function(d) { return <any>d; })
+        let drag = d3.behavior.drag()
+            .origin(function(d: any) { return <any>d; })
         // Function is important here
-            .on("dragstart", function(d) {
+            .on("dragstart", function(d: any) {
                 (<any>d3.event).sourceEvent.stopPropagation();
                 d3.select(this).classed("dragging", true);
                 me.force.start();
             })
-            .on("drag", function(d : any) {
-                var evt = <any>d3.event;
+            .on("drag", function(d: any) {
+                let evt = <any>d3.event;
                 d3.select(this).attr("cx", d.x = evt.x).attr("cy", d.y = evt.y);
             })
-            .on("dragend", function(d) {
+            .on("dragend", function(d: any) {
                 d3.select(this).classed("dragging", false);
             });
 
@@ -241,17 +247,17 @@ export class NetworkNavigator {
             .attr("pointer-events", "all")
         // Function is important here
             .call(this.zoom);
-        this.vis = this.svg.append('svg:g');
+        this.vis = this.svg.append("svg:g");
 
-        var nodes = graph.nodes.slice();
-        var links = [];
-        var bilinks = [];
+        let nodes = graph.nodes.slice();
+        let links: { source: any; target: any; }[] = [];
+        let bilinks: any[] = [];
 
         graph.links.forEach(function(link) {
-            var s = nodes[link.source];
-            var t = nodes[link.target];
-            var w = link.value;
-            var i = {}; // intermediate node
+            let s = nodes[link.source];
+            let t = nodes[link.target];
+            let w = link.value;
+            let i = {}; // intermediate node
             nodes.push(<any>i);
             links.push({ source: s, target: i }, { source: i, target: t });
             bilinks.push([s, i, t, w]);
@@ -278,37 +284,34 @@ export class NetworkNavigator {
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5");
 
-        var link = this.vis.selectAll(".link")
+        let link = this.vis.selectAll(".link")
             .data(bilinks)
             .enter().append("line")
             .attr("class", "link")
             .style("stroke", "gray")
-            .style("stroke-width", function(d) {
-                var w = 0.15 + (d[3] / 500);
+            .style("stroke-width", function(d: any) {
+                let w = 0.15 + (d[3] / 500);
                 return (w > 3) ? 3 : w;
             })
-            .attr("id", function(d) {
-                return d[0].name.replace(/\./g, '_').replace(/@/g, '_') + '_' +
-                    d[2].name.replace(/\./g, '_').replace(/@/g, '_');
+            .attr("id", function(d: any) {
+                return d[0].name.replace(/\./g, "_").replace(/@/g, "_") + "_" +
+                    d[2].name.replace(/\./g, "_").replace(/@/g, "_");
             });
 
-        var node = this.vis.selectAll(".node")
+        let node = this.vis.selectAll(".node")
             .data(graph.nodes)
             .enter().append("g")
             .call(drag)
             .attr("class", "node");
 
         node.append("svg:circle")
-            .attr("r", (d) => Math.log(((d.num || 1) * 100)))
-            .style("fill", (d) => d.color)
+            .attr("r", (d: any) => Math.log(((d.num || 1) * 100)))
+            .style("fill", (d: any) => d.color)
             .style("stroke", "red")
-            .style("stroke-width", (d) => d.selected ? 1 : 0)
+            .style("stroke-width", (d: any) => d.selected ? 1 : 0)
             .style("opacity", 1);
 
-        node.on("click", (n) => {
-            this.events.raiseEvent("nodeClicked", n);
-            this.updateSelection(n);
-        });
+        node.on("click", (n: INetworkNavigatorNode) => this.onNodeClicked(n));
 
         node.on("mouseover", () => {
             d3.select(this.svgContainer.find("svg text")[0]).style("opacity", "100");
@@ -320,7 +323,7 @@ export class NetworkNavigator {
         });
 
         link.append("svg:text")
-            .text(function(d) { return 'yes'; })
+            .text((d: any) => "yes")
             .attr("fill", "black")
             .attr("stroke", "black")
             .attr("font-size", "5pt")
@@ -331,13 +334,11 @@ export class NetworkNavigator {
                 return 100;
             });
 
-        link.on("click", function(n) { console.log(n); });
-
         node.append("svg:text")
             .attr("class", "node-label")
-            .text(function(d) { return d.name; })
-            .attr("fill", (d) => d.labelColor || this.configuration.defaultLabelColor)
-            .attr("stroke", (d) => d.labelColor || this.configuration.defaultLabelColor)
+            .text(function(d: any) { return d.name; })
+            .attr("fill", (d: any) => d.labelColor || this.configuration.defaultLabelColor)
+            .attr("stroke", (d: any) => d.labelColor || this.configuration.defaultLabelColor)
             .attr("font-size", "5pt")
             .attr("stroke-width", "0.5px")
             .style("opacity", this._configuration.labels ? 100 : 0);
@@ -353,20 +354,20 @@ export class NetworkNavigator {
             }
             this.force.stop();
 
-            link.attr("x1", (d) => d[0].x)
-                .attr("y1", (d) => d[0].y)
-                .attr("x2", (d) => d[2].x)
-                .attr("y2", (d) => d[2].y);
-            node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+            link.attr("x1", (d: any) => d[0].x)
+                .attr("y1", (d: any) => d[0].y)
+                .attr("x2", (d: any) => d[2].x)
+                .attr("y2", (d: any) => d[2].y);
+            node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
         }
 
         this.force.on("tick", () => {
             if (this.configuration.animate) {
-                link.attr("x1", (d) => d[0].x)
-                    .attr("y1", (d) => d[0].y)
-                    .attr("x2", (d) => d[2].x)
-                    .attr("y2", (d) => d[2].y);
-                node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+                link.attr("x1", (d: any) => d[0].x)
+                    .attr("y1", (d: any) => d[0].y)
+                    .attr("x2", (d: any) => d[2].x)
+                    .attr("y2", (d: any) => d[2].y);
+                node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
             }
         });
     }
@@ -376,7 +377,7 @@ export class NetworkNavigator {
      */
     public redrawSelection() {
         this.vis.selectAll(".node circle")
-            .style("stroke-width", (d) => d.selected ? 1 : 0);
+            .style("stroke-width", (d: any) => d.selected ? 1 : 0);
     }
 
     /**
@@ -384,15 +385,14 @@ export class NetworkNavigator {
      */
     public redrawLabels() {
         this.vis.selectAll(".node .node-label")
-            .attr("fill", (d) => d.labelColor || this.configuration.defaultLabelColor)
-            .attr("stroke", (d) => d.labelColor || this.configuration.defaultLabelColor);
+            .attr("fill", (d: any) => d.labelColor || this.configuration.defaultLabelColor)
+            .attr("stroke", (d: any) => d.labelColor || this.configuration.defaultLabelColor);
     }
 
     /**
      * Filters the nodes to the given string
      */
     public filterNodes(text: string, animate = true) {
-        let test = "";
         let temp = this.vis.selectAll(".node circle");
         if (animate) {
             temp = temp
@@ -401,7 +401,7 @@ export class NetworkNavigator {
                 .delay(100);
         }
         const pretty = (val: string) => ((val || "") + "");
-        temp.attr("transform", (d) => {
+        temp.attr("transform", (d: any) => {
             let scale = 1;
             const searchStr = d.name || "";
             const flags = this.configuration.caseInsensitive ? "i" : "";
@@ -412,12 +412,14 @@ export class NetworkNavigator {
             return `scale(${scale})`;
         });
     }
-    
+
     /**
-     * Escapes RegExp
+     * Listener for node clicked
+     * public for testing, cause phantomjs is puking on triggering clicks
      */
-    private static escapeRegExp(str: string) {
-        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    public onNodeClicked(n: INetworkNavigatorNode) {
+        this.events.raiseEvent("nodeClicked", n);
+        this.updateSelection(n);
     }
 
     /**
@@ -438,7 +440,7 @@ export class NetworkNavigator {
             }
             this._selectedNode = undefined;
         }
-        this.events.raiseEvent('selectionChanged', this._selectedNode);
+        this.events.raiseEvent("selectionChanged", this._selectedNode);
         this.redrawSelection();
     }
 }

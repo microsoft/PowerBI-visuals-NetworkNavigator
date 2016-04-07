@@ -1,9 +1,14 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-const $ = require("jquery");
-import { NetworkNavigator as NetworkNavigatorImpl, INetworkNavigatorData, INetworkNavigatorNode, INetworkNavigatorConfiguration } from "./NetworkNavigator";
+import * as $ from "jquery";
+import {
+    NetworkNavigator as NetworkNavigatorImpl,
+    INetworkNavigatorData,
+    INetworkNavigatorNode,
+    INetworkNavigatorConfiguration,
+} from "./NetworkNavigator";
 
-require("./css/NetworkNavigator.scss");
+import "./css/NetworkNavigator.scss";
 
 export interface INetworkNavigatorProps {
     graph: INetworkNavigatorData<INetworkNavigatorNode>;
@@ -17,16 +22,15 @@ export interface INetworkNavigatorState { }
  * Thin wrapper around LineUp
  */
 export class NetworkNavigator extends React.Component<INetworkNavigatorProps, INetworkNavigatorState> {
+    public props: INetworkNavigatorProps;
     private networkNavigator: NetworkNavigatorImpl;
     private node: any;
-    private selectionListener : any;
-    private canLoadListener : any;
-    public props : INetworkNavigatorProps;
+    private selectionListener: any;
 
-    componentDidMount() {
+    public componentDidMount() {
         this.node = ReactDOM.findDOMNode(this);
         this.networkNavigator = new NetworkNavigatorImpl($(this.node));
-        this.networkNavigator.events.on("selectionChanged", (node) => {
+        this.networkNavigator.events.on("selectionChanged", (node: INetworkNavigatorNode) => {
             if (this.props.onSelectionChanged) {
                 this.props.onSelectionChanged(node);
             }
@@ -35,18 +39,18 @@ export class NetworkNavigator extends React.Component<INetworkNavigatorProps, IN
         this.renderContent();
     }
 
-    componentWillReceiveProps(newProps : INetworkNavigatorProps) {
+    public componentWillReceiveProps(newProps: INetworkNavigatorProps) {
         this.renderContent(newProps);
     }
 
     /**
      * Renders this component
      */
-    render() {
+    public render() {
         return <div style={{width:"100%", height:"100%"}}></div>;
     }
 
-    private renderContent(props? : INetworkNavigatorProps) {
+    private renderContent(props?: INetworkNavigatorProps) {
         // if called from `componentWillReceiveProps`, then we use the new
         // props, otherwise use what we already have.
         props = props || this.props;
@@ -61,7 +65,8 @@ export class NetworkNavigator extends React.Component<INetworkNavigatorProps, IN
         }
 
         if (props.onSelectionChanged) {
-            this.selectionListener = this.networkNavigator.events.on("selectionChanged", (rows) => props.onSelectionChanged(rows));
+            this.selectionListener =
+                this.networkNavigator.events.on("selectionChanged", (nodes: INetworkNavigatorNode) => props.onSelectionChanged(nodes));
         } else if (this.selectionListener) {
             this.selectionListener.destroy();
         }

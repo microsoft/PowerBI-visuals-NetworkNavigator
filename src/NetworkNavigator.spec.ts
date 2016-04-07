@@ -1,31 +1,28 @@
-require("../base/testSetup");
+import "../base/testSetup";
 
 import { expect } from "chai";
-import { NetworkNavigator, INetworkNavigatorData, INetworkNavigatorNode, INetworkNavigatorLink } from "./NetworkNavigator";
+import { NetworkNavigator, INetworkNavigatorData, INetworkNavigatorNode } from "./NetworkNavigator";
 import * as $ from "jquery";
 
 describe("NetworkNavigator", () => {
-    var parentEle;
+    let parentEle: JQuery;
     beforeEach(() => {
-        global['$'] = require("jquery");
-        global['d3'] = require("d3");
-        global['_'] = require("underscore");
-        parentEle = $('<div></div>');
+        parentEle = $("<div></div>");
     });
 
     afterEach(() => {
         if (parentEle) {
             parentEle.remove();
         }
-        parentEle = null;
+        parentEle = undefined;
     });
 
-    var createInstance = () => {
-        let ele = $('<div>');
+    const createInstance = () => {
+        let ele = $("<div>");
         parentEle.append(ele);
-        var result = {
+        let result = {
             instance: new NetworkNavigator(ele),
-            element: ele
+            element: ele,
         };
         result.instance.configuration = {
             animate: false
@@ -37,7 +34,7 @@ describe("NetworkNavigator", () => {
         createInstance();
     });
 
-    const oneSourceTwoTargets : INetworkNavigatorData<INetworkNavigatorNode> = {
+    const oneSourceTwoTargets: INetworkNavigatorData<INetworkNavigatorNode> = {
         nodes: [
             {  selected: false, name: "SOURCE_NODE" },
             {  selected: false, name: "TARGET_NODE_1" },
@@ -45,15 +42,15 @@ describe("NetworkNavigator", () => {
         ],
         links: [{
             source: 0,
-            target: 1
+            target: 1,
         }, {
             source: 0,
-            target: 2
-        }]
+            target: 2,
+        }, ],
     };
 
     describe("filterNodes", () => {
-        const testFilters = (instance, element, text: string, matches: string[]) => {
+        const testFilters = (instance: NetworkNavigator, element: JQuery, text: string, matches: string[]) => {
             // Set the filter to highlight nodes with "TARGET" in their name
             instance.filterNodes(text, false);
 
@@ -68,10 +65,11 @@ describe("NetworkNavigator", () => {
                 return trans && trans.indexOf("scale(3)") >= 0;
             });
 
-            let texts = [];
-            highlightedNodes.each((i, node) =>
-                texts.push($(node).find("text").html())
-            );
+            let texts: string[] = [];
+            highlightedNodes.each((i, node) => {
+                let textNode = $(node).find("text")[0];
+                texts.push(textNode.innerText || textNode.textContent);
+            });
             expect(texts).to.deep.equal(matches);
         };
 
@@ -112,22 +110,19 @@ describe("NetworkNavigator", () => {
     });
 
     describe("selection", () => {
-       it("should raise a click event when a node is selected", () => {
-            let { instance, element } = createInstance();
+       it("should raise a click event when a node is selected", (done) => {
+            let { instance } = createInstance();
 
             // Set that datas
             instance.setData(oneSourceTwoTargets);
 
             let clicked = false;
-            instance.events.on("nodeClicked", (node) => {
+            instance.events.on("nodeClicked", (node: INetworkNavigatorNode) => {
                 clicked = true;
+                done();
             });
 
-            // Click on a circle
-            element.find("circle").first().click();
-
-            // We were clicked on
-            expect(clicked).to.be.true;
+            instance.onNodeClicked(<any>{});
        });
     });
 
