@@ -12,7 +12,7 @@
     "lint": "tslint 'src/**/*[!.d].{ts,tsx}'",
     "karma:tdd": "karma start --tdd",
     "karma:once": "karma start",
-    "test": "npm-run-all --sequential clean typings tsc --parallel lint karma:once --sequential pbibundle",
+    "test": "npm-run-all --sequential clean typings tsc --parallel lint karma:once",
     "build": "npm-run-all typings --parallel tsc pbibundle",
     "bump:patch": "gulp bump:patch",
     "bump:minor": "gulp bump:minor",
