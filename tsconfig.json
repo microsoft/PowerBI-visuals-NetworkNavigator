@@ -4,7 +4,9 @@
     "module": "commonjs",
     "experimentalDecorators": true,
     "jsx": "react",
-    "declaration": true
+    "declaration": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true
   },
   "compileOnSave": false,
   "exclude": [

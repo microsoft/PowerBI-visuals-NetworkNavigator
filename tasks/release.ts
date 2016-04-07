@@ -11,12 +11,12 @@ const sequence = require("gulp-sequence");
 const projectConfig = require("./project");
 const addsrc = require("gulp-add-src");
 
-module.exports = function(gulp) {
+module.exports = function(gulp: any) {
     const project = projectConfig.name;
     const config = projectConfig.buildConfig;
     const paths = projectConfig.paths;
 
-    function inc(importance) {
+    function inc(importance: string) {
 
         // get all the files to bump version in
         return gulp.src(['./package.json'])
@@ -26,7 +26,7 @@ module.exports = function(gulp) {
             .pipe(gulp.dest('./'));
     }
 
-    function release(importance, cb) {
+    function release(importance: string, cb: Function) {
         process.env.BUILD_TARGET = "release";
         return sequence(`bump:${importance}`, `build`, `commit_artifacts`, `tag`, cb);
     }

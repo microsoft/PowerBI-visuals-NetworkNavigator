@@ -5,7 +5,7 @@ global['powerbi'] = {
         utility: {
             SelectionManager: () => {
                 return {
-                    getSelectionIds: () => []
+                    getSelectionIds: () => <any[]>[]
                 };
             }
         },

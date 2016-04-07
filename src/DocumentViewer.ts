@@ -41,7 +41,7 @@ export class DocumentViewer {
     public set data(data: IDocumentViewerDocument[]) {
         this.tableElement.empty();
 
-        let error;
+        let error: string;
         if (data.length === 1) {
             let eles = data.map((doc: IDocumentViewerDocument) => {
                 let docEle = $(`
