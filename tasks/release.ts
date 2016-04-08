@@ -57,7 +57,7 @@ module.exports = function(gulp: any) {
      */
     gulp.task(`commit_artifacts`, function() {
         return gulp.src([paths.buildArtifacts, paths.projectDir + "/build.js", "package.json"])
-            .pipe(git.add())
+            .pipe(git.add({ args: "-f" }))
 
             // Add the build artifacts
             .pipe(git.commit('Updating Artifacts'));
