@@ -4,13 +4,10 @@ const webpack = require('webpack');
 module.exports = {
     devtool: 'eval',
     resolve: {
-        // Add `.ts` and `.tsx` as a resolvable extension.
-        extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js', '.json']
+        extensions: ['', '.webpack.js', '.web.js', '.js', '.json']
     },
     module: {
         loaders: [
-            // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
-            { test: /\.(tsx|ts)?$/, loader: 'ts-loader?configFileName=tsconfig.web.json', exclude: '.d.ts' },
             {
                 test: /\.scss$/,
                 loaders: ["style", "css", "sass"]

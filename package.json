@@ -7,13 +7,13 @@
   "scripts": {
     "clean": "rimraf dist",
     "typings": "typings install",
-    "tsc": "tsc",
+    "tsc": "! tsc | grep -v \"^node_modules.*\"",
     "pbibundle": "gulp",
     "lint": "tslint 'src/**/*[!.d].{ts,tsx}'",
     "karma:tdd": "karma start --tdd",
     "karma:once": "karma start",
     "test": "npm-run-all --sequential clean typings tsc --parallel lint karma:once",
-    "build": "npm-run-all typings --parallel tsc pbibundle",
+    "build": "npm-run-all --sequential typings tsc pbibundle",
     "bump:patch": "gulp bump:patch",
     "bump:minor": "gulp bump:minor",
     "bump:major": "gulp bump:major",
@@ -30,7 +30,8 @@
     "dompurify": "^0.7.4",
     "jquery": "^2.2.0",
     "lodash": "4.0.0",
-    "moment": "^2.12.0"
+    "moment": "^2.12.0",
+    "powerbi-visuals": "^0.3.8"
   },
   "devDependencies": {
     "babel-cli": "6.x",
@@ -82,7 +83,6 @@
     "sinon": "^1.17.3",
     "sinon-chai": "^2.8.0",
     "style-loader": "0.13.0",
-    "ts-loader": "0.7.2",
     "ts-node": "0.5.5",
     "tslint": "3.2.1",
     "typescript": "^1.7.5",
