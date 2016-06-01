@@ -8,10 +8,10 @@ module.exports = config => {
   config.set({
     basePath: '',
     frameworks: ['mocha'],
-    files: [ 'src/**/*.spec.{ts,tsx}' ],
+    files: [ 'src/**/*.spec.js' ],
     exclude: [],
     preprocessors: {
-      'src/**/*.spec.{ts,tsx}': ['webpack', 'sourcemap']
+      'src/**/*.spec.js': ['webpack', 'sourcemap']
     },
     webpack: webpackConf,
     reporters: ['progress'],
