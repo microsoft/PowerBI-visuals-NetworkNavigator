@@ -6,9 +6,8 @@ import {
     INetworkNavigatorNode,
 } from "./NetworkNavigator";
 import { VisualBase } from "../base/powerbi/VisualBase";
-import { Visual } from "../base/powerbi/Utils";
+import { Visual, default as Utils, UpdateType } from "../base/powerbi/Utils";
 import IVisual = powerbi.IVisual;
-import DataViewTable = powerbi.DataViewTable;
 import IVisualHostServices = powerbi.IVisualHostServices;
 import VisualCapabilities = powerbi.VisualCapabilities;
 import VisualInitOptions = powerbi.VisualInitOptions;
@@ -28,11 +27,53 @@ declare var _: any;
 @Visual(require("./build").output.PowerBI)
 export default class NetworkNavigator extends VisualBase implements IVisual {
 
+    /**
+     * A list of our data roles
+     */
+    public static DATA_ROLES = {
+        source: {
+            displayName: "Source Node",
+            name: "SOURCE_NODE",
+        },
+        target: {
+            displayName: "Target Node",
+            name: "TARGET_NODE",
+        },
+        edgeValue: {
+            displayName: "Edge Weight",
+            name: "EDGE_VALUE",
+        }/*,
+        sourceGroup: {
+            displayName: "Source Node Group",
+            name: "SOURCE_GROUP"
+        }*/,
+        sourceColor: {
+            displayName: "Source Node Color",
+            name: "SOURCE_NODE_COLOR",
+        },
+        sourceLabelColor: {
+            displayName: "Source Node Label Color",
+            name: "SOURCE_LABEL_COLOR",
+        }/*,
+        targetGroup: {
+            displayName: "Target Node Group",
+            name: "TARGET_GROUP"
+        }*/,
+        targetColor: {
+            displayName: "Target Node Color",
+            name: "TARGET_NODE_COLOR",
+        },
+        targetLabelColor: {
+            displayName: "Target Node Label Color",
+            name: "TARGET_LABEL_COLOR",
+        },
+    };
+
     public static capabilities: VisualCapabilities = $.extend(true, {}, VisualBase.capabilities, {
         dataRoles: Object.keys(NetworkNavigator.DATA_ROLES).map(n => ({
             name: NetworkNavigator.DATA_ROLES[n].name,
             displayName: NetworkNavigator.DATA_ROLES[n].displayName,
-            kind: powerbi.VisualDataRoleKind.Grouping,
+            kind: powerbi.VisualDataRoleKind.GroupingOrMeasure,
         })),
         dataViewMappings: [{
             table: {
@@ -116,52 +157,20 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                         displayName: "Max Zoom",
                         type: { numeric: true },
                     },
+                    minEdgeWeightPx: {
+                        displayName: "Min Edge Weight(px)",
+                        description: "The minimum size of edges in pixels",
+                        type: { numeric: true },
+                    },
+                    maxEdgeWeightPx: {
+                        displayName: "Max Edge Weight(px)",
+                        description: "The maximum size of edges in pixels",
+                        type: { numeric: true },
+                    },
                 },
             },
         },
     });
-
-    /**
-     * A list of our data roles
-     */
-    private static DATA_ROLES = {
-        source: {
-            displayName: "Source Node",
-            name: "SOURCE_NODE",
-        },
-        target: {
-            displayName: "Target Node",
-            name: "TARGET_NODE",
-        }/*,
-        edgeValue: {
-            displayName: "Edge Weight",
-            name: "EDGE_VALUE"
-        },
-        sourceGroup: {
-            displayName: "Source Node Group",
-            name: "SOURCE_GROUP"
-        }*/,
-        sourceColor: {
-            displayName: "Source Node Color",
-            name: "SOURCE_NODE_COLOR",
-        },
-        sourceLabelColor: {
-            displayName: "Source Node Label Color",
-            name: "SOURCE_LABEL_COLOR",
-        }/*,
-        targetGroup: {
-            displayName: "Target Node Group",
-            name: "TARGET_GROUP"
-        }*/,
-        targetColor: {
-            displayName: "Target Node Color",
-            name: "TARGET_NODE_COLOR",
-        },
-        targetLabelColor: {
-            displayName: "Target Node Label Color",
-            name: "TARGET_LABEL_COLOR",
-        },
-    };
 
     private static DEFAULT_SETTINGS: NetworkNavigatorVisualSettings = {
         search: {
@@ -177,11 +186,12 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             labels: false,
             minZoom: .1,
             maxZoom: 100,
+            minEdgeWeightPx: .5,
+            maxEdgeWeightPx: 5,
             defaultLabelColor: colors[0],
         },
     };
 
-    private dataViewTable: DataViewTable;
     private myNetworkNavigator: NetworkNavigatorImpl;
     private host: IVisualHostServices;
     private interactivityService: IInteractivityService;
@@ -201,6 +211,11 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     private template: string = `
         <div id="node_graph" style= "height: 100%;"> </div>
     `;
+
+    /**
+     * Getter for the update type
+     */
+    private updateType = Utils.updateTypeGetter(this);
 
     /**
      * Gets called when a node is selected
@@ -280,7 +295,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         let targetColorIdx = colMap[roles.targetColor.name];
         let targetLabelColorIdx = colMap[roles.targetLabelColor.name];
         let targetIdx = colMap[roles.target.name];
-        // let edgeValueIdx = colMap[roles.edgeValue.name];
+        const edgeValueIdx = colMap[roles.edgeValue.name];
 
         let sourceField = dataView.categorical.categories[0].identityFields[sourceIdx];
         let targetField = dataView.categorical.categories[0].identityFields[targetIdx];
@@ -292,9 +307,9 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             color: string = "gray",
             labelColor: string,
             group: number = 0): NetworkNavigatorSelectableNode {
+            const field = (isSource ? sourceField : targetField) as powerbi.data.SQExpr;
             let node = nodeMap[id];
-            // let expr = identity.expr;
-            let expr = powerbi.data.SQExprBuilder.equal(isSource ? sourceField : targetField, powerbi.data.SQExprBuilder.text(id));
+            let expr = powerbi.data.SQExprBuilder.equal(field, powerbi.data.SQExprBuilder.text(id));
 
             if (!nodeMap[id]) {
                 node = nodeMap[id] = {
@@ -323,7 +338,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                         getNode(sourceId, identity, true, row[sourceColorIdx], row[sourceLabelColorIdx]/*, row[sourceGroup]*/).index,
                     target:
                         getNode(targetId, identity, false, row[targetColorIdx], row[targetLabelColorIdx]/*, row[targetGroupIdx]*/).index,
-                    value: <any>undefined,
+                    value: row[edgeValueIdx] || 0
                 };
                 nodeList[edge.source].num += 1;
                 nodeList[edge.target].num += 1;
@@ -359,40 +374,48 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
 
         let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
         let dataViewTable = dataView && dataView.table;
+        let forceReloadData = false;
 
-        // Assume that if the dimensions changed, thats all that did        
-        if (!_.isEqual(this.myNetworkNavigator.dimensions, options.viewport)) {
+        const type = this.updateType();
+        if (type & UpdateType.Settings) {
+            forceReloadData = this.updateSettings(options);
+        }
+        if (type & UpdateType.Resize) {
             this.myNetworkNavigator.dimensions = { width: options.viewport.width, height: options.viewport.height };
             this.element.css({ width: options.viewport.width, height: options.viewport.height });
-        } else if (dataViewTable) {
-            const parsedData = NetworkNavigator.converter(dataView, this.settings);
-            this.myNetworkNavigator.setData(parsedData);
-            const selectedIds = this.selectionManager.getSelectionIds();
-            const data = this.myNetworkNavigator.getData();
-            if (data && data.nodes && data.nodes.length) {
-                let updated = false;
-                data.nodes.forEach((n) => {
-                    let isSelected = !!_.find(selectedIds, (id: SelectionId) => id.equals((<NetworkNavigatorSelectableNode>n).identity));
-                    if (isSelected !== n.selected) {
-                        n.selected = isSelected;
-                        updated = true;
-                    }
+        }
+        if (type & UpdateType.Data || forceReloadData) {
+            if (dataViewTable) {
+                const newData = NetworkNavigator.converter(dataView, this.settings);
+                this.myNetworkNavigator.setData(newData);
+            } else {
+                this.myNetworkNavigator.setData({
+                    links: [],
+                    nodes: [],
                 });
-
-                if (updated) {
-                    this.myNetworkNavigator.redrawSelection();
-                }
-
-                this.myNetworkNavigator.redrawLabels();
             }
-        } else {
-            this.myNetworkNavigator.setData({
-                links: [],
-                nodes: [],
-            });
         }
 
-        this.dataViewTable = dataViewTable;
+        const data = this.myNetworkNavigator.getData();
+        const nodes = data && data.nodes;
+        const selectedIds = this.selectionManager.getSelectionIds();
+        if (nodes && nodes.length) {
+            let updated = false;
+            nodes.forEach((n) => {
+                let isSelected =
+                    !!_.find(selectedIds, (id: SelectionId) => id.equals((<NetworkNavigatorSelectableNode>n).identity));
+                if (isSelected !== n.selected) {
+                    n.selected = isSelected;
+                    updated = true;
+                }
+            });
+
+            if (updated) {
+                this.myNetworkNavigator.redrawSelection();
+            }
+        }
+
+        this.myNetworkNavigator.redrawLabels();
     }
 
     /**
@@ -417,37 +440,37 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         return super.getCss().concat([require("!css!sass!./css/NetworkNavigatorVisual.scss")]);
     }
 
-    // /**
-    //  * Handles updating of the settings
-    //  */
-    // private updateSettings(options: VisualUpdateOptions): boolean {
-    //     // There are some changes to the options
-    //     let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
-    //     if (dataView && dataView.metadata) {
-    //         let oldSettings = $.extend(true, {}, this.settings);
-    //         let newObjects = dataView.metadata.objects;
+    /**
+     * Handles updating of the settings
+     */
+    private updateSettings(options: VisualUpdateOptions): boolean {
+        // There are some changes to the options
+        let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
+        if (dataView && dataView.metadata) {
+            let oldSettings = $.extend(true, {}, this.settings);
+            let newObjects = dataView.metadata.objects;
 
-    //         // Merge in the settings
-    //         $.extend(true, this.settings, NetworkNavigator.DEFAULT_SETTINGS, newObjects ? newObjects : {}, {
-    //             layout: {
-    //                 defaultLabelColor: newObjects &&
-    //                     newObjects["layout"] &&
-    //                     newObjects["layout"]["defaultLabelColor"] &&
-    //                     newObjects["layout"]["defaultLabelColor"].solid.color
-    //             }
-    //         });
+            // Merge in the settings
+            $.extend(true, this.settings, NetworkNavigator.DEFAULT_SETTINGS, newObjects ? newObjects : {}, {
+                layout: {
+                    defaultLabelColor: newObjects &&
+                        newObjects["layout"] &&
+                        newObjects["layout"]["defaultLabelColor"] &&
+                        newObjects["layout"]["defaultLabelColor"].solid.color,
+                },
+            });
 
-    //         // There were some changes to the layout
-    //         if (!_.isEqual(oldSettings, this.settings)) {
-    //             this.myNetworkNavigator.configuration = $.extend(true, {}, this.settings.search, this.settings.layout);
-    //         }
+            // There were some changes to the layout
+            if (!_.isEqual(oldSettings, this.settings)) {
+                this.myNetworkNavigator.configuration = $.extend(true, {}, this.settings.search, this.settings.layout);
+            }
 
-    //         if (oldSettings.layout.maxNodeCount !== this.settings.layout.maxNodeCount) {
-    //             return true;
-    //         }
-    //     }
-    //     return false;
-    // }
+            if (oldSettings.layout.maxNodeCount !== this.settings.layout.maxNodeCount) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Returns if all the properties in the first object are present and equal to the ones in the super set
@@ -458,20 +481,6 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         }
         return set === superSet;
     }
-
-    // /**
-    //  * Determines if the old data is different from the new data.
-    //  */
-    // private hasDataChanged(oldData: DataViewTable, newData: DataViewTable): boolean {
-    //     if (!oldData || !newData || oldData.rows.length !== newData.rows.length) {
-    //         return true;
-    //     }
-
-    //     // If there are any elements in newdata that arent in the old data
-    //     return _.any(newData.identity, (n: any) => {
-    //         return !_.any(oldData.identity, (m: any) => m.key.indexOf(n.key) === 0);
-    //     });
-    // }
 
     /**
      * Attaches the line up events to lineup
@@ -505,6 +514,8 @@ export interface NetworkNavigatorVisualSettings {
         labels?: boolean;
         minZoom?: number;
         maxZoom?: number;
+        maxEdgeWeightPx?: number;
+        minEdgeWeightPx?: number;
         defaultLabelColor?: string;
     };
 };

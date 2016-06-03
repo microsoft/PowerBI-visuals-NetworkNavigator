@@ -6,6 +6,7 @@ import * as $ from "jquery";
  */
 /* @Mixin(EventEmitter) */
 export class NetworkNavigator {
+
     /**
      * The event emitter for this graph
      */
@@ -28,6 +29,8 @@ export class NetworkNavigator {
         labels: false,
         minZoom: .1,
         maxZoom: 100,
+        maxEdgeWeightPx: 5,
+        minEdgeWeightPx: .5,
         caseInsensitive: true,
         defaultLabelColor: "blue",
     };
@@ -157,6 +160,17 @@ export class NetworkNavigator {
                 this.force.start();
             } else if (!this.configuration.animate) {
                 this.force.stop();
+            }
+
+            if (newConfig.maxEdgeWeightPx !== this._configuration.maxEdgeWeightPx ||
+                newConfig.minEdgeWeightPx !== this._configuration.minEdgeWeightPx) {
+                this.vis.selectAll(".link")
+                    .style("stroke-width", (d: any) => {
+                        const min = newConfig.minEdgeWeightPx;
+                        const max = newConfig.maxEdgeWeightPx;
+                        const r = max - min;
+                        return Math.min(min + (d[3] * r), max);
+                    });
             }
 
             if (newConfig.labels !== this._configuration.labels) {
@@ -289,9 +303,11 @@ export class NetworkNavigator {
             .enter().append("line")
             .attr("class", "link")
             .style("stroke", "gray")
-            .style("stroke-width", function(d: any) {
-                let w = 0.15 + (d[3] / 500);
-                return (w > 3) ? 3 : w;
+            .style("stroke-width", (d: any) => {
+                const min = this.configuration.minEdgeWeightPx;
+                const max = this.configuration.maxEdgeWeightPx;
+                const r = max - min;
+                return Math.min(min + (d[3] * r), max);
             })
             .attr("id", function(d: any) {
                 return d[0].name.replace(/\./g, "_").replace(/@/g, "_") + "_" +
@@ -525,4 +541,14 @@ export interface INetworkNavigatorConfiguration {
     maxZoom?: number;
     defaultLabelColor?: string;
     caseInsensitive?: boolean;
+
+    /**
+     * The maximum size (in pixels) of an edge
+     */
+    maxEdgeWeightPx?: number;
+
+    /**
+     * The minimum size (in pixels) of an edge
+     */
+    minEdgeWeightPx?: number;
 }
