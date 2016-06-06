@@ -164,10 +164,16 @@ export class NetworkNavigator {
                 this.zoom.scaleExtent([newConfig.minZoom, newConfig.maxZoom]);
             }
 
-            if (runStart && this.configuration.animate) {
-                this.force.start();
-            } else if (!this.configuration.animate) {
+            if (newConfig.animate) {
+                // If we are rerunning start or if we weren't animated, but now we are, then start the force
+                if (runStart || !this.configuration.animate) {
+                    this.force.start();
+                }
+            } else {
                 this.force.stop();
+                if (runStart) {
+                    this.reflow(this.vis.selectAll(".link"), this.vis.selectAll(".node"));
+                }
             }
 
             if (newConfig.labels !== this._configuration.labels) {
@@ -371,20 +377,7 @@ export class NetworkNavigator {
 
         // If we are not animating, then play the force quickly
         if (!this.configuration.animate) {
-            let k = 0;
-            this.force.start();
-            // Alpha measures the amount of movement
-            while ((this.force.alpha() > 1e-2) && (k < 150)) {
-                this.force.tick();
-                k = k + 1;
-            }
-            this.force.stop();
-
-            link.attr("x1", (d: any) => d[0].x)
-                .attr("y1", (d: any) => d[0].y)
-                .attr("x2", (d: any) => d[2].x)
-                .attr("y2", (d: any) => d[2].y);
-            node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
+            this.reflow(link, node);
         }
 
         this.force.on("tick", () => {
@@ -446,6 +439,26 @@ export class NetworkNavigator {
     public onNodeClicked(n: INetworkNavigatorNode) {
         this.events.raiseEvent("nodeClicked", n);
         this.updateSelection(n);
+    }
+
+    /**
+     * Reflows the given links and nodes
+     */
+    private reflow(link: d3.Selection<any>, node: d3.Selection<any>) {
+        let k = 0;
+        this.force.start();
+        // Alpha measures the amount of movement
+        while ((this.force.alpha() > 1e-2) && (k < 150)) {
+            this.force.tick();
+            k = k + 1;
+        }
+        this.force.stop();
+
+        link.attr("x1", (d: any) => d[0].x)
+            .attr("y1", (d: any) => d[0].y)
+            .attr("x2", (d: any) => d[2].x)
+            .attr("y2", (d: any) => d[2].y);
+        node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
     }
 
     /**
