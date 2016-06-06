@@ -2,6 +2,16 @@ import EventEmitter from "../base/EventEmitter";
 import * as $ from "jquery";
 
 /**
+ * The default node size in px
+ */
+const DEFAULT_NODE_SIZE = 10;
+
+/**
+ * The default size of edges in px
+ */
+const DEFAULT_EDGE_SIZE = 1;
+
+/**
  * Class which represents the force graph
  */
 /* @Mixin(EventEmitter) */
@@ -29,8 +39,6 @@ export class NetworkNavigator {
         labels: false,
         minZoom: .1,
         maxZoom: 100,
-        maxEdgeWeightPx: 5,
-        minEdgeWeightPx: .5,
         caseInsensitive: true,
         defaultLabelColor: "blue",
     };
@@ -160,17 +168,6 @@ export class NetworkNavigator {
                 this.force.start();
             } else if (!this.configuration.animate) {
                 this.force.stop();
-            }
-
-            if (newConfig.maxEdgeWeightPx !== this._configuration.maxEdgeWeightPx ||
-                newConfig.minEdgeWeightPx !== this._configuration.minEdgeWeightPx) {
-                this.vis.selectAll(".link")
-                    .style("stroke-width", (d: any) => {
-                        const min = newConfig.minEdgeWeightPx;
-                        const max = newConfig.maxEdgeWeightPx;
-                        const r = max - min;
-                        return Math.min(min + (d[3] * r), max);
-                    });
             }
 
             if (newConfig.labels !== this._configuration.labels) {
@@ -304,10 +301,14 @@ export class NetworkNavigator {
             .attr("class", "link")
             .style("stroke", "gray")
             .style("stroke-width", (d: any) => {
-                const min = this.configuration.minEdgeWeightPx;
-                const max = this.configuration.maxEdgeWeightPx;
-                const r = max - min;
-                return Math.min(min + (d[3] * r), max);
+                const width = d[3];
+                /* tslint:disable */
+                if (typeof width === "undefined" || width === null) {
+                /* tslint:enable */
+                    return DEFAULT_EDGE_SIZE;
+                }
+                // Make sure > 0
+                return width > 0 ? width : 0;
             })
             .attr("id", function(d: any) {
                 return d[0].name.replace(/\./g, "_").replace(/@/g, "_") + "_" +
@@ -321,7 +322,16 @@ export class NetworkNavigator {
             .attr("class", "node");
 
         node.append("svg:circle")
-            .attr("r", (d: any) => Math.log(((d.num || 1) * 100)))
+            .attr("r", (d: any) => {
+                const width = d.value;
+                /* tslint:disable */
+                if (typeof width === "undefined" || width === null) {
+                /* tslint:enable */
+                    return DEFAULT_NODE_SIZE;
+                }
+                // Make sure > 0
+                return width > 0 ? width : 0;
+            })
             .style("fill", (d: any) => d.color)
             .style("stroke", "red")
             .style("stroke-width", (d: any) => d.selected ? 1 : 0)
@@ -483,7 +493,7 @@ export interface INetworkNavigatorNode {
     /**
      * The size of the node
      */
-    num?: number;
+    value?: number;
 
     /**
      * Whether or not the given node is selected
@@ -541,14 +551,4 @@ export interface INetworkNavigatorConfiguration {
     maxZoom?: number;
     defaultLabelColor?: string;
     caseInsensitive?: boolean;
-
-    /**
-     * The maximum size (in pixels) of an edge
-     */
-    maxEdgeWeightPx?: number;
-
-    /**
-     * The minimum size (in pixels) of an edge
-     */
-    minEdgeWeightPx?: number;
 }

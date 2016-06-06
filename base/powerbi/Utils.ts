@@ -214,6 +214,17 @@ function hasDataViewChanged(dv1: powerbi.DataView, dv2: powerbi.DataView) {
         cols1.length !== cols2.length) {
         return true;
     }
+    cols1 = cols1.sort((a, b) => a.queryName.localeCompare(b.queryName));
+    cols2 = cols2.sort((a, b) => a.queryName.localeCompare(b.queryName));
+
+    for (let i = 0; i < cols1.length; i++) {
+        // The underlying column has changed, or if the roles have changed
+        if (cols1[i].queryName !== cols2[i].queryName ||
+            !_.isEqual(cols1[i].roles, cols2[i].roles)) {
+            return true;
+        }
+    }
+
     for (let i = 0; i < cats1.length; i++) {
         if (hasCategoryChanged(cats1[i], cats2[i])) {
             return true;

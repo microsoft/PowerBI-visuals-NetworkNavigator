@@ -42,6 +42,10 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         edgeValue: {
             displayName: "Edge Weight",
             name: "EDGE_VALUE",
+        },
+        sourceNodeWeight: {
+            displayName: "Source Node Weight",
+            name: "SOURCE_NODE_WEIGHT",
         }/*,
         sourceGroup: {
             displayName: "Source Node Group",
@@ -59,6 +63,10 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             displayName: "Target Node Group",
             name: "TARGET_GROUP"
         }*/,
+        targetNodeWeight: {
+            displayName: "Target Node Weight",
+            name: "TARGET_NODE_WEIGHT",
+        },
         targetColor: {
             displayName: "Target Node Color",
             name: "TARGET_NODE_COLOR",
@@ -157,16 +165,6 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                         displayName: "Max Zoom",
                         type: { numeric: true },
                     },
-                    minEdgeWeightPx: {
-                        displayName: "Min Edge Weight(px)",
-                        description: "The minimum size of edges in pixels",
-                        type: { numeric: true },
-                    },
-                    maxEdgeWeightPx: {
-                        displayName: "Max Edge Weight(px)",
-                        description: "The maximum size of edges in pixels",
-                        type: { numeric: true },
-                    },
                 },
             },
         },
@@ -186,8 +184,6 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             labels: false,
             minZoom: .1,
             maxZoom: 100,
-            minEdgeWeightPx: .5,
-            maxEdgeWeightPx: 5,
             defaultLabelColor: colors[0],
         },
     };
@@ -296,6 +292,8 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         let targetLabelColorIdx = colMap[roles.targetLabelColor.name];
         let targetIdx = colMap[roles.target.name];
         const edgeValueIdx = colMap[roles.edgeValue.name];
+        const sourceNodeWeightIdx = colMap[roles.sourceNodeWeight.name];
+        const targetNodeWeightIdx = colMap[roles.targetNodeWeight.name];
 
         let sourceField = dataView.categorical.categories[0].identityFields[sourceIdx];
         let targetField = dataView.categorical.categories[0].identityFields[targetIdx];
@@ -304,6 +302,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             id: string,
             identity: powerbi.DataViewScopeIdentity,
             isSource: boolean,
+            nodeWeight: number,
             color: string = "gray",
             labelColor: string,
             group: number = 0): NetworkNavigatorSelectableNode {
@@ -318,7 +317,8 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                     labelColor: labelColor,
                     index: nodeList.length,
                     filterExpr: expr,
-                    num: 1,
+                    value: nodeWeight,
+                    neighbors: 1,
                     selected: false,
                     identity: SelectionId.createWithId(powerbi.data.createDataViewScopeIdentity(expr)),
                 };
@@ -335,13 +335,25 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                 let targetId = row[targetIdx] + "";
                 let edge = {
                     source:
-                        getNode(sourceId, identity, true, row[sourceColorIdx], row[sourceLabelColorIdx]/*, row[sourceGroup]*/).index,
+                        getNode(sourceId,
+                                identity,
+                                true,
+                                row[sourceNodeWeightIdx],
+                                row[sourceColorIdx],
+                                row[sourceLabelColorIdx]/*,
+                                row[sourceGroup]*/).index,
                     target:
-                        getNode(targetId, identity, false, row[targetColorIdx], row[targetLabelColorIdx]/*, row[targetGroupIdx]*/).index,
-                    value: row[edgeValueIdx] || 0
+                        getNode(targetId,
+                                identity,
+                                false,
+                                row[targetNodeWeightIdx],
+                                row[targetColorIdx],
+                                row[targetLabelColorIdx]/*, 
+                                row[targetGroupIdx]*/).index,
+                    value: row[edgeValueIdx],
                 };
-                nodeList[edge.source].num += 1;
-                nodeList[edge.target].num += 1;
+                nodeList[edge.source].neighbors += 1;
+                nodeList[edge.target].neighbors += 1;
                 linkList.push(edge);
             }
         });
@@ -514,8 +526,6 @@ export interface NetworkNavigatorVisualSettings {
         labels?: boolean;
         minZoom?: number;
         maxZoom?: number;
-        maxEdgeWeightPx?: number;
-        minEdgeWeightPx?: number;
         defaultLabelColor?: string;
     };
 };
@@ -531,9 +541,9 @@ export interface NetworkNavigatorSelectableNode extends powerbi.visuals.Selectab
     index: number;
 
     /**
-     * Represents the number of edges that this node is connected to
+     * The number of neighbor nodes to this node
      */
-    num: number;
+    neighbors: number;
 
     /**
      * The expression that will exactly match this row
