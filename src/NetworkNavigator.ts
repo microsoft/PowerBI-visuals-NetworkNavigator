@@ -178,7 +178,7 @@ export class NetworkNavigator {
 
             if (newConfig.labels !== this._configuration.labels) {
                 this.vis.selectAll(".node text")
-                    .style("opacity", newConfig.labels ? 100 : 0);
+                    .style("display", newConfig.labels ? null : "none");
             }
 
             if (newConfig.caseInsensitive !== this._configuration.caseInsensitive) {
@@ -340,17 +340,16 @@ export class NetworkNavigator {
             })
             .style("fill", (d: any) => d.color)
             .style("stroke", "red")
-            .style("stroke-width", (d: any) => d.selected ? 1 : 0)
-            .style("opacity", 1);
+            .style("stroke-width", (d: any) => d.selected ? 1 : 0);
 
         node.on("click", (n: INetworkNavigatorNode) => this.onNodeClicked(n));
 
         node.on("mouseover", () => {
-            d3.select(this.svgContainer.find("svg text")[0]).style("opacity", "100");
+            d3.select(this.svgContainer.find("svg text")[0]).style("display", null);
         });
         node.on("mouseout", () => {
             if (!this._configuration.labels) {
-                d3.select(this.svgContainer.find("svg text")[0]).style("opacity", "0");
+                d3.select(this.svgContainer.find("svg text")[0]).style("display", "none");
             }
         });
 
@@ -361,10 +360,7 @@ export class NetworkNavigator {
             .attr("font-size", "5pt")
             .attr("stroke-width", "0.5px")
             .attr("class", "linklabel")
-            .attr("text-anchor", "middle")
-            .style("opacity", function() {
-                return 100;
-            });
+            .attr("text-anchor", "middle");
 
         node.append("svg:text")
             .attr("class", "node-label")
@@ -373,7 +369,7 @@ export class NetworkNavigator {
             .attr("stroke", (d: any) => d.labelColor || this.configuration.defaultLabelColor)
             .attr("font-size", "5pt")
             .attr("stroke-width", "0.5px")
-            .style("opacity", this._configuration.labels ? 100 : 0);
+            .style("display", this._configuration.labels ? null : "none");
 
         // If we are not animating, then play the force quickly
         if (!this.configuration.animate) {
