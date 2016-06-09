@@ -2,6 +2,21 @@ import EventEmitter from "../base/EventEmitter";
 import * as $ from "jquery";
 
 /**
+ * The min value of charge
+ */
+const CHARGE_MIN = -100000;
+
+/**
+ * The max value of charge
+ */
+const CHARGE_MAX = 10;
+
+/**
+ * The default value of charge
+ */
+const DEFAULT_CHARGE = -120;
+
+/**
  * The default node size in px
  */
 const DEFAULT_NODE_SIZE = 10;
@@ -156,7 +171,7 @@ export class NetworkNavigator {
 
             runStart = runStart || updateForceConfig("linkDistance", 10, 1, 30);
             runStart = runStart || updateForceConfig("linkStrength", 2, 20, 1);
-            runStart = runStart || updateForceConfig("charge", -120, -10, -200);
+            runStart = runStart || updateForceConfig("charge", DEFAULT_CHARGE, CHARGE_MAX, CHARGE_MIN);
             runStart = runStart || updateForceConfig("gravity", .1, 10, .1);
 
             if (newConfig.minZoom !== this._configuration.minZoom ||
