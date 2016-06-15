@@ -1,6 +1,4 @@
-/// <reference path="./references.d.ts"/>
-import { VisualBase } from "../base/powerbi/VisualBase";
-import { Visual } from "../base/powerbi/Utils";
+import { VisualBase, Visual } from "essex.powerbi.base";
 import { DocumentViewer, IDocumentViewerDocument } from "./DocumentViewer";
 
 import IVisual = powerbi.IVisual;
