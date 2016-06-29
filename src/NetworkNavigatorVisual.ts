@@ -1,12 +1,10 @@
-/// <reference path="../base/powerbi/references.d.ts"/>
 import {
     NetworkNavigator as NetworkNavigatorImpl,
     INetworkNavigatorData,
     INetworkNavigatorLink,
     INetworkNavigatorNode,
 } from "./NetworkNavigator";
-import { VisualBase } from "../base/powerbi/VisualBase";
-import { Visual, default as Utils, UpdateType } from "../base/powerbi/Utils";
+import { VisualBase, Visual, updateTypeGetter, UpdateType } from "essex.powerbi.base";
 import IVisual = powerbi.IVisual;
 import IVisualHostServices = powerbi.IVisualHostServices;
 import VisualCapabilities = powerbi.VisualCapabilities;
@@ -20,7 +18,7 @@ import DataView = powerbi.DataView;
 import SelectionId = powerbi.visuals.SelectionId;
 import utility = powerbi.visuals.utility;
 /* tslint:disable */
-const colors = require("../base/powerbi/colors");
+const colors = require("essex.powerbi.base/src/colors");
 /* tslint:enable */
 declare var _: any;
 
@@ -211,7 +209,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     /**
      * Getter for the update type
      */
-    private updateType = Utils.updateTypeGetter(this);
+    private updateType = updateTypeGetter(this);
 
     /**
      * Gets called when a node is selected
