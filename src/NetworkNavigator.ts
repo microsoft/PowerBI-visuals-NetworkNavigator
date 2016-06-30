@@ -70,10 +70,7 @@ export class NetworkNavigator {
                     </li>
                     <li class="clear-selection" title="Clear filter and selection">
                         <a>
-                            <span class="fa-stack">
-                                <i class="fa fa-check fa-stack-1x"></i>
-                                <i class="fa fa-ban fa-stack-2x"></i>
-                            </span>
+                            <span class="clear-selection-button"></span>
                         </a>
                     </li>
                 </ul>
@@ -259,14 +256,21 @@ export class NetworkNavigator {
             .on("dragstart", function(d: any) {
                 (<any>d3.event).sourceEvent.stopPropagation();
                 d3.select(this).classed("dragging", true);
-                me.force.start();
+                me.force.stop();
             })
             .on("drag", function(d: any) {
                 let evt = <any>d3.event;
-                d3.select(this).attr("cx", d.x = evt.x).attr("cy", d.y = evt.y);
+                d.px = d.x = evt.x;
+                d.py = d.y = evt.y;
+                tick();
             })
             .on("dragend", function(d: any) {
                 d3.select(this).classed("dragging", false);
+
+                // If we have animation on, then start that beast
+                if (me.configuration.animate) {
+                    me.force.resume();
+                }
             });
 
         this.svg.remove();
@@ -391,7 +395,7 @@ export class NetworkNavigator {
             this.reflow(link, node);
         }
 
-        this.force.on("tick", () => {
+        const tick = () => {
             if (this.configuration.animate) {
                 link.attr("x1", (d: any) => d[0].x)
                     .attr("y1", (d: any) => d[0].y)
@@ -399,7 +403,9 @@ export class NetworkNavigator {
                     .attr("y2", (d: any) => d[2].y);
                 node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
             }
-        });
+        };
+
+        this.force.on("tick", tick);
     }
 
     /**
