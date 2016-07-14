@@ -92,6 +92,10 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                 return a;
             }, {}), ],
         }, ],
+        // sort this crap by default
+        sorting: {
+            default: {}
+        },
         objects: {
             general: {
                 displayName: powerbi.data.createDisplayNameGetter("Visual_General"),
