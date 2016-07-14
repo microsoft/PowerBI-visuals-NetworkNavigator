@@ -2,10 +2,36 @@ import EventEmitter from "../base/EventEmitter";
 import * as $ from "jquery";
 
 /**
+ * The min value of charge
+ */
+const CHARGE_MIN = -100000;
+
+/**
+ * The max value of charge
+ */
+const CHARGE_MAX = 10;
+
+/**
+ * The default value of charge
+ */
+const DEFAULT_CHARGE = -120;
+
+/**
+ * The default node size in px
+ */
+const DEFAULT_NODE_SIZE = 10;
+
+/**
+ * The default size of edges in px
+ */
+const DEFAULT_EDGE_SIZE = 1;
+
+/**
  * Class which represents the force graph
  */
 /* @Mixin(EventEmitter) */
 export class NetworkNavigator {
+
     /**
      * The event emitter for this graph
      */
@@ -44,10 +70,7 @@ export class NetworkNavigator {
                     </li>
                     <li class="clear-selection" title="Clear filter and selection">
                         <a>
-                            <span class="fa-stack">
-                                <i class="fa fa-check fa-stack-1x"></i>
-                                <i class="fa fa-ban fa-stack-2x"></i>
-                            </span>
+                            <span class="clear-selection-button"></span>
                         </a>
                     </li>
                 </ul>
@@ -145,7 +168,7 @@ export class NetworkNavigator {
 
             runStart = runStart || updateForceConfig("linkDistance", 10, 1, 30);
             runStart = runStart || updateForceConfig("linkStrength", 2, 20, 1);
-            runStart = runStart || updateForceConfig("charge", -120, -10, -200);
+            runStart = runStart || updateForceConfig("charge", DEFAULT_CHARGE, CHARGE_MAX, CHARGE_MIN);
             runStart = runStart || updateForceConfig("gravity", .1, 10, .1);
 
             if (newConfig.minZoom !== this._configuration.minZoom ||
@@ -153,15 +176,21 @@ export class NetworkNavigator {
                 this.zoom.scaleExtent([newConfig.minZoom, newConfig.maxZoom]);
             }
 
-            if (runStart && this.configuration.animate) {
-                this.force.start();
-            } else if (!this.configuration.animate) {
+            if (newConfig.animate) {
+                // If we are rerunning start or if we weren't animated, but now we are, then start the force
+                if (runStart || !this.configuration.animate) {
+                    this.force.start();
+                }
+            } else {
                 this.force.stop();
+                if (runStart) {
+                    this.reflow(this.vis.selectAll(".link"), this.vis.selectAll(".node"));
+                }
             }
 
             if (newConfig.labels !== this._configuration.labels) {
                 this.vis.selectAll(".node text")
-                    .style("opacity", newConfig.labels ? 100 : 0);
+                    .style("display", newConfig.labels ? null : "none");
             }
 
             if (newConfig.caseInsensitive !== this._configuration.caseInsensitive) {
@@ -227,14 +256,21 @@ export class NetworkNavigator {
             .on("dragstart", function(d: any) {
                 (<any>d3.event).sourceEvent.stopPropagation();
                 d3.select(this).classed("dragging", true);
-                me.force.start();
+                me.force.stop();
             })
             .on("drag", function(d: any) {
                 let evt = <any>d3.event;
-                d3.select(this).attr("cx", d.x = evt.x).attr("cy", d.y = evt.y);
+                d.px = d.x = evt.x;
+                d.py = d.y = evt.y;
+                tick();
             })
             .on("dragend", function(d: any) {
                 d3.select(this).classed("dragging", false);
+
+                // If we have animation on, then start that beast
+                if (me.configuration.animate) {
+                    me.force.resume();
+                }
             });
 
         this.svg.remove();
@@ -289,9 +325,15 @@ export class NetworkNavigator {
             .enter().append("line")
             .attr("class", "link")
             .style("stroke", "gray")
-            .style("stroke-width", function(d: any) {
-                let w = 0.15 + (d[3] / 500);
-                return (w > 3) ? 3 : w;
+            .style("stroke-width", (d: any) => {
+                const width = d[3];
+                /* tslint:disable */
+                if (typeof width === "undefined" || width === null) {
+                /* tslint:enable */
+                    return DEFAULT_EDGE_SIZE;
+                }
+                // Make sure > 0
+                return width > 0 ? width : 0;
             })
             .attr("id", function(d: any) {
                 return d[0].name.replace(/\./g, "_").replace(/@/g, "_") + "_" +
@@ -305,20 +347,28 @@ export class NetworkNavigator {
             .attr("class", "node");
 
         node.append("svg:circle")
-            .attr("r", (d: any) => Math.log(((d.num || 1) * 100)))
+            .attr("r", (d: any) => {
+                const width = d.value;
+                /* tslint:disable */
+                if (typeof width === "undefined" || width === null) {
+                /* tslint:enable */
+                    return DEFAULT_NODE_SIZE;
+                }
+                // Make sure > 0
+                return width > 0 ? width : 0;
+            })
             .style("fill", (d: any) => d.color)
             .style("stroke", "red")
-            .style("stroke-width", (d: any) => d.selected ? 1 : 0)
-            .style("opacity", 1);
+            .style("stroke-width", (d: any) => d.selected ? 1 : 0);
 
         node.on("click", (n: INetworkNavigatorNode) => this.onNodeClicked(n));
 
         node.on("mouseover", () => {
-            d3.select(this.svgContainer.find("svg text")[0]).style("opacity", "100");
+            d3.select(this.svgContainer.find("svg text")[0]).style("display", null);
         });
         node.on("mouseout", () => {
             if (!this._configuration.labels) {
-                d3.select(this.svgContainer.find("svg text")[0]).style("opacity", "0");
+                d3.select(this.svgContainer.find("svg text")[0]).style("display", "none");
             }
         });
 
@@ -329,10 +379,7 @@ export class NetworkNavigator {
             .attr("font-size", "5pt")
             .attr("stroke-width", "0.5px")
             .attr("class", "linklabel")
-            .attr("text-anchor", "middle")
-            .style("opacity", function() {
-                return 100;
-            });
+            .attr("text-anchor", "middle");
 
         node.append("svg:text")
             .attr("class", "node-label")
@@ -341,27 +388,14 @@ export class NetworkNavigator {
             .attr("stroke", (d: any) => d.labelColor || this.configuration.defaultLabelColor)
             .attr("font-size", "5pt")
             .attr("stroke-width", "0.5px")
-            .style("opacity", this._configuration.labels ? 100 : 0);
+            .style("display", this._configuration.labels ? null : "none");
 
         // If we are not animating, then play the force quickly
         if (!this.configuration.animate) {
-            let k = 0;
-            this.force.start();
-            // Alpha measures the amount of movement
-            while ((this.force.alpha() > 1e-2) && (k < 150)) {
-                this.force.tick();
-                k = k + 1;
-            }
-            this.force.stop();
-
-            link.attr("x1", (d: any) => d[0].x)
-                .attr("y1", (d: any) => d[0].y)
-                .attr("x2", (d: any) => d[2].x)
-                .attr("y2", (d: any) => d[2].y);
-            node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
+            this.reflow(link, node);
         }
 
-        this.force.on("tick", () => {
+        const tick = () => {
             if (this.configuration.animate) {
                 link.attr("x1", (d: any) => d[0].x)
                     .attr("y1", (d: any) => d[0].y)
@@ -369,7 +403,9 @@ export class NetworkNavigator {
                     .attr("y2", (d: any) => d[2].y);
                 node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
             }
-        });
+        };
+
+        this.force.on("tick", tick);
     }
 
     /**
@@ -423,6 +459,26 @@ export class NetworkNavigator {
     }
 
     /**
+     * Reflows the given links and nodes
+     */
+    private reflow(link: d3.Selection<any>, node: d3.Selection<any>) {
+        let k = 0;
+        this.force.start();
+        // Alpha measures the amount of movement
+        while ((this.force.alpha() > 1e-2) && (k < 150)) {
+            this.force.tick();
+            k = k + 1;
+        }
+        this.force.stop();
+
+        link.attr("x1", (d: any) => d[0].x)
+            .attr("y1", (d: any) => d[0].y)
+            .attr("x2", (d: any) => d[2].x)
+            .attr("y2", (d: any) => d[2].y);
+        node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
+    }
+
+    /**
      * Updates the selection based on the given node
      */
     private updateSelection(n? : INetworkNavigatorNode) {
@@ -467,7 +523,7 @@ export interface INetworkNavigatorNode {
     /**
      * The size of the node
      */
-    num?: number;
+    value?: number;
 
     /**
      * Whether or not the given node is selected

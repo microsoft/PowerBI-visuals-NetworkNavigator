@@ -92,23 +92,14 @@ html, body {
   height: 100%;
   box-sizing: border-box;
   vertical-align: middle;
-
-  .fa-stack {
-      font-size: .5em;
-      margin: .5em;
-    //   margin-top: -.25em;
-      
-      .fa-check {
-          line-height: 2em;
-      }
-  }
 }
 
-.add-column,.add-stacked-column {
-    .fa-plus-circle {
-        margin: .5em;
-        color: green;
-    }
+.clear-selection-button {
+   margin: .5em;
+}
+
+.clear-selection-button:before {
+  content: "\20E0"
 }
 
 .button-bar a:hover {

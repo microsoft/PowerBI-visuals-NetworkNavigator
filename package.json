@@ -1,6 +1,6 @@
 {
   "name": "essex.widget.networknavigator",
-  "version": "0.9.7",
+  "version": "0.10.0",
   "description": "",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
@@ -28,6 +28,7 @@
   "dependencies": {
     "d3": "3.5.12",
     "dompurify": "^0.7.4",
+    "essex.powerbi.base": "~0.1.0",
     "jquery": "^2.2.0",
     "lodash": "4.0.0",
     "moment": "^2.12.0",
