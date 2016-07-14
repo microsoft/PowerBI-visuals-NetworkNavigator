@@ -271,7 +271,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         let table = dataView.table;
 
         let colMap = {};
-        dataView.metadata.columns.forEach((c, i) => {
+        table.columns.forEach((c, i) => {
             Object.keys(c.roles).forEach(role => {
                 colMap[role] = i;
             });
