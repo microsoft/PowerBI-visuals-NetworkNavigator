@@ -109,6 +109,10 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                             },
                         },
                     },
+                    textSize: {
+                        displayName: powerbi.data.createDisplayNameGetter("Visual_TextSize"),
+                        type: { numeric: true },
+                    },
                 },
             },
             search: {
@@ -187,6 +191,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             minZoom: .1,
             maxZoom: 100,
             defaultLabelColor: colors[0],
+            fontSizePT: 8
         },
     };
 
@@ -444,6 +449,9 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             properties: {},
         }, ];
         $.extend(true, instances[0].properties, this.settings[options.objectName]);
+        if (options.objectName === "general") {
+            instances[0].properties["textSize"] = this.myNetworkNavigator.configuration.fontSizePT;
+        }
         return instances;
     }
 
@@ -461,16 +469,16 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         // There are some changes to the options
         let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
         if (dataView && dataView.metadata) {
-            let oldSettings = $.extend(true, {}, this.settings);
-            let newObjects = dataView.metadata.objects;
+            const oldSettings = $.extend(true, {}, this.settings);
+            const newObjects = dataView.metadata.objects;
+            const layoutObjs = newObjects && newObjects["layout"];
+            const generalObjs = newObjects && newObjects["general"];
 
             // Merge in the settings
             $.extend(true, this.settings, NetworkNavigator.DEFAULT_SETTINGS, newObjects ? newObjects : {}, {
                 layout: {
-                    defaultLabelColor: newObjects &&
-                        newObjects["layout"] &&
-                        newObjects["layout"]["defaultLabelColor"] &&
-                        newObjects["layout"]["defaultLabelColor"].solid.color,
+                    fontSizePT: generalObjs && generalObjs["textSize"],
+                    defaultLabelColor: layoutObjs && layoutObjs["defaultLabelColor"] && layoutObjs["defaultLabelColor"].solid.color,
                 },
             });
 
@@ -529,6 +537,7 @@ export interface NetworkNavigatorVisualSettings {
         minZoom?: number;
         maxZoom?: number;
         defaultLabelColor?: string;
+        fontSizePT?: number;
     };
 };
 

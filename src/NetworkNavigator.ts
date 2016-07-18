@@ -56,6 +56,7 @@ export class NetworkNavigator {
         maxZoom: 100,
         caseInsensitive: true,
         defaultLabelColor: "blue",
+        fontSizePT: 8,
     };
 
     /**
@@ -195,6 +196,12 @@ export class NetworkNavigator {
 
             if (newConfig.caseInsensitive !== this._configuration.caseInsensitive) {
                 this.filterNodes(this.element.find(".search-filter-box").val());
+            }
+
+            if (newConfig.fontSizePT !== this._configuration.fontSizePT) {
+                newConfig.fontSizePT = newConfig.fontSizePT || 8;
+                this.vis.selectAll(".node text")
+                    .attr("font-size", () => `${newConfig.fontSizePT}pt`);
             }
         }
 
@@ -376,7 +383,7 @@ export class NetworkNavigator {
             .text((d: any) => "yes")
             .attr("fill", "black")
             .attr("stroke", "black")
-            .attr("font-size", "5pt")
+            .attr("font-size", () => `${this.configuration.fontSizePT}pt`)
             .attr("stroke-width", "0.5px")
             .attr("class", "linklabel")
             .attr("text-anchor", "middle");
@@ -386,7 +393,7 @@ export class NetworkNavigator {
             .text(function(d: any) { return d.name; })
             .attr("fill", (d: any) => d.labelColor || this.configuration.defaultLabelColor)
             .attr("stroke", (d: any) => d.labelColor || this.configuration.defaultLabelColor)
-            .attr("font-size", "5pt")
+            .attr("font-size", () => `${this.configuration.fontSizePT}pt`)
             .attr("stroke-width", "0.5px")
             .style("display", this._configuration.labels ? null : "none");
 
@@ -581,4 +588,9 @@ export interface INetworkNavigatorConfiguration {
     maxZoom?: number;
     defaultLabelColor?: string;
     caseInsensitive?: boolean;
+
+    /**
+     * The font size to use in PT
+     */
+    fontSizePT?: number;
 }
