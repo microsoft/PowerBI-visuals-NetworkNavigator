@@ -1,20 +1,14 @@
 import EventEmitter from "../base/EventEmitter";
 import * as $ from "jquery";
 
-/**
- * The min value of charge
- */
-const CHARGE_MIN = -100000;
-
-/**
- * The max value of charge
- */
-const CHARGE_MAX = 10;
-
-/**
- * The default value of charge
- */
-const DEFAULT_CHARGE = -120;
+export const CONSTANTS = {
+    charge: { min: -100000, max: 10, default: -120 },
+    linkDistance: { min: 1, max: 30, default: 10 },
+    linkStrength: { min: 1, max: 20, default: 2 },
+    gravity: { min: .1, max: 10, default: .1 },
+    minZoom: { min: .0001, max: 100000, default: .1 },
+    maxZoom: { min: .0001, max: 100000, default: 100 },
+};
 
 /**
  * The default node size in px
@@ -167,10 +161,11 @@ export class NetworkNavigator {
                 }
             };
 
-            runStart = runStart || updateForceConfig("linkDistance", 10, 1, 30);
-            runStart = runStart || updateForceConfig("linkStrength", 2, 20, 1);
-            runStart = runStart || updateForceConfig("charge", DEFAULT_CHARGE, CHARGE_MAX, CHARGE_MIN);
-            runStart = runStart || updateForceConfig("gravity", .1, 10, .1);
+            const { charge, linkDistance, linkStrength, gravity } = CONSTANTS;
+            runStart = runStart || updateForceConfig("linkDistance", linkDistance.default, linkDistance.max, linkDistance.min);
+            runStart = runStart || updateForceConfig("linkStrength", linkStrength.default, linkStrength.max, linkStrength.min);
+            runStart = runStart || updateForceConfig("charge", charge.default, charge.max, charge.min);
+            runStart = runStart || updateForceConfig("gravity", gravity.default, gravity.max, gravity.min);
 
             if (newConfig.minZoom !== this._configuration.minZoom ||
                 newConfig.maxZoom !== this._configuration.maxZoom) {

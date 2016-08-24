@@ -1,5 +1,6 @@
 import {
     NetworkNavigator as NetworkNavigatorImpl,
+    CONSTANTS,
     INetworkNavigatorData,
     INetworkNavigatorLink,
     INetworkNavigatorNode,
@@ -479,7 +480,21 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             objectName: options.objectName,
             properties: {},
         }, ];
+
+        if (options.objectName === "layout") {
+            const { layout } = this.settings;
+            // autoClamp
+            Object.keys(layout).forEach((name: string) => {
+                if (CONSTANTS[name]) {
+                    const { min, max } = CONSTANTS[name];
+                    const value = layout[name];
+                    layout[name] = Math.min(max, Math.max(min, value));
+                }
+            });
+        }
+
         $.extend(true, instances[0].properties, this.settings[options.objectName]);
+
         if (options.objectName === "general") {
             instances[0].properties["textSize"] = this.myNetworkNavigator.configuration.fontSizePT;
         }
