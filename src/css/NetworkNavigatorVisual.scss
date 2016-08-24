@@ -1,6 +1,9 @@
 @import "../../node_modules/essex.powerbi.base/css/main";
+@import "../../node_modules/essex.powerbi.base/css/variables";
 @import "./Base";
 
-svg text {
-    @extend .regularFont;
+:local(.className) {
+    svg text {
+        @extend %regularFont;
+    }
 }

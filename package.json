@@ -13,7 +13,8 @@
     "karma:tdd": "karma start --tdd",
     "karma:once": "karma start",
     "test": "npm-run-all --sequential clean typings tsc --parallel lint karma:once",
-    "build": "npm-run-all --sequential typings tsc pbibundle",
+    "build": "npm-run-all --sequential typings tsc pbibundle", 
+    "bundle": "npm-run-all --sequential tsc pbibundle",
     "bump:patch": "gulp bump:patch",
     "bump:minor": "gulp bump:minor",
     "bump:major": "gulp bump:major",
@@ -28,7 +29,7 @@
   "dependencies": {
     "d3": "3.5.12",
     "dompurify": "^0.7.4",
-    "essex.powerbi.base": "~0.1.0",
+    "essex.powerbi.base": "~0.2.0",
     "jquery": "^2.2.0",
     "lodash": "4.0.0",
     "moment": "^2.12.0",
