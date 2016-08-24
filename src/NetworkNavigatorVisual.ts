@@ -307,73 +307,76 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         const sourceNodeWeightIdx = colMap[roles.sourceNodeWeight.name];
         const targetNodeWeightIdx = colMap[roles.targetNodeWeight.name];
 
-        let sourceField = dataView.categorical.categories[0].identityFields[sourceIdx];
-        let targetField = dataView.categorical.categories[0].identityFields[targetIdx];
+        let sourceField = table.identityFields[sourceIdx];
+        let targetField = table.identityFields[targetIdx];
 
-        function getNode(
-            id: string,
-            identity: powerbi.DataViewScopeIdentity,
-            isSource: boolean,
-            nodeWeight: number,
-            color: string = "gray",
-            labelColor: string,
-            group: number = 0): NetworkNavigatorSelectableNode {
-            const field = (isSource ? sourceField : targetField) as powerbi.data.SQExpr;
-            let node = nodeMap[id];
-            let expr = powerbi.data.SQExprBuilder.equal(field, powerbi.data.SQExprBuilder.text(id));
+        // Can't do nuffin' without source an target fields
+        if (sourceField && targetField) {
+            function getNode(
+                id: string,
+                identity: powerbi.DataViewScopeIdentity,
+                isSource: boolean,
+                nodeWeight: number,
+                color: string = "gray",
+                labelColor: string,
+                group: number = 0): NetworkNavigatorSelectableNode {
+                const field = (isSource ? sourceField : targetField);
+                let node = nodeMap[id];
+                let expr = powerbi.data.SQExprBuilder.equal(field as powerbi.data.SQExpr, powerbi.data.SQExprBuilder.text(id));
 
-            if (!nodeMap[id]) {
-                node = nodeMap[id] = {
-                    name: id,
-                    color: color || "gray",
-                    labelColor: labelColor,
-                    index: nodeList.length,
-                    filterExpr: expr,
-                    value: nodeWeight,
-                    neighbors: 1,
-                    selected: false,
-                    identity: SelectionId.createWithId(powerbi.data.createDataViewScopeIdentity(expr)),
-                };
-                nodeList.push(node);
+                if (!nodeMap[id]) {
+                    node = nodeMap[id] = {
+                        name: id,
+                        color: color || "gray",
+                        labelColor: labelColor,
+                        index: nodeList.length,
+                        filterExpr: expr,
+                        value: nodeWeight,
+                        neighbors: 1,
+                        selected: false,
+                        identity: SelectionId.createWithId(powerbi.data.createDataViewScopeIdentity(expr)),
+                    };
+                    nodeList.push(node);
+                }
+                return node;
             }
-            return node;
-        }
 
-        table.rows.forEach((row, idx) => {
-            let identity = table.identity[idx];
-            if (row[sourceIdx] && row[targetIdx]) {
-                /** These need to be strings to work properly */
-                let sourceId = row[sourceIdx] + "";
-                let targetId = row[targetIdx] + "";
-                let edge = {
-                    source:
-                        getNode(sourceId,
-                                identity,
-                                true,
-                                row[sourceNodeWeightIdx],
-                                row[sourceColorIdx],
-                                row[sourceLabelColorIdx]/*,
-                                row[sourceGroup]*/).index,
-                    target:
-                        getNode(targetId,
-                                identity,
-                                false,
-                                row[targetNodeWeightIdx],
-                                row[targetColorIdx],
-                                row[targetLabelColorIdx]/*, 
-                                row[targetGroupIdx]*/).index,
-                    value: row[edgeValueIdx],
-                };
-                nodeList[edge.source].neighbors += 1;
-                nodeList[edge.target].neighbors += 1;
-                linkList.push(edge);
+            table.rows.forEach((row, idx) => {
+                let identity = table.identity[idx];
+                if (row[sourceIdx] && row[targetIdx]) {
+                    /** These need to be strings to work properly */
+                    let sourceId = row[sourceIdx] + "";
+                    let targetId = row[targetIdx] + "";
+                    let edge = {
+                        source:
+                            getNode(sourceId,
+                                    identity,
+                                    true,
+                                    row[sourceNodeWeightIdx],
+                                    row[sourceColorIdx],
+                                    row[sourceLabelColorIdx]/*,
+                                    row[sourceGroup]*/).index,
+                        target:
+                            getNode(targetId,
+                                    identity,
+                                    false,
+                                    row[targetNodeWeightIdx],
+                                    row[targetColorIdx],
+                                    row[targetLabelColorIdx]/*, 
+                                    row[targetGroupIdx]*/).index,
+                        value: row[edgeValueIdx],
+                    };
+                    nodeList[edge.source].neighbors += 1;
+                    nodeList[edge.target].neighbors += 1;
+                    linkList.push(edge);
+                }
+            });
+
+            const maxNodes = settings.layout.maxNodeCount;
+            if (typeof maxNodes === "number" && maxNodes > 0) {
+                nodeList = nodeList.slice(0, maxNodes);
+                linkList = linkList.filter(n => n.source < maxNodes && n.target < maxNodes);
             }
-        });
-
-        const maxNodes = settings.layout.maxNodeCount;
-        if (typeof maxNodes === "number" && maxNodes > 0) {
-            nodeList = nodeList.slice(0, maxNodes);
-            linkList = linkList.filter(n => n.source < maxNodes && n.target < maxNodes);
         }
 
         return {
