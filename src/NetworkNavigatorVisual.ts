@@ -103,7 +103,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         },
         objects: {
             general: {
-                displayName: powerbi.data.createDisplayNameGetter("Visual_General"),
+                displayName: "General",
                 properties: {
                     filter: {
                         type: { filter: {} },
@@ -115,7 +115,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                         },
                     },
                     textSize: {
-                        displayName: powerbi.data.createDisplayNameGetter("Visual_TextSize"),
+                        displayName: "Text Size",
                         type: { numeric: true },
                     },
                 },
