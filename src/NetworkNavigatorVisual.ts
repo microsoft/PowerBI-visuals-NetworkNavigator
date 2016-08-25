@@ -404,9 +404,6 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     public init(options: VisualInitOptions): void {
         super.init(options, this.template);
 
-        // HAX: I am a strong, independent element and I don't need no framework tellin me how much focus I can have
-        this.element.on(EVENTS_TO_IGNORE, (e) => e.stopPropagation());
-
         const className = this.myCssModule && this.myCssModule.locals && this.myCssModule.locals.className;
         if (className) {
             this.element.addClass(className);
@@ -564,6 +561,9 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             }
             this.listener =
                 this.myNetworkNavigator.events.on("selectionChanged", (node: INetworkNavigatorNode) => this.onNodeSelected(node));
+
+            // HAX: I am a strong, independent element and I don't need no framework tellin me how much focus I can have
+            this.element.find(".filter-box input").on(EVENTS_TO_IGNORE, (e) => e.stopPropagation());
         }
     }
 }
