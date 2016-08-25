@@ -528,6 +528,9 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                 },
             });
 
+            // Remove the general section, added by the above statement
+            delete this.settings["general"];
+
             // There were some changes to the layout
             if (!_.isEqual(oldSettings, this.settings)) {
                 this.myNetworkNavigator.configuration = $.extend(true, {}, this.settings.search, this.settings.layout);
