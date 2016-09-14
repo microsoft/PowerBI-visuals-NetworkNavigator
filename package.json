@@ -7,7 +7,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "typings": "typings install",
-    "tsc": "! tsc | grep -v \"^node_modules.*\"",
+    "tsc": "(tsc > build.out) || (! cat build.out | grep -v \"^node_modules.*\" | grep -v \"^\\s.*\") || ! printf \"\\n\\033[0;31mCheck build.out for full error text\\n\"",
     "pbibundle": "gulp",
     "lint": "tslint 'src/**/*[!.d].{ts,tsx}'",
     "karma:tdd": "karma start --tdd",
@@ -29,7 +29,7 @@
   "dependencies": {
     "d3": "3.5.12",
     "dompurify": "^0.7.4",
-    "essex.powerbi.base": "~0.2.0",
+    "essex.powerbi.base": "~0.3.2",
     "jquery": "^2.2.0",
     "lodash": "4.0.0",
     "moment": "^2.12.0",

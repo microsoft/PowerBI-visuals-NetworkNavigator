@@ -20,6 +20,7 @@ import SelectionId = powerbi.visuals.SelectionId;
 import utility = powerbi.visuals.utility;
 /* tslint:disable */
 const colors = require("essex.powerbi.base/src/colors");
+const MY_CSS_MODULE = require("!css!sass!./css/NetworkNavigatorVisual.scss");
 
 // PBI Swallows these
 const EVENTS_TO_IGNORE = "mousedown mouseup click focus blur input pointerdown pointerup touchstart touchmove touchdown";
@@ -221,9 +222,6 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     //     <div class="load-container load5">
     //         <div class="loader">Loading...</div>
     //     </div>`;
-    private template: string = `
-        <div id="node_graph" style= "height: 100%;"> </div>
-    `;
 
     /**
      * Getter for the update type
@@ -395,14 +393,23 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
      */
     constructor(noCss = false) {
         super(noCss);
-        if (!noCss) {
-             this.myCssModule = require("!css!sass!./css/NetworkNavigatorVisual.scss");
+
+        const className = MY_CSS_MODULE && MY_CSS_MODULE.locals && MY_CSS_MODULE.locals.className;
+        if (className) {
+            this.element.addClass(className);
         }
+    }
+
+    /**
+     * Gets the template for this visual
+     */
+    public get template() {
+        return `<div id="node_graph" style= "height: 100%;"> </div>`;
     }
 
     /** This is called once when the visual is initialially created */
     public init(options: VisualInitOptions): void {
-        super.init(options, this.template);
+        super.init(options);
 
         const className = this.myCssModule && this.myCssModule.locals && this.myCssModule.locals.className;
         if (className) {
@@ -502,7 +509,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
      * Gets the inline css used for this element
      */
     protected getCss(): string[] {
-        return this.myCssModule ? super.getCss().concat([this.myCssModule + ""]) : [];
+        return (super.getCss() || []).concat([MY_CSS_MODULE]);
     }
 
     /**
