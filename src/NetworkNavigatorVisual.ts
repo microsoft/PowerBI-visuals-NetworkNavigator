@@ -207,11 +207,6 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     private listener: { destroy: Function; };
 
     /**
-     * My css module
-     */
-    private myCssModule: any;
-
-    /**
      * The selection manager
      */
     private selectionManager: utility.SelectionManager;
@@ -410,11 +405,6 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     /** This is called once when the visual is initialially created */
     public init(options: VisualInitOptions): void {
         super.init(options);
-
-        const className = this.myCssModule && this.myCssModule.locals && this.myCssModule.locals.className;
-        if (className) {
-            this.element.addClass(className);
-        }
 
         this.myNetworkNavigator = new NetworkNavigatorImpl(this.element.find("#node_graph"), 500, 500);
         this.host = options.host;
