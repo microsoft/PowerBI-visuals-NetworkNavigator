@@ -22,5 +22,12 @@
  * SOFTWARE.
  */
 
-@import "./variables";
-@import "./includes";
+@import "../../../node_modules/essex.powerbi.base/css/main";
+@import "../../../node_modules/essex.powerbi.base/css/variables";
+@import "../../css/Base";
+
+:local(.className) {
+    svg text {
+        @extend %regularFont;
+    }
+}

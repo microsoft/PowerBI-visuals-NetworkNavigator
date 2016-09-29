@@ -1,10 +1,31 @@
-import {
-    NetworkNavigator as NetworkNavigatorImpl,
-    CONSTANTS,
-    INetworkNavigatorData,
-    INetworkNavigatorLink,
-    INetworkNavigatorNode,
-} from "./NetworkNavigator";
+/*
+ * Copyright (c) Microsoft
+ * All rights reserved.
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+import { NetworkNavigator as NetworkNavigatorImpl } from "../NetworkNavigator";
+import { INetworkNavigatorData, INetworkNavigatorLink, INetworkNavigatorNode } from "../models";
+import * as CONSTANTS from "../constants";
+import { INetworkNavigatorSelectableNode, INetworkNavigatorVisualSettings } from "./models";
 import { VisualBase, Visual, updateTypeGetter, UpdateType } from "essex.powerbi.base";
 import IVisual = powerbi.IVisual;
 import IVisualHostServices = powerbi.IVisualHostServices;
@@ -18,188 +39,24 @@ import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInst
 import DataView = powerbi.DataView;
 import SelectionId = powerbi.visuals.SelectionId;
 import utility = powerbi.visuals.utility;
+
 /* tslint:disable */
-const colors = require("essex.powerbi.base/src/colors");
 const MY_CSS_MODULE = require("!css!sass!./css/NetworkNavigatorVisual.scss");
 
 // PBI Swallows these
 const EVENTS_TO_IGNORE = "mousedown mouseup click focus blur input pointerdown pointerup touchstart touchmove touchdown";
 
+import { DATA_ROLES } from "./constants";
+import { DEFAULT_SETTINGS } from "./defaults";
+import capabilities from "./capabilities";
+
 /* tslint:enable */
 declare var _: any;
 
-@Visual(require("./build").output.PowerBI)
+@Visual(require("../build").output.PowerBI)
 export default class NetworkNavigator extends VisualBase implements IVisual {
 
-    /**
-     * A list of our data roles
-     */
-    public static DATA_ROLES = {
-        source: {
-            displayName: "Source Node",
-            name: "SOURCE_NODE",
-        },
-        target: {
-            displayName: "Target Node",
-            name: "TARGET_NODE",
-        },
-        edgeValue: {
-            displayName: "Edge Weight",
-            name: "EDGE_VALUE",
-        },
-        sourceNodeWeight: {
-            displayName: "Source Node Weight",
-            name: "SOURCE_NODE_WEIGHT",
-        }/*,
-        sourceGroup: {
-            displayName: "Source Node Group",
-            name: "SOURCE_GROUP"
-        }*/,
-        sourceColor: {
-            displayName: "Source Node Color",
-            name: "SOURCE_NODE_COLOR",
-        },
-        sourceLabelColor: {
-            displayName: "Source Node Label Color",
-            name: "SOURCE_LABEL_COLOR",
-        }/*,
-        targetGroup: {
-            displayName: "Target Node Group",
-            name: "TARGET_GROUP"
-        }*/,
-        targetNodeWeight: {
-            displayName: "Target Node Weight",
-            name: "TARGET_NODE_WEIGHT",
-        },
-        targetColor: {
-            displayName: "Target Node Color",
-            name: "TARGET_NODE_COLOR",
-        },
-        targetLabelColor: {
-            displayName: "Target Node Label Color",
-            name: "TARGET_LABEL_COLOR",
-        },
-    };
-
-    public static capabilities: VisualCapabilities = $.extend(true, {}, VisualBase.capabilities, {
-        dataRoles: Object.keys(NetworkNavigator.DATA_ROLES).map(n => ({
-            name: NetworkNavigator.DATA_ROLES[n].name,
-            displayName: NetworkNavigator.DATA_ROLES[n].displayName,
-            kind: powerbi.VisualDataRoleKind.GroupingOrMeasure,
-        })),
-        dataViewMappings: [{
-            table: {
-                rows: {
-                    select: Object.keys(NetworkNavigator.DATA_ROLES).map(n => ({ bind: { to: NetworkNavigator.DATA_ROLES[n].name }}))
-                },
-            },
-            conditions: [Object.keys(NetworkNavigator.DATA_ROLES).reduce((a, b) => {
-                a[NetworkNavigator.DATA_ROLES[b].name] = { min: 0, max: 1 };
-                return a;
-            }, {}), ],
-        }, ],
-        // sort this crap by default
-        sorting: {
-            default: {}
-        },
-        objects: {
-            general: {
-                displayName: "General",
-                properties: {
-                    filter: {
-                        type: { filter: {} },
-                        rule: {
-                            output: {
-                                property: "selected",
-                                selector: ["Values"],
-                            },
-                        },
-                    },
-                    textSize: {
-                        displayName: "Text Size",
-                        type: { numeric: true },
-                    },
-                },
-            },
-            search: {
-                displayName: "Search",
-                properties: {
-                    caseInsensitive: {
-                        displayName: "Case Insensitive",
-                        type: { bool: true },
-                    },
-                },
-            },
-            layout: {
-                displayName: "Layout",
-                properties: {
-                    animate: {
-                        displayName: "Animate",
-                        description: "Should the graph be animated",
-                        type: { bool: true },
-                    },
-                    maxNodeCount: {
-                        displayName: "Max nodes",
-                        description: "The maximum number of nodes to render",
-                        type: { numeric: true },
-                    },
-                    linkDistance: {
-                        displayName: "Link Distance",
-                        type: { numeric: true },
-                    },
-                    linkStrength: {
-                        displayName: "Link Strength",
-                        type: { numeric: true },
-                    },
-                    gravity: {
-                        displayName: "Gravity",
-                        type: { numeric: true },
-                    },
-                    charge: {
-                        displayName: "Charge",
-                        type: { numeric: true },
-                    },
-                    labels: {
-                        displayName: "Labels",
-                        description: "If labels on the nodes should be shown",
-                        type: { bool: true },
-                    },
-                    defaultLabelColor: {
-                        displayName: "Default Label Color",
-                        description: "The default color to use for labels",
-                        type: { fill: { solid: { color: true } } },
-                    },
-                    minZoom: {
-                        displayName: "Min Zoom",
-                        type: { numeric: true },
-                    },
-                    maxZoom: {
-                        displayName: "Max Zoom",
-                        type: { numeric: true },
-                    },
-                },
-            },
-        },
-    });
-
-    private static DEFAULT_SETTINGS: NetworkNavigatorVisualSettings = {
-        search: {
-            caseInsensitive: true
-        },
-        layout: {
-            animate: true,
-            maxNodeCount: 0,
-            linkDistance: 10,
-            linkStrength: 2,
-            gravity: .1,
-            charge: -120,
-            labels: false,
-            minZoom: .1,
-            maxZoom: 100,
-            defaultLabelColor: colors[0],
-            fontSizePT: 8
-        },
-    };
+    public static capabilities: VisualCapabilities = capabilities;
 
     private myNetworkNavigator: NetworkNavigatorImpl;
     private host: IVisualHostServices;
@@ -211,12 +68,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
      */
     private selectionManager: utility.SelectionManager;
 
-    private settings: NetworkNavigatorVisualSettings = $.extend(true, {}, NetworkNavigator.DEFAULT_SETTINGS);
-
-    // private template : string = `
-    //     <div class="load-container load5">
-    //         <div class="loader">Loading...</div>
-    //     </div>`;
+    private settings: INetworkNavigatorVisualSettings = $.extend(true, {}, DEFAULT_SETTINGS);
 
     /**
      * Getter for the update type
@@ -226,7 +78,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     /**
      * Gets called when a node is selected
      */
-    private onNodeSelected = _.debounce((node: NetworkNavigatorSelectableNode) => {
+    private onNodeSelected = _.debounce((node: INetworkNavigatorSelectableNode) => {
         /* tslint:disable */
         let filter: any = null;
         /* tslint:enable */
@@ -272,9 +124,9 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
      */
     public static converter(
         dataView: DataView,
-        settings: NetworkNavigatorVisualSettings): INetworkNavigatorData<NetworkNavigatorSelectableNode> {
-        let nodeList: NetworkNavigatorSelectableNode[] = [];
-        let nodeMap: { [name: string] : NetworkNavigatorSelectableNode } = {};
+        settings: INetworkNavigatorVisualSettings): INetworkNavigatorData<INetworkNavigatorSelectableNode> {
+        let nodeList: INetworkNavigatorSelectableNode[] = [];
+        let nodeMap: { [name: string] : INetworkNavigatorSelectableNode } = {};
         let linkList: INetworkNavigatorLink[] = [];
         let table = dataView.table;
 
@@ -292,7 +144,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         // target - array index into node
         // value - The number of times that the link has been made, ie, I emailed bob@gmail.com 10 times, so value would be 10
 
-        let roles = NetworkNavigator.DATA_ROLES;
+        let roles = DATA_ROLES;
         let sourceIdx = colMap[roles.source.name];
         let sourceColorIdx = colMap[roles.sourceColor.name];
         let sourceLabelColorIdx = colMap[roles.sourceLabelColor.name];
@@ -317,7 +169,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                 nodeWeight: number,
                 color: string = "gray",
                 labelColor: string,
-                group: number = 0): NetworkNavigatorSelectableNode {
+                group: number = 0): INetworkNavigatorSelectableNode {
                 const field = (isSource ? sourceField : targetField);
                 let node = nodeMap[id];
                 let expr = powerbi.data.SQExprBuilder.equal(field as powerbi.data.SQExpr, powerbi.data.SQExprBuilder.text(id));
@@ -448,7 +300,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             let updated = false;
             nodes.forEach((n) => {
                 let isSelected =
-                    !!_.find(selectedIds, (id: SelectionId) => id.equals((<NetworkNavigatorSelectableNode>n).identity));
+                    !!_.find(selectedIds, (id: SelectionId) => id.equals((<INetworkNavigatorSelectableNode>n).identity));
                 if (isSelected !== n.selected) {
                     n.selected = isSelected;
                     updated = true;
@@ -515,7 +367,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             const generalObjs = newObjects && newObjects["general"];
 
             // Merge in the settings
-            $.extend(true, this.settings, NetworkNavigator.DEFAULT_SETTINGS, newObjects ? newObjects : {}, {
+            $.extend(true, this.settings, DEFAULT_SETTINGS, newObjects ? newObjects : {}, {
                 layout: {
                     fontSizePT: generalObjs && generalObjs["textSize"],
                     defaultLabelColor: layoutObjs && layoutObjs["defaultLabelColor"] && layoutObjs["defaultLabelColor"].solid.color,
@@ -563,47 +415,4 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             this.element.find(".filter-box input").on(EVENTS_TO_IGNORE, (e) => e.stopPropagation());
         }
     }
-}
-
-/**
- * Represents the settings for this visual
- */
-export interface NetworkNavigatorVisualSettings {
-    search?: {
-        caseInsensitive?: boolean;
-    };
-    layout?: {
-        animate?: boolean;
-        maxNodeCount?: number;
-        linkDistance?: number;
-        linkStrength?: number;
-        gravity?: number;
-        charge?: number;
-        labels?: boolean;
-        minZoom?: number;
-        maxZoom?: number;
-        defaultLabelColor?: string;
-        fontSizePT?: number;
-    };
-};
-
-/**
- * The lineup data
- */
-export interface NetworkNavigatorSelectableNode extends powerbi.visuals.SelectableDataPoint, INetworkNavigatorNode {
-
-    /**
-     * The nodes index into the node list
-     */
-    index: number;
-
-    /**
-     * The number of neighbor nodes to this node
-     */
-    neighbors: number;
-
-    /**
-     * The expression that will exactly match this row
-     */
-    filterExpr: powerbi.data.SQExpr;
 }

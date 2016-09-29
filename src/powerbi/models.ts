@@ -22,5 +22,47 @@
  * SOFTWARE.
  */
 
-@import "./variables";
-@import "./includes";
+import { INetworkNavigatorNode } from "../models";
+
+/**
+ * Represents the settings for this visual
+ */
+export interface INetworkNavigatorVisualSettings {
+    search?: {
+        caseInsensitive?: boolean;
+    };
+    layout?: {
+        animate?: boolean;
+        maxNodeCount?: number;
+        linkDistance?: number;
+        linkStrength?: number;
+        gravity?: number;
+        charge?: number;
+        labels?: boolean;
+        minZoom?: number;
+        maxZoom?: number;
+        defaultLabelColor?: string;
+        fontSizePT?: number;
+    };
+};
+
+/**
+ * The lineup data
+ */
+export interface INetworkNavigatorSelectableNode extends powerbi.visuals.SelectableDataPoint, INetworkNavigatorNode {
+
+    /**
+     * The nodes index into the node list
+     */
+    index: number;
+
+    /**
+     * The number of neighbor nodes to this node
+     */
+    neighbors: number;
+
+    /**
+     * The expression that will exactly match this row
+     */
+    filterExpr: powerbi.data.SQExpr;
+}

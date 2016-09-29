@@ -1,14 +1,32 @@
+/*
+ * Copyright (c) Microsoft
+ * All rights reserved.
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 import EventEmitter from "../base/EventEmitter";
 import * as $ from "jquery";
-
-export const CONSTANTS = {
-    charge: { min: -100000, max: 10, default: -120 },
-    linkDistance: { min: 1, max: 30, default: 10 },
-    linkStrength: { min: 1, max: 20, default: 2 },
-    gravity: { min: .1, max: 10, default: .1 },
-    minZoom: { min: .0001, max: 100000, default: .1 },
-    maxZoom: { min: .0001, max: 100000, default: 100 },
-};
+import * as CONSTANTS from "./constants";
+import { INetworkNavigatorData, INetworkNavigatorNode, INetworkNavigatorConfiguration } from "./models";
+import template from "./templates/networkNavigator.tmpl";
 
 /**
  * The default node size in px
@@ -54,28 +72,6 @@ export class NetworkNavigator {
     };
 
     /**
-     * My template string
-     */
-    private template = `
-        <div class="graph-container">
-            <div class="button-bar">
-                <ul>
-                    <li class="filter-box" title="Filter Nodes">
-                        <input type="text" placeholder="Enter text filter" class="search-filter-box"/>
-                    </li>
-                    <li class="clear-selection" title="Clear filter and selection">
-                        <a>
-                            <span class="clear-selection-button"></span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="svg-container">
-            </div>
-        </div>
-    `.trim().replace(/[\r\n]/g, "");
-
-    /**
      * The svg container
      */
     private svgContainer: JQuery;
@@ -84,7 +80,7 @@ export class NetworkNavigator {
      * Constructor for the network navigator
      */
     constructor(element: JQuery, width = 500, height = 500) {
-        this.element = $(this.template);
+        this.element = $(template());
         element.append(this.element);
         this.svgContainer = this.element.find(".svg-container");
         const filterBox = this.element.find(".search-filter-box");
@@ -186,7 +182,9 @@ export class NetworkNavigator {
 
             if (newConfig.labels !== this._configuration.labels) {
                 this.vis.selectAll(".node text")
+                    /* tslint:disable */
                     .style("display", newConfig.labels ? null : "none");
+                    /* tslint:enable */
             }
 
             if (newConfig.caseInsensitive !== this._configuration.caseInsensitive) {
@@ -264,7 +262,9 @@ export class NetworkNavigator {
                 let evt = <any>d3.event;
                 d.px = d.x = evt.x;
                 d.py = d.y = evt.y;
+                /* tslint:disable */
                 tick();
+                /* tslint:enable */
             })
             .on("dragend", function(d: any) {
                 d3.select(this).classed("dragging", false);
@@ -366,7 +366,9 @@ export class NetworkNavigator {
         node.on("click", (n: INetworkNavigatorNode) => this.onNodeClicked(n));
 
         node.on("mouseover", () => {
+            /* tslint:disable */
             d3.select(this.svgContainer.find("svg text")[0]).style("display", null);
+            /* tslint:enable */
         });
         node.on("mouseout", () => {
             if (!this._configuration.labels) {
@@ -390,7 +392,9 @@ export class NetworkNavigator {
             .attr("stroke", (d: any) => d.labelColor || this.configuration.defaultLabelColor)
             .attr("font-size", () => `${this.configuration.fontSizePT}pt`)
             .attr("stroke-width", "0.5px")
+            /* tslint:disable */
             .style("display", this._configuration.labels ? null : "none");
+            /* tslint:enable */
 
         // If we are not animating, then play the force quickly
         if (!this.configuration.animate) {
@@ -501,91 +505,4 @@ export class NetworkNavigator {
         this.events.raiseEvent("selectionChanged", this._selectedNode);
         this.redrawSelection();
     }
-}
-
-/**
- * The node in a graph
- */
-export interface INetworkNavigatorNode {
-    /**
-     * The name of the node
-     */
-    name?: string;
-
-    /**
-     * The color of the node
-     */
-    color?: string;
-
-    /**
-     * The color of the label of the node
-     */
-    labelColor?: string;
-
-    /**
-     * The size of the node
-     */
-    value?: number;
-
-    /**
-     * Whether or not the given node is selected
-     */
-    selected: boolean;
-}
-
-/**
- * Represents a link in the network navigator
- */
-export interface INetworkNavigatorLink {
-    /**
-     * The source node, index into the nodes list
-     */
-    source?: number;
-
-    /**
-     * The target node, index into the nodes list
-     */
-    target?: number;
-
-    /**
-     * The value of the link, basically the weight of the edge
-     */
-    value?: number;
-}
-
-/**
- * The data for the network navigator
- */
-export interface INetworkNavigatorData<NodeType> {
-
-    /**
-     * The list of the nodes in the network navigator
-     */
-    nodes?: NodeType[];
-
-    /**
-     * The links in the network navigator
-     */
-    links?: INetworkNavigatorLink[];
-}
-
-/**
- * Represents the configuration for the network navigator
- */
-export interface INetworkNavigatorConfiguration {
-    animate?: boolean;
-    linkDistance?: number;
-    linkStrength?: number;
-    charge?: number;
-    gravity?: number;
-    labels?: boolean;
-    minZoom?: number;
-    maxZoom?: number;
-    defaultLabelColor?: string;
-    caseInsensitive?: boolean;
-
-    /**
-     * The font size to use in PT
-     */
-    fontSizePT?: number;
 }

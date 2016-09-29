@@ -22,5 +22,28 @@
  * SOFTWARE.
  */
 
-@import "./variables";
-@import "./includes";
+/* tslint:disable */
+const colors = require("essex.powerbi.base/src/colors"); 
+/* tslint:enable */
+
+/**
+ * The default settings for the network navigator visual
+ */
+export const DEFAULT_SETTINGS = {
+    search: {
+        caseInsensitive: true
+    },
+    layout: {
+        animate: true,
+        maxNodeCount: 0,
+        linkDistance: 10,
+        linkStrength: 2,
+        gravity: .1,
+        charge: -120,
+        labels: false,
+        minZoom: .1,
+        maxZoom: 100,
+        defaultLabelColor: colors[0],
+        fontSizePT: 8,
+    },
+};

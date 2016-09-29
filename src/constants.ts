@@ -22,5 +22,9 @@
  * SOFTWARE.
  */
 
-@import "./variables";
-@import "./includes";
+export const charge = { min: -100000, max: 10, default: -120 };
+export const linkDistance = { min: 1, max: 30, default: 10 };
+export const linkStrength = { min: 1, max: 20, default: 2 };
+export const gravity = { min: .1, max: 10, default: .1 };
+export const minZoom = { min: .0001, max: 100000, default: .1 };
+export const maxZoom = { min: .0001, max: 100000, default: 100 };
