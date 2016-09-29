@@ -23,10 +23,11 @@
  */
 
 import { NetworkNavigator as NetworkNavigatorImpl } from "../NetworkNavigator";
-import { INetworkNavigatorData, INetworkNavigatorLink, INetworkNavigatorNode } from "../models";
+import { INetworkNavigatorNode } from "../models";
 import * as CONSTANTS from "../constants";
 import { INetworkNavigatorSelectableNode, INetworkNavigatorVisualSettings } from "./models";
 import { VisualBase, Visual, updateTypeGetter, UpdateType } from "essex.powerbi.base";
+import converter from "./dataConversion";
 import IVisual = powerbi.IVisual;
 import IVisualHostServices = powerbi.IVisualHostServices;
 import VisualCapabilities = powerbi.VisualCapabilities;
@@ -36,7 +37,6 @@ import IInteractivityService = powerbi.visuals.IInteractivityService;
 import InteractivityService = powerbi.visuals.InteractivityService;
 import VisualObjectInstance = powerbi.VisualObjectInstance;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
-import DataView = powerbi.DataView;
 import SelectionId = powerbi.visuals.SelectionId;
 import utility = powerbi.visuals.utility;
 
@@ -56,18 +56,39 @@ declare var _: any;
 @Visual(require("../build").output.PowerBI)
 export default class NetworkNavigator extends VisualBase implements IVisual {
 
+    /**
+     * The capabilities of the Visual
+     */
     public static capabilities: VisualCapabilities = capabilities;
 
+    /**
+     * My network navigator instance
+     */
     private myNetworkNavigator: NetworkNavigatorImpl;
-    private host: IVisualHostServices;
-    private interactivityService: IInteractivityService;
-    private listener: { destroy: Function; };
 
     /**
-     * The selection manager
+     * The visual's host
+     */
+    private host: IVisualHostServices;
+
+    /**
+     * The interactivity service
+     */
+    private interactivityService: IInteractivityService;
+
+    /**
+     * The selection changed listener for NetworkNavigator
+     */
+    private selectionChangedListener: { destroy: Function; };
+
+    /**
+     * The selection manager, used to sync selection with PowerBI
      */
     private selectionManager: utility.SelectionManager;
 
+    /**
+     * The current set of settings synchronized with powerbi
+     */
     private settings: INetworkNavigatorVisualSettings = $.extend(true, {}, DEFAULT_SETTINGS);
 
     /**
@@ -76,7 +97,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     private updateType = updateTypeGetter(this);
 
     /**
-     * Gets called when a node is selected
+     * A debounced event listener for when a node is selected through NetworkNavigator
      */
     private onNodeSelected = _.debounce((node: INetworkNavigatorSelectableNode) => {
         /* tslint:disable */
@@ -120,127 +141,12 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     }, 100);
 
     /**
-     * Converts the data view into an internal data structure
-     */
-    public static converter(
-        dataView: DataView,
-        settings: INetworkNavigatorVisualSettings): INetworkNavigatorData<INetworkNavigatorSelectableNode> {
-        let nodeList: INetworkNavigatorSelectableNode[] = [];
-        let nodeMap: { [name: string] : INetworkNavigatorSelectableNode } = {};
-        let linkList: INetworkNavigatorLink[] = [];
-        let table = dataView.table;
-
-        let colMap = {};
-        table.columns.forEach((c, i) => {
-            Object.keys(c.roles).forEach(role => {
-                colMap[role] = i;
-            });
-        });
-
-        // group defines the bundle basically
-        // name, user friendly name,
-        // num, size of circle, probably meant to be the number of matches
-        // source - array index into nodes
-        // target - array index into node
-        // value - The number of times that the link has been made, ie, I emailed bob@gmail.com 10 times, so value would be 10
-
-        let roles = DATA_ROLES;
-        let sourceIdx = colMap[roles.source.name];
-        let sourceColorIdx = colMap[roles.sourceColor.name];
-        let sourceLabelColorIdx = colMap[roles.sourceLabelColor.name];
-        // let sourceGroup = colMap[roles.sourceGroup.name];
-        // let targetGroupIdx = colMap[roles.targetGroup.name];
-        let targetColorIdx = colMap[roles.targetColor.name];
-        let targetLabelColorIdx = colMap[roles.targetLabelColor.name];
-        let targetIdx = colMap[roles.target.name];
-        const edgeValueIdx = colMap[roles.edgeValue.name];
-        const sourceNodeWeightIdx = colMap[roles.sourceNodeWeight.name];
-        const targetNodeWeightIdx = colMap[roles.targetNodeWeight.name];
-
-        let sourceField = table.identityFields[sourceIdx];
-        let targetField = table.identityFields[targetIdx];
-
-        // Can't do nuffin' without source an target fields
-        if (sourceField && targetField) {
-            function getNode(
-                id: string,
-                identity: powerbi.DataViewScopeIdentity,
-                isSource: boolean,
-                nodeWeight: number,
-                color: string = "gray",
-                labelColor: string,
-                group: number = 0): INetworkNavigatorSelectableNode {
-                const field = (isSource ? sourceField : targetField);
-                let node = nodeMap[id];
-                let expr = powerbi.data.SQExprBuilder.equal(field as powerbi.data.SQExpr, powerbi.data.SQExprBuilder.text(id));
-
-                if (!nodeMap[id]) {
-                    node = nodeMap[id] = {
-                        name: id,
-                        color: color || "gray",
-                        labelColor: labelColor,
-                        index: nodeList.length,
-                        filterExpr: expr,
-                        value: nodeWeight,
-                        neighbors: 1,
-                        selected: false,
-                        identity: SelectionId.createWithId(powerbi.data.createDataViewScopeIdentity(expr)),
-                    };
-                    nodeList.push(node);
-                }
-                return node;
-            }
-
-            table.rows.forEach((row, idx) => {
-                let identity = table.identity[idx];
-                if (row[sourceIdx] && row[targetIdx]) {
-                    /** These need to be strings to work properly */
-                    let sourceId = row[sourceIdx] + "";
-                    let targetId = row[targetIdx] + "";
-                    let edge = {
-                        source:
-                            getNode(sourceId,
-                                    identity,
-                                    true,
-                                    row[sourceNodeWeightIdx],
-                                    row[sourceColorIdx],
-                                    row[sourceLabelColorIdx]/*,
-                                    row[sourceGroup]*/).index,
-                        target:
-                            getNode(targetId,
-                                    identity,
-                                    false,
-                                    row[targetNodeWeightIdx],
-                                    row[targetColorIdx],
-                                    row[targetLabelColorIdx]/*, 
-                                    row[targetGroupIdx]*/).index,
-                        value: row[edgeValueIdx],
-                    };
-                    nodeList[edge.source].neighbors += 1;
-                    nodeList[edge.target].neighbors += 1;
-                    linkList.push(edge);
-                }
-            });
-
-            const maxNodes = settings.layout.maxNodeCount;
-            if (typeof maxNodes === "number" && maxNodes > 0) {
-                nodeList = nodeList.slice(0, maxNodes);
-                linkList = linkList.filter(n => n.source < maxNodes && n.target < maxNodes);
-            }
-        }
-
-        return {
-            nodes: nodeList,
-            links: linkList,
-        };
-    }
-
-    /**
      * Constructor for the network navigator
      */
     constructor(noCss = false) {
         super(noCss);
 
+        // Some of the css is in a css module (:local() {....}), this adds the auto generated class to our element
         const className = MY_CSS_MODULE && MY_CSS_MODULE.locals && MY_CSS_MODULE.locals.className;
         if (className) {
             this.element.addClass(className);
@@ -254,7 +160,9 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         return `<div id="node_graph" style= "height: 100%;"> </div>`;
     }
 
-    /** This is called once when the visual is initialially created */
+    /** 
+     * This is called once when the visual is initialially created 
+     */
     public init(options: VisualInitOptions): void {
         super.init(options);
 
@@ -265,7 +173,9 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         this.selectionManager = new utility.SelectionManager({ hostServices: this.host });
     }
 
-    /** Update is called for data updates, resizes & formatting changes */
+    /** 
+     * Update is called for data updates, resizes & formatting changes 
+     */
     public update(options: VisualUpdateOptions) {
         super.update(options);
 
@@ -273,17 +183,22 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         let dataViewTable = dataView && dataView.table;
         let forceReloadData = false;
 
+        // Some settings have been updated
         const type = this.updateType();
         if (type & UpdateType.Settings) {
-            forceReloadData = this.updateSettings(options);
+            forceReloadData = this.loadSettingsFromPowerBI(dataView);
         }
+
+        // The visual has been resized
         if (type & UpdateType.Resize) {
             this.myNetworkNavigator.dimensions = { width: options.viewport.width, height: options.viewport.height };
             this.element.css({ width: options.viewport.width, height: options.viewport.height });
         }
+
+        // The dataset has been modified, or something has happened that requires us to force reload the data
         if (type & UpdateType.Data || forceReloadData) {
             if (dataViewTable) {
-                const newData = NetworkNavigator.converter(dataView, this.settings);
+                const newData = converter(dataView, this.settings);
                 this.myNetworkNavigator.setData(newData);
             } else {
                 this.myNetworkNavigator.setData({
@@ -293,30 +208,13 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             }
         }
 
-        const data = this.myNetworkNavigator.getData();
-        const nodes = data && data.nodes;
-        const selectedIds = this.selectionManager.getSelectionIds();
-        if (nodes && nodes.length) {
-            let updated = false;
-            nodes.forEach((n) => {
-                let isSelected =
-                    !!_.find(selectedIds, (id: SelectionId) => id.equals((<INetworkNavigatorSelectableNode>n).identity));
-                if (isSelected !== n.selected) {
-                    n.selected = isSelected;
-                    updated = true;
-                }
-            });
-
-            if (updated) {
-                this.myNetworkNavigator.redrawSelection();
-            }
-        }
+        this.loadSelectionFromPowerBI();
 
         this.myNetworkNavigator.redrawLabels();
     }
 
     /**
-     * Enumerates the instances for the objects that appear in the power bi panel
+     * Enumerates the instances for the objects (settings) that appear in the power bi panel
      */
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
         let instances = super.enumerateObjectInstances(options) || [{
@@ -327,6 +225,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             properties: {},
         }, ];
 
+        // Layout needs to be handled specially, cause we need to clamp the values to our min/maxes
         if (options.objectName === "layout") {
             const { layout } = this.settings;
             // autoClamp
@@ -339,6 +238,8 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             });
         }
 
+        // Since the structure for our settings reflects those in the capabilities, then just copy them into
+        // the final object
         $.extend(true, instances[0].properties, this.settings[options.objectName]);
 
         if (options.objectName === "general") {
@@ -355,18 +256,45 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     }
 
     /**
-     * Handles updating of the settings
+     * Loads the selection state from powerbi
      */
-    private updateSettings(options: VisualUpdateOptions): boolean {
+    private loadSelectionFromPowerBI() {
+        const data = this.myNetworkNavigator.getData();
+        const nodes = data && data.nodes;
+        const selectedIds = this.selectionManager.getSelectionIds();
+
+        // For each of the nodes, check to see if their ids are in the selection manager, and
+        // mark them as selected
+        if (nodes && nodes.length) {
+            let updated = false;
+            nodes.forEach((n) => {
+                let isSelected =
+                    !!_.find(selectedIds, (id: SelectionId) => id.equals((<INetworkNavigatorSelectableNode>n).identity));
+                if (isSelected !== n.selected) {
+                    n.selected = isSelected;
+                    updated = true;
+                }
+            });
+
+            if (updated) {
+                this.myNetworkNavigator.redrawSelection();
+            }
+        }
+    }
+
+    /**
+     * Handles updating of the settings
+     * @returns True if there was some settings changed that requires a data reload
+     */
+    private loadSettingsFromPowerBI(dataView: powerbi.DataView): boolean {
         // There are some changes to the options
-        let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
         if (dataView && dataView.metadata) {
             const oldSettings = $.extend(true, {}, this.settings);
             const newObjects = dataView.metadata.objects;
             const layoutObjs = newObjects && newObjects["layout"];
             const generalObjs = newObjects && newObjects["general"];
 
-            // Merge in the settings
+            // Merge in the new settings from PowerBI
             $.extend(true, this.settings, DEFAULT_SETTINGS, newObjects ? newObjects : {}, {
                 layout: {
                     fontSizePT: generalObjs && generalObjs["textSize"],
@@ -382,6 +310,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                 this.myNetworkNavigator.configuration = $.extend(true, {}, this.settings.search, this.settings.layout);
             }
 
+            // If maxNodeCount has changed than we need to reload the data.
             if (oldSettings.layout.maxNodeCount !== this.settings.layout.maxNodeCount) {
                 return true;
             }
@@ -390,28 +319,18 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     }
 
     /**
-     * Returns if all the properties in the first object are present and equal to the ones in the super set
-     */
-    private objectIsSubset(set: Object, superSet: Object) {
-        if (_.isObject(set)) {
-            return _.any(_.keys(set), (key: string) => !this.objectIsSubset(set[key], superSet[key]));
-        }
-        return set === superSet;
-    }
-
-    /**
      * Attaches the line up events to lineup
      */
     private attachEvents() {
         if (this.myNetworkNavigator) {
             // Cleans up events
-            if (this.listener) {
-                this.listener.destroy();
+            if (this.selectionChangedListener) {
+                this.selectionChangedListener.destroy();
             }
-            this.listener =
+            this.selectionChangedListener =
                 this.myNetworkNavigator.events.on("selectionChanged", (node: INetworkNavigatorNode) => this.onNodeSelected(node));
 
-            // HAX: I am a strong, independent element and I don't need no framework tellin me how much focus I can have
+            // PowerBI will eat some events, so use this to prevent powerbi from eating them
             this.element.find(".filter-box input").on(EVENTS_TO_IGNORE, (e) => e.stopPropagation());
         }
     }
