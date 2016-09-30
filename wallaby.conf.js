@@ -39,7 +39,7 @@ module.exports = function (wallaby) {
     ],
 
     tests: [
-      {pattern: 'src/**/NetworkNavigator.spec.ts', load: false}
+      {pattern: 'src/**/NetworkNavigatorVisual.spec.ts', load: false}
     ],
 
     postprocessor: wallabyPostprocessor,

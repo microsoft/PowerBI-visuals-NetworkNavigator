@@ -33,8 +33,6 @@ import IVisualHostServices = powerbi.IVisualHostServices;
 import VisualCapabilities = powerbi.VisualCapabilities;
 import VisualInitOptions = powerbi.VisualInitOptions;
 import VisualUpdateOptions = powerbi.VisualUpdateOptions;
-import IInteractivityService = powerbi.visuals.IInteractivityService;
-import InteractivityService = powerbi.visuals.InteractivityService;
 import VisualObjectInstance = powerbi.VisualObjectInstance;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import SelectionId = powerbi.visuals.SelectionId;
@@ -70,11 +68,6 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
      * The visual's host
      */
     private host: IVisualHostServices;
-
-    /**
-     * The interactivity service
-     */
-    private interactivityService: IInteractivityService;
 
     /**
      * The selection changed listener for NetworkNavigator
@@ -168,7 +161,6 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
 
         this.myNetworkNavigator = new NetworkNavigatorImpl(this.element.find("#node_graph"), 500, 500);
         this.host = options.host;
-        this.interactivityService = new InteractivityService(this.host);
         this.attachEvents();
         this.selectionManager = new utility.SelectionManager({ hostServices: this.host });
     }

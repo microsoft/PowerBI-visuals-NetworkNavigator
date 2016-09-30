@@ -50,40 +50,40 @@ export function converter(
     let sourceField = table.identityFields[sourceIdx];
     let targetField = table.identityFields[targetIdx];
 
+    /**
+     * Creates a node with the given value if the node has not already been seen/created
+     */
+    function getNode(
+        id: string,
+        identity: powerbi.DataViewScopeIdentity,
+        isSource: boolean,
+        nodeWeight: number,
+        color: string = "gray",
+        labelColor: string,
+        group: number = 0): INetworkNavigatorSelectableNode {
+        const field = (isSource ? sourceField : targetField);
+        let node = nodeMap[id];
+        let expr = powerbi.data.SQExprBuilder.equal(field as powerbi.data.SQExpr, powerbi.data.SQExprBuilder.text(id));
+
+        if (!nodeMap[id]) {
+            node = nodeMap[id] = {
+                name: id,
+                color: color || "gray",
+                labelColor: labelColor,
+                index: nodeList.length,
+                filterExpr: expr,
+                value: nodeWeight,
+                neighbors: 1,
+                selected: false,
+                identity: SelectionId.createWithId(powerbi.data.createDataViewScopeIdentity(expr)),
+            };
+            nodeList.push(node);
+        }
+        return node;
+    }
+
     // The minimum necessary is a source node and a target node, otherwise we'll just have a bunch of disconnected nodes
     if (sourceField && targetField) {
-
-        /**
-         * Creates a node with the given value if the node has not already been seen/created
-         */
-        function getNode(
-            id: string,
-            identity: powerbi.DataViewScopeIdentity,
-            isSource: boolean,
-            nodeWeight: number,
-            color: string = "gray",
-            labelColor: string,
-            group: number = 0): INetworkNavigatorSelectableNode {
-            const field = (isSource ? sourceField : targetField);
-            let node = nodeMap[id];
-            let expr = powerbi.data.SQExprBuilder.equal(field as powerbi.data.SQExpr, powerbi.data.SQExprBuilder.text(id));
-
-            if (!nodeMap[id]) {
-                node = nodeMap[id] = {
-                    name: id,
-                    color: color || "gray",
-                    labelColor: labelColor,
-                    index: nodeList.length,
-                    filterExpr: expr,
-                    value: nodeWeight,
-                    neighbors: 1,
-                    selected: false,
-                    identity: SelectionId.createWithId(powerbi.data.createDataViewScopeIdentity(expr)),
-                };
-                nodeList.push(node);
-            }
-            return node;
-        }
 
         // Iterate through each row and create a connection between the source node and the target node
         table.rows.forEach((row, idx) => {
