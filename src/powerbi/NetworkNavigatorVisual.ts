@@ -62,7 +62,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     /**
      * My network navigator instance
      */
-    private myNetworkNavigator: NetworkNavigatorImpl;
+    public myNetworkNavigator: NetworkNavigatorImpl;
 
     /**
      * The visual's host

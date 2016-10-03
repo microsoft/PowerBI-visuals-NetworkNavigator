@@ -182,8 +182,9 @@ export class NetworkNavigator {
             runStart = runStart || updateForceConfig("gravity", gravity);
 
             // If the zoom has changed at all, then let the zoom behavior know
-            if (newConfig.minZoom !== this._configuration.minZoom ||
-                newConfig.maxZoom !== this._configuration.maxZoom) {
+            if ((newConfig.minZoom !== this._configuration.minZoom ||
+                newConfig.maxZoom !== this._configuration.maxZoom) &&
+                this.zoom) {
                 this.zoom.scaleExtent([newConfig.minZoom, newConfig.maxZoom]);
             }
 
@@ -304,6 +305,7 @@ export class NetworkNavigator {
 
         this.svg = d3.select(this.svgContainer[0]).append("svg")
             .attr("width", this.dimensions.width)
+            .attr("height", this.dimensions.height)
             .attr("preserveAspectRatio", "xMidYMid meet")
             .attr("pointer-events", "all")
             .call(this.zoom);

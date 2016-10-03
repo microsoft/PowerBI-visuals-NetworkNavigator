@@ -1,0 +1,694 @@
+{
+    "viewport": {
+        "width": 270,
+        "height": 270
+    },
+    "viewMode": 1,
+    "type": 2,
+    "operationKind": 0,
+    "dataViews": [
+        {
+            "metadata": {
+                "objects": {
+                    "search": {
+                        "caseInsensitive": false
+                    },
+                    "layout": {
+                        "animate": false,
+                        "maxNodeCount": 1,
+                        "linkDistance": 20,
+                        "linkStrength": 1,
+                        "gravity": 0.5,
+                        "charge": -10,
+                        "labels": true,
+                        "minZoom": 0.12,
+                        "maxZoom": 1000,
+                        "defaultLabelColor": {
+                            "solid": {
+                                "color": "#374649"
+                            }
+                        }
+                    }
+                },
+                "columns": [
+                    {
+                        "roles": {
+                            "SOURCE_NODE": true
+                        },
+                        "type": {
+                            "underlyingType": 1,
+                            "category": null
+                        },
+                        "displayName": "Customer Name",
+                        "queryName": "Orders.Customer Name",
+                        "expr": {
+                            "_kind": 2,
+                            "source": {
+                                "_kind": 0,
+                                "entity": "Orders",
+                                "variable": "o"
+                            },
+                            "ref": "Customer Name"
+                        }
+                    },
+                    {
+                        "roles": {
+                            "TARGET_NODE": true
+                        },
+                        "type": {
+                            "underlyingType": 1,
+                            "category": null
+                        },
+                        "displayName": "Product Name",
+                        "queryName": "Orders.Product Name",
+                        "expr": {
+                            "_kind": 2,
+                            "source": {
+                                "_kind": 0,
+                                "entity": "Orders",
+                                "variable": "o"
+                            },
+                            "ref": "Product Name"
+                        }
+                    }
+                ]
+            },
+            "table": {
+                "rows": [
+                    [
+                        "Aaron Bergman",
+                        "Acme® Preferred Stainless Steel Scissors"
+                    ],
+                    [
+                        "Aaron Bergman",
+                        "Avery 49"
+                    ],
+                    [
+                        "Aaron Bergman",
+                        "Canon S750 Color Inkjet Printer"
+                    ],
+                    [
+                        "Aaron Bergman",
+                        "SANFORD Liquid Accent™ Tank-Style Highlighters"
+                    ],
+                    [
+                        "Aaron Bergman",
+                        "V70"
+                    ],
+                    [
+                        "Aaron Bergman",
+                        "Xerox 194"
+                    ],
+                    [
+                        "Aaron Bergman",
+                        "Xerox 1968"
+                    ],
+                    [
+                        "Aaron Hawkins",
+                        "*Staples* Highlighting Markers"
+                    ],
+                    [
+                        "Aaron Hawkins",
+                        "Accessory34"
+                    ],
+                    [
+                        "Aaron Hawkins",
+                        "DAX Two-Tone Rosewood/Black Document Frame, Desktop, 5 x 7"
+                    ]
+                ],
+                "columns": [
+                    {
+                        "roles": {
+                            "SOURCE_NODE": true
+                        },
+                        "type": {
+                            "underlyingType": 1,
+                            "category": null
+                        },
+                        "displayName": "Customer Name",
+                        "queryName": "Orders.Customer Name",
+                        "expr": {
+                            "_kind": 2,
+                            "source": {
+                                "_kind": 0,
+                                "entity": "Orders",
+                                "variable": "o"
+                            },
+                            "ref": "Customer Name"
+                        }
+                    },
+                    {
+                        "roles": {
+                            "TARGET_NODE": true
+                        },
+                        "type": {
+                            "underlyingType": 1,
+                            "category": null
+                        },
+                        "displayName": "Product Name",
+                        "queryName": "Orders.Product Name",
+                        "expr": {
+                            "_kind": 2,
+                            "source": {
+                                "_kind": 0,
+                                "entity": "Orders",
+                                "variable": "o"
+                            },
+                            "ref": "Product Name"
+                        }
+                    }
+                ],
+                "identity": [
+                    {
+                        "_expr": {
+                            "_kind": 8,
+                            "left": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Customer Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Aaron Bergman",
+                                    "valueEncoded": "'Aaron Bergman'"
+                                }
+                            },
+                            "right": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Product Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Acme® Preferred Stainless Steel Scissors",
+                                    "valueEncoded": "'Acme® Preferred Stainless Steel Scissors'"
+                                }
+                            }
+                        },
+                        "_key": {
+                            "factoryMethod": null,
+                            "value": "{\"and\":{\"l\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Customer Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Aaron Bergman\"}}}},\"r\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Product Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Acme® Preferred Stainless Steel Scissors\"}}}}}}"
+                        }
+                    },
+                    {
+                        "_expr": {
+                            "_kind": 8,
+                            "left": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Customer Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Aaron Bergman",
+                                    "valueEncoded": "'Aaron Bergman'"
+                                }
+                            },
+                            "right": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Product Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Avery 49",
+                                    "valueEncoded": "'Avery 49'"
+                                }
+                            }
+                        },
+                        "_key": {
+                            "factoryMethod": null,
+                            "value": "{\"and\":{\"l\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Customer Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Aaron Bergman\"}}}},\"r\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Product Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Avery 49\"}}}}}}"
+                        }
+                    },
+                    {
+                        "_expr": {
+                            "_kind": 8,
+                            "left": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Customer Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Aaron Bergman",
+                                    "valueEncoded": "'Aaron Bergman'"
+                                }
+                            },
+                            "right": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Product Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Canon S750 Color Inkjet Printer",
+                                    "valueEncoded": "'Canon S750 Color Inkjet Printer'"
+                                }
+                            }
+                        },
+                        "_key": {
+                            "factoryMethod": null,
+                            "value": "{\"and\":{\"l\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Customer Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Aaron Bergman\"}}}},\"r\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Product Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Canon S750 Color Inkjet Printer\"}}}}}}"
+                        }
+                    },
+                    {
+                        "_expr": {
+                            "_kind": 8,
+                            "left": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Customer Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Aaron Bergman",
+                                    "valueEncoded": "'Aaron Bergman'"
+                                }
+                            },
+                            "right": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Product Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "SANFORD Liquid Accent™ Tank-Style Highlighters",
+                                    "valueEncoded": "'SANFORD Liquid Accent™ Tank-Style Highlighters'"
+                                }
+                            }
+                        },
+                        "_key": {
+                            "factoryMethod": null,
+                            "value": "{\"and\":{\"l\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Customer Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Aaron Bergman\"}}}},\"r\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Product Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"SANFORD Liquid Accent™ Tank-Style Highlighters\"}}}}}}"
+                        }
+                    },
+                    {
+                        "_expr": {
+                            "_kind": 8,
+                            "left": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Customer Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Aaron Bergman",
+                                    "valueEncoded": "'Aaron Bergman'"
+                                }
+                            },
+                            "right": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Product Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "V70",
+                                    "valueEncoded": "'V70'"
+                                }
+                            }
+                        },
+                        "_key": {
+                            "factoryMethod": null,
+                            "value": "{\"and\":{\"l\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Customer Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Aaron Bergman\"}}}},\"r\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Product Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"V70\"}}}}}}"
+                        }
+                    },
+                    {
+                        "_expr": {
+                            "_kind": 8,
+                            "left": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Customer Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Aaron Bergman",
+                                    "valueEncoded": "'Aaron Bergman'"
+                                }
+                            },
+                            "right": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Product Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Xerox 194",
+                                    "valueEncoded": "'Xerox 194'"
+                                }
+                            }
+                        },
+                        "_key": {
+                            "factoryMethod": null,
+                            "value": "{\"and\":{\"l\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Customer Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Aaron Bergman\"}}}},\"r\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Product Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Xerox 194\"}}}}}}"
+                        }
+                    },
+                    {
+                        "_expr": {
+                            "_kind": 8,
+                            "left": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Customer Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Aaron Bergman",
+                                    "valueEncoded": "'Aaron Bergman'"
+                                }
+                            },
+                            "right": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Product Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Xerox 1968",
+                                    "valueEncoded": "'Xerox 1968'"
+                                }
+                            }
+                        },
+                        "_key": {
+                            "factoryMethod": null,
+                            "value": "{\"and\":{\"l\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Customer Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Aaron Bergman\"}}}},\"r\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Product Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Xerox 1968\"}}}}}}"
+                        }
+                    },
+                    {
+                        "_expr": {
+                            "_kind": 8,
+                            "left": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Customer Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Aaron Hawkins",
+                                    "valueEncoded": "'Aaron Hawkins'"
+                                }
+                            },
+                            "right": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Product Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "*Staples* Highlighting Markers",
+                                    "valueEncoded": "'*Staples* Highlighting Markers'"
+                                }
+                            }
+                        },
+                        "_key": {
+                            "factoryMethod": null,
+                            "value": "{\"and\":{\"l\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Customer Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Aaron Hawkins\"}}}},\"r\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Product Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"*Staples* Highlighting Markers\"}}}}}}"
+                        }
+                    },
+                    {
+                        "_expr": {
+                            "_kind": 8,
+                            "left": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Customer Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Aaron Hawkins",
+                                    "valueEncoded": "'Aaron Hawkins'"
+                                }
+                            },
+                            "right": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Product Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Accessory34",
+                                    "valueEncoded": "'Accessory34'"
+                                }
+                            }
+                        },
+                        "_key": {
+                            "factoryMethod": null,
+                            "value": "{\"and\":{\"l\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Customer Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Aaron Hawkins\"}}}},\"r\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Product Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Accessory34\"}}}}}}"
+                        }
+                    },
+                    {
+                        "_expr": {
+                            "_kind": 8,
+                            "left": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Customer Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "Aaron Hawkins",
+                                    "valueEncoded": "'Aaron Hawkins'"
+                                }
+                            },
+                            "right": {
+                                "_kind": 13,
+                                "comparison": 0,
+                                "left": {
+                                    "_kind": 2,
+                                    "source": {
+                                        "_kind": 0,
+                                        "entity": "Orders"
+                                    },
+                                    "ref": "Product Name"
+                                },
+                                "right": {
+                                    "_kind": 17,
+                                    "type": {
+                                        "underlyingType": 1,
+                                        "category": null
+                                    },
+                                    "value": "DAX Two-Tone Rosewood/Black Document Frame, Desktop, 5 x 7",
+                                    "valueEncoded": "'DAX Two-Tone Rosewood/Black Document Frame, Desktop, 5 x 7'"
+                                }
+                            }
+                        },
+                        "_key": {
+                            "factoryMethod": null,
+                            "value": "{\"and\":{\"l\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Customer Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"Aaron Hawkins\"}}}},\"r\":{\"comp\":{\"k\":0,\"l\":{\"col\":{\"s\":{\"e\":\"Orders\"},\"r\":\"Product Name\"}},\"r\":{\"const\":{\"t\":1,\"v\":\"DAX Two-Tone Rosewood/Black Document Frame, Desktop, 5 x 7\"}}}}}}"
+                        }
+                    }
+                ],
+                "identityFields": [
+                    {
+                        "_kind": 2,
+                        "source": {
+                            "_kind": 0,
+                            "entity": "Orders"
+                        },
+                        "ref": "Customer Name"
+                    },
+                    {
+                        "_kind": 2,
+                        "source": {
+                            "_kind": 0,
+                            "entity": "Orders"
+                        },
+                        "ref": "Product Name"
+                    }
+                ]
+            }
+        }
+    ]
+}

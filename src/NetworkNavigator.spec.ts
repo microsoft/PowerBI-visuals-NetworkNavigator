@@ -435,4 +435,32 @@ describe("NetworkNavigator", () => {
             expect(n.selected).to.be.eq(n.name === selectedNodeName);
         });
     });
+
+    it("should set the height of the svg when dimensions have been changed", () => {
+        const { instance, element } = createInstance();
+
+        instance.dimensions = { width: 260, height: 245 };
+
+        instance.data = oneSourceTwoTargets;
+
+        expect(element.find("svg").attr("height")).to.be.deep.equal("245");
+
+        instance.dimensions = { width: 123, height: 643 };
+
+        expect(element.find("svg").attr("height")).to.be.deep.equal("643");
+    });
+
+    it("should set the height of the svg when dimensions have been changed", () => {
+        const { instance, element } = createInstance();
+
+        instance.dimensions = { width: 260, height: 245 };
+
+        instance.data = oneSourceTwoTargets;
+
+        expect(element.find("svg").attr("width")).to.be.deep.equal("260");
+
+        instance.dimensions = { width: 123, height: 245 };
+
+        expect(element.find("svg").attr("width")).to.be.deep.equal("123");
+    });
 });
