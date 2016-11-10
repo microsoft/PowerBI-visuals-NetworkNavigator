@@ -16,14 +16,7 @@
     "compile": "npm-run-all --sequential tsc pbibundle",
     "compile:release": "NODE_ENV=production npm-run-all --sequential tsc pbibundle",
     "build": "npm-run-all --sequential test pbibundle",
-    "build:release": "NODE_ENV=production npm-run-all --sequential test pbibundle",
-    "bump:patch": "gulp bump:patch",
-    "bump:minor": "gulp bump:minor",
-    "bump:major": "gulp bump:major",
-    "tag": "gulp commit_artifacts tag",
-    "release:patch": "npm-run-all --sequential bump:patch build:release tag",
-    "release:minor": "npm-run-all --sequential bump:minor build:release tag",
-    "release:major": "npm-run-all --sequential bump:major build:release tag"
+    "build:release": "NODE_ENV=production npm-run-all --sequential test pbibundle"
   },
   "author": "",
   "license": "MIT",
