@@ -162,14 +162,14 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
 
         // Can't do nuffin' without source an target fields
         if (sourceField && targetField) {
-            function getNode(
+            const getNode = (
                 id: string,
                 identity: powerbi.DataViewScopeIdentity,
                 isSource: boolean,
                 nodeWeight: number,
                 color: string = "gray",
                 labelColor: string,
-                group: number = 0): INetworkNavigatorSelectableNode {
+                group: number = 0) => {
                 const field = (isSource ? sourceField : targetField);
                 let node = nodeMap[id];
                 let expr = powerbi.data.SQExprBuilder.equal(field as powerbi.data.SQExpr, powerbi.data.SQExprBuilder.text(id));
@@ -188,8 +188,8 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                     };
                     nodeList.push(node);
                 }
-                return node;
-            }
+                return node as INetworkNavigatorSelectableNode;
+            };
 
             table.rows.forEach((row, idx) => {
                 let identity = table.identity[idx];
@@ -239,7 +239,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
      * Constructor for the network navigator
      */
     constructor(noCss = false) {
-        super(noCss);
+        super("NetworkNavigator", noCss);
 
         const className = MY_CSS_MODULE && MY_CSS_MODULE.locals && MY_CSS_MODULE.locals.className;
         if (className) {
@@ -344,7 +344,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         if (options.objectName === "general") {
             instances[0].properties["textSize"] = this.myNetworkNavigator.configuration.fontSizePT;
         }
-        return instances;
+        return instances as VisualObjectInstance[];
     }
 
     /**

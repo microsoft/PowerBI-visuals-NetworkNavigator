@@ -24,6 +24,7 @@
 
 import EventEmitter from "../base/EventEmitter";
 import * as $ from "jquery";
+import * as d3 from "d3";
 import * as CONSTANTS from "./constants";
 import { INetworkNavigatorData, INetworkNavigatorNode, INetworkNavigatorConfiguration } from "./models";
 import template from "./templates/networkNavigator.tmpl";
