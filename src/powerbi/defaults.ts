@@ -23,7 +23,7 @@
  */
 
 /* tslint:disable */
-const colors = require("essex.powerbi.base/src/colors"); 
+const colors = require("essex.powerbi.base/dist/lib/colors"); 
 /* tslint:enable */
 
 /**
