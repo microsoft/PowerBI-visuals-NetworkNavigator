@@ -22,27 +22,40 @@
  * SOFTWARE.
  */
 
-import * as $ from "jquery";
 import { DATA_ROLES } from "./constants";
+import VisualCapabilities = powerbi.VisualCapabilities;
+import DataViewMapping = powerbi.DataViewMapping;
 
-export default $.extend(true, {}, {
+/**
+ * Defines the capabilities for this visual for PowerBI
+ */
+export const capabilities: VisualCapabilities = {
     dataRoles: Object.keys(DATA_ROLES).map(n => ({
         name: DATA_ROLES[n].name,
         displayName: DATA_ROLES[n].displayName,
         kind: powerbi.VisualDataRoleKind.GroupingOrMeasure,
     })),
     dataViewMappings: [{
+        /**
+         * This visual supports the table dataview
+         */
         table: {
             rows: {
                 select: Object.keys(DATA_ROLES).map(n => ({ bind: { to: DATA_ROLES[n].name }}))
             },
         },
-        conditions: [Object.keys(DATA_ROLES).reduce((a, b) => {
+
+        /**
+         * Defines the conditions for each of the data roles
+         */
+        conditions: <any>[Object.keys(DATA_ROLES).reduce((a, b) => {
             a[DATA_ROLES[b].name] = { min: 0, max: 1 };
             return a;
         }, {}), ],
-    }, ],
-    // sort this crap by default
+    }, ] as DataViewMapping[],
+    /**
+     * Indicates that this visual's dataViews can be sorted
+     */
     sorting: {
         default: {}
     },
@@ -124,4 +137,6 @@ export default $.extend(true, {}, {
             },
         },
     },
-});
+};
+
+export default capabilities;

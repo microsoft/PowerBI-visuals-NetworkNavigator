@@ -16,7 +16,8 @@
     "compile": "npm-run-all --sequential tsc pbibundle",
     "compile:release": "NODE_ENV=production npm-run-all --sequential tsc pbibundle",
     "build": "npm-run-all --sequential test pbibundle",
-    "build:release": "NODE_ENV=production npm-run-all --sequential test pbibundle"
+    "build:release": "NODE_ENV=production npm-run-all --sequential test pbibundle",
+    "docs": "node docgen --exclude **/src/*.spec.ts --out ./docs/ ./src/ ./base/ ./typings/main.d.ts ./typings/powerbi.d.ts"
   },
   "author": "",
   "license": "MIT",
@@ -88,6 +89,8 @@
     "ts-node": "0.5.5",
     "tslint": "3.2.1",
     "typescript": "^2.0.8",
+    "typedoc": "^0.4.5",
+    "typedoc-markdown-theme": "0.0.4",
     "underscore": "1.8.3",
     "wallaby-webpack": "0.0.16",
     "webpack": "1.12.9",

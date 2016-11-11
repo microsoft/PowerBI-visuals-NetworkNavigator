@@ -78,12 +78,12 @@ export interface INetworkNavigatorLink {
 export interface INetworkNavigatorData<NodeType> {
 
     /**
-     * The list of the nodes in the network navigator
+     * The list of the nodes in the graph
      */
     nodes?: NodeType[];
 
     /**
-     * The links in the network navigator
+     * The links in the graph
      */
     links?: INetworkNavigatorLink[];
 }
@@ -92,19 +92,59 @@ export interface INetworkNavigatorData<NodeType> {
  * Represents the configuration for the network navigator
  */
 export interface INetworkNavigatorConfiguration {
+
+    /**
+     * Enable/disable animation of the graph
+     */
     animate?: boolean;
+
+    /**
+     * The link distance used in the force graph
+     */
     linkDistance?: number;
+
+    /**
+     * The link strength used in the force graph
+     */
     linkStrength?: number;
+
+    /**
+     * The charge in the force graph
+     */
     charge?: number;
+
+    /**
+     * The gravity used in the force graph
+     */
     gravity?: number;
-    labels?: boolean;
-    minZoom?: number;
-    maxZoom?: number;
-    defaultLabelColor?: string;
+
+    /**
+     * Searches are case insensitive
+     */
     caseInsensitive?: boolean;
 
     /**
-     * The font size to use in PT
+     * Should labels be shown on the graph
+     */
+    labels?: boolean;
+
+    /**
+     * The minimum amount that a user can zoom into the graph
+     */
+    minZoom?: number;
+
+    /**
+     * The maximum amount that a user can zoom into the graph
+     */
+    maxZoom?: number;
+
+    /**
+     * The default color used for labels
+     */
+    defaultLabelColor?: string;
+
+    /**
+     * The size of the font to use for the labels, in pt
      */
     fontSizePT?: number;
 }

@@ -25,11 +25,12 @@
 /* tslint:disable */
 const colors = require("essex.powerbi.base/dist/lib/colors"); 
 /* tslint:enable */
+import { INetworkNavigatorVisualSettings } from "./models";
 
 /**
  * The default settings for the network navigator visual
  */
-export const DEFAULT_SETTINGS = {
+export const DEFAULT_SETTINGS: INetworkNavigatorVisualSettings = {
     search: {
         caseInsensitive: true
     },

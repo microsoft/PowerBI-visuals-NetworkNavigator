@@ -25,7 +25,9 @@
 import { NetworkNavigator } from "./NetworkNavigator";
 import { NetworkNavigator as NetworkNavigatorReact } from "./react/NetworkNavigatorReact";
 
-export = {
+const types = {
     NetworkNavigator,
     NetworkNavigatorReact,
 };
+
+export default types;

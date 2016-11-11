@@ -22,9 +22,32 @@
  * SOFTWARE.
  */
 
+/**
+ * Defines the minimum, maximum, and default values for charge
+ */
 export const charge = { min: -100000, max: 10, default: -120 };
+
+/**
+ * Defines the minimum, maximum, and default values for link distance
+ */
 export const linkDistance = { min: 1, max: 30, default: 10 };
+
+/**
+ * Defines the minimum, maximum, and default values for link strength
+ */
 export const linkStrength = { min: 1, max: 20, default: 2 };
+
+/**
+ * Defines the minimum, maximum, and default values for gravity
+ */
 export const gravity = { min: .1, max: 10, default: .1 };
+
+/**
+ * Defines the minimum, maximum, and default values for the minimum zoom of the graph
+ */
 export const minZoom = { min: .0001, max: 100000, default: .1 };
+
+/**
+ * Defines the minimum, maximum, and default values for the maximum zoom of the graph
+ */
 export const maxZoom = { min: .0001, max: 100000, default: 100 };
