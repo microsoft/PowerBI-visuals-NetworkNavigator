@@ -235,7 +235,7 @@ describe("NetworkNavigator", () => {
     });
 
     describe("selection", () => {
-       it("should raise a click event when a node is selected", (done) => {
+       it("should raise a click event when a node is selected", (done: Function) => {
             let { instance } = createInstance();
 
             // Set that datas
@@ -392,7 +392,7 @@ describe("NetworkNavigator", () => {
         return { instance, element, singleNode };
     };
 
-    it("should fire the node selected event when a node is clicked on", (done) => {
+    it("should fire the node selected event when a node is clicked on", (done: Function) => {
         selectTest(done);
     });
 

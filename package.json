@@ -15,9 +15,9 @@
     "test:slim": "npm-run-all --sequential tsc karma:once",
     "compile": "npm-run-all --sequential tsc pbibundle",
     "compile:release": "NODE_ENV=production npm-run-all --sequential tsc pbibundle",
-    "build": "npm-run-all --sequential test pbibundle",
-    "build:release": "NODE_ENV=production npm-run-all --sequential test pbibundle",
-    "docs": "node docgen --exclude **/src/*.spec.ts --out ./docs/ ./src/ ./base/ ./typings/main.d.ts ./typings/powerbi.d.ts"
+    "build": "npm-run-all --sequential test compile",
+    "build:release": "NODE_ENV=production npm-run-all --sequential test compile",
+    "docs": "node docgen --exclude **/src/*.spec.ts --out ./docs/ ./src/ ./base/"
   },
   "author": "",
   "license": "MIT",
