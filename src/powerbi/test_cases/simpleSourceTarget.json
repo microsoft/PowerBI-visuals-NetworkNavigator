@@ -9,48 +9,45 @@
     "dataViews": [
         {
             "metadata": {
-                "columns": {
-                    "0": {
-                        "roles": {
-                            "SOURCE_NODE": true
-                        },
-                        "type": {
-                            "underlyingType": 1,
-                            "category": null
-                        },
-                        "displayName": "Customer Name",
-                        "queryName": "Orders.Customer Name",
-                        "expr": {
-                            "_kind": 2,
-                            "source": {
-                                "_kind": 0,
-                                "entity": "Orders",
-                                "variable": "o"
-                            },
-                            "ref": "Customer Name"
-                        }
+                "columns": [{
+                    "roles": {
+                        "SOURCE_NODE": true
                     },
-                    "1": {
-                        "roles": {
-                            "TARGET_NODE": true
+                    "type": {
+                        "underlyingType": 1,
+                        "category": null
+                    },
+                    "displayName": "Customer Name",
+                    "queryName": "Orders.Customer Name",
+                    "expr": {
+                        "_kind": 2,
+                        "source": {
+                            "_kind": 0,
+                            "entity": "Orders",
+                            "variable": "o"
                         },
-                        "type": {
-                            "underlyingType": 1,
-                            "category": null
-                        },
-                        "displayName": "Product Name",
-                        "queryName": "Orders.Product Name",
-                        "expr": {
-                            "_kind": 2,
-                            "source": {
-                                "_kind": 0,
-                                "entity": "Orders",
-                                "variable": "o"
-                            },
-                            "ref": "Product Name"
-                        }
+                        "ref": "Customer Name"
                     }
-                }
+                }, {
+                    "roles": {
+                        "TARGET_NODE": true
+                    },
+                    "type": {
+                        "underlyingType": 1,
+                        "category": null
+                    },
+                    "displayName": "Product Name",
+                    "queryName": "Orders.Product Name",
+                    "expr": {
+                        "_kind": 2,
+                        "source": {
+                            "_kind": 0,
+                            "entity": "Orders",
+                            "variable": "o"
+                        },
+                        "ref": "Product Name"
+                    }
+                }]
             },
             "table": {
                 "rows": [
