@@ -45,6 +45,8 @@ module.exports = config => {
     autoWatch: isTddMode,
     browsers: isTddMode ? ['Chrome'] : [ 'PhantomJS' ],
     singleRun: !isTddMode,
-    concurrency: Infinity
+    client: {
+      captureConsole: true,
+    },
   });
 };

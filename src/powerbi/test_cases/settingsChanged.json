@@ -4,8 +4,8 @@
         "height": 270
     },
     "viewMode": 1,
-    "type": 2,
-    "operationKind": 0,
+    "type": 4,
+    "operationKind": 4,
     "dataViews": [
         {
             "metadata": {

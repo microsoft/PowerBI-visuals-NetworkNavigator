@@ -26,17 +26,17 @@ import { NetworkNavigator as NetworkNavigatorImpl } from "../NetworkNavigator";
 import { INetworkNavigatorNode } from "../models";
 import * as CONSTANTS from "../constants";
 import { INetworkNavigatorSelectableNode, INetworkNavigatorVisualSettings } from "./models";
-import { VisualBase, Visual, updateTypeGetter, UpdateType } from "essex.powerbi.base";
+import { Visual, UpdateType, capabilities, receiveDimensions, IDimensions } from "essex.powerbi.base";
 import converter from "./dataConversion";
-import IVisual = powerbi.IVisual;
 import IVisualHostServices = powerbi.IVisualHostServices;
-import VisualCapabilities = powerbi.VisualCapabilities;
 import VisualInitOptions = powerbi.VisualInitOptions;
 import VisualUpdateOptions = powerbi.VisualUpdateOptions;
 import VisualObjectInstance = powerbi.VisualObjectInstance;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import SelectionId = powerbi.visuals.SelectionId;
 import utility = powerbi.visuals.utility;
+import { StatefulVisual, publishChange } from "pbi-stateful";
+import NetworkNavigatorState from "./state";
 
 /* tslint:disable */
 const MY_CSS_MODULE = require("!css!sass!./css/NetworkNavigatorVisual.scss");
@@ -46,18 +46,15 @@ const EVENTS_TO_IGNORE = "mousedown mouseup click focus blur input pointerdown p
 
 import { DATA_ROLES } from "./constants";
 import { DEFAULT_SETTINGS } from "./defaults";
-import capabilities from "./capabilities";
+import capabilitiesData from "./capabilities";
 
 /* tslint:enable */
 declare var _: any;
 
 @Visual(require("../build").output.PowerBI)
-export default class NetworkNavigator extends VisualBase implements IVisual {
-
-    /**
-     * The capabilities of the Visual
-     */
-    public static capabilities: VisualCapabilities = capabilities;
+@receiveDimensions
+@capabilities(capabilitiesData)
+export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorState> {
 
     /**
      * My network navigator instance
@@ -85,14 +82,31 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     private settings: INetworkNavigatorVisualSettings = $.extend(true, {}, DEFAULT_SETTINGS);
 
     /**
-     * Getter for the update type
+     * The internal state of the network navigator
      */
-    private updateType = updateTypeGetter(this);
+    private _internalState: NetworkNavigatorState;
+
+    private _nodes: INetworkNavigatorNode[];
 
     /**
      * A debounced event listener for when a node is selected through NetworkNavigator
      */
     private onNodeSelected = _.debounce((node: INetworkNavigatorSelectableNode) => {
+        const isInternalStateNodeUnset = this._internalState.selectedNodeIndex === undefined;
+        const areBothUndefined = !node && isInternalStateNodeUnset;
+        const areIndexesEqual = node && this._internalState.selectedNodeIndex === node.index;
+
+        if (areBothUndefined || areIndexesEqual) {
+            return;
+        }
+
+        this._internalState = this._internalState.receive({ selectedNodeIndex: node ? node.index : undefined });
+        this.persistNodeSelection(node as INetworkNavigatorSelectableNode);
+        const label = node ? `Select ${node.name}` : "Clear selection";
+        publishChange(this, label, this._internalState.toJSONObject());
+    }, 100);
+
+    protected persistNodeSelection(node: INetworkNavigatorSelectableNode) {
         /* tslint:disable */
         let filter: any = null;
         /* tslint:enable */
@@ -131,7 +145,7 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         }
 
         this.host.persistProperties(objects);
-    }, 100);
+    }
 
     /*
      * Constructor for the network navigator
@@ -144,6 +158,8 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         if (className) {
             this.element.addClass(className);
         }
+
+        this._internalState = NetworkNavigatorState.create();
     }
 
     /**
@@ -156,35 +172,63 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     /** 
      * This is called once when the visual is initialially created 
      */
-    public init(options: VisualInitOptions): void {
-        super.init(options);
-
+    public onInit(options: VisualInitOptions): void {
         this.myNetworkNavigator = new NetworkNavigatorImpl(this.element.find("#node_graph"), 500, 500);
         this.host = options.host;
         this.attachEvents();
         this.selectionManager = new utility.SelectionManager({ hostServices: this.host });
     }
 
+    public generateState() {
+        return this._internalState.toJSONObject();
+    }
+
+    public onSetState(state: NetworkNavigatorState) {
+        this._internalState = this._internalState.receive(state);
+
+        // Set the Selected Node
+        if (this._internalState.selectedNodeIndex) {
+            const nodeIndex = this._internalState.selectedNodeIndex;
+            const node = this._nodes && this._nodes.length >= nodeIndex ? this._nodes[nodeIndex] : undefined;
+            this.persistNodeSelection(node as INetworkNavigatorSelectableNode);
+            this.myNetworkNavigator.selectedNode = node;
+        } else {
+            this.persistNodeSelection(undefined);
+            this.myNetworkNavigator.selectedNode = undefined;
+        }
+
+        // Set Text Filter
+        this.myNetworkNavigator.textFilter = this._internalState.textFilter;
+
+        // Set pan & zoom
+        const doesStateHaveScaleAndTranslate = this._internalState.scale &&
+            this._internalState.translate &&
+            this._internalState.translate.length === 2;
+
+        let doesScaleAndTranslateDiffer = false;
+        if (doesStateHaveScaleAndTranslate) {
+            doesScaleAndTranslateDiffer = this._internalState.scale !== this.myNetworkNavigator.scale ||
+                !_.isEqual(this._internalState.translate, this.myNetworkNavigator.translate);
+        }
+
+        if (doesStateHaveScaleAndTranslate && doesScaleAndTranslateDiffer) {
+            this.myNetworkNavigator.scale = this._internalState.scale;
+            this.myNetworkNavigator.translate = this._internalState.translate;
+            this.myNetworkNavigator.redraw();
+        }
+    }
+
     /** 
      * Update is called for data updates, resizes & formatting changes 
      */
-    public update(options: VisualUpdateOptions) {
-        super.update(options);
-
+    public onUpdate(options: VisualUpdateOptions, type: UpdateType) {
         let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
         let dataViewTable = dataView && dataView.table;
         let forceReloadData = false;
 
         // Some settings have been updated
-        const type = this.updateType();
         if (type & UpdateType.Settings) {
             forceReloadData = this.loadSettingsFromPowerBI(dataView);
-        }
-
-        // The visual has been resized
-        if (type & UpdateType.Resize) {
-            this.myNetworkNavigator.dimensions = { width: options.viewport.width, height: options.viewport.height };
-            this.element.css({ width: options.viewport.width, height: options.viewport.height });
         }
 
         // The dataset has been modified, or something has happened that requires us to force reload the data
@@ -198,11 +242,19 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
                     nodes: [],
                 });
             }
+            this.loadSelectionFromPowerBI();
         }
-
-        this.loadSelectionFromPowerBI();
-
         this.myNetworkNavigator.redrawLabels();
+    }
+
+
+    public setDimensions(dim: IDimensions) {
+        if (this.myNetworkNavigator) {
+            this.myNetworkNavigator.dimensions = { width: dim.width, height: dim.height };
+        }
+        if (this.element) {
+            this.element.css({ width: dim.width, height: dim.height });
+        }
     }
 
     /**
@@ -240,11 +292,20 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
         return instances as VisualObjectInstance[];
     }
 
+    public destroy() {
+        super.destroy();
+        this.container.empty();
+    }
+
     /**
      * Gets the inline css used for this element
      */
     protected getCss(): string[] {
         return (super.getCss() || []).concat([MY_CSS_MODULE]);
+    }
+
+    protected getCustomCssModules() {
+        return [MY_CSS_MODULE];
     }
 
     /**
@@ -253,11 +314,12 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
     private loadSelectionFromPowerBI() {
         const data = this.myNetworkNavigator.getData();
         const nodes = data && data.nodes;
-        const selectedIds = this.selectionManager.getSelectionIds();
+        const selectedIds = this._internalState.selectedNodeIndex; this.selectionManager.getSelectionIds();
 
         // For each of the nodes, check to see if their ids are in the selection manager, and
         // mark them as selected
         if (nodes && nodes.length) {
+            this._nodes = nodes;
             let updated = false;
             nodes.forEach((n) => {
                 let isSelected =
@@ -319,8 +381,17 @@ export default class NetworkNavigator extends VisualBase implements IVisual {
             if (this.selectionChangedListener) {
                 this.selectionChangedListener.destroy();
             }
-            this.selectionChangedListener =
-                this.myNetworkNavigator.events.on("selectionChanged", (node: INetworkNavigatorNode) => this.onNodeSelected(node));
+            const dispatcher = this.myNetworkNavigator.events;
+            this.selectionChangedListener = dispatcher.on("selectionChanged", (node: INetworkNavigatorNode) => this.onNodeSelected(node));
+            dispatcher.on("zoomed", ({ scale, translate }: { scale: number, translate: [number, number] }) => {
+                this._internalState = this._internalState.receive({scale, translate});
+            });
+
+            dispatcher.on("textFilter", (textFilter: string) => {
+                this._internalState = this._internalState.receive({ textFilter });
+                const label = textFilter && textFilter !== "" ? `Filtered ${textFilter}` : `Cleared text filter`;
+                publishChange(this, label, this._internalState.toJSONObject());
+            });
 
             // PowerBI will eat some events, so use this to prevent powerbi from eating them
             this.element.find(".filter-box input").on(EVENTS_TO_IGNORE, (e) => e.stopPropagation());

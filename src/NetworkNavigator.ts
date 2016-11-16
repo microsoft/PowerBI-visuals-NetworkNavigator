@@ -29,6 +29,11 @@ import * as CONSTANTS from "./constants";
 import { DEFAULT_EDGE_SIZE, DEFAULT_NODE_SIZE, DEFAULT_CONFIGURATION } from "./defaults";
 import { INetworkNavigatorData, INetworkNavigatorNode, INetworkNavigatorConfiguration } from "./models";
 import template from "./templates/networkNavigator.tmpl";
+import * as _ from "lodash";
+
+/* tslint:disable */
+const log = require("debug")("NetworkNavigator");
+/* tslint:enable */
 
 /**
  * The network navigator is an advanced force graph based component
@@ -40,6 +45,16 @@ export class NetworkNavigator {
      * The event emitter for this graph
      */
     public events = new EventEmitter();
+
+    /**
+     * The current translate
+     */
+    public translate: [number, number] = [0, 0];
+
+    /**
+     * The current scale
+     */
+    public scale: number = 1;
 
     /**
      * The element into which the network navigator is loaded
@@ -98,16 +113,18 @@ export class NetworkNavigator {
         this.element = $(template());
         element.append(this.element);
         this.svgContainer = this.element.find(".svg-container");
-        const filterBox = this.element.find(".search-filter-box");
         this.element.find(".clear-selection").on("click", () => {
-            filterBox.val("");
-            this.filterNodes(filterBox.val());
+            this.textFilter = "";
             this.updateSelection(undefined);
-        });
-        filterBox.on("input", () => {
-            this.filterNodes(filterBox.val());
+            this.events.raiseEvent("textFilter", "");
         });
 
+        const handleTextInput = _.debounce(() => {
+            this.filterNodes(this.textFilter);
+            this.events.raiseEvent("textFilter", this.textFilter);
+        }, 500);
+
+        this.filterBox.on("input", handleTextInput);
         this.dimensions = { width: width, height: height };
         this.svg = d3.select(this.svgContainer[0]).append("svg")
             .attr("width", width)
@@ -119,6 +136,22 @@ export class NetworkNavigator {
             .charge(-120)
             .size([width, height]);
         this.vis = this.svg.append("svg:g");
+        this.redraw();
+    }
+
+    public get textFilter(): string {
+        return this.filterBox.val();
+    }
+
+    public set textFilter(value: string) {
+        if (value !== this.textFilter) {
+            this.filterBox.val(value);
+            this.filterNodes(value);
+        }
+    }
+
+    private get filterBox() {
+        return this.element.find(".search-filter-box");
     }
 
     /**
@@ -249,9 +282,8 @@ export class NetworkNavigator {
      * Redraws the force network navigator
      */
     public redraw() {
-        if (this.vis && d3.event) {
-            let zoomEvt = <any>d3.event;
-            this.vis.attr("transform", `translate(${zoomEvt.translate}) scale(${zoomEvt.scale})`);
+        if (this.vis) {
+            this.vis.attr("transform", `translate(${this.translate}) scale(${this.scale})`);
         }
     }
 
@@ -271,7 +303,16 @@ export class NetworkNavigator {
 
         this.zoom = d3.behavior.zoom()
             .scaleExtent([this._configuration.minZoom, this._configuration.maxZoom])
-            .on("zoom", () => this.redraw());
+            .on("zoom", () => {
+                const event = d3.event as d3.ZoomEvent;
+                this.scale = event.scale;
+                this.translate = event.translate;
+                this.redraw();
+                this.events.raiseEvent("zoomed", {
+                    scale: this.scale,
+                    translate: this.translate,
+                });
+            });
 
         let drag = d3.behavior.drag()
             .origin(function(d: any) { return <any>d; })
@@ -494,6 +535,47 @@ export class NetworkNavigator {
     }
 
     /**
+     * Updates the selection based on the given node
+     */
+    private updateSelection(n? : INetworkNavigatorNode) {
+        let selectedNode = n;
+        if (n !== this._selectedNode) {
+            if (this._selectedNode) {
+                this._selectedNode.selected = false;
+            }
+            if (n) {
+                n.selected = true;
+            }
+        } else {
+            // Toggle the selected node 
+            if (this._selectedNode) {
+                this._selectedNode.selected = false;
+            }
+            selectedNode = undefined;
+        }
+        log("raise selectionChanged", this._selectedNode);
+        this.selectedNode = selectedNode;
+        this.events.raiseEvent("selectionChanged", this._selectedNode);
+    }
+
+    public set selectedNode(n: INetworkNavigatorNode) {
+        if (this._selectedNode !== n) {
+            if (this._selectedNode) {
+                this._selectedNode.selected = false;
+            }
+            this._selectedNode = n;
+            if (n) {
+                n.selected = true;
+            }
+            this.redrawSelection();
+        }
+    }
+
+    public get selectedNode(): INetworkNavigatorNode {
+        return this._selectedNode;
+    }
+
+    /**
      * Reflows the given links and nodes
      */
     private reflow(link: d3.Selection<any>, node: d3.Selection<any>) {
@@ -511,28 +593,5 @@ export class NetworkNavigator {
             .attr("x2", (d: any) => d[2].x)
             .attr("y2", (d: any) => d[2].y);
         node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
-    }
-
-    /**
-     * Updates the selection based on the given node
-     */
-    private updateSelection(n? : INetworkNavigatorNode) {
-        // Toggle the selected node
-        if (n !== this._selectedNode) {
-            if (this._selectedNode) {
-                this._selectedNode.selected = false;
-            }
-            if (n) {
-                n.selected = true;
-            }
-            this._selectedNode = n;
-        } else {
-            if (this._selectedNode) {
-                this._selectedNode.selected = false;
-            }
-            this._selectedNode = undefined;
-        }
-        this.events.raiseEvent("selectionChanged", this._selectedNode);
-        this.redrawSelection();
     }
 }
