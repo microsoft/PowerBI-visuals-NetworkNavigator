@@ -139,6 +139,11 @@ export interface INetworkNavigatorConfiguration {
     maxZoom?: number;
 
     /**
+     * The maximum number of nodes to render
+     */
+    maxNodeCount?: number;
+
+    /**
      * The default color used for labels
      */
     defaultLabelColor?: string;

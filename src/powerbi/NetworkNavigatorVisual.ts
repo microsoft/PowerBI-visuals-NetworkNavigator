@@ -21,11 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 import { NetworkNavigator as NetworkNavigatorImpl } from "../NetworkNavigator";
 import { INetworkNavigatorNode } from "../models";
-import * as CONSTANTS from "../constants";
-import { INetworkNavigatorSelectableNode, INetworkNavigatorVisualSettings } from "./models";
+import { INetworkNavigatorSelectableNode } from "./models";
 import { Visual, UpdateType, capabilities, receiveDimensions, IDimensions } from "essex.powerbi.base";
 import converter from "./dataConversion";
 import IVisualHostServices = powerbi.IVisualHostServices;
@@ -45,7 +43,6 @@ const MY_CSS_MODULE = require("!css!sass!./css/NetworkNavigatorVisual.scss");
 const EVENTS_TO_IGNORE = "mousedown mouseup click focus blur input pointerdown pointerup touchstart touchmove touchdown";
 
 import { DATA_ROLES } from "./constants";
-import { DEFAULT_SETTINGS } from "./defaults";
 import capabilitiesData from "./capabilities";
 
 /* tslint:enable */
@@ -77,16 +74,13 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
     private selectionManager: utility.SelectionManager;
 
     /**
-     * The current set of settings synchronized with powerbi
-     */
-    private settings: INetworkNavigatorVisualSettings = $.extend(true, {}, DEFAULT_SETTINGS);
-
-    /**
      * The internal state of the network navigator
      */
     private _internalState: NetworkNavigatorState;
 
     private _nodes: INetworkNavigatorNode[];
+
+    private _dataView: powerbi.DataView;
 
     /**
      * A debounced event listener for when a node is selected through NetworkNavigator
@@ -159,7 +153,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
             this.element.addClass(className);
         }
 
-        this._internalState = NetworkNavigatorState.create();
+        this._internalState = NetworkNavigatorState.create() as NetworkNavigatorState;
     }
 
     /**
@@ -216,6 +210,9 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
             this.myNetworkNavigator.translate = this._internalState.translate;
             this.myNetworkNavigator.redraw();
         }
+
+        // Set configuration
+        this.myNetworkNavigator.configuration = this._internalState;
     }
 
     /** 
@@ -223,6 +220,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
      */
     public onUpdate(options: VisualUpdateOptions, type: UpdateType) {
         let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
+        this._dataView = dataView;
         let dataViewTable = dataView && dataView.table;
         let forceReloadData = false;
 
@@ -234,7 +232,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         // The dataset has been modified, or something has happened that requires us to force reload the data
         if (type & UpdateType.Data || forceReloadData) {
             if (dataViewTable) {
-                const newData = converter(dataView, this.settings);
+                const newData = converter(dataView, this._internalState);
                 this.myNetworkNavigator.setData(newData);
             } else {
                 this.myNetworkNavigator.setData({
@@ -260,36 +258,8 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
     /**
      * Enumerates the instances for the objects (settings) that appear in the power bi panel
      */
-    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
-        let instances = super.enumerateObjectInstances(options) || [{
-            /* tslint:disable */
-            selector: null,
-            /* tslint:enable */
-            objectName: options.objectName,
-            properties: {},
-        }, ];
-
-        // Layout needs to be handled specially, cause we need to clamp the values to our min/maxes
-        if (options.objectName === "layout") {
-            const { layout } = this.settings;
-            // autoClamp
-            Object.keys(layout).forEach((name: string) => {
-                if (CONSTANTS[name]) {
-                    const { min, max } = CONSTANTS[name];
-                    const value = layout[name];
-                    layout[name] = Math.min(max, Math.max(min, value));
-                }
-            });
-        }
-
-        // Since the structure for our settings reflects those in the capabilities, then just copy them into
-        // the final object
-        $.extend(true, instances[0].properties, this.settings[options.objectName]);
-
-        if (options.objectName === "general") {
-            instances[0].properties["textSize"] = this.myNetworkNavigator.configuration.fontSizePT;
-        }
-        return instances as VisualObjectInstance[];
+    protected handleEnumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): powerbi.VisualObjectInstanceEnumeration {
+        return this._internalState.buildEnumerationObjects(options.objectName, this._dataView, false);
     }
 
     public destroy() {
@@ -341,35 +311,10 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
      * @returns True if there was some settings changed that requires a data reload
      */
     private loadSettingsFromPowerBI(dataView: powerbi.DataView): boolean {
-        // There are some changes to the options
-        if (dataView && dataView.metadata) {
-            const oldSettings = $.extend(true, {}, this.settings);
-            const newObjects = dataView.metadata.objects;
-            const layoutObjs = newObjects && newObjects["layout"];
-            const generalObjs = newObjects && newObjects["general"];
-
-            // Merge in the new settings from PowerBI
-            $.extend(true, this.settings, DEFAULT_SETTINGS, newObjects ? newObjects : {}, {
-                layout: {
-                    fontSizePT: generalObjs && generalObjs["textSize"],
-                    defaultLabelColor: layoutObjs && layoutObjs["defaultLabelColor"] && layoutObjs["defaultLabelColor"].solid.color,
-                },
-            });
-
-            // Remove the general section, added by the above statement
-            delete this.settings["general"];
-
-            // There were some changes to the layout
-            if (!_.isEqual(oldSettings, this.settings)) {
-                this.myNetworkNavigator.configuration = $.extend(true, {}, this.settings.search, this.settings.layout);
-            }
-
-            // If maxNodeCount has changed than we need to reload the data.
-            if (oldSettings.layout.maxNodeCount !== this.settings.layout.maxNodeCount) {
-                return true;
-            }
-        }
-        return false;
+        const oldState = this._internalState;
+        this._internalState = this._internalState.receiveFromPBI(dataView);
+        this.myNetworkNavigator.configuration = this._internalState;
+        return oldState.maxNodeCount !== this._internalState.maxNodeCount;
     }
 
     /**
