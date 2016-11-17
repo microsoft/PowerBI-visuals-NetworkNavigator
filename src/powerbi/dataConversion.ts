@@ -44,6 +44,7 @@ export function converter(
     let targetLabelColorIdx = colMap[roles.targetLabelColor.name];
     let targetIdx = colMap[roles.target.name];
     const edgeValueIdx = colMap[roles.edgeValue.name];
+    const edgeColorValueIdx = colMap[roles.edgeColorValue.name];
     const sourceNodeWeightIdx = colMap[roles.sourceNodeWeight.name];
     const targetNodeWeightIdx = colMap[roles.targetNodeWeight.name];
 
@@ -110,6 +111,7 @@ export function converter(
                                 row[targetLabelColorIdx]/*, 
                                 row[targetGroupIdx]*/).index,
                     value: row[edgeValueIdx],
+                    colorValue: row[edgeColorValueIdx],
                 };
                 nodeList[edge.source].neighbors += 1;
                 nodeList[edge.target].neighbors += 1;

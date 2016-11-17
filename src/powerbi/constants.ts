@@ -51,6 +51,14 @@ export const DATA_ROLES = {
     },
 
     /**
+     * The edge weight
+     */
+    edgeColorValue: {
+        displayName: "Edge Color Weight",
+        name: "EDGE_COLOR_VALUE",
+    },
+
+    /**
      * The source node weight
      */
     sourceNodeWeight: {

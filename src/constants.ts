@@ -56,3 +56,11 @@ export const maxZoom = { min: .0001, max: 100000, default: 100 };
  * Defines the minimum, maximum, and default values for the font size
  */
 export const fontSizePT = { min: 6, max: 30, defaultValue: 8 };
+
+export const edgeStartColor = { defaultValue: "#FDFEFE" };
+
+export const edgeEndColor = { defaultValue: "#273746" };
+
+export const edgeMinWidth = { defaultValue: 1, min: 0, max: 15 };
+
+export const edgeMaxWidth = { defaultValue: 5, min: 1, max: 15 };

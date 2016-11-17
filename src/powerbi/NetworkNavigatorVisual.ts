@@ -314,6 +314,9 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         const oldState = this._internalState;
         this._internalState = this._internalState.receiveFromPBI(dataView);
         this.myNetworkNavigator.configuration = this._internalState;
+        if (!this.isHandlingSetState) {
+            publishChange(this, "Config change", this._internalState.toJSONObject());
+        }
         return oldState.maxNodeCount !== this._internalState.maxNodeCount;
     }
 
