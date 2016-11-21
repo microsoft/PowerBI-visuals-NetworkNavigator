@@ -242,7 +242,7 @@ export class NetworkNavigator {
                     /* tslint:enable */
             }
 
-            // 
+            //
             if (newConfig.caseInsensitive !== this._configuration.caseInsensitive) {
                 this.filterNodes(this.element.find(".search-filter-box").val());
             }
@@ -310,7 +310,7 @@ export class NetworkNavigator {
                 // The use of "function" is important to preserve "this"
                 .on("dragstart", function(d: any) {
 
-                    // Stop the force graph animation while we are dragging, otherwise it causes the graph to 
+                    // Stop the force graph animation while we are dragging, otherwise it causes the graph to
                     // jitter while you drag it
                     (<any>d3.event).sourceEvent.stopPropagation();
                     d3.select(this).classed("dragging", true);
@@ -632,7 +632,7 @@ export class NetworkNavigator {
                 n.selected = true;
             }
         } else {
-            // Toggle the selected node 
+            // Toggle the selected node
             if (this._selectedNode) {
                 this._selectedNode.selected = false;
             }

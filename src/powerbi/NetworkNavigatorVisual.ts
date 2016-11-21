@@ -163,8 +163,8 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         return `<div id="node_graph" style= "height: 100%;"> </div>`;
     }
 
-    /** 
-     * This is called once when the visual is initialially created 
+    /**
+     * This is called once when the visual is initialially created
      */
     public onInit(options: VisualInitOptions): void {
         this.myNetworkNavigator = new NetworkNavigatorImpl(this.element.find("#node_graph"), 500, 500);
@@ -215,8 +215,8 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         this.myNetworkNavigator.configuration = this._internalState;
     }
 
-    /** 
-     * Update is called for data updates, resizes & formatting changes 
+    /**
+     * Update is called for data updates, resizes & formatting changes
      */
     public onUpdate(options: VisualUpdateOptions, type: UpdateType) {
         let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
@@ -267,12 +267,12 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         this.container.empty();
     }
 
-    /**
-     * Gets the inline css used for this element
-     */
-    protected getCss(): string[] {
-        return (super.getCss() || []).concat([MY_CSS_MODULE]);
-    }
+    // /**
+    //  * Gets the inline css used for this element
+    //  */
+    // protected getCss(): string[] {
+    //     return (super.getCss() || []).concat([MY_CSS_MODULE]);
+    // }
 
     protected getCustomCssModules() {
         return [MY_CSS_MODULE];
@@ -317,7 +317,8 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         if (!this.isHandlingSetState) {
             publishChange(this, "Config change", this._internalState.toJSONObject());
         }
-        return oldState.maxNodeCount !== this._internalState.maxNodeCount;
+        return oldState.maxNodeCount !== this._internalState.maxNodeCount ||
+            oldState.labels !== this._internalState.labels;
     }
 
     /**

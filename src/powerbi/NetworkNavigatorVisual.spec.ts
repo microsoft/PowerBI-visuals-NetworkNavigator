@@ -1,32 +1,5 @@
-import "../../base/testSetup";
-
-/* tslint:disable */
-global["powerbi"] = {
-    visuals: {
-        utility: {
-            SelectionManager: function () { 
-                this.getSelectionIds = function(): any[] {
-                    return [];
-                };
-            }
-        },
-        SelectionId: {
-            createWithId: function() {}
-        }
-    },
-    data: {
-        createDataViewScopeIdentity: function() {},
-        SQExprBuilder: {
-            equal: function() {},
-            text: function() {}
-        }
-    },
-    VisualDataRoleKind: {
-        
-    }
-};
-/* tslint:enable */
-
+import "essex.powerbi.base/dist/spec/visualHelpers";
+import { UpdateType } from "essex.powerbi.base";
 import NetworkNavigatorVisual from "./NetworkNavigatorVisual";
 import { expect } from "chai";
 import * as $ from "jquery";
@@ -201,11 +174,11 @@ describe("NetworkNavigatorVisual", () => {
      * Sets up a settings test
      */
     const settingsTestSetup = () => {
-        const { instance } = createInstance();
+        const { instance, element } = createInstance();
         // instance.update(require("./test_cases/simpleSourceTarget.json"));
-        const update = require("./test_cases/settingsChanged.json");
+        const update = require("./test_cases/complexDataWithSettingsChanged.json");
         instance.onUpdate(update, 4);
-        return { instance };
+        return { instance, element };
     };
 
     it("should update the 'animate' property when it changes in power bi", () => {
@@ -263,15 +236,36 @@ describe("NetworkNavigatorVisual", () => {
         expect(instance.myNetworkNavigator.configuration.maxZoom).to.be.equal(1000);
     });
 
-    it("should update the 'defaultLabelColor' property when it changes in power bi", () => {
-        const { instance } = settingsTestSetup();
-
-        expect(instance.myNetworkNavigator.configuration.defaultLabelColor).to.be.equal("#374649");
-    });
-
     it("should update the 'caseInsensitive' property when it changes in power bi", () => {
         const { instance } = settingsTestSetup();
 
         expect(instance.myNetworkNavigator.configuration.caseInsensitive).to.be.equal(false);
+    });
+
+    describe("defaultLabelColor", () => {
+        it("should update the 'defaultLabelColor' property when it changes in power bi", () => {
+            const { instance } = settingsTestSetup();
+            const expectedColor = "#374649"; // #374649 is pulled from the test case
+
+            expect(instance.myNetworkNavigator.configuration.defaultLabelColor).to.be.equal(expectedColor);
+        });
+
+        it.only("should rerender the graph when the 'defaultLabelColor' setting changes", () => {
+            const { instance, element } = createInstance();
+            let update = require("./test_cases/complexDataWithLabels.json"); // Basic data
+            instance.onUpdate(update, UpdateType.DataAndSettings);
+
+            update = require("./test_cases/complexDataWithLabelColor.json"); // Basic data
+            instance.onUpdate(update, UpdateType.Settings);
+
+            const expectedColor = "#374649"; // #374649 is pulled from the test case
+
+            const labels = element.find(".node-label");
+            expect(labels.length).to.be.greaterThan(0);
+
+            labels.each((i, ele) => {
+                expect($(ele).attr("fill")).to.equal(expectedColor);
+            });
+        });
     });
 });
