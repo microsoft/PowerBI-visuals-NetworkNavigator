@@ -3,12 +3,10 @@ import {
     boolSetting,
     numberSetting,
     colorSetting,
+    colors,
 } from "essex.powerbi.base";
 import * as constants from "../constants";
 import { INetworkNavigatorConfiguration } from "../models";
-/* tslint:disable */
-const colors = require("essex.powerbi.base/dist/lib/colors"); 
-/* tslint:enable */
 
 const CAT_SEARCH = "Search";
 const CAT_LAYOUT = "Layout";
