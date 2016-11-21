@@ -547,9 +547,14 @@ export class NetworkNavigator {
         }
     }
 
+    /**
+     * Applies the current scale and translate settings to the view.
+     */
     public zoomToViewport() {
-        if (this.vis) {
+        if (this.zoom && this.vis) {
             this.vis.attr("transform", `translate(${this.translate}) scale(${this.scale})`);
+            this.zoom.scale(this.scale);
+            this.zoom.translate(this.translate);
         }
     }
 

@@ -250,7 +250,7 @@ describe("NetworkNavigatorVisual", () => {
             expect(instance.myNetworkNavigator.configuration.defaultLabelColor).to.be.equal(expectedColor);
         });
 
-        it.only("should rerender the graph when the 'defaultLabelColor' setting changes", () => {
+        it("should rerender the graph when the 'defaultLabelColor' setting changes", () => {
             const { instance, element } = createInstance();
             let update = require("./test_cases/complexDataWithLabels.json"); // Basic data
             instance.onUpdate(update, UpdateType.DataAndSettings);

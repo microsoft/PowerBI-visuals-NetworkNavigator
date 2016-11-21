@@ -106,6 +106,15 @@ describe("NetworkNavigator", () => {
         node.dispatchEvent(me);
     };
 
+    const performZoomPan = (node: Element, zoomDelta: number, panDelta: number) => {
+        performZoom(node, zoomDelta);
+        performDrag(node, panDelta);
+    };
+
+    const getRootGraphElement = () => {
+        return parentEle.find("svg");
+    };
+
     it("should load", () => {
         createInstance();
     });
@@ -315,7 +324,7 @@ describe("NetworkNavigator", () => {
         // Set that datas
         instance.data = oneSourceTwoTargets;
 
-        const svgEle = element.find("svg");
+        const svgEle = getRootGraphElement();
         performZoom(svgEle[0], 1000);
 
         const transform = svgEle.find("g").attr("transform");
@@ -330,7 +339,7 @@ describe("NetworkNavigator", () => {
         // Set that datas
         instance.data = oneSourceTwoTargets;
 
-        const svgEle = element.find("svg");
+        const svgEle = getRootGraphElement();
         performZoom(svgEle[0], -1000);
 
         const transform = svgEle.find("g").attr("transform");
@@ -345,7 +354,7 @@ describe("NetworkNavigator", () => {
         // Set that datas
         instance.data = oneSourceTwoTargets;
 
-        const svgEle = element.find("svg");
+        const svgEle = getRootGraphElement();
         performDrag(svgEle[0], -1000);
 
         const transform = svgEle.find("g").attr("transform");
@@ -443,11 +452,11 @@ describe("NetworkNavigator", () => {
 
         instance.data = oneSourceTwoTargets;
 
-        expect(element.find("svg").attr("height")).to.be.deep.equal("245");
+        expect(getRootGraphElement().attr("height")).to.be.deep.equal("245");
 
         instance.dimensions = { width: 123, height: 643 };
 
-        expect(element.find("svg").attr("height")).to.be.deep.equal("643");
+        expect(getRootGraphElement().attr("height")).to.be.deep.equal("643");
     });
 
     it("should set the height of the svg when dimensions have been changed", () => {
@@ -457,10 +466,41 @@ describe("NetworkNavigator", () => {
 
         instance.data = oneSourceTwoTargets;
 
-        expect(element.find("svg").attr("width")).to.be.deep.equal("260");
+        expect(getRootGraphElement().attr("width")).to.be.deep.equal("260");
 
         instance.dimensions = { width: 123, height: 245 };
 
-        expect(element.find("svg").attr("width")).to.be.deep.equal("123");
+        expect(getRootGraphElement().attr("width")).to.be.deep.equal("123");
+    });
+
+    it("should restore the correct zoom/pan after a redraw", () => {
+        const { instance, element } = createInstance();
+        instance.dimensions = { width: 260, height: 245 };
+
+        // Load it the first time
+        instance.data = oneSourceTwoTargets;
+
+        // Perform the original pan/zoom
+        let svgEle = getRootGraphElement();
+        performZoomPan(svgEle[0], 2000, 2000);
+
+        // Get the current transformation
+        let graph = element.find("svg > g");
+        const originalTransform = graph.attr("transform");
+
+        // Tell our instance to redraw iteself
+        instance.redraw();
+
+        // Perform another "fake" drag/zoom operation
+        svgEle = getRootGraphElement();
+        performZoomPan(svgEle[0], 0, 0);
+
+        // Get the new transform
+        graph = element.find("svg > g");
+        expect(graph.length).to.be.eq(1);
+        const transform = graph.attr("transform");
+
+        // Since we didn't actually pan/zoom anywhere (but faked it), the transforms should be the same
+        expect(transform).to.be.equal(originalTransform);
     });
 });
