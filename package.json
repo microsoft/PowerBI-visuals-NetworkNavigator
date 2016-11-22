@@ -15,8 +15,9 @@
     "test:slim": "npm-run-all --sequential tsc karma:once",
     "compile": "npm-run-all --sequential tsc pbibundle",
     "compile:release": "NODE_ENV=production npm-run-all --sequential tsc pbibundle",
+    "docs": "typedoc --out docs --ignoreCompilerErrors ./ --externalPattern **/node_modules/**/*.* --exclude **/src/**/*.spec.ts",
     "build": "npm-run-all --sequential test compile",
-    "build:release": "NODE_ENV=production npm-run-all --sequential test compile",
+    "build:release": "NODE_ENV=production npm-run-all --sequential test compile"
   },
   "author": "",
   "license": "MIT",
