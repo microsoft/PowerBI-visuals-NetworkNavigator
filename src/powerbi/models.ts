@@ -25,7 +25,7 @@
 import { INetworkNavigatorNode } from "../models";
 
 /**
- * The lineup data
+ * A selectable node within network navigator
  */
 export interface INetworkNavigatorSelectableNode extends powerbi.visuals.SelectableDataPoint, INetworkNavigatorNode {
 

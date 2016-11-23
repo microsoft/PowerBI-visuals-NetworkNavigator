@@ -139,19 +139,36 @@ export class NetworkNavigator {
         this.redraw();
     }
 
+    /**
+     * Escapes RegExp
+     */
+    private static escapeRegExp(str: string) {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    }
+
+    /**
+     * Gets the search filter box
+     */
+    private get filterBox() {
+        return this.element.find(".search-filter-box");
+    }
+
+    /**
+     * Gets the current text filter
+     */
     public get textFilter(): string {
         return this.filterBox.val();
     }
 
+    /**
+     * Sets the current text filter
+     * @param value The value of the text filter
+     */
     public set textFilter(value: string) {
         if (value !== this.textFilter) {
             this.filterBox.val(value);
             this.filterNodes(value);
         }
-    }
-
-    private get filterBox() {
-        return this.element.find(".search-filter-box");
     }
 
     /**
@@ -189,6 +206,7 @@ export class NetworkNavigator {
 
     /**
      * Setter for the configuration
+     * @param newConfig The new configuration to set
      */
     public set configuration(newConfig: INetworkNavigatorConfiguration) {
         newConfig = $.extend(true, {}, this._configuration, newConfig);
@@ -273,10 +291,26 @@ export class NetworkNavigator {
     }
 
     /**
-     * Escapes RegExp
+     * Sets the selected node
      */
-    private static escapeRegExp(str: string) {
-        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    public set selectedNode(n: INetworkNavigatorNode) {
+        if (this._selectedNode !== n) {
+            if (this._selectedNode) {
+                this._selectedNode.selected = false;
+            }
+            this._selectedNode = n;
+            if (n) {
+                n.selected = true;
+            }
+            this.redrawSelection();
+        }
+    }
+
+    /**
+     * Gets the currently selected node
+     */
+    public get selectedNode(): INetworkNavigatorNode {
+        return this._selectedNode;
     }
 
     /**
@@ -287,7 +321,11 @@ export class NetworkNavigator {
         this.zoomToViewport();
     }
 
+    /**
+     * Renders the graph to the user
+     */
     public renderGraph() {
+        // TODO: Break this apart, this is ginormous
         if (this.graph) {
             const graph = this.graph;
             const me = this;
@@ -618,6 +656,7 @@ export class NetworkNavigator {
     /**
      * Listener for node clicked
      * public for testing, cause phantomjs is puking on triggering clicks
+     * @param n The ndoe that was clicked
      */
     public onNodeClicked(n: INetworkNavigatorNode) {
         this.events.raiseEvent("nodeClicked", n);
@@ -626,6 +665,7 @@ export class NetworkNavigator {
 
     /**
      * Updates the selection based on the given node
+     * @param n The node to update selection for
      */
     private updateSelection(n? : INetworkNavigatorNode) {
         let selectedNode = n;
@@ -646,23 +686,6 @@ export class NetworkNavigator {
         log("raise selectionChanged", this._selectedNode);
         this.selectedNode = selectedNode;
         this.events.raiseEvent("selectionChanged", this._selectedNode);
-    }
-
-    public set selectedNode(n: INetworkNavigatorNode) {
-        if (this._selectedNode !== n) {
-            if (this._selectedNode) {
-                this._selectedNode.selected = false;
-            }
-            this._selectedNode = n;
-            if (n) {
-                n.selected = true;
-            }
-            this.redrawSelection();
-        }
-    }
-
-    public get selectedNode(): INetworkNavigatorNode {
-        return this._selectedNode;
     }
 
     /**

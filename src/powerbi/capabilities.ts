@@ -30,7 +30,6 @@ import NetworkNavigatorState from "./state";
 /**
  * Defines the capabilities for this visual for PowerBI
  */
-
 export const capabilities: VisualCapabilities = {
     dataRoles: Object.keys(DATA_ROLES).map(n => ({
         name: DATA_ROLES[n].name,

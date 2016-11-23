@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+// TODO: This isn't necessary with `defaults.ts`
+
 /**
  * Defines the minimum, maximum, and default values for charge
  */
@@ -57,10 +59,22 @@ export const maxZoom = { min: .0001, max: 100000, default: 100 };
  */
 export const fontSizePT = { min: 6, max: 40, defaultValue: 8 };
 
+/**
+ * The default, min, and max start color for edges
+ */
 export const edgeStartColor = { defaultValue: "#FDFEFE" };
 
+/**
+ * The default, min, and max end color for edges
+ */
 export const edgeEndColor = { defaultValue: "#273746" };
 
+/**
+ * The default, min, and max width for the minimum edge width
+ */
 export const edgeMinWidth = { defaultValue: 1, min: 0, max: 15 };
 
+/**
+ * The default, min, and max width for the maximum edge width
+ */
 export const edgeMaxWidth = { defaultValue: 5, min: 1, max: 15 };

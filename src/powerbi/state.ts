@@ -36,11 +36,12 @@ const CAT_SEARCH = "Search";
 const CAT_LAYOUT = "Layout";
 
 /**
- * Represents the state of the timebrush
+ * Represents the state of the network navigator
  */
 export default class NetworkNavigatorVisualState extends HasSettings implements INetworkNavigatorConfiguration {
+
     /**
-     * Searches are case insensitive
+     * If searches are case insensitive
      */
     @boolSetting({
         category: CAT_SEARCH,

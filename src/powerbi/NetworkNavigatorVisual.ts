@@ -48,6 +48,9 @@ import capabilitiesData from "./capabilities";
 /* tslint:enable */
 declare var _: any;
 
+/**
+ * A visual which supports the displaying of graph based datasets in power bi
+ */
 @Visual(require("../build").output.PowerBI)
 @receiveDimensions
 @capabilities(capabilitiesData)
@@ -78,8 +81,14 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
      */
     private _internalState: NetworkNavigatorState;
 
+    /**
+     * The list of nodes loaded into the network navigator
+     */
     private _nodes: INetworkNavigatorNode[];
 
+    /**
+     * The currently loaded dataView
+     */
     private _dataView: powerbi.DataView;
 
     /**
@@ -100,6 +109,157 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         publishChange(this, label, this._internalState.toJSONObject());
     }, 100);
 
+    /*
+     * Constructor for the network navigator
+     */
+    constructor(noCss = false) {
+        super("NetworkNavigator", noCss);
+
+        // Some of the css is in a css module (:local() {....}), this adds the auto generated class to our element
+        const className = MY_CSS_MODULE && MY_CSS_MODULE.locals && MY_CSS_MODULE.locals.className;
+        if (className) {
+            this.element.addClass(className);
+        }
+
+        this._internalState = NetworkNavigatorState.create() as NetworkNavigatorState;
+    }
+
+    /**
+     * Gets the template for this visual
+     */
+    public get template() {
+        return `<div id="node_graph" style= "height: 100%;"> </div>`;
+    }
+
+    /**
+     * This is called once when the visual is initialially created
+     */
+    public onInit(options: VisualInitOptions): void {
+        this.myNetworkNavigator = new NetworkNavigatorImpl(this.element.find("#node_graph"), 500, 500);
+        this.host = options.host;
+        this.attachEvents();
+        this.selectionManager = new utility.SelectionManager({ hostServices: this.host });
+    }
+
+    /**
+     * Generates a state object
+     */
+    public generateState() {
+        return this._internalState.toJSONObject();
+    }
+
+    /**
+     * Called when a new state has been set on the visual
+     * @param state The state that was set
+     */
+    public onSetState(state: NetworkNavigatorState) {
+        this._internalState = this._internalState.receive(state);
+
+        // Set the Selected Node
+        if (this._internalState.selectedNodeIndex) {
+            const nodeIndex = this._internalState.selectedNodeIndex;
+            const node = this._nodes && this._nodes.length >= nodeIndex ? this._nodes[nodeIndex] : undefined;
+            this.persistNodeSelection(node as INetworkNavigatorSelectableNode);
+            this.myNetworkNavigator.selectedNode = node;
+        } else {
+            this.persistNodeSelection(undefined);
+            this.myNetworkNavigator.selectedNode = undefined;
+        }
+
+        // Set Text Filter
+        this.myNetworkNavigator.textFilter = this._internalState.textFilter;
+
+        // Set pan & zoom
+        const doesStateHaveScaleAndTranslate = this._internalState.scale &&
+            this._internalState.translate &&
+            this._internalState.translate.length === 2;
+
+        let doesScaleAndTranslateDiffer = false;
+        if (doesStateHaveScaleAndTranslate) {
+            doesScaleAndTranslateDiffer = this._internalState.scale !== this.myNetworkNavigator.scale ||
+                !_.isEqual(this._internalState.translate, this.myNetworkNavigator.translate);
+        }
+
+        if (doesStateHaveScaleAndTranslate && doesScaleAndTranslateDiffer) {
+            this.myNetworkNavigator.scale = this._internalState.scale;
+            this.myNetworkNavigator.translate = this._internalState.translate;
+            this.myNetworkNavigator.redraw();
+        }
+
+        // Set configuration
+        this.myNetworkNavigator.configuration = this._internalState;
+    }
+
+    /**
+     * Update is called for data updates, resizes & formatting changes
+     * @param options The update options from PBI
+     * @param type The update type that occurred
+     */
+    public onUpdate(options: VisualUpdateOptions, type: UpdateType) {
+        let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
+        this._dataView = dataView;
+        let dataViewTable = dataView && dataView.table;
+        let forceReloadData = false;
+
+        // Some settings have been updated
+        if (type & UpdateType.Settings) {
+            forceReloadData = this.loadSettingsFromPowerBI(dataView);
+        }
+
+        // The dataset has been modified, or something has happened that requires us to force reload the data
+        if (type & UpdateType.Data || forceReloadData) {
+            if (dataViewTable) {
+                const newData = converter(dataView, this._internalState);
+                this.myNetworkNavigator.setData(newData);
+            } else {
+                this.myNetworkNavigator.setData({
+                    links: [],
+                    nodes: [],
+                });
+            }
+            this.loadSelectionFromPowerBI();
+        }
+        this.myNetworkNavigator.redrawLabels();
+    }
+
+    /**
+     * Sets the dimensions of this visual
+     * @param dim The new dimensions
+     */
+    public setDimensions(dim: IDimensions) {
+        if (this.myNetworkNavigator) {
+            this.myNetworkNavigator.dimensions = { width: dim.width, height: dim.height };
+        }
+        if (this.element) {
+            this.element.css({ width: dim.width, height: dim.height });
+        }
+    }
+
+    /**
+     * Destroys the visual
+     */
+    public destroy() {
+        super.destroy();
+        this.container.empty();
+    }
+
+    /**
+     * Enumerates the instances for the objects (settings) that appear in the power bi panel
+     */
+    protected handleEnumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): powerbi.VisualObjectInstanceEnumeration {
+        return this._internalState.buildEnumerationObjects(options.objectName, this._dataView, false);
+    }
+
+    /**
+     * Gets the set of custom modules loaded into this visual
+     */
+    protected getCustomCssModules() {
+        return [MY_CSS_MODULE];
+    }
+
+    /**
+     * Persists the given node as the seelcted node
+     */
     protected persistNodeSelection(node: INetworkNavigatorSelectableNode) {
         /* tslint:disable */
         let filter: any = null;
@@ -141,143 +301,6 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         this.host.persistProperties(objects);
     }
 
-    /*
-     * Constructor for the network navigator
-     */
-    constructor(noCss = false) {
-        super("NetworkNavigator", noCss);
-
-        // Some of the css is in a css module (:local() {....}), this adds the auto generated class to our element
-        const className = MY_CSS_MODULE && MY_CSS_MODULE.locals && MY_CSS_MODULE.locals.className;
-        if (className) {
-            this.element.addClass(className);
-        }
-
-        this._internalState = NetworkNavigatorState.create() as NetworkNavigatorState;
-    }
-
-    /**
-     * Gets the template for this visual
-     */
-    public get template() {
-        return `<div id="node_graph" style= "height: 100%;"> </div>`;
-    }
-
-    /**
-     * This is called once when the visual is initialially created
-     */
-    public onInit(options: VisualInitOptions): void {
-        this.myNetworkNavigator = new NetworkNavigatorImpl(this.element.find("#node_graph"), 500, 500);
-        this.host = options.host;
-        this.attachEvents();
-        this.selectionManager = new utility.SelectionManager({ hostServices: this.host });
-    }
-
-    public generateState() {
-        return this._internalState.toJSONObject();
-    }
-
-    public onSetState(state: NetworkNavigatorState) {
-        this._internalState = this._internalState.receive(state);
-
-        // Set the Selected Node
-        if (this._internalState.selectedNodeIndex) {
-            const nodeIndex = this._internalState.selectedNodeIndex;
-            const node = this._nodes && this._nodes.length >= nodeIndex ? this._nodes[nodeIndex] : undefined;
-            this.persistNodeSelection(node as INetworkNavigatorSelectableNode);
-            this.myNetworkNavigator.selectedNode = node;
-        } else {
-            this.persistNodeSelection(undefined);
-            this.myNetworkNavigator.selectedNode = undefined;
-        }
-
-        // Set Text Filter
-        this.myNetworkNavigator.textFilter = this._internalState.textFilter;
-
-        // Set pan & zoom
-        const doesStateHaveScaleAndTranslate = this._internalState.scale &&
-            this._internalState.translate &&
-            this._internalState.translate.length === 2;
-
-        let doesScaleAndTranslateDiffer = false;
-        if (doesStateHaveScaleAndTranslate) {
-            doesScaleAndTranslateDiffer = this._internalState.scale !== this.myNetworkNavigator.scale ||
-                !_.isEqual(this._internalState.translate, this.myNetworkNavigator.translate);
-        }
-
-        if (doesStateHaveScaleAndTranslate && doesScaleAndTranslateDiffer) {
-            this.myNetworkNavigator.scale = this._internalState.scale;
-            this.myNetworkNavigator.translate = this._internalState.translate;
-            this.myNetworkNavigator.redraw();
-        }
-
-        // Set configuration
-        this.myNetworkNavigator.configuration = this._internalState;
-    }
-
-    /**
-     * Update is called for data updates, resizes & formatting changes
-     */
-    public onUpdate(options: VisualUpdateOptions, type: UpdateType) {
-        let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
-        this._dataView = dataView;
-        let dataViewTable = dataView && dataView.table;
-        let forceReloadData = false;
-
-        // Some settings have been updated
-        if (type & UpdateType.Settings) {
-            forceReloadData = this.loadSettingsFromPowerBI(dataView);
-        }
-
-        // The dataset has been modified, or something has happened that requires us to force reload the data
-        if (type & UpdateType.Data || forceReloadData) {
-            if (dataViewTable) {
-                const newData = converter(dataView, this._internalState);
-                this.myNetworkNavigator.setData(newData);
-            } else {
-                this.myNetworkNavigator.setData({
-                    links: [],
-                    nodes: [],
-                });
-            }
-            this.loadSelectionFromPowerBI();
-        }
-        this.myNetworkNavigator.redrawLabels();
-    }
-
-
-    public setDimensions(dim: IDimensions) {
-        if (this.myNetworkNavigator) {
-            this.myNetworkNavigator.dimensions = { width: dim.width, height: dim.height };
-        }
-        if (this.element) {
-            this.element.css({ width: dim.width, height: dim.height });
-        }
-    }
-
-    /**
-     * Enumerates the instances for the objects (settings) that appear in the power bi panel
-     */
-    protected handleEnumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): powerbi.VisualObjectInstanceEnumeration {
-        return this._internalState.buildEnumerationObjects(options.objectName, this._dataView, false);
-    }
-
-    public destroy() {
-        super.destroy();
-        this.container.empty();
-    }
-
-    // /**
-    //  * Gets the inline css used for this element
-    //  */
-    // protected getCss(): string[] {
-    //     return (super.getCss() || []).concat([MY_CSS_MODULE]);
-    // }
-
-    protected getCustomCssModules() {
-        return [MY_CSS_MODULE];
-    }
-
     /**
      * Loads the selection state from powerbi
      */
@@ -308,6 +331,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
 
     /**
      * Handles updating of the settings
+     * @param dataView The dataView to load the settings from
      * @returns True if there was some settings changed that requires a data reload
      */
     private loadSettingsFromPowerBI(dataView: powerbi.DataView): boolean {
@@ -322,7 +346,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
     }
 
     /**
-     * Attaches the line up events to lineup
+     * Attaches the event listeners to the network navigator
      */
     private attachEvents() {
         if (this.myNetworkNavigator) {
