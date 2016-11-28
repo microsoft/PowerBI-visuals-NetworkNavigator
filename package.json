@@ -17,7 +17,9 @@
     "compile:release": "NODE_ENV=production npm-run-all --sequential tsc pbibundle",
     "docs": "typedoc --out docs --ignoreCompilerErrors ./ --externalPattern **/node_modules/**/*.* --exclude **/src/**/*.spec.ts",
     "build": "npm-run-all --sequential test compile",
-    "build:release": "NODE_ENV=production npm-run-all --sequential test compile"
+    "build:release": "NODE_ENV=production npm-run-all --sequential test compile",
+    "preversion": "npm test",
+    "version": "npm run build:release && git add -A -f dist"
   },
   "author": "",
   "license": "MIT",
