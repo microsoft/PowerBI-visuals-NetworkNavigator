@@ -29,27 +29,30 @@ module.exports = {
     devtool: 'eval',
     resolve: {
         // Add `.ts` and `.tsx` as a resolvable extension.
-        extensions: ['', '.webpack.js', '.web.js', '.js', '.json']
+        extensions: ['', '.webpack.js', '.web.js', '.js', '.json'],
+        alias: {
+            "!css!sass!./css/NetworkNavigatorVisual.scss": 'webpack.config.js', // nothing
+        },
     },
     module: {
         loaders: [
             {
                 test: /\.scss$/,
-                loaders: ["style", "css", "sass"]
+                loader: 'ignore-loader',
             },
             {
                 test: /\.json$/,
-                loader: 'json-loader'
-            }
+                loader: 'json-loader',
+            },
         ],
     },
     externals: {
-        "jsdom": ""
+        "jsdom": "",
     },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.ProvidePlugin({
-            'Promise': 'exports?global.Promise!es6-promise'
-        })
+            'Promise': 'exports?global.Promise!es6-promise',
+        }),
     ],
 };

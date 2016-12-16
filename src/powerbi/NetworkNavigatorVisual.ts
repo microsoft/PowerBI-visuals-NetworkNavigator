@@ -37,7 +37,7 @@ import { StatefulVisual, publishChange } from "pbi-stateful";
 import NetworkNavigatorState from "./state";
 
 /* tslint:disable */
-const MY_CSS_MODULE = require("!css!sass!./css/NetworkNavigatorVisual.scss");
+const MY_CSS_MODULE = require("./css/NetworkNavigatorVisual.scss");
 
 // PBI Swallows these
 const EVENTS_TO_IGNORE = "mousedown mouseup click focus blur input pointerdown pointerup touchstart touchmove touchdown";

@@ -28,7 +28,7 @@ const fs = require("fs");
 
 const config = module.exports = {
     resolve: {
-        extensions: ['', '.webpack.js', '.web.js', '.js', '.json']
+        extensions: ['', '.webpack.js', '.web.js', '.js', '.json'],
     },
     module: {
         loaders: [
@@ -38,7 +38,7 @@ const config = module.exports = {
             },
             {
                 test: /\.json$/,
-                loader: 'json-loader'
+                loader: 'json-loader',
             }
         ],
     },
@@ -52,11 +52,11 @@ const config = module.exports = {
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.ProvidePlugin({
-            'Promise': 'exports?global.Promise!es6-promise'
+            'Promise': 'exports?global.Promise!es6-promise',
         }),
         new webpack.DefinePlugin({
-            'process.env.DEBUG': "\"" + (process.env.DEBUG || "") + "\""
-        })
+            'process.env.DEBUG': "\"" + (process.env.DEBUG || "") + "\"",
+        }),
     ],
 };
 
@@ -72,7 +72,7 @@ if (process.env.NODE_ENV !== "production") {
         output: {
             ascii_only: true, // Necessary, otherwise it screws up the unicode characters that lineup is using for font-awesome 
             comments: false,
-        }
+        },
     });
     config.plugins.push(uglify);
     config.plugins.push(banner);
