@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import "essex.powerbi.base/dist/spec/visualHelpers";
+// import "essex.powerbi.base/dist/spec/visualHelpers";
 import { UpdateType } from "essex.powerbi.base";
 import NetworkNavigatorVisual from "./NetworkNavigatorVisual";
 import { expect } from "chai";

@@ -1,0 +1,18 @@
+machine:
+  node:
+    version: 6
+
+dependencies:
+  cache_directories:
+    - "~/.yarn-cache"
+
+  override:
+    - which node
+    - ./scripts/setup-circle.sh
+    - yarn install
+    - yarn add node-sass --force --target=4.0.0
+
+general:
+  artifacts:
+    - "dist/"
+    - "docs/"
