@@ -21,18 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 "use strict";
 const _ = require("lodash");
 const webpackConf = require("./webpack.config.test");
-
 const isTddMode = process.argv.indexOf("--tdd") > -1;
 
 module.exports = config => {
   config.set({
     basePath: '',
     frameworks: ['mocha'],
-    files: [ '{src,base}/**/*.spec.js'],
+    files: ['{src,base}/**/*.spec.js'],
     exclude: [],
     preprocessors: {
       '{src,base}/**/*.spec.js': ['webpack', 'sourcemap']

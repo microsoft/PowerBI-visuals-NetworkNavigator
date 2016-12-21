@@ -21,8 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import "../base/testSetup";
+import "@essex/pbi-base/dist/spec/visualHelpers";
 
 import { expect } from "chai";
 import { NetworkNavigator } from "./NetworkNavigator";

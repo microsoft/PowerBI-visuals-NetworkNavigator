@@ -35,6 +35,7 @@ import SelectionId = powerbi.visuals.SelectionId;
 import utility = powerbi.visuals.utility;
 import { StatefulVisual, publishChange } from "@essex/pbi-stateful/lib";
 import NetworkNavigatorState from "./state";
+import * as $ from "jquery";
 
 /* tslint:disable */
 const MY_CSS_MODULE = require("./css/NetworkNavigatorVisual.scss");

@@ -26,6 +26,7 @@ import { DATA_ROLES } from "./constants";
 import VisualCapabilities = powerbi.VisualCapabilities;
 import DataViewMapping = powerbi.DataViewMapping;
 import NetworkNavigatorState from "./state";
+import * as $ from "jquery";
 
 /**
  * Defines the capabilities for this visual for PowerBI

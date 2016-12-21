@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-// import "@essex.pbi-base/dist/spec/visualHelpers";
+import "@essex/pbi-base/dist/spec/visualHelpers";
 import { UpdateType } from "@essex/pbi-base";
 import NetworkNavigatorVisual from "./NetworkNavigatorVisual";
 import { expect } from "chai";

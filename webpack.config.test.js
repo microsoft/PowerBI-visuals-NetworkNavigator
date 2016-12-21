@@ -35,18 +35,23 @@ module.exports = {
     module: {
         loaders: [
             {
+                test: /\.scss$/,
+                loader: 'ignore-loader',
+            },
+            {
                 test: /\.json$/,
                 loader: 'json-loader',
             },
         ],
     },
     externals: {
-        "jsdom": "",
-        "powerbi-visuals/lib/powerbi-visuals": "powerbi",
+        "jsdom": ""
     },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery',
             'Promise': 'exports?global.Promise!es6-promise',
         }),
     ],
