@@ -9,8 +9,7 @@ dependencies:
   override:
     - which node
     - ./scripts/setup-circle.sh
-    - yarn install
-    - yarn add node-sass --force --target=4.0.0
+    - yarn install --force
 
 general:
   artifacts:
