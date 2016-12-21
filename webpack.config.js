@@ -28,7 +28,7 @@ const fs = require("fs");
 
 const config = module.exports = {
     resolve: {
-        extensions: ['', '.webpack.js', '.web.js', '.js', '.json'],
+        extensions: ['', '.js', '.json'],
     },
     module: {
         loaders: [

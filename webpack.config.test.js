@@ -44,9 +44,6 @@ module.exports = {
             },
         ],
     },
-    externals: {
-        "jsdom": ""
-    },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.ProvidePlugin({
