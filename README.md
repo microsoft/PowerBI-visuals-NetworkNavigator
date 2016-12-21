@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/Microsoft/PowerBI-visuals-NetworkNavigator/tree/master.svg?style=svg)](https://circleci.com/gh/Microsoft/PowerBI-visuals-NetworkNavigator/tree/master)
+
 # NetworkNavigator
 
 Network Navigator lets you explore node-link data by panning over and zooming into a force-directed node layout (which can be precomputed or animated live). From an initial overview of all nodes, you can use simple text search to enlarge matching nodes in ways that guide subsequent navigation. Network nodes can also be color-coded based on additional attributes of the dataset and filtered by linked visuals.

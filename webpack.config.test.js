@@ -28,10 +28,8 @@ const webpack = require('webpack');
 module.exports = {
     devtool: 'eval',
     resolve: {
-        // Add `.ts` and `.tsx` as a resolvable extension.
-        extensions: ['', '.webpack.js', '.web.js', '.js', '.json'],
+        extensions: ['', '.js', '.json'],
         alias: {
-            "!css!sass!./css/NetworkNavigatorVisual.scss": 'webpack.config.js', // nothing
         },
     },
     module: {
@@ -46,12 +44,11 @@ module.exports = {
             },
         ],
     },
-    externals: {
-        "jsdom": "",
-    },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery',
             'Promise': 'exports?global.Promise!es6-promise',
         }),
     ],
