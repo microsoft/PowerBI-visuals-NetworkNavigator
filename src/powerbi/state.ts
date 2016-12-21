@@ -28,7 +28,7 @@ import {
     numberSetting,
     colorSetting,
     colors,
-} from "essex.powerbi.base";
+} from "@essex/pbi-base";
 import * as constants from "../constants";
 import { INetworkNavigatorConfiguration } from "../models";
 

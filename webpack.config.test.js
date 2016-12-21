@@ -28,18 +28,12 @@ const webpack = require('webpack');
 module.exports = {
     devtool: 'eval',
     resolve: {
-        // Add `.ts` and `.tsx` as a resolvable extension.
-        extensions: ['', '.webpack.js', '.web.js', '.js', '.json'],
+        extensions: ['', '.js', '.json'],
         alias: {
-            "!css!sass!./css/NetworkNavigatorVisual.scss": 'webpack.config.js', // nothing
         },
     },
     module: {
         loaders: [
-            {
-                test: /\.scss$/,
-                loader: 'ignore-loader',
-            },
             {
                 test: /\.json$/,
                 loader: 'json-loader',
@@ -48,6 +42,7 @@ module.exports = {
     },
     externals: {
         "jsdom": "",
+        "powerbi-visuals/lib/powerbi-visuals": "powerbi",
     },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),

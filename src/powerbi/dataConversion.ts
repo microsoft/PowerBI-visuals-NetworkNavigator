@@ -37,7 +37,7 @@ export function converter(
     settings: INetworkNavigatorConfiguration): INetworkNavigatorData<INetworkNavigatorSelectableNode> {
     "use strict";
     let nodeList: INetworkNavigatorSelectableNode[] = [];
-    let nodeMap: { [name: string] : INetworkNavigatorSelectableNode } = {};
+    let nodeMap: { [name: string]: INetworkNavigatorSelectableNode } = {};
     let linkList: INetworkNavigatorLink[] = [];
     let table = dataView.table;
 
@@ -117,26 +117,24 @@ export function converter(
                 /** These need to be strings to work properly */
                 let sourceId = row[sourceIdx] + "";
                 let targetId = row[targetIdx] + "";
-                let edge = {
+                const edge = {
                     source:
                         getNode(sourceId,
                                 identity,
                                 true,
-                                row[sourceNodeWeightIdx],
-                                row[sourceColorIdx],
-                                row[sourceLabelColorIdx]/*,
-                                row[sourceGroup]*/).index,
+                                row[sourceNodeWeightIdx] as number,
+                                row[sourceColorIdx] as string,
+                                row[sourceLabelColorIdx] as string).index,
                     target:
                         getNode(targetId,
                                 identity,
                                 false,
-                                row[targetNodeWeightIdx],
-                                row[targetColorIdx],
-                                row[targetLabelColorIdx]/*, 
-                                row[targetGroupIdx]*/).index,
+                                row[targetNodeWeightIdx] as number,
+                                row[targetColorIdx] as string,
+                                row[targetLabelColorIdx] as string).index,
                     value: row[edgeValueIdx],
                     colorValue: row[edgeColorValueIdx],
-                };
+                } as INetworkNavigatorLink;
                 nodeList[edge.source].neighbors += 1;
                 nodeList[edge.target].neighbors += 1;
                 linkList.push(edge);

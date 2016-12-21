@@ -24,7 +24,7 @@
 import { NetworkNavigator as NetworkNavigatorImpl } from "../NetworkNavigator";
 import { INetworkNavigatorNode } from "../models";
 import { INetworkNavigatorSelectableNode } from "./models";
-import { Visual, UpdateType, capabilities, receiveDimensions, IDimensions } from "essex.powerbi.base";
+import { Visual, UpdateType, capabilities, receiveDimensions, IDimensions } from "@essex/pbi-base";
 import converter from "./dataConversion";
 import IVisualHostServices = powerbi.IVisualHostServices;
 import VisualInitOptions = powerbi.VisualInitOptions;
@@ -33,7 +33,7 @@ import VisualObjectInstance = powerbi.VisualObjectInstance;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import SelectionId = powerbi.visuals.SelectionId;
 import utility = powerbi.visuals.utility;
-import { StatefulVisual, publishChange } from "pbi-stateful";
+import { StatefulVisual, publishChange } from "@essex/pbi-stateful/lib";
 import NetworkNavigatorState from "./state";
 
 /* tslint:disable */
@@ -253,7 +253,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
     /**
      * Gets the set of custom modules loaded into this visual
      */
-    protected getCustomCssModules() {
+    protected getCustomCssModules(): string[] {
         return [MY_CSS_MODULE];
     }
 
@@ -279,7 +279,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
                         objectName: "general",
                         selector: undefined,
                         properties: {
-                            "filter": filter
+                            filter,
                         },
                     },
                 ],
@@ -291,7 +291,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
                         objectName: "general",
                         selector: undefined,
                         properties: {
-                            "filter": filter
+                            filter,
                         },
                     },
                 ],

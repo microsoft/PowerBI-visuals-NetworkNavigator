@@ -407,11 +407,11 @@ export class NetworkNavigator {
             const determineDomain: (
                 configMin: number,
                 configMax: number,
-                fn: (i: any) => number
+                fn: (i: any) => number,
             ) => [number, number] = (
                 configMin: number,
                 configMax: number,
-                fn: (i: any) => number
+                fn: (i: any) => number,
             ) => {
                 if (configMin !== undefined && configMax !== undefined) {
                     return [configMin, configMax];
@@ -434,13 +434,13 @@ export class NetworkNavigator {
             const edgeColorWeightDomain = determineDomain(
                 this.configuration.minEdgeColorWeight,
                 this.configuration.maxEdgeColorWeight,
-                (b) => b[4]
+                (b) => b[4],
             );
 
             const edgeWidthDomain = determineDomain(
                 this.configuration.minEdgeWeight,
                 this.configuration.maxEdgeWeight,
-                (b) => b[3]
+                (b) => b[3],
             );
 
             const edgeColorScale = d3.scale.linear()
@@ -495,7 +495,7 @@ export class NetworkNavigator {
                         d[4],
                         edgeColorScale,
                         edgeColorWeightDomain,
-                        "gray"
+                        "gray",
                     );
                 })
                 .style("stroke-width", function(d: any) {
@@ -503,7 +503,7 @@ export class NetworkNavigator {
                         d[3],
                         edgeWidthScale,
                         edgeWidthDomain,
-                        DEFAULT_EDGE_SIZE
+                        DEFAULT_EDGE_SIZE,
                     );
                 })
                 .attr("id", function(d: any) {
@@ -667,7 +667,7 @@ export class NetworkNavigator {
      * Updates the selection based on the given node
      * @param n The node to update selection for
      */
-    private updateSelection(n? : INetworkNavigatorNode) {
+    private updateSelection(n?: INetworkNavigatorNode) {
         let selectedNode = n;
         if (n !== this._selectedNode) {
             if (this._selectedNode) {
