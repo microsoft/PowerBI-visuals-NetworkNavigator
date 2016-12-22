@@ -18,7 +18,7 @@
     "preversion": "npm run verify",
     "version": "npm run pbibundle"
   },
-  "author": "",
+  "author": "Microsoft",
   "license": "MIT",
   "dependencies": {
     "@essex/pbi-base": "^0.8.23",
