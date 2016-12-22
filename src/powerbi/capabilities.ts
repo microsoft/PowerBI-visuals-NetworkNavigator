@@ -26,6 +26,7 @@ import { DATA_ROLES } from "./constants";
 import VisualCapabilities = powerbi.VisualCapabilities;
 import DataViewMapping = powerbi.DataViewMapping;
 import NetworkNavigatorState from "./state";
+import * as $ from "jquery";
 
 /**
  * Defines the capabilities for this visual for PowerBI
@@ -42,18 +43,21 @@ export const capabilities: VisualCapabilities = {
          */
         table: {
             rows: {
-                select: Object.keys(DATA_ROLES).map(n => ({ bind: { to: DATA_ROLES[n].name }}))
+                select: Object.keys(DATA_ROLES).map(n => ({ bind: { to: DATA_ROLES[n].name }})),
             },
         },
 
         /**
          * Defines the conditions for each of the data roles
          */
-        conditions: <any>[Object.keys(DATA_ROLES).reduce((a, b) => {
-            a[DATA_ROLES[b].name] = { min: 0, max: 1 };
-            return a;
-        }, {}), ],
-    }, ] as DataViewMapping[],
+        conditions: <any>[
+            Object.keys(DATA_ROLES)
+            .reduce((a, b) => {
+                a[DATA_ROLES[b].name] = { min: 0, max: 1 };
+                return a;
+            }, {})
+        ],
+    }] as DataViewMapping[],
     /**
      * Indicates that this visual's dataViews can be sorted
      */

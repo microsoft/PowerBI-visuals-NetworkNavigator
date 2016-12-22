@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-import "essex.powerbi.base/dist/spec/visualHelpers";
-import { UpdateType } from "essex.powerbi.base";
+import "@essex/pbi-base/dist/spec/visualHelpers";
+import { UpdateType } from "@essex/pbi-base";
 import NetworkNavigatorVisual from "./NetworkNavigatorVisual";
 import { expect } from "chai";
 import * as $ from "jquery";

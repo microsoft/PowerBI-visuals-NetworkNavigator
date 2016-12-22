@@ -22,8 +22,10 @@
  * SOFTWARE.
  */
 
-/*@import "../../../node_modules/essex.powerbi.base/css/main";*/
-@import "../../../node_modules/essex.powerbi.base/css/variables";
+/* @import "../../../node_modules/@essex/pbi-base/css/main"; */
+
+@import "../../../node_modules/@essex/pbi-base/css/variables";
+@import "../../../node_modules/@essex/pbi-base/css/font";
 @import "../../css/Base";
 
 :local(.className) {

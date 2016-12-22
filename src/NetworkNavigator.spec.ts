@@ -21,8 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import "../base/testSetup";
+import "@essex/pbi-base/dist/spec/visualHelpers";
 
 import { expect } from "chai";
 import { NetworkNavigator } from "./NetworkNavigator";
@@ -50,7 +49,7 @@ describe("NetworkNavigator", () => {
             element: ele,
         };
         result.instance.configuration = {
-            animate: false
+            animate: false,
         };
         return result;
     };
@@ -131,7 +130,7 @@ describe("NetworkNavigator", () => {
         }, {
             source: 0,
             target: 2,
-        }, ],
+        }],
     };
 
     describe("redrawLabels", () => {
@@ -141,7 +140,7 @@ describe("NetworkNavigator", () => {
             const color = "#123456";
             instance.data = oneSourceTwoTargets;
             instance.configuration = {
-                defaultLabelColor: color
+                defaultLabelColor: color,
             };
             instance.redrawLabels();
 
@@ -161,7 +160,7 @@ describe("NetworkNavigator", () => {
                 }),
             };
             instance.configuration = {
-                defaultLabelColor: "purple"
+                defaultLabelColor: "purple",
             };
             instance.data = myData;
 
@@ -286,7 +285,7 @@ describe("NetworkNavigator", () => {
         const { element, instance } = createInstance();
         const color = "#123456";
         instance.configuration = {
-            defaultLabelColor: color
+            defaultLabelColor: color,
         };
         instance.data = oneSourceTwoTargets;
 
@@ -365,7 +364,7 @@ describe("NetworkNavigator", () => {
         let { instance, element } = createInstance();
 
         instance.configuration = {
-            animate: true
+            animate: true,
         };
 
         // Set that datas
