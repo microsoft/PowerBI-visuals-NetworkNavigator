@@ -21,7 +21,7 @@
   "author": "Microsoft",
   "license": "MIT",
   "dependencies": {
-    "@essex/pbi-base": "^0.8.23",
+    "@essex/pbi-base": "^0.8.24",
     "@essex/pbi-stateful": "^0.12.0",
     "@types/d3": "^3.x",
     "@types/node": "^6.0.52",
@@ -95,8 +95,5 @@
     "wallaby-webpack": "^0.0.26",
     "webpack": "^1.14.0",
     "yargs": "3.31.0"
-  },
-  "publishConfig": {
-    "registry": "http://essex-private-npm.westus.cloudapp.azure.com:4873/"
   }
 }
