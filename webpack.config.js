@@ -24,32 +24,56 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const fs = require("fs");
 
-module.exports = {
-    devtool: 'eval',
+const config = module.exports = {
     resolve: {
         extensions: ['', '.js', '.json'],
-        alias: {
-        },
     },
     module: {
         loaders: [
             {
                 test: /\.scss$/,
-                loader: 'ignore-loader',
+                loaders: ["style", "css", "sass"]
             },
             {
                 test: /\.json$/,
                 loader: 'json-loader',
-            },
+            }
         ],
+    },
+    externals: {
+        jquery: "jQuery",
+        d3: "d3",
+        underscore: "_",
+        "lodash": "_",
+        "powerbi-visuals/lib/powerbi-visuals": "powerbi",
     },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.ProvidePlugin({
-            $: 'jquery',
-            jQuery: 'jquery',
             'Promise': 'exports?global.Promise!es6-promise',
+        }),
+        new webpack.DefinePlugin({
+            'process.env.DEBUG': "\"" + (process.env.DEBUG || "") + "\"",
         }),
     ],
 };
+
+if (process.env.NODE_ENV !== "production") {
+    config.devtool = "eval";    
+} else {
+    var banner = new webpack.BannerPlugin(fs.readFileSync("LICENSE").toString());
+    var uglify = new webpack.optimize.UglifyJsPlugin({
+        mangle: true,
+        minimize: true,
+        compress: false,
+        beautify: false,
+        output: {
+            ascii_only: true, // Necessary, otherwise it screws up the unicode characters that lineup is using for font-awesome 
+            comments: false,
+        },
+    });
+    config.plugins.push(uglify);
+    config.plugins.push(banner);
+}

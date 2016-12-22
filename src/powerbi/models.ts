@@ -22,5 +22,25 @@
  * SOFTWARE.
  */
 
-@import "./variables";
-@import "./includes";
+import { INetworkNavigatorNode } from "../models";
+
+/**
+ * A selectable node within network navigator
+ */
+export interface INetworkNavigatorSelectableNode extends powerbi.visuals.SelectableDataPoint, INetworkNavigatorNode {
+
+    /**
+     * The nodes index into the node list
+     */
+    index: number;
+
+    /**
+     * The number of neighbor nodes to this node
+     */
+    neighbors: number;
+
+    /**
+     * The expression that will exactly match this row
+     */
+    filterExpr: powerbi.data.SQExpr;
+}

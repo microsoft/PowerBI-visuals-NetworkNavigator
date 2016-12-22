@@ -22,5 +22,27 @@
  * SOFTWARE.
  */
 
-@import "./variables";
-@import "./includes";
+/**
+ * The template for the network navigator
+ */
+export default function() {
+    "use strict";
+    return `
+        <div class="graph-container">
+            <div class="button-bar">
+                <ul>
+                    <li class="filter-box" title="Filter Nodes">
+                        <input type="text" placeholder="Enter text filter" class="search-filter-box"/>
+                    </li>
+                    <li class="clear-selection" title="Clear filter and selection">
+                        <a>
+                            <span class="clear-selection-button"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="svg-container">
+            </div>
+        </div>
+    `.trim().replace(/[\r\n]/g, "");
+}
