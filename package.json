@@ -21,7 +21,7 @@
     "preversion": "npm test",
     "version": "npm run build:release && git add -A -f dist"
   },
-  "author": "",
+  "author": "Microsoft",
   "license": "MIT",
   "dependencies": {
     "@types/d3": "^3.x",
