@@ -70,7 +70,7 @@ if (process.env.NODE_ENV !== "production") {
         compress: false,
         beautify: false,
         output: {
-            ascii_only: true, // Necessary, otherwise it screws up the unicode characters that lineup is using for font-awesome 
+            ascii_only: true, // Necessary, otherwise it messes up the unicode characters that lineup is using for font-awesome 
             comments: false,
         },
     });
