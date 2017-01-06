@@ -654,7 +654,7 @@ export class NetworkNavigator {
 
     /**
      * Listener for node clicked
-     * public for testing, cause phantomjs is puking on triggering clicks
+     * public for testing, cause phantomjs is not working on triggering clicks
      * @param n The ndoe that was clicked
      */
     public onNodeClicked(n: INetworkNavigatorNode) {
