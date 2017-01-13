@@ -32,4 +32,7 @@
     svg text {
         @extend %regularFont;
     }
+    .button-bar {
+        @extend %regularFont;
+    }
 }
