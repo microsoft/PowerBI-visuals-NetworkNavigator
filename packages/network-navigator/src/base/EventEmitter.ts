@@ -32,12 +32,12 @@ export default class EventEmitter {
      * Adds an event listener for the given event
      */
     public on(name: string, handler: Function) {
-        var listeners = this.listeners[name] = this.listeners[name] || [];
+        const listeners = this.listeners[name] = this.listeners[name] || [];
         listeners.push(handler);
         return {
             destroy: () => {
-                this.off(name, handler)
-            }
+                this.off(name, handler);
+            },
         };
     }
 
@@ -45,9 +45,9 @@ export default class EventEmitter {
      * Removes an event listener for the given event
      */
     public off(name: string, handler: Function) {
-        var listeners = this.listeners[name];
+        const listeners = this.listeners[name];
         if (listeners) {
-            var idx = listeners.indexOf(handler);
+            const idx = listeners.indexOf(handler);
             if (idx >= 0) {
                 listeners.splice(idx, 1);
             }
@@ -58,7 +58,7 @@ export default class EventEmitter {
      * Raises the given event
      */
     /*protected*/public raiseEvent(name: string, ...args: any[]) {
-        var listeners = this.listeners[name];
+        const listeners = this.listeners[name];
         if (listeners) {
             listeners.forEach((l) => {
                 l.apply(this, args);

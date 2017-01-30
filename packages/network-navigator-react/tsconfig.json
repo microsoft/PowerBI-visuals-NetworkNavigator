@@ -9,9 +9,6 @@
     "suppressImplicitAnyIndexErrors": true
   },
   "compileOnSave": false,
-  "include": [
-      "src/index.ts"
-  ],
   "exclude": [
     "power-bi",
     "node_modules",

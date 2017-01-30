@@ -34,12 +34,12 @@ module.exports = function (wallaby) {
       // {pattern: 'lib/jquery.js', instrument: false},
       {pattern: 'src/**/*.{js,ts,scss,json}', load: false},
       {pattern: 'base/**/*.{js,ts,scss,json}', load: false},
-      {pattern: 'node_modules/@essex/pbi-base/css/*.{scss}', load: false},
+      {pattern: 'node_modules//css/*.{scss}', load: false},
       {pattern: '!src/**/*.spec.ts', load: false}
     ],
 
     tests: [
-      {pattern: 'src/**/NetworkNavigatorVisual.spec.ts', load: false}
+      {pattern: 'src/**/NetworkNavigator.spec.ts', load: false}
     ],
 
     postprocessor: wallabyPostprocessor,

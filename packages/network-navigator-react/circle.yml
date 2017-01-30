@@ -1,0 +1,17 @@
+machine:
+  node:
+    version: 6
+
+dependencies:
+  cache_directories:
+    - "~/.yarn-cache"
+
+  override:
+    - which node
+    - ./scripts/setup-circle.sh
+    - yarn install --force
+
+general:
+  artifacts:
+    - "dist/"
+    - "docs/"
