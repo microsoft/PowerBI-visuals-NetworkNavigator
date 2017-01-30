@@ -3,7 +3,7 @@ node_modules/
 
 # Temp Files
 .DS_Store
-/.scripts
+.scripts
 /dump
 
 # IDE / Editors
