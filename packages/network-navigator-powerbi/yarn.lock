@@ -2,6 +2,14 @@
 # yarn lockfile v1
 
 
+"@essex/network-navigator@file:../network-navigator":
+  version "0.11.2"
+  dependencies:
+    d3 "3.5.12"
+    debug "^2.6.0"
+    jquery "^2.2.0"
+    lodash "4.0.0"
+
 "@essex/pbi-base@^0.8.24":
   version "0.8.24"
   resolved "https://registry.yarnpkg.com/@essex/pbi-base/-/pbi-base-0.8.24.tgz#4d84334a744823eac6386616949984ada1d98833"
@@ -1219,6 +1227,12 @@ debug@2.2.0, debug@~2.2.0:
 debug@2.X, debug@^2.1.1, debug@^2.2.0:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.3.3.tgz#40c453e67e6e13c901ddec317af8986cda9eff8c"
+  dependencies:
+    ms "0.7.2"
+
+debug@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.0.tgz#bc596bcabe7617f11d9fa15361eded5608b8499b"
   dependencies:
     ms "0.7.2"
 
@@ -4200,13 +4214,13 @@ postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0
     source-map "^0.5.6"
     supports-color "^3.1.2"
 
-powerbi-visuals@*, powerbi-visuals@^0.5.9:
-  version "0.5.9"
-  resolved "https://registry.yarnpkg.com/powerbi-visuals/-/powerbi-visuals-0.5.9.tgz#6412aa5c6f08d39f4a6ff4e819ec4705b004c1dd"
-
-powerbi-visuals@^0.3.8:
+powerbi-visuals@*, powerbi-visuals@^0.3.8:
   version "0.3.10"
   resolved "https://registry.yarnpkg.com/powerbi-visuals/-/powerbi-visuals-0.3.10.tgz#fc6abce25930b29bce9941f85ffeae7dd43e909e"
+
+powerbi-visuals@^0.5.9:
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/powerbi-visuals/-/powerbi-visuals-0.5.9.tgz#6412aa5c6f08d39f4a6ff4e819ec4705b004c1dd"
 
 prepend-http@^1.0.0, prepend-http@^1.0.1:
   version "1.0.4"

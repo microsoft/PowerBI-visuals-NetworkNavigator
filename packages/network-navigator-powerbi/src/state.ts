@@ -29,8 +29,7 @@ import {
     colorSetting,
     colors,
 } from "@essex/pbi-base";
-import * as constants from "../constants";
-import { INetworkNavigatorConfiguration } from "../models";
+import { constants, INetworkNavigatorConfiguration } from "@essex/network-navigator";
 
 const CAT_SEARCH = "Search";
 const CAT_LAYOUT = "Layout";

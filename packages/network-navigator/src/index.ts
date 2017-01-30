@@ -23,4 +23,16 @@
  */
 
 import { NetworkNavigator } from "./NetworkNavigator";
+import * as constants from "./constants";
+import * as defaults from "./defaults";
+import * as templates from "./templates/networkNavigator.tmpl";
+
+export {
+    constants,
+    defaults,
+    templates
+};
+
+export * from "./models";
+
 export default NetworkNavigator;

@@ -25,14 +25,14 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as $ from "jquery";
-import { NetworkNavigator as NetworkNavigatorImpl } from "../NetworkNavigator";
 import {
+    default as NetworkNavigatorImpl,
     INetworkNavigatorData,
     INetworkNavigatorNode,
     INetworkNavigatorConfiguration,
-} from "../models";
+} from "@essex/network-navigator";
 
-import "../css/NetworkNavigator.scss";
+// import "../css/NetworkNavigator.scss";
 
 export interface INetworkNavigatorProps {
     graph: INetworkNavigatorData<INetworkNavigatorNode>;

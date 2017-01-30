@@ -21,26 +21,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import { INetworkNavigatorNode } from "@essex/network-navigator";
-
-/**
- * A selectable node within network navigator
- */
-export interface INetworkNavigatorSelectableNode extends powerbi.visuals.SelectableDataPoint, INetworkNavigatorNode {
-
-    /**
-     * The nodes index into the node list
-     */
-    index: number;
-
-    /**
-     * The number of neighbor nodes to this node
-     */
-    neighbors: number;
-
-    /**
-     * The expression that will exactly match this row
-     */
-    filterExpr: powerbi.data.SQExpr;
-}
+export { NetworkNavigator } from "./NetworkNavigatorReact";

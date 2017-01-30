@@ -9,7 +9,7 @@
     "lint": "tslint 'src/**/*[!.d].{ts,tsx}'",
     "karma:tdd": "karma start --tdd",
     "karma:once": "karma start",
-    "docs": "typedoc --out docs --ignoreCompilerErrors ./ --externalPattern **/node_modules/**/*.* --exclude **/src/**/*.spec.ts",
+    "docs": "typedoc --out docs --ignoreCompilerErrors ./ --externalPattern **/node_modules/**/*.* --exclude **/src/**/*.spec.ts > /dev/null || exit 1",
     "verify": "npm run clean && tsc && npm-run-all lint karma:once docs",
     "test": "npm run verify",
     "version": "npm run verify"

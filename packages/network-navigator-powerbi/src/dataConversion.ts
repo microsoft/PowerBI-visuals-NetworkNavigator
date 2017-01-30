@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import { INetworkNavigatorData, INetworkNavigatorLink, INetworkNavigatorConfiguration } from "../models";
+import { INetworkNavigatorData, INetworkNavigatorLink, INetworkNavigatorConfiguration } from "@essex/network-navigator";
 import { INetworkNavigatorSelectableNode } from "./models";
 import { DATA_ROLES } from "./constants";
 
