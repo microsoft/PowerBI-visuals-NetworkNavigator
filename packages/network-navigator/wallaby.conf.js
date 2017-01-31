@@ -34,7 +34,7 @@ module.exports = function (wallaby) {
       // {pattern: 'lib/jquery.js', instrument: false},
       {pattern: 'src/**/*.{js,ts,scss,json}', load: false},
       {pattern: 'base/**/*.{js,ts,scss,json}', load: false},
-      {pattern: 'node_modules//css/*.{scss}', load: false},
+      {pattern: 'node_modules/css/*.{scss}', load: false},
       {pattern: '!src/**/*.spec.ts', load: false}
     ],
 
