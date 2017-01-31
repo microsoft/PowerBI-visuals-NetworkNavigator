@@ -4,7 +4,7 @@
 
 This is the PowerBI visual version of the Network Navigator.
 
-![Network Navigator](/src/assets/screenshot.png?raw=true)
+![Network Navigator](/packages/network-navigator-powerbi/src/assets/screenshot.png?raw=true)
 
 > This visual is currently in beta testing and is undergoing active development.
 
