@@ -22,17 +22,25 @@
  * SOFTWARE.
  */
 
-/* @import "../../../node_modules/@essex/pbi-base/css/main"; */
+import { INetworkNavigatorNode } from "@essex/network-navigator";
 
-@import "../../../node_modules/@essex/pbi-base/css/variables";
-@import "../../../node_modules/@essex/pbi-base/css/font";
-@import "../../css/Base";
+/**
+ * A selectable node within network navigator
+ */
+export interface INetworkNavigatorSelectableNode extends powerbi.visuals.SelectableDataPoint, INetworkNavigatorNode {
 
-:local(.className) {
-    svg text {
-        @extend %regularFont;
-    }
-    .button-bar {
-        @extend %regularFont;
-    }
+    /**
+     * The nodes index into the node list
+     */
+    index: number;
+
+    /**
+     * The number of neighbor nodes to this node
+     */
+    neighbors: number;
+
+    /**
+     * The expression that will exactly match this row
+     */
+    filterExpr: powerbi.data.SQExpr;
 }

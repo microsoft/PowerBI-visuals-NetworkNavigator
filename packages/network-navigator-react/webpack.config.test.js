@@ -21,34 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-var wallabyWebpack = require('wallaby-webpack');
-var wallabyPostprocessor = wallabyWebpack(require("./webpack.config.test"));
 
-module.exports = function (wallaby) {
-  return {
-    // set `load: false` to all source files and tests processed by webpack
-    // (except external files),
-    // as they should not be loaded in browser,
-    // their wrapped versions will be loaded instead
-    files: [
-      // {pattern: 'lib/jquery.js', instrument: false},
-      {pattern: 'src/**/*.{js,ts,scss,json}', load: false},
-      {pattern: 'base/**/*.{js,ts,scss,json}', load: false},
-      {pattern: 'node_modules/@essex/pbi-base/css/*.{scss}', load: false},
-      {pattern: '!src/**/*.spec.ts', load: false}
+const path = require('path');
+const webpack = require('webpack');
+
+module.exports = {
+    devtool: 'eval',
+    resolve: {
+        extensions: ['', '.js', '.json'],
+        alias: {
+        },
+    },
+    module: {
+        loaders: [
+            {
+                test: /\.scss$/,
+                loader: 'ignore-loader',
+            },
+            {
+                test: /\.json$/,
+                loader: 'json-loader',
+            },
+        ],
+    },
+    plugins: [
+        new webpack.optimize.OccurenceOrderPlugin(),
+        new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery',
+            'Promise': 'exports?global.Promise!es6-promise',
+        }),
     ],
-
-    tests: [
-      {pattern: 'src/**/NetworkNavigatorVisual.spec.ts', load: false}
-    ],
-
-    postprocessor: wallabyPostprocessor,
-
-    testFramework: "mocha",
-
-    setup: function () {
-      // required to trigger test loading
-      window.__moduleBundler.loadTests();
-    }
-  };
 };

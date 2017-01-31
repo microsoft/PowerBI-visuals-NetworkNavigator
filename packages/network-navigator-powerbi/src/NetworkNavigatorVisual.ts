@@ -21,8 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { NetworkNavigator as NetworkNavigatorImpl } from "../NetworkNavigator";
-import { INetworkNavigatorNode } from "../models";
+import { default as NetworkNavigatorImpl } from "@essex/network-navigator";
+import { INetworkNavigatorNode } from "@essex/network-navigator";
 import { INetworkNavigatorSelectableNode } from "./models";
 import { Visual, UpdateType, capabilities, receiveDimensions, IDimensions } from "@essex/pbi-base";
 import converter from "./dataConversion";
@@ -52,7 +52,7 @@ declare var _: any;
 /**
  * A visual which supports the displaying of graph based datasets in power bi
  */
-@Visual(require("../build").output.PowerBI)
+@Visual(require("./build.json").output.PowerBI)
 @receiveDimensions
 @capabilities(capabilitiesData)
 export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorState> {

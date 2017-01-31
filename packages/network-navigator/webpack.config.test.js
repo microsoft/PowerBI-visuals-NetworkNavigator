@@ -22,25 +22,34 @@
  * SOFTWARE.
  */
 
-import { INetworkNavigatorNode } from "../models";
+const path = require('path');
+const webpack = require('webpack');
 
-/**
- * A selectable node within network navigator
- */
-export interface INetworkNavigatorSelectableNode extends powerbi.visuals.SelectableDataPoint, INetworkNavigatorNode {
-
-    /**
-     * The nodes index into the node list
-     */
-    index: number;
-
-    /**
-     * The number of neighbor nodes to this node
-     */
-    neighbors: number;
-
-    /**
-     * The expression that will exactly match this row
-     */
-    filterExpr: powerbi.data.SQExpr;
-}
+module.exports = {
+    devtool: 'eval',
+    resolve: {
+        extensions: ['', '.js', '.json'],
+        alias: {
+        },
+    },
+    module: {
+        loaders: [
+            {
+                test: /\.scss$/,
+                loader: 'ignore-loader',
+            },
+            {
+                test: /\.json$/,
+                loader: 'json-loader',
+            },
+        ],
+    },
+    plugins: [
+        new webpack.optimize.OccurenceOrderPlugin(),
+        new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery',
+            'Promise': 'exports?global.Promise!es6-promise',
+        }),
+    ],
+};
