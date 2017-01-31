@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "postinstall": "lerna exec --concurrency=1 -- yarn && lerna exec --concurrency=99 -- linklocal"
+    "postinstall": "lerna exec --concurrency=1 -- yarn && lerna exec --concurrency=99 -- linklocal --named @essex/network-navigator ../network-navigator"
   },
   "devDependencies": {
     "lerna": "2.0.0-beta.34",
