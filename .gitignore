@@ -15,7 +15,7 @@ build/
 dist/
 docs/
 *.js
-!/*.js
+!/packages/*/*.js
 *.d.ts
 !/src/references.d.ts
 !/base/powerbi/powerbi.d.ts
