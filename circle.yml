@@ -15,7 +15,7 @@ dependencies:
         echo "The correct version of Yarn is already installed."
       fi
   override:
-    - npm install # npm install actually runs lerna's install, which in terns runs yarn install
+    - yarn # npm install actually runs lerna's install, which in terns runs yarn install
 
   cache_directories:
     - ~/.yarn
@@ -24,7 +24,7 @@ dependencies:
 test:
   override:
    # We need to seperate these out, cause the rest of the projects depend on network-navigator being built first.
-    - NODE_ENV=production lerna --scope @essex/network-navigator run test && NODE_ENV=production lerna run test --ignore @essex/network-navigator
+    - NODE_ENV=production yarn test
 
 general:
   artifacts:

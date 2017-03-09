@@ -21,3 +21,5 @@ docs/
 !/base/powerbi/powerbi.d.ts
 !/base/powerbi/references.d.ts
 build.out
+yarn-error.log
+lerna-debug.log

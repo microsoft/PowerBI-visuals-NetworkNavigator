@@ -1,19 +1,14 @@
 [![CircleCI](https://circleci.com/gh/Microsoft/PowerBI-visuals-NetworkNavigator/tree/master.svg?style=svg)](https://circleci.com/gh/Microsoft/PowerBI-visuals-NetworkNavigator/tree/master)
 
-# NetworkNavigator
+# Network Navigator -- React
 
-Network Navigator lets you explore node-link data by panning over and zooming into a force-directed node layout (which can be precomputed or animated live). From an initial overview of all nodes, you can use simple text search to enlarge matching nodes in ways that guide subsequent navigation. Network nodes can also be color-coded based on additional attributes of the dataset and filtered by linked visuals.
+This is the react version of the Network Navigator.
 
 > This visual is currently in beta testing and is undergoing active development.
 
-## Getting Started
+## Usage
 * Fork this repo
 * Install [node.js 6+](https://nodejs.org)
-* Run `npm install` on the project directory
-* The `src` directory contains all of the visual's code.
-
-## Building
-* Running `npm run build` will do the following:
-  * Compiles the `src` directory.
-  * Creates a `.pbiviz` file in the `dist\powerbi` directory.
-    * Go to [Power BI](https://app.powerbi.com/), and to import your new visual.
+* Install [yarn](https://yarnpkg.com/)
+* Run `yarn && yarn test` in the `../network-navigator` directory
+* Run `yarn && yarn test` in this directory.

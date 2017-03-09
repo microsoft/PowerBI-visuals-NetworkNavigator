@@ -16,7 +16,8 @@
     "verify": "npm-run-all clean tsc lint karma:once docs",
     "test": "npm-run-all verify pbibundle",
     "preversion": "npm run verify",
-    "version": "npm run pbibundle"
+    "version": "npm run pbibundle",
+    "postinstall": "linklocal"
   },
   "author": "Microsoft",
   "license": "MIT",
@@ -73,6 +74,7 @@
     "karma-sinon-chai": "^1.2.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
+    "linklocal": "^2.8.0",
     "lolex": "^1.4.0",
     "mocha": "^3.2.0",
     "node-sass": "^4.0.0",
