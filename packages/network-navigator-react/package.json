@@ -13,7 +13,8 @@
     "build": "npm-run-all --sequential test compile",
     "verify": "npm-run-all tsc lint karma:once docs",
     "test": "npm run verify",
-    "version": "npm run verify"
+    "version": "npm run verify",
+    "postinstall": "linklocal"
   },
   "author": "Microsoft",
   "license": "MIT",
@@ -43,6 +44,7 @@
     "karma-sinon-chai": "^1.2.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
+    "linklocal": "^2.8.0",
     "mocha": "^3.2.0",
     "node-sass": "^4.0.0",
     "npm-run-all": "^3.1.2",
