@@ -13,7 +13,7 @@
     "karma:once": "karma start",
     "docs": "typedoc --out docs --ignoreCompilerErrors ./ --externalPattern \"**/node_modules/**/*.*\" --exclude \"**/src/**/*.spec.ts\"",
     "build": "npm-run-all --sequential test compile",
-    "verify": "npm-run-all clean compile lint karma:once docs",
+    "verify": "npm run clean && npm run compile && npm-run-all lint karma:once docs",
     "test": "npm-run-all verify pbibundle",
     "preversion": "npm run verify",
     "version": "npm run pbibundle",
