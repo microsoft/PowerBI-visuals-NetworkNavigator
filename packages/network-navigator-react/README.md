@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Microsoft/PowerBI-visuals-NetworkNavigator.svg?branch=master)](https://travis-ci.org/Microsoft/PowerBI-visuals-NetworkNavigator)
+[![Build Status](https://travis-ci.org/Microsoft/PowerBI-visuals-NetworkNavigator.svg?branch=develop)](https://travis-ci.org/Microsoft/PowerBI-visuals-NetworkNavigator)
 
 # Network Navigator -- React
 
