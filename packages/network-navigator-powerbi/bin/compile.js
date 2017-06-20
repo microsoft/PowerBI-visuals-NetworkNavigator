@@ -13,6 +13,7 @@ function checkAndLog(data) {
         console.log(data);
         hasErrors = true;
     }
+    console.log(data);
 }
 
 tsc.stdout.on('data', checkAndLog);
