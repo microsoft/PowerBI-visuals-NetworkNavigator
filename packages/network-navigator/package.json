@@ -6,10 +6,10 @@
   "typings": "src/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "lint": "tslint 'src/**/*[!.d].{ts,tsx}'",
+    "lint": "tslint \"src/**/*[!.d].{ts,tsx}\"",
     "karma:tdd": "karma start --tdd",
     "karma:once": "karma start",
-    "docs": "typedoc --out docs --ignoreCompilerErrors ./ --externalPattern **/node_modules/**/*.* --exclude **/src/**/*.spec.ts > /dev/null || exit 1",
+    "docs": "typedoc --out docs --ignoreCompilerErrors ./ --externalPattern \"**/node_modules/**/*.*\" --exclude \"**/src/**/*.spec.ts\"",
     "verify": "npm run clean && tsc && npm-run-all lint karma:once docs",
     "test": "npm run verify",
     "version": "npm run verify"
@@ -47,8 +47,8 @@
     "rimraf": "^2.5.4",
     "sass-loader": "^4.1.0",
     "tslint": "^4.1.1",
-    "typedoc": "^0.5.1",
-    "typescript": "^2.0.8",
+    "typedoc": "^0.7.1",
+    "typescript": "2.3",
     "underscore": "1.8.3",
     "wallaby-webpack": "^0.0.26",
     "webpack": "^1.14.0"

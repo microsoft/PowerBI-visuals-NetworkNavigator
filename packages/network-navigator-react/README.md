@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/Microsoft/PowerBI-visuals-NetworkNavigator/tree/master.svg?style=svg)](https://circleci.com/gh/Microsoft/PowerBI-visuals-NetworkNavigator/tree/master)
+[![Build Status](https://travis-ci.org/Microsoft/PowerBI-visuals-NetworkNavigator.svg?branch=master)](https://travis-ci.org/Microsoft/PowerBI-visuals-NetworkNavigator)
 
 # Network Navigator -- React
 
