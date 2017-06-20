@@ -6,7 +6,7 @@
   "typings": "src/index.d.ts",
   "scripts": {
     "lint": "tslint \"src/**/*[!.d].{ts,tsx}\"",
-    "compile": "node ./bin/compile",
+    "compile": "node ./scripts/compile",
     "karma:tdd": "karma start --tdd",
     "karma:once": "karma start",
     "docs": "typedoc --out docs --ignoreCompilerErrors ./ --externalPattern \"**/node_modules/**/*.*\" --exclude \"**/src/**/*.spec.ts\"",

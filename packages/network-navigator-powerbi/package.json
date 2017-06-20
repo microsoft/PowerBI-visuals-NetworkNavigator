@@ -6,7 +6,7 @@
   "typings": "src/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "compile": "node ./bin/compile",
+    "compile": "node ./scripts/compile",
     "pbibundle": "gulp",
     "lint": "tslint \"src/**/*[!.d].{ts,tsx}\"",
     "karma:tdd": "karma start --tdd",
