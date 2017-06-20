@@ -34,7 +34,8 @@ import SelectionId = powerbi.visuals.SelectionId;
  */
 export function converter(
     dataView: DataView,
-    settings: INetworkNavigatorConfiguration): INetworkNavigatorData<INetworkNavigatorSelectableNode> {
+    settings: INetworkNavigatorConfiguration,
+    filterColumn?: powerbi.DataViewMetadataColumn): INetworkNavigatorData<INetworkNavigatorSelectableNode> {
     "use strict";
     let nodeList: INetworkNavigatorSelectableNode[] = [];
     let nodeMap: { [name: string]: INetworkNavigatorSelectableNode } = {};
@@ -88,7 +89,9 @@ export function converter(
         group: number = 0): INetworkNavigatorSelectableNode {
         const field = (isSource ? sourceField : targetField);
         let node = nodeMap[id];
-        let expr = powerbi.data.SQExprBuilder.equal(field as powerbi.data.SQExpr, powerbi.data.SQExprBuilder.text(id));
+        const SQExprBuilder = powerbi.data.SQExprBuilder;
+        let identityExpr = SQExprBuilder.equal(field as powerbi.data.SQExpr, SQExprBuilder.text(id));
+        const filterExpr = filterColumn ? SQExprBuilder.equal(<any>filterColumn.expr, SQExprBuilder.text(id)) : identityExpr;
 
         if (!nodeMap[id]) {
             node = nodeMap[id] = {
@@ -96,11 +99,11 @@ export function converter(
                 color: color || "gray",
                 labelColor: labelColor,
                 index: nodeList.length,
-                filterExpr: expr,
+                filterExpr,
                 value: nodeWeight,
                 neighbors: 1,
                 selected: false,
-                identity: SelectionId.createWithId(powerbi.data.createDataViewScopeIdentity(expr)),
+                identity: SelectionId.createWithId(powerbi.data.createDataViewScopeIdentity(identityExpr)),
             };
             nodeList.push(node);
         }

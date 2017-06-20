@@ -113,4 +113,12 @@ export const DATA_ROLES = {
         displayName: "Target Node Label Color",
         name: "TARGET_LABEL_COLOR",
     },
+
+    /**
+     * The filter field
+     */
+    filterField: {
+        displayName: "Filter",
+        name: "FILTER_FIELD",
+    },
 };
