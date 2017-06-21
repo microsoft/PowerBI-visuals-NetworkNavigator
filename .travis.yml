@@ -1,10 +1,18 @@
-sudo: false
+sudo: true
 language: node_js
 node_js:
   - "6"
 before_install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 0.24.6
   - export PATH=$HOME/.yarn/bin:$PATH
+  - sudo apt-get update
+  - sudo apt-get install python3
 cache:
   yarn: true
 script: NODE_ENV=production yarn test
+after_success:
+  - pip install --user azure-cli
+  - export PATH=$PATH:~/.local/bin
+  - PACKAGE_VERSION=$(node -p -e "require('./packages/network-navigator-powerbi/package.json').version")
+  - FILE_NAME=network-navigator-$PACKAGE_VERSION.$TRAVIS_BUILD_NUMBER.pbiviz
+  - az storage blob upload --container-name $AZURE_CONTAINER --file ./packages/network-navigator-powerbi/dist/powerbi/@essex/network-navigator-powerbi.pbiviz --name $FILE_NAME
