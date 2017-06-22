@@ -210,7 +210,8 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         // The dataset has been modified, or something has happened that requires us to force reload the data
         if (type & UpdateType.Data || forceReloadData) {
             if (dataViewTable) {
-                const newData = converter(dataView, this._internalState);
+                const filterColumn = dataView.metadata.columns.filter(n => n.roles[DATA_ROLES.filterField.name])[0];
+                const newData = converter(dataView, this._internalState, filterColumn);
                 this.myNetworkNavigator.setData(newData);
             } else {
                 this.myNetworkNavigator.setData({
