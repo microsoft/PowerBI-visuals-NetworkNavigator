@@ -25,13 +25,20 @@
 const path = require('path');
 const webpack = require('webpack');
 const fs = require("fs");
+const ENTRY = './src/NetworkNavigatorVisual.js';
+const regex = path.normalize(ENTRY).replace(/\\/g, '\\\\').replace(/\./g, '\\.');
 
 const config = module.exports = {
+    entry: ENTRY,
     resolve: {
         extensions: ['', '.js', '.json'],
     },
     module: {
         loaders: [
+            {
+                test: new RegExp(regex),
+                loader: path.join(__dirname, 'scripts', 'pbiPluginLoader'),
+            },
             {
                 test: /\.scss$/,
                 loaders: ["css", "sass"]

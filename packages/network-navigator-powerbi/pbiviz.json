@@ -1,0 +1,24 @@
+{
+  "visual": {
+    "name": "NetworkNavigator",
+    "displayName": "Network Navigator",
+    "guid": "TemplateVisual1642123423151",
+    "visualClassName": "NetworkNavigator",
+    "description": "ESSEX Visual Template",
+    "supportUrl": "",
+    "gitHubUrl": ""
+  },
+  "author": {
+    "name": "",
+    "email": ""
+  },
+  "apiVersion": "",
+  "assets": {
+    "icon": "src/assets/icon.png",
+    "thumbnail": "src/assets/thumbnail.png",
+    "screenshot": "src/assets/screenshot.png"
+  },
+  "style": "",
+  "capabilities": "capabilities.json",
+  "output": "dist/essexVisualTemplate.pbiviz"
+}
