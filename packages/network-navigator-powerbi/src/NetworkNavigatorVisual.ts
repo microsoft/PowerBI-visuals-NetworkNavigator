@@ -52,9 +52,7 @@ declare var _: any;
 /**
  * A visual which supports the displaying of graph based datasets in power bi
  */
-@Visual(require("./build.json").output.PowerBI)
 @receiveDimensions
-@capabilities(capabilitiesData)
 export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorState> {
 
     /**
