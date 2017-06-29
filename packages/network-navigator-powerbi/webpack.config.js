@@ -37,7 +37,7 @@ const config = module.exports = {
         loaders: [
             {
                 test: new RegExp(regex),
-                loader: path.join(__dirname, 'scripts', 'pbiPluginLoader'),
+                loader: path.join(__dirname, 'bin', 'pbiPluginLoader'),
             },
             {
                 test: /\.scss$/,
