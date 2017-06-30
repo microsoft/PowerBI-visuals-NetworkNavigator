@@ -145,17 +145,20 @@ const _buildPackageJson = () => {
 const buildPackageJson = pbivizJson.apiVersion ? _buildPackageJson() : _buildLegacyPackageJson();
 
 const compileSass = () => {
-    const sassOutput = sass.renderSync({ file: pbivizJson.style }).css.toString();
-    const options = { 
-        level: { 
-            2: {
-                all: true,
-                mergeNonAdjacentRules: false,
+    if (pbivizJson.style) {
+        const sassOutput = sass.renderSync({ file: pbivizJson.style }).css.toString();
+        const options = { 
+            level: { 
+                2: {
+                    all: true,
+                    mergeNonAdjacentRules: false,
+                },
             },
-        },
-    };
-    const cssContent = new CleanCSS(options).minify(sassOutput).styles;
-    return cssContent;
+        };
+        const cssContent = new CleanCSS(options).minify(sassOutput).styles;
+        return cssContent;
+    }
+    return '';
 };
 
 const compileScripts = (callback) => {
