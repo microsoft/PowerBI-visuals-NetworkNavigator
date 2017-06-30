@@ -24,7 +24,7 @@
 
 import "@essex/pbi-base/dist/spec/visualHelpers";
 import { UpdateType } from "@essex/pbi-base";
-import NetworkNavigatorVisual from "./NetworkNavigatorVisual";
+import NetworkNavigator from "./NetworkNavigatorVisual";
 import { expect } from "chai";
 import * as $ from "jquery";
 
@@ -53,7 +53,7 @@ describe("NetworkNavigatorVisual", () => {
                 height: 100,
             },
         }
-        const instance = new NetworkNavigatorVisual(true,options);
+        const instance = new NetworkNavigator(true,options);
         
         return {
             instance,

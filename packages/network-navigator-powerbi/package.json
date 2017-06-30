@@ -89,6 +89,7 @@
     "repeat-string": "^1.5.2",
     "rimraf": "^2.5.2",
     "sass-loader": "^4.1.0",
+    "serve-static": "^1.11.1",
     "sinon": "^1.17.3",
     "sinon-chai": "^2.8.0",
     "style-loader": "^0.13.1",

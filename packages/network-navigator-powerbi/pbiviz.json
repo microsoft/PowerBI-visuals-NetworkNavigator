@@ -18,7 +18,7 @@
     "screenshot": "assets/screenshot.png",
     "thumbnail": "assets/thumbnail.png"
   },
-  "style": "",
+  "style": "src/css/NetworkNavigatorVisual.scss",
   "capabilities": "capabilities.json",
   "output": "dist/NetworkNavigator.pbiviz"
 }
