@@ -159,7 +159,8 @@ function pbivizPluginTemplate (pbiviz) {
                                         createSelectionManager: function() {
                                             return new powerbi.visuals.utility.SelectionManager({hostServices: options.host});
                                         },
-                                        colors: options.style.colorPalette.dataColors.getAllColors()
+                                        colors: options.style.colorPalette.dataColors.getAllColors(),
+                                        persistProperties: options.host.persistProperties.bind(options.host)
                                     },
                                     element: options.element.get(0),
                                     viewport: {width: 500, height: 500}

@@ -139,7 +139,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         this.myNetworkNavigator = new NetworkNavigatorImpl(this.element.find("#node_graph"), 500, 500);
         this.host = options.host;
         this.attachEvents();
-        this.selectionManager = new utility.SelectionManager({ hostServices: this.host });
+        this.selectionManager = this.host["createSelectionManager"]();
     }
 
     /**
