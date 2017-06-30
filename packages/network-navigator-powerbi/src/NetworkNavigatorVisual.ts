@@ -111,7 +111,7 @@ export default class NetworkNavigatorVisual extends StatefulVisual<NetworkNaviga
     /*
      * Constructor for the network navigator
      */
-    constructor(noCss = false) {
+    constructor(noCss = false, options : any) {
         super("NetworkNavigator", noCss);
 
         // Some of the css is in a css module (:local() {....}), this adds the auto generated class to our element
@@ -121,6 +121,8 @@ export default class NetworkNavigatorVisual extends StatefulVisual<NetworkNaviga
         }
 
         this._internalState = NetworkNavigatorState.create() as NetworkNavigatorState;
+        options.element = $(options.element); // make this a jquery object
+        this.init(options);
     }
 
     /**

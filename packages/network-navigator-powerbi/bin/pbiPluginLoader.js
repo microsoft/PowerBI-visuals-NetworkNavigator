@@ -162,8 +162,9 @@ function pbivizPluginTemplate (pbiviz) {
                                         colors: options.style.colorPalette.dataColors.getAllColors()
                                     },
                                     element: options.element.get(0),
+                                    viewport: {width: 500, height: 500}
                                 };
-                                ${pbiviz.visual.visualClassName}.call(instance, adaptedOptions);
+                                ${pbiviz.visual.visualClassName}.call(instance, false, adaptedOptions);
 
                                 instance.update = function(options) {
                                     options.type = powerbi.extensibility.v100.convertLegacyUpdateType(options);

@@ -14,7 +14,7 @@
     "start": "npm run dev",
     "tdd": "npm-run-all --parallel dev test:tdd",
     "dev": "node bin/startDev",
-    "package": "node bin/packageVisual",
+    "package": "npm run compile && node bin/packageVisual",
     "test": "karma start --color | node bin/filterErrors",
     "test:tdd": "karma start --color --tdd | node bin/filterErrors",
     "lint": "tslint src/**/*.ts",
