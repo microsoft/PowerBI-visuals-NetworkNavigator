@@ -162,7 +162,7 @@ const compileSass = () => {
 };
 
 const compileScripts = (callback) => {
-    const regex = new RegExp("\\bpowerbi-visuals.d.ts\\b");
+    const regex = /\bnode_modules\b/;
     const fs = new MemoryFS();
     const compiler = webpack(Object.assign(webpackConfig, packagingWebpackConfig));
     compiler.outputFileSystem = fs;

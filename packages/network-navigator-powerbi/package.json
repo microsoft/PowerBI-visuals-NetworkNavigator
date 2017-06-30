@@ -6,19 +6,16 @@
   "typings": "src/index.d.ts",
   "scripts": {
     "compile": "node ./scripts/compile",
-    "preinstall:prereq": "npm install tar.gz mv --save-dev",
-    "preinstall:submodules": "node bin/downloadPrivateSubmodules",
-    "preinstall:dependencies": "node bin/installSubmoduleDeps",
-    "preinstall": "npm run preinstall:prereq && npm run preinstall:submodules && npm run preinstall:dependencies",
     "install-certificate": "node bin/openCert",
     "start": "npm run dev",
     "tdd": "npm-run-all --parallel dev test:tdd",
     "dev": "node bin/startDev",
-    "package": "npm run compile && node bin/packageVisual",
+    "package": "node bin/packageVisual",
     "test": "karma start --color | node bin/filterErrors",
     "test:tdd": "karma start --color --tdd | node bin/filterErrors",
     "lint": "tslint src/**/*.ts",
-    "clean": "rm -rf node_modules .tmp"
+    "clean": "rm -rf node_modules .tmp",
+    "postinstall": "linklocal"
   },
   "author": "Microsoft",
   "license": "MIT",
