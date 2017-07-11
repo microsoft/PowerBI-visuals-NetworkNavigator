@@ -25,13 +25,20 @@
 const path = require('path');
 const webpack = require('webpack');
 const fs = require("fs");
+const ENTRY = './src/NetworkNavigatorVisual.ts';
+const regex = path.normalize(ENTRY).replace(/\\/g, '\\\\').replace(/\./g, '\\.');
 
 const config = module.exports = {
+    entry: ENTRY,
     resolve: {
-        extensions: ['', '.js', '.json'],
+        extensions: ['', '.ts', '.js','.json'],
     },
     module: {
         loaders: [
+            {
+                test: new RegExp(regex),
+                loader: path.join(__dirname, 'bin', 'pbiPluginLoader'),
+            },
             {
                 test: /\.scss$/,
                 loaders: ["css", "sass"]
@@ -39,6 +46,10 @@ const config = module.exports = {
             {
                 test: /\.json$/,
                 loader: 'json-loader',
+            },
+            {
+                test: /\.ts$/,
+                loader: 'ts-loader',
             }
         ],
     },

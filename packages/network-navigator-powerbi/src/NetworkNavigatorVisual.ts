@@ -52,9 +52,7 @@ declare var _: any;
 /**
  * A visual which supports the displaying of graph based datasets in power bi
  */
-@Visual(require("./build.json").output.PowerBI)
 @receiveDimensions
-@capabilities(capabilitiesData)
 export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorState> {
 
     /**
@@ -113,7 +111,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
     /*
      * Constructor for the network navigator
      */
-    constructor(noCss = false) {
+    constructor(noCss = false, options : any) {
         super("NetworkNavigator", noCss);
 
         // Some of the css is in a css module (:local() {....}), this adds the auto generated class to our element
@@ -123,6 +121,8 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         }
 
         this._internalState = NetworkNavigatorState.create() as NetworkNavigatorState;
+        options.element = $(options.element); // make this a jquery object
+        this.init(options);
     }
 
     /**
@@ -139,7 +139,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         this.myNetworkNavigator = new NetworkNavigatorImpl(this.element.find("#node_graph"), 500, 500);
         this.host = options.host;
         this.attachEvents();
-        this.selectionManager = new utility.SelectionManager({ hostServices: this.host });
+        this.selectionManager = this.host["createSelectionManager"]();
     }
 
     /**

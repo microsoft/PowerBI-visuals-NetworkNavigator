@@ -24,7 +24,7 @@
 
 import "@essex/pbi-base/dist/spec/visualHelpers";
 import { UpdateType } from "@essex/pbi-base";
-import NetworkNavigatorVisual from "./NetworkNavigatorVisual";
+import NetworkNavigator from "./NetworkNavigatorVisual";
 import { expect } from "chai";
 import * as $ from "jquery";
 
@@ -42,9 +42,8 @@ describe("NetworkNavigatorVisual", () => {
     });
 
     const createInstance = () => {
-        const instance = new NetworkNavigatorVisual(true);
         const element = $("<div>");
-        instance.init(<any>{
+        const options = {
             element: element,
             host: {
                 persistProperties: () => true
@@ -53,7 +52,9 @@ describe("NetworkNavigatorVisual", () => {
                 width: 100,
                 height: 100,
             },
-        });
+        }
+        const instance = new NetworkNavigator(true,options);
+        
         return {
             instance,
             element,
