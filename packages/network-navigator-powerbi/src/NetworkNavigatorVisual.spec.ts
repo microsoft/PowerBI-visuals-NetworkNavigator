@@ -57,7 +57,6 @@ describe("NetworkNavigatorVisual", () => {
     };
     it("should load", () => {
         expect(createInstance().instance).to.not.be.undefined;
-        expect(1).to.be.equal(0);
     });
     it("should load the nodes for a simple source/target dataset on update", () => {
         const { instance } = createInstance();
