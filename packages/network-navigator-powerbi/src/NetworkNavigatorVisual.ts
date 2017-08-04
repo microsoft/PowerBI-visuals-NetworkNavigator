@@ -197,21 +197,13 @@ export default class NetworkNavigator extends VisualBase {
     }
 
 
-    /** Update is called for data updates, resizes & formatting changes */
-    public updateWithType(options: powerbi.VisualUpdateOptions, updateType: UpdateType) {
-        try {
-            super.updateWithType(options, updateType);
-            this.onUpdate(options, updateType);
-        } catch (err) {
-            console.log("Error in %s::updateSelection", "NetworkNavigator", err);
-        }
-    }
     /**
      * Update is called for data updates, resizes & formatting changes
      * @param options The update options from PBI
      * @param type The update type that occurred
      */
-    public onUpdate(options: VisualUpdateOptions, type: UpdateType) {
+    public updateWithType(options: VisualUpdateOptions, type: UpdateType) {
+        super.updateWithType(options, type);
         let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
         this._dataView = dataView;
         let dataViewTable = dataView && dataView.table;
