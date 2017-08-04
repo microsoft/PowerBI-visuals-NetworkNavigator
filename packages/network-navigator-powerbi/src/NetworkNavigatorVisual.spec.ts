@@ -44,6 +44,10 @@ describe("NetworkNavigatorVisual", () => {
 
     const createInstance = () => {
        
+       // mock power bi functions
+       powerbi.data.SQExprBuilder.text = <any>( () => {});
+       powerbi.data.SQExprBuilder.equal = <any>( () => {});
+
         let initOptions = SpecUtils.createFakeInitOptions();
         initOptions.host["createSelectionManager"] = () => {
             return new SelectionManager({hostServices:  initOptions.host})
@@ -84,7 +88,7 @@ describe("NetworkNavigatorVisual", () => {
     it("should load the links for a simple source/target dataset on update", () => {
         const { instance } = createInstance();
 
-        instance.onUpdate(require("./test_cases/simpleSourceTarget.json"), 7);
+        instance.updateWithType(require("./test_cases/simpleSourceTarget.json"), 7);
 
         const data = instance.myNetworkNavigator.data;
         expect(data).to.be.ok;
@@ -132,7 +136,7 @@ describe("NetworkNavigatorVisual", () => {
 
     it("should load the node weights correctly", () => {
         const { instance } = createInstance();
-        instance.onUpdate(require("./test_cases/allFields.json"), 7);
+        instance.updateWithType(require("./test_cases/allFields.json"), 7);
 
         const result = instance.myNetworkNavigator.data.nodes.map(n => n.value).sort();
         const expected = [
@@ -152,7 +156,7 @@ describe("NetworkNavigatorVisual", () => {
 
     it("should load the node label colors correctly", () => {
         const { instance } = createInstance();
-        instance.onUpdate(require("./test_cases/allFields.json"), 7);
+        instance.updateWithType(require("./test_cases/allFields.json"), 7);
 
         const result = instance.myNetworkNavigator.data.nodes.map(n => n.labelColor).sort();
         const expected = [
@@ -172,7 +176,7 @@ describe("NetworkNavigatorVisual", () => {
 
     it("should load the edge weights correctly", () => {
         const { instance } = createInstance();
-        instance.onUpdate(require("./test_cases/allFields.json"), 7);
+        instance.updateWithType(require("./test_cases/allFields.json"), 7);
 
         const result = instance.myNetworkNavigator.data.links.map(n => n.value).sort();
         const expected = [
@@ -197,7 +201,7 @@ describe("NetworkNavigatorVisual", () => {
         const { instance, element } = createInstance();
         // instance.update(require("./test_cases/simpleSourceTarget.json"));
         const update = require("./test_cases/complexDataWithSettingsChanged.json");
-        instance.onUpdate(update, 4);
+        instance.updateWithType(update, 4);
         return { instance, element };
     };
 
@@ -273,10 +277,10 @@ describe("NetworkNavigatorVisual", () => {
         it("should rerender the graph when the 'defaultLabelColor' setting changes", () => {
             const { instance, element } = createInstance();
             let update = require("./test_cases/complexDataWithLabels.json"); // Basic data
-            instance.onUpdate(update, UpdateType.DataAndSettings);
+            instance.updateWithType(update, UpdateType.DataAndSettings);
 
             update = require("./test_cases/complexDataWithLabelColor.json"); // Basic data
-            instance.onUpdate(update, UpdateType.Settings);
+            instance.updateWithType(update, UpdateType.Settings);
 
             const expectedColor = "#374649"; // #374649 is pulled from the test case
 

@@ -22,7 +22,6 @@
   "dependencies": {
     "@essex/network-navigator": "file:../network-navigator",
     "@essex/pbi-base": "^0.8.24",
-    "@essex/pbi-stateful": "^0.12.0",
     "@types/d3": "^3.x",
     "@types/node": "^6.0.52",
     "@types/react": "^0.14.47",

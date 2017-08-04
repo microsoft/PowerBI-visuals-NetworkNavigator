@@ -24,7 +24,7 @@
 import { default as NetworkNavigatorImpl } from "@essex/network-navigator";
 import { INetworkNavigatorNode } from "@essex/network-navigator";
 import { INetworkNavigatorSelectableNode } from "./models";
-import { Visual, UpdateType, capabilities, receiveDimensions, IDimensions } from "@essex/pbi-base";
+import { Visual, VisualBase, UpdateType, capabilities, receiveDimensions, IDimensions } from "@essex/pbi-base";
 import converter from "./dataConversion";
 import IVisualHostServices = powerbi.IVisualHostServices;
 import VisualInitOptions = powerbi.VisualInitOptions;
@@ -33,7 +33,6 @@ import VisualObjectInstance = powerbi.VisualObjectInstance;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import SelectionId = powerbi.visuals.SelectionId;
 import utility = powerbi.visuals.utility;
-import { StatefulVisual, publishChange } from "@essex/pbi-stateful/lib";
 import NetworkNavigatorState from "./state";
 import * as $ from "jquery";
 
@@ -53,7 +52,7 @@ declare var _: any;
  * A visual which supports the displaying of graph based datasets in power bi
  */
 @receiveDimensions
-export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorState> {
+export default class NetworkNavigator extends VisualBase {
 
     /**
      * My network navigator instance
@@ -91,6 +90,11 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
     private _dataView: powerbi.DataView;
 
     /**
+     * Whether or not css needs loaded
+     */
+    protected noCss: boolean;
+
+    /**
      * A debounced event listener for when a node is selected through NetworkNavigator
      */
     private onNodeSelected = _.debounce((node: INetworkNavigatorSelectableNode) => {
@@ -105,7 +109,6 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         this._internalState = this._internalState.receive({ selectedNodeIndex: node ? node.index : undefined });
         this.persistNodeSelection(node as INetworkNavigatorSelectableNode);
         const label = node ? `Select ${node.name}` : "Clear selection";
-        publishChange(this, label, this._internalState.toJSONObject());
     }, 100);
 
     /*
@@ -113,6 +116,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
      */
     constructor(noCss = false, options : any) {
         super("NetworkNavigator", noCss);
+        this.noCss = noCss;
 
         // Some of the css is in a css module (:local() {....}), this adds the auto generated class to our element
         const className = MY_CSS_MODULE && MY_CSS_MODULE.locals && MY_CSS_MODULE.locals.className;
@@ -135,7 +139,8 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
     /**
      * This is called once when the visual is initialially created
      */
-    public onInit(options: VisualInitOptions): void {
+    public doInit(options: VisualInitOptions): void {
+        super.doInit(options);
         this.myNetworkNavigator = new NetworkNavigatorImpl(this.element.find("#node_graph"), 500, 500);
         this.host = options.host;
         this.attachEvents();
@@ -145,7 +150,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
     /**
      * Generates a state object
      */
-    public generateState() {
+    public get state() {
         return this._internalState.toJSONObject();
     }
 
@@ -153,7 +158,7 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
      * Called when a new state has been set on the visual
      * @param state The state that was set
      */
-    public onSetState(state: NetworkNavigatorState) {
+    public set state(state: NetworkNavigatorState) {
         this._internalState = this._internalState.receive(state);
 
         // Set the Selected Node
@@ -191,12 +196,14 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         this.myNetworkNavigator.configuration = this._internalState;
     }
 
+
     /**
      * Update is called for data updates, resizes & formatting changes
      * @param options The update options from PBI
      * @param type The update type that occurred
      */
-    public onUpdate(options: VisualUpdateOptions, type: UpdateType) {
+    public updateWithType(options: VisualUpdateOptions, type: UpdateType) {
+        super.updateWithType(options, type);
         let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
         this._dataView = dataView;
         let dataViewTable = dataView && dataView.table;
@@ -255,9 +262,10 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
     /**
      * Gets the set of custom modules loaded into this visual
      */
-    protected getCustomCssModules(): string[] {
-        return [MY_CSS_MODULE];
+    protected getCss(): string[] {
+        return this.noCss ? [] : (super.getCss() || []).concat([MY_CSS_MODULE]);
     }
+
 
     /**
      * Persists the given node as the seelcted node
@@ -340,9 +348,6 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
         const oldState = this._internalState;
         this._internalState = this._internalState.receiveFromPBI(dataView);
         this.myNetworkNavigator.configuration = this._internalState;
-        if (!this.isHandlingSetState) {
-            publishChange(this, "Config change", this._internalState.toJSONObject());
-        }
         return oldState.maxNodeCount !== this._internalState.maxNodeCount ||
             oldState.labels !== this._internalState.labels;
     }
@@ -365,7 +370,6 @@ export default class NetworkNavigator extends StatefulVisual<NetworkNavigatorSta
             dispatcher.on("textFilter", (textFilter: string) => {
                 this._internalState = this._internalState.receive({ textFilter });
                 const label = textFilter && textFilter !== "" ? `Filtered ${textFilter}` : `Cleared text filter`;
-                publishChange(this, label, this._internalState.toJSONObject());
             });
 
             // PowerBI will eat some events, so use this to prevent powerbi from eating them

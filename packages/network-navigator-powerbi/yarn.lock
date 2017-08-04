@@ -35,26 +35,9 @@
     lodash "^4.11.0"
     powerbi-visuals "*"
 
-"@essex/pbi-stateful@^0.12.0":
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/@essex/pbi-stateful/-/pbi-stateful-0.12.0.tgz#18ad2f6dd4cf97941f65c9cfa6b7c4e6fda0b6ad"
-  dependencies:
-    "@types/debug" "0.0.29"
-    "@types/lodash" "^4.14.37"
-    "@types/node" "^6.0.41"
-    debug "^2.2.0"
-    json-stringify-safe "^5.0.1"
-    lodash "^4.16.4"
-    powerbi-visuals "^0.5.9"
-    react-frame-component "^0.6.6"
-
 "@types/d3@^3.5.36", "@types/d3@^3.x":
   version "3.5.36"
   resolved "https://registry.yarnpkg.com/@types/d3/-/d3-3.5.36.tgz#0943ab98253421fb07b9adfc6dc7ddd36c5178b2"
-
-"@types/debug@0.0.29":
-  version "0.0.29"
-  resolved "https://registry.yarnpkg.com/@types/debug/-/debug-0.0.29.tgz#a1e514adfbd92f03a224ba54d693111dbf1f3754"
 
 "@types/fs-extra@^3.0.0":
   version "3.0.3"
@@ -98,7 +81,7 @@
   version "2.2.34"
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-2.2.34.tgz#398e8a265f1db1e5f8c6e520064a74cbef84cbdc"
 
-"@types/node@*", "@types/node@^6.0.41", "@types/node@^6.0.45", "@types/node@^6.0.52":
+"@types/node@*", "@types/node@^6.0.45", "@types/node@^6.0.52":
   version "6.0.52"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.52.tgz#1ac3a99b42320f9e463482f25af4c2359473aaa6"
 
@@ -1230,7 +1213,7 @@ debug@2.2.0, debug@~2.2.0:
   dependencies:
     ms "0.7.1"
 
-debug@2.6.7:
+debug@2.6.7, debug@^2.6.0:
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.7.tgz#92bad1f6d05bbb6bba22cca88bcd0ec894c2861e"
   dependencies:
@@ -1239,12 +1222,6 @@ debug@2.6.7:
 debug@2.X, debug@^2.1.1, debug@^2.2.0, debug@^2.3.3:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.3.3.tgz#40c453e67e6e13c901ddec317af8986cda9eff8c"
-  dependencies:
-    ms "0.7.2"
-
-debug@^2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.0.tgz#bc596bcabe7617f11d9fa15361eded5608b8499b"
   dependencies:
     ms "0.7.2"
 
@@ -3329,7 +3306,7 @@ lodash@^3.5.0, lodash@^3.8.0:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
 
-lodash@^4.0.0, lodash@^4.0.1, lodash@^4.11.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.16.4, lodash@^4.2.0, lodash@^4.5.0:
+lodash@^4.0.0, lodash@^4.0.1, lodash@^4.11.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.2.0, lodash@^4.5.0:
   version "4.17.2"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.2.tgz#34a3055babe04ce42467b607d700072c7ff6bf42"
 
@@ -4324,10 +4301,6 @@ powerbi-visuals@*, powerbi-visuals@^0.3.8:
   version "0.3.10"
   resolved "https://registry.yarnpkg.com/powerbi-visuals/-/powerbi-visuals-0.3.10.tgz#fc6abce25930b29bce9941f85ffeae7dd43e909e"
 
-powerbi-visuals@^0.5.9:
-  version "0.5.9"
-  resolved "https://registry.yarnpkg.com/powerbi-visuals/-/powerbi-visuals-0.5.9.tgz#6412aa5c6f08d39f4a6ff4e819ec4705b004c1dd"
-
 prepend-http@^1.0.0, prepend-http@^1.0.1:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-1.0.4.tgz#d4f4562b0ce3696e41ac52d0e002e57a635dc6dc"
@@ -4457,12 +4430,6 @@ react-dom@^15.4.1:
   dependencies:
     fbjs "^0.8.1"
     loose-envify "^1.1.0"
-    object-assign "^4.1.0"
-
-react-frame-component@^0.6.6:
-  version "0.6.6"
-  resolved "https://registry.yarnpkg.com/react-frame-component/-/react-frame-component-0.6.6.tgz#f86ccab8d8c2feb4606cfda17ec65ca8ace84e36"
-  dependencies:
     object-assign "^4.1.0"
 
 react@^15.4.1:
