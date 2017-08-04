@@ -12,7 +12,7 @@
     "dev": "node bin/startDev",
     "package": "node bin/packageVisual",
     "test": "npm run compile && karma start --color && node bin/packageVisual",
-    "test:tdd": "karma start --color --tdd",
+    "test:tdd": "npm run compile && karma start --color --tdd",
     "lint": "tslint src/**/*.ts",
     "clean": "rm -rf node_modules .tmp",
     "postinstall": "linklocal"
