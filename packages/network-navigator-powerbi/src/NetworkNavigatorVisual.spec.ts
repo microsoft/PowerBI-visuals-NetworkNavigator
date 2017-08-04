@@ -44,6 +44,10 @@ describe("NetworkNavigatorVisual", () => {
 
     const createInstance = () => {
        
+       // mock power bi functions
+       powerbi.data.SQExprBuilder.text = <any>( () => {});
+       powerbi.data.SQExprBuilder.equal = <any>( () => {});
+
         let initOptions = SpecUtils.createFakeInitOptions();
         initOptions.host["createSelectionManager"] = () => {
             return new SelectionManager({hostServices:  initOptions.host})

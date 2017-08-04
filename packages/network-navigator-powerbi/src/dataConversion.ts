@@ -91,7 +91,7 @@ export function converter(
         let node = nodeMap[id];
         const SQExprBuilder = powerbi.data.SQExprBuilder;
         let identityExpr = SQExprBuilder.equal(field as powerbi.data.SQExpr, SQExprBuilder.text(id));
-        const filterExpr = filterColumn ? SQExprBuilder.equal(<any>filterColumn.expr, SQExprBuilder.text(id)) : identityExpr;
+        const filterExpr = (filterColumn && filterColumn["expr"]) ? SQExprBuilder.equal(filterColumn["expr"], SQExprBuilder.text(id)) : identityExpr;
 
         if (!nodeMap[id]) {
             node = nodeMap[id] = {
