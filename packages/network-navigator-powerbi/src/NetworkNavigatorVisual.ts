@@ -90,7 +90,7 @@ export default class NetworkNavigator extends VisualBase {
     private _dataView: powerbi.DataView;
 
     /**
-     * Wheater or not css needs loaded
+     * Whether or not css needs loaded
      */
     protected noCss: boolean;
 
