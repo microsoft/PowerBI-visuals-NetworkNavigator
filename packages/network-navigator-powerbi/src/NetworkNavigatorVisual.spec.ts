@@ -22,11 +22,12 @@
  * SOFTWARE.
  */
 
-import "@essex/pbi-base/dist/spec/visualHelpers";
+import { Utils as SpecUtils } from "@essex/pbi-base/dist/spec/visualHelpers";
 import { UpdateType } from "@essex/pbi-base";
 import NetworkNavigator from "./NetworkNavigatorVisual";
 import { expect } from "chai";
 import * as $ from "jquery";
+import SelectionManager = powerbi.visuals.utility.SelectionManager;
 
 describe("NetworkNavigatorVisual", () => {
     let parentEle: JQuery;
@@ -42,22 +43,16 @@ describe("NetworkNavigatorVisual", () => {
     });
 
     const createInstance = () => {
-        const element = $("<div>");
-        const options = {
-            element: element,
-            host: {
-                persistProperties: () => true
-            },
-            viewport: {
-                width: 100,
-                height: 100,
-            },
-        }
-        const instance = new NetworkNavigator(true,options);
+       
+        let initOptions = SpecUtils.createFakeInitOptions();
+        initOptions.host["createSelectionManager"] = () => {
+            return new SelectionManager({hostServices:  initOptions.host})
+        };
+        const instance = new NetworkNavigator(true,initOptions);
         
         return {
             instance,
-            element,
+            element: initOptions.element,
         };
     };
     it("should load", () => {
