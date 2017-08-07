@@ -277,6 +277,32 @@ describe("NetworkNavigator", () => {
             // The 2 links
             expect(element.find(".link").length).to.eq(2);
         });
+
+        it("should limit max vertex size", () => {
+            let { instance, element } = createInstance();
+
+            instance.maxVertexSize = 5;
+            instance.setData(oneSourceTwoTargets);
+
+            const values: number[] = [];
+            element.find("circle").each(function() {
+                values.push(parseInt($(this).attr("r")));
+            });
+            expect(values).to.be.deep.equal([5, 5, 5]);
+        });
+
+        it("should limit min vertex size", () => {
+            let { instance, element } = createInstance();
+
+            instance.minVertexSize = 100;
+            instance.setData(oneSourceTwoTargets);
+
+            const values: number[] = [];
+            element.find("circle").each(function() {
+                values.push(parseInt($(this).attr("r")));
+            });
+            expect(values).to.be.deep.equal([100, 100, 100]);
+        });
     });
 
     it ("should default the label colors to the color in the configuration", () => {

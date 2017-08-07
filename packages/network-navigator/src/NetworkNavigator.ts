@@ -106,6 +106,23 @@ export class NetworkNavigator {
     private _configuration: INetworkNavigatorConfiguration = $.extend(true, {}, DEFAULT_CONFIGURATION);
 
     /**
+     * Minimum size to render a vertex
+     */
+    private _minVertexSize: Number;
+    public set minVertexSize(size: Number){
+        this._minVertexSize = size;
+    }
+
+    /**
+     *  Maximum size to render a vertex
+     */
+    private _maxVertexSize: Number;
+    public set maxVertexSize(size: Number){
+        this._maxVertexSize = size;
+    }
+
+
+    /**
      * Constructor for the network navigator
      */
     constructor(element: JQuery, width = 500, height = 500) {
@@ -269,6 +286,9 @@ export class NetworkNavigator {
                 this.vis.selectAll(".node text")
                     .attr("font-size", () => `${newConfig.fontSizePT}pt`);
             }
+
+            this.maxVertexSize = newConfig.maxNodeSize;
+            this.minVertexSize = newConfig.minNodeSize;
         }
 
         this._configuration = newConfig;
@@ -518,12 +538,14 @@ export class NetworkNavigator {
 
             node.append("svg:circle")
                 .attr("r", (d: any) => {
-                    const width = d.value;
+                    let width = d.value;
                     /* tslint:disable */
                     if (typeof width === "undefined" || width === null) {
                     /* tslint:enable */
-                        return DEFAULT_NODE_SIZE;
+                        width = DEFAULT_NODE_SIZE;
                     }
+                    width  = (this._maxVertexSize && width > this._maxVertexSize) ? this._maxVertexSize : width;
+                    width = (this._minVertexSize && width < this._minVertexSize) ? this._minVertexSize : width;
                     // Make sure > 0
                     return width > 0 ? width : 0;
                 })
