@@ -281,7 +281,8 @@ describe("NetworkNavigator", () => {
         it("should limit max vertex size", () => {
             let { instance, element } = createInstance();
 
-            instance.maxVertexSize = 5;
+            instance.configuration = {maxNodeSize: 5};
+
             instance.setData(oneSourceTwoTargets);
 
             const values: number[] = [];
@@ -294,7 +295,7 @@ describe("NetworkNavigator", () => {
         it("should limit min vertex size", () => {
             let { instance, element } = createInstance();
 
-            instance.minVertexSize = 100;
+            instance.configuration = {minNodeSize: 100};
             instance.setData(oneSourceTwoTargets);
 
             const values: number[] = [];

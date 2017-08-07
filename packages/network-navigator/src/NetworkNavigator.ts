@@ -105,22 +105,6 @@ export class NetworkNavigator {
      */
     private _configuration: INetworkNavigatorConfiguration = $.extend(true, {}, DEFAULT_CONFIGURATION);
 
-    /**
-     * Minimum size to render a vertex
-     */
-    private _minVertexSize: Number;
-    public set minVertexSize(size: Number){
-        this._minVertexSize = size;
-    }
-
-    /**
-     *  Maximum size to render a vertex
-     */
-    private _maxVertexSize: Number;
-    public set maxVertexSize(size: Number){
-        this._maxVertexSize = size;
-    }
-
 
     /**
      * Constructor for the network navigator
@@ -286,9 +270,6 @@ export class NetworkNavigator {
                 this.vis.selectAll(".node text")
                     .attr("font-size", () => `${newConfig.fontSizePT}pt`);
             }
-
-            this.maxVertexSize = newConfig.maxNodeSize;
-            this.minVertexSize = newConfig.minNodeSize;
         }
 
         this._configuration = newConfig;
@@ -544,8 +525,10 @@ export class NetworkNavigator {
                     /* tslint:enable */
                         width = DEFAULT_NODE_SIZE;
                     }
-                    width  = (this._maxVertexSize && width > this._maxVertexSize) ? this._maxVertexSize : width;
-                    width = (this._minVertexSize && width < this._minVertexSize) ? this._minVertexSize : width;
+                    const maxSize = this._configuration.maxNodeSize;
+                    const minSize = this._configuration.minNodeSize;
+                    width  = (maxSize && width > maxSize) ? maxSize : width;
+                    width = (minSize && width < minSize) ? minSize : width;
                     // Make sure > 0
                     return width > 0 ? width : 0;
                 })
