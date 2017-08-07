@@ -189,6 +189,20 @@
 					"displayName": "Max nodes",
 					"description": "The maximum number of nodes to render"
 				},
+				"maxNodeSize": {
+					"type": {
+						"numeric": true
+					},
+					"displayName": "Max node size",
+					"description": "The maximum size to render a vertex"
+				},
+				"minNodeSize": {
+					"type": {
+						"numeric": true
+					},
+					"displayName": "Min node size",
+					"description": "The minimum size to render a vertex"
+				},
 				"linkDistance": {
 					"type": {
 						"numeric": true

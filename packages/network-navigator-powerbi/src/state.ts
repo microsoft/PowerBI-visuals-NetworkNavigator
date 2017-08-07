@@ -73,6 +73,28 @@ export default class NetworkNavigatorVisualState extends HasSettings implements 
     public maxNodeCount: number = 0;
 
     /**
+     * The maximum size to render a vertex
+     */
+    @numberSetting({
+        category: CAT_LAYOUT,
+        displayName: "Max node size",
+        description: "The maximum size to render a vertex",
+        defaultValue: 500,
+    })
+    public maxNodeSize: number = 500;
+
+    /**
+     * The minimum size to render a vertex
+     */
+    @numberSetting({
+        category: CAT_LAYOUT,
+        displayName: "Min node size",
+        description: "The minimum size to render a vertex",
+        defaultValue: 1,
+    })
+    public minNodeSize: number = 1;
+
+    /**
      * The link distance used in the force graph
      */
     @numberSetting({

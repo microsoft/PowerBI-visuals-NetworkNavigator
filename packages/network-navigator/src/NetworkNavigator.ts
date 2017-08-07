@@ -105,6 +105,7 @@ export class NetworkNavigator {
      */
     private _configuration: INetworkNavigatorConfiguration = $.extend(true, {}, DEFAULT_CONFIGURATION);
 
+
     /**
      * Constructor for the network navigator
      */
@@ -518,12 +519,16 @@ export class NetworkNavigator {
 
             node.append("svg:circle")
                 .attr("r", (d: any) => {
-                    const width = d.value;
+                    let width = d.value;
                     /* tslint:disable */
                     if (typeof width === "undefined" || width === null) {
                     /* tslint:enable */
-                        return DEFAULT_NODE_SIZE;
+                        width = DEFAULT_NODE_SIZE;
                     }
+                    const maxSize = this._configuration.maxNodeSize;
+                    const minSize = this._configuration.minNodeSize;
+                    width  = (maxSize && width > maxSize) ? maxSize : width;
+                    width = (minSize && width < minSize) ? minSize : width;
                     // Make sure > 0
                     return width > 0 ? width : 0;
                 })

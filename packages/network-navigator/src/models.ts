@@ -149,6 +149,16 @@ export interface INetworkNavigatorConfiguration {
     maxNodeCount?: number;
 
     /**
+     * The maximum size of a node to render
+     */
+    maxNodeSize?: number;
+
+    /**
+     * The minimum size of a node to render
+     */
+    minNodeSize?: number;
+
+    /**
      * The default color used for labels
      */
     defaultLabelColor?: string;
