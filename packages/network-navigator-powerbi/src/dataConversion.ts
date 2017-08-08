@@ -22,12 +22,16 @@
  * SOFTWARE.
  */
 
+import "powerbi-visuals-tools/templates/visuals/.api/v1.7.0/PowerBI-visuals";
 import { INetworkNavigatorData, INetworkNavigatorLink, INetworkNavigatorConfiguration } from "@essex/network-navigator";
 import { INetworkNavigatorSelectableNode } from "./models";
 import { DATA_ROLES } from "./constants";
+import * as models from "powerbi-models";
+
 
 import DataView = powerbi.DataView;
-import SelectionId = powerbi.visuals.SelectionId;
+import SelectionId = powerbi.visuals.ISelectionId;
+import ISelectionIdBuilder = powerbi.visuals.ISelectionIdBuilder;
 
 /**
  * Converts the powerbi data view into an internal data structure
@@ -35,7 +39,8 @@ import SelectionId = powerbi.visuals.SelectionId;
 export function converter(
     dataView: DataView,
     settings: INetworkNavigatorConfiguration,
-    filterColumn?: powerbi.DataViewMetadataColumn): INetworkNavigatorData<INetworkNavigatorSelectableNode> {
+    filterColumn?: powerbi.DataViewMetadataColumn,
+    createIdBuilder?: () => ISelectionIdBuilder): INetworkNavigatorData<INetworkNavigatorSelectableNode> {
     "use strict";
     let nodeList: INetworkNavigatorSelectableNode[] = [];
     let nodeMap: { [name: string]: INetworkNavigatorSelectableNode } = {};
@@ -43,12 +48,14 @@ export function converter(
     let table = dataView.table;
 
     // The map of dataRoles to an index
-    let colMap = {};
+    const colMap = {};
+    const metadataColMap = {};
 
     // Maps all of the DATA_ROLES to an index into the data
     table.columns.forEach((c, i) => {
         Object.keys(c.roles).forEach(role => {
             colMap[role] = i;
+            metadataColMap[role] = c;
         });
     });
 
@@ -73,37 +80,48 @@ export function converter(
     const sourceNodeWeightIdx = colMap[roles.sourceNodeWeight.name];
     const targetNodeWeightIdx = colMap[roles.targetNodeWeight.name];
 
-    let sourceField = table.identityFields[sourceIdx];
-    let targetField = table.identityFields[targetIdx];
-
     /**
      * Creates a node with the given value if the node has not already been seen/created
      */
     function getNode(
         id: string,
-        identity: powerbi.DataViewScopeIdentity,
+        dvIdentity: powerbi.DataViewScopeIdentity,
         isSource: boolean,
         nodeWeight: number,
         color: string = "gray",
         labelColor: string,
         group: number = 0): INetworkNavigatorSelectableNode {
-        const field = (isSource ? sourceField : targetField);
+        const column = table.columns[isSource ? sourceIdx : targetIdx];
         let node = nodeMap[id];
-        const SQExprBuilder = powerbi.data.SQExprBuilder;
-        let identityExpr = SQExprBuilder.equal(field as powerbi.data.SQExpr, SQExprBuilder.text(id));
-        const filterExpr = (filterColumn && filterColumn["expr"]) ? SQExprBuilder.equal(filterColumn["expr"], SQExprBuilder.text(id)) : identityExpr;
-
         if (!nodeMap[id]) {
+            const builder = createIdBuilder();
+            const categoryColumn = {
+                source: dataView.metadata.columns.filter(n => n.queryName === column.queryName)[0],
+                values: <any>null,
+                identity: [dvIdentity]
+            };
+            const filterTarget: models.IFilterColumnTarget = {
+                table: categoryColumn.source.queryName.substr(0, categoryColumn.source.queryName.indexOf('.')),
+                column: categoryColumn.source.displayName
+            };
+            const identity = builder ? builder
+                .withCategory(categoryColumn, 0)
+                .createSelectionId() : <any>-1;
+            const filter = <models.IAdvancedFilter><any>new models.AdvancedFilter(filterTarget, "And", {
+                operator: "Is",
+                value: id,
+            });
+
             node = nodeMap[id] = {
                 name: id,
                 color: color || "gray",
                 labelColor: labelColor,
                 index: nodeList.length,
-                filterExpr,
+                filter,
                 value: nodeWeight,
                 neighbors: 1,
                 selected: false,
-                identity: SelectionId.createWithId(powerbi.data.createDataViewScopeIdentity(identityExpr)),
+                identity,
             };
             nodeList.push(node);
         }
@@ -111,7 +129,7 @@ export function converter(
     }
 
     // The minimum necessary is a source node and a target node, otherwise we'll just have a bunch of disconnected nodes
-    if (sourceField && targetField) {
+    if (sourceIdx !== undefined && targetIdx !== undefined) {
 
         // Iterate through each row and create a connection between the source node and the target node
         table.rows.forEach((row, idx) => {

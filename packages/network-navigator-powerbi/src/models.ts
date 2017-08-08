@@ -22,12 +22,14 @@
  * SOFTWARE.
  */
 
+import "powerbi-visuals-tools/templates/visuals/.api/v1.7.0/PowerBI-visuals";
+import * as models from "powerbi-models";
 import { INetworkNavigatorNode } from "@essex/network-navigator";
 
 /**
  * A selectable node within network navigator
  */
-export interface INetworkNavigatorSelectableNode extends powerbi.visuals.SelectableDataPoint, INetworkNavigatorNode {
+export interface INetworkNavigatorSelectableNode extends INetworkNavigatorNode {
 
     /**
      * The nodes index into the node list
@@ -40,7 +42,12 @@ export interface INetworkNavigatorSelectableNode extends powerbi.visuals.Selecta
     neighbors: number;
 
     /**
-     * The expression that will exactly match this row
+     * The unique filter for this node
      */
-    filterExpr: powerbi.data.SQExpr;
+    filter: models.IFilter;
+
+    /**
+     * The identity of the node
+     */
+    identity: powerbi.visuals.ISelectionId;
 }

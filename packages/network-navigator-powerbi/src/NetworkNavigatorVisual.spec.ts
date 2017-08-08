@@ -27,7 +27,6 @@ import { UpdateType } from "@essex/pbi-base";
 import NetworkNavigator from "./NetworkNavigatorVisual";
 import { expect } from "chai";
 import * as $ from "jquery";
-import SelectionManager = powerbi.visuals.utility.SelectionManager;
 
 describe("NetworkNavigatorVisual", () => {
     let parentEle: JQuery;
@@ -43,20 +42,13 @@ describe("NetworkNavigatorVisual", () => {
     });
 
     const createInstance = () => {
-       
-       // mock power bi functions
-       powerbi.data.SQExprBuilder.text = <any>( () => {});
-       powerbi.data.SQExprBuilder.equal = <any>( () => {});
 
-        let initOptions = SpecUtils.createFakeInitOptions();
-        initOptions.host["createSelectionManager"] = () => {
-            return new SelectionManager({hostServices:  initOptions.host})
-        };
-        const instance = new NetworkNavigator(true,initOptions);
-        
+        let initOptions = SpecUtils.createFakeConstructorOptions();
+        const instance = new NetworkNavigator(initOptions, true);
+
         return {
             instance,
-            element: initOptions.element,
+            element: $(initOptions.element),
         };
     };
     it("should load", () => {
@@ -88,7 +80,7 @@ describe("NetworkNavigatorVisual", () => {
     it("should load the links for a simple source/target dataset on update", () => {
         const { instance } = createInstance();
 
-        instance.updateWithType(require("./test_cases/simpleSourceTarget.json"), 7);
+        instance.update(require("./test_cases/simpleSourceTarget.json"), undefined, 7);
 
         const data = instance.myNetworkNavigator.data;
         expect(data).to.be.ok;
@@ -136,7 +128,7 @@ describe("NetworkNavigatorVisual", () => {
 
     it("should load the node weights correctly", () => {
         const { instance } = createInstance();
-        instance.updateWithType(require("./test_cases/allFields.json"), 7);
+        instance.update(require("./test_cases/allFields.json"), undefined, 7);
 
         const result = instance.myNetworkNavigator.data.nodes.map(n => n.value).sort();
         const expected = [
@@ -156,7 +148,7 @@ describe("NetworkNavigatorVisual", () => {
 
     it("should load the node label colors correctly", () => {
         const { instance } = createInstance();
-        instance.updateWithType(require("./test_cases/allFields.json"), 7);
+        instance.update(require("./test_cases/allFields.json"), undefined, 7);
 
         const result = instance.myNetworkNavigator.data.nodes.map(n => n.labelColor).sort();
         const expected = [
@@ -176,7 +168,7 @@ describe("NetworkNavigatorVisual", () => {
 
     it("should load the edge weights correctly", () => {
         const { instance } = createInstance();
-        instance.updateWithType(require("./test_cases/allFields.json"), 7);
+        instance.update(require("./test_cases/allFields.json"), undefined, 7);
 
         const result = instance.myNetworkNavigator.data.links.map(n => n.value).sort();
         const expected = [
@@ -201,7 +193,7 @@ describe("NetworkNavigatorVisual", () => {
         const { instance, element } = createInstance();
         // instance.update(require("./test_cases/simpleSourceTarget.json"));
         const update = require("./test_cases/complexDataWithSettingsChanged.json");
-        instance.updateWithType(update, 4);
+        instance.update(update, undefined, 4);
         return { instance, element };
     };
 
@@ -277,10 +269,10 @@ describe("NetworkNavigatorVisual", () => {
         it("should rerender the graph when the 'defaultLabelColor' setting changes", () => {
             const { instance, element } = createInstance();
             let update = require("./test_cases/complexDataWithLabels.json"); // Basic data
-            instance.updateWithType(update, UpdateType.DataAndSettings);
+            instance.update(update, undefined, UpdateType.DataAndSettings);
 
             update = require("./test_cases/complexDataWithLabelColor.json"); // Basic data
-            instance.updateWithType(update, UpdateType.Settings);
+            instance.update(update, undefined, UpdateType.Settings);
 
             const expectedColor = "#374649"; // #374649 is pulled from the test case
 

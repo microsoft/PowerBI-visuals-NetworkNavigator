@@ -12,7 +12,7 @@
     "name": "Microsoft (experimental)",
     "email": "msrvizsupport@microsoft.com"
   },
-  "apiVersion": "",
+  "apiVersion": "1.7.0",
   "assets": {
     "icon":"assets/icon.svg",
     "screenshot": "assets/screenshot.png",

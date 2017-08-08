@@ -46,10 +46,14 @@ module.exports = {
     },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
+        new webpack.NormalModuleReplacementPlugin(/powerbi-visuals-tools/, 'node-noop'),
+        new webpack.NormalModuleReplacementPlugin(/powerbi-visuals-utils-.*index\.d/, 'node-noop'),
+        new webpack.NormalModuleReplacementPlugin(/jsdom/, 'node-noop'),
         new webpack.ProvidePlugin({
-            $: 'jquery',
-            jQuery: 'jquery',
             'Promise': 'exports?global.Promise!es6-promise',
+        }),
+        new webpack.DefinePlugin({
+            'process.env.DEBUG': "\"" + (process.env.DEBUG || "") + "\"",
         }),
     ],
 };
