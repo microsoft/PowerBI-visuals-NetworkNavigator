@@ -266,15 +266,7 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
      * Persists the given node as the seelcted node
      */
     protected persistNodeSelection(node: INetworkNavigatorSelectableNode) {
-        /* tslint:disable */
-        let filter: any = null;
-        /* tslint:enable */
-        if (node) {
-            this.selectionManager.select(node.identity, false);
-            this.host.applyJsonFilter(node.filter, "general", "filter");
-        } else {
-            this.selectionManager.clear();
-        }
+        this.host.applyJsonFilter(node ? node.filter : null, "general", "filter");
     }
 
     /**

@@ -39,7 +39,7 @@ import ISelectionIdBuilder = powerbi.visuals.ISelectionIdBuilder;
 export function converter(
     dataView: DataView,
     settings: INetworkNavigatorConfiguration,
-    filterColumn?: powerbi.DataViewMetadataColumn,
+    columnToFilter?: powerbi.DataViewMetadataColumn,
     createIdBuilder?: () => ISelectionIdBuilder): INetworkNavigatorData<INetworkNavigatorSelectableNode> {
     "use strict";
     let nodeList: INetworkNavigatorSelectableNode[] = [];
@@ -95,23 +95,16 @@ export function converter(
         let node = nodeMap[id];
         if (!nodeMap[id]) {
             const builder = createIdBuilder();
-            const categoryColumn = {
-                source: dataView.metadata.columns.filter(n => n.queryName === column.queryName)[0],
-                values: <any>null,
-                identity: [dvIdentity]
+            const identityColumn = dataView.metadata.columns.filter(n => n.queryName === column.queryName)[0];
+            const filterTargetColumn = columnToFilter || identityColumn;
+            const target: models.IFilterColumnTarget = {
+                table: filterTargetColumn.queryName.substr(0, filterTargetColumn.queryName.indexOf('.')),
+                column: filterTargetColumn.displayName
             };
-            const filterTarget: models.IFilterColumnTarget = {
-                table: categoryColumn.source.queryName.substr(0, categoryColumn.source.queryName.indexOf('.')),
-                column: categoryColumn.source.displayName
-            };
-            const identity = builder ? builder
-                .withCategory(categoryColumn, 0)
-                .createSelectionId() : <any>-1;
-            const filter = <models.IAdvancedFilter><any>new models.AdvancedFilter(filterTarget, "And", {
+            const filter = <models.IAdvancedFilter><any>new models.AdvancedFilter(target, "And", {
                 operator: "Is",
                 value: id,
             });
-
             node = nodeMap[id] = {
                 name: id,
                 color: color || "gray",
@@ -121,7 +114,14 @@ export function converter(
                 value: nodeWeight,
                 neighbors: 1,
                 selected: false,
-                identity,
+                identity: builder ? builder
+                    .withCategory({
+                        // https://community.powerbi.com/t5/Developer/Creating-Selection-manager-for-Custom-Table-visuals/m-p/218391/highlight/true#M6869
+                        source: identityColumn,
+                        values: <any>null,
+                        identity: [dvIdentity]
+                    }, 0)
+                    .createSelectionId() : <any>-1,
             };
             nodeList.push(node);
         }

@@ -72,7 +72,7 @@ export interface INetworkNavigatorLink {
     value?: number;
 
     /**
-     * The value of the link, used to weight the link color 
+     * The value of the link, used to weight the link color
      */
     colorValue?: number;
 }
