@@ -317,11 +317,6 @@ export default class NetworkNavigatorVisualState extends HasSettings implements 
     public edgeEndColor: string = constants.edgeEndColor.defaultValue;
 
     /**
-     * The current selected node index
-     */
-    public selectedNodeIndex: number;
-
-    /**
      * The current zoom scale
      */
     public scale: number = 1;
