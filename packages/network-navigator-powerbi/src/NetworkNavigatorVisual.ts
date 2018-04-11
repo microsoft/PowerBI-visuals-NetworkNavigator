@@ -143,61 +143,11 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
             this.element.addClass(className);
         }
 
-        this._internalState = NetworkNavigatorState.create() as NetworkNavigatorState;
+        this._internalState = NetworkNavigatorState.create<NetworkNavigatorState>();
 
         this.myNetworkNavigator = new NetworkNavigatorImpl(this.element, 500, 500);
         this.attachEvents();
     }
-
-    /**
-     * Generates a state object
-     */
-    public get state() {
-        return this._internalState.toJSONObject();
-    }
-
-    /**
-     * Called when a new state has been set on the visual
-     * @param state The state that was set
-     */
-    public set state(state: NetworkNavigatorState) {
-        this._internalState = this._internalState.receive(state);
-
-        // Set the Selected Node
-        if (this._internalState.selectedNodeIndex) {
-            const nodeIndex = this._internalState.selectedNodeIndex;
-            const node = this._nodes && this._nodes.length >= nodeIndex ? this._nodes[nodeIndex] : undefined;
-            this.persistNodeSelection(node as INetworkNavigatorSelectableNode);
-            this.myNetworkNavigator.selectedNode = node;
-        } else {
-            this.persistNodeSelection(undefined);
-            this.myNetworkNavigator.selectedNode = undefined;
-        }
-
-        // Set Text Filter
-        this.myNetworkNavigator.textFilter = this._internalState.textFilter;
-
-        // Set pan & zoom
-        const doesStateHaveScaleAndTranslate = this._internalState.scale &&
-            this._internalState.translate &&
-            this._internalState.translate.length === 2;
-
-        let doesScaleAndTranslateDiffer = false;
-        if (doesStateHaveScaleAndTranslate) {
-            doesScaleAndTranslateDiffer = this._internalState.scale !== this.myNetworkNavigator.scale ||
-                !_.isEqual(this._internalState.translate, this.myNetworkNavigator.translate);
-        }
-
-        if (doesStateHaveScaleAndTranslate && doesScaleAndTranslateDiffer) {
-            this.myNetworkNavigator.scale = this._internalState.scale;
-            this.myNetworkNavigator.translate = this._internalState.translate;
-            this.myNetworkNavigator.redraw();
-        }
-
-        // Set configuration
-        this.myNetworkNavigator.configuration = this._internalState;
-    }
-
 
     /**
      * Update is called for data updates, resizes & formatting changes
@@ -258,7 +208,7 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
     /**
      * Enumerates the instances for the objects (settings) that appear in the power bi panel
      */
-    protected handleEnumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): powerbi.VisualObjectInstanceEnumeration {
+    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): powerbi.VisualObjectInstanceEnumeration {
         return this._internalState.buildEnumerationObjects(options.objectName, this._dataView, false);
     }
 
