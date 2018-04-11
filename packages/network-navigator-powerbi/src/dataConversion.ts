@@ -43,9 +43,9 @@ export function converter(
     createIdBuilder?: () => ISelectionIdBuilder): INetworkNavigatorData<INetworkNavigatorSelectableNode> {
     "use strict";
     let nodeList: INetworkNavigatorSelectableNode[] = [];
-    let nodeMap: { [name: string]: INetworkNavigatorSelectableNode } = {};
+    const nodeMap: { [name: string]: INetworkNavigatorSelectableNode } = {};
     let linkList: INetworkNavigatorLink[] = [];
-    let table = dataView.table;
+    const table = dataView.table;
 
     // The map of dataRoles to an index
     const colMap = {};
@@ -66,15 +66,15 @@ export function converter(
     // target - array index into node
     // value - The number of times that the link has been made, ie, I emailed bob@gmail.com 10 times, so value would be 10
 
-    let roles = DATA_ROLES;
-    let sourceIdx = colMap[roles.source.name];
-    let sourceColorIdx = colMap[roles.sourceColor.name];
-    let sourceLabelColorIdx = colMap[roles.sourceLabelColor.name];
+    const roles = DATA_ROLES;
+    const sourceIdx = colMap[roles.source.name];
+    const sourceColorIdx = colMap[roles.sourceColor.name];
+    const sourceLabelColorIdx = colMap[roles.sourceLabelColor.name];
     // let sourceGroup = colMap[roles.sourceGroup.name];
     // let targetGroupIdx = colMap[roles.targetGroup.name];
-    let targetColorIdx = colMap[roles.targetColor.name];
-    let targetLabelColorIdx = colMap[roles.targetLabelColor.name];
-    let targetIdx = colMap[roles.target.name];
+    const targetColorIdx = colMap[roles.targetColor.name];
+    const targetLabelColorIdx = colMap[roles.targetLabelColor.name];
+    const targetIdx = colMap[roles.target.name];
     const edgeValueIdx = colMap[roles.edgeValue.name];
     const edgeColorValueIdx = colMap[roles.edgeColorValue.name];
     const sourceNodeWeightIdx = colMap[roles.sourceNodeWeight.name];
@@ -98,8 +98,8 @@ export function converter(
             const identityColumn = dataView.metadata.columns.filter(n => n.queryName === column.queryName)[0];
             const filterTargetColumn = columnToFilter || identityColumn;
             const target: models.IFilterColumnTarget = {
-                table: filterTargetColumn.queryName.substr(0, filterTargetColumn.queryName.indexOf('.')),
-                column: filterTargetColumn.displayName
+                table: filterTargetColumn.queryName.substr(0, filterTargetColumn.queryName.indexOf(".")),
+                column: filterTargetColumn.displayName,
             };
             const filter = <models.IAdvancedFilter><any>new models.AdvancedFilter(target, "And", {
                 operator: "Is",
@@ -108,7 +108,7 @@ export function converter(
             node = nodeMap[id] = {
                 name: id,
                 color: color || "gray",
-                labelColor: labelColor,
+                labelColor,
                 index: nodeList.length,
                 filter,
                 value: nodeWeight,
@@ -119,7 +119,7 @@ export function converter(
                         // https://community.powerbi.com/t5/Developer/Creating-Selection-manager-for-Custom-Table-visuals/m-p/218391/highlight/true#M6869
                         source: identityColumn,
                         values: <any>null,
-                        identity: [dvIdentity]
+                        identity: [dvIdentity],
                     }, 0)
                     .createSelectionId() : <any>-1,
             };
@@ -133,11 +133,11 @@ export function converter(
 
         // Iterate through each row and create a connection between the source node and the target node
         table.rows.forEach((row, idx) => {
-            let identity = table.identity[idx];
+            const identity = table.identity[idx];
             if (row[sourceIdx] && row[targetIdx]) {
                 /** These need to be strings to work properly */
-                let sourceId = row[sourceIdx] + "";
-                let targetId = row[targetIdx] + "";
+                const sourceId = row[sourceIdx] + "";
+                const targetId = row[targetIdx] + "";
                 const edge = {
                     source:
                         getNode(sourceId,

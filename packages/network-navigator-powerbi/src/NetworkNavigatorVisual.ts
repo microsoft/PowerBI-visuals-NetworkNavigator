@@ -61,6 +61,11 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
     public myNetworkNavigator: NetworkNavigatorImpl;
 
     /**
+     * Whether or not css needs loaded
+     */
+    protected noCss: boolean;
+
+    /**
      * The visual's host
      */
     private host: IVisualHost;
@@ -99,11 +104,6 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
      * The previous update options
      */
     private prevUpdateOptions: powerbi.extensibility.visual.VisualUpdateOptions;
-
-    /**
-     * Whether or not css needs loaded
-     */
-    protected noCss: boolean;
 
     /**
      * A debounced event listener for when a node is selected through NetworkNavigator
@@ -208,9 +208,9 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
     public update(options: VisualUpdateOptions, vm?: any, type?: UpdateType) {
         const updateType = type !== undefined ? type : calcUpdateType(this.prevUpdateOptions, options);
         this.prevUpdateOptions = options;
-        let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
+        const dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
         this._dataView = dataView;
-        let dataViewTable = dataView && dataView.table;
+        const dataViewTable = dataView && dataView.table;
         let forceReloadData = false;
 
         // Some settings have been updated
@@ -283,7 +283,7 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
             this._nodes = nodes;
             let updated = false;
             nodes.forEach((n) => {
-                let isSelected =
+                const isSelected =
                     !!_.find(selectedIds, (id: SelectionId) => id.equals((<INetworkNavigatorSelectableNode>n).identity));
                 if (isSelected !== n.selected) {
                     n.selected = isSelected;
