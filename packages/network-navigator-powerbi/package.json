@@ -14,14 +14,15 @@
     "test": "npm run compile && karma start --color && node bin/packageVisual",
     "test:tdd": "npm run compile && karma start --color --tdd",
     "lint": "tslint src/**/*.ts",
-    "clean": "rm -rf node_modules .tmp",
-    "postinstall": "linklocal"
+    "clean": "rm -rf node_modules .tmp"
   },
   "author": "Microsoft",
   "license": "MIT",
   "dependencies": {
     "@essex/network-navigator": "file:../network-navigator",
-    "@essex/pbi-base": "^0.8.24",
+    "@essex/visual-styling": "^2.0.0",
+    "@essex/visual-testing-tools": "^2.0.1",
+    "@essex/visual-utils": "^2.0.1",
     "@types/d3": "^3.x",
     "@types/node": "^6.0.52",
     "@types/react": "^0.14.47",

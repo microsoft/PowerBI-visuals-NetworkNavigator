@@ -27,8 +27,8 @@ import {
     boolSetting,
     numberSetting,
     colorSetting,
-    colors,
-} from "@essex/pbi-base";
+} from "@essex/visual-settings";
+import { colors } from "@essex/visual-styling";
 import { constants, INetworkNavigatorConfiguration } from "@essex/network-navigator";
 
 const CAT_SEARCH = "Search";

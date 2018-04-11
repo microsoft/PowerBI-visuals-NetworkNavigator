@@ -1,10 +1,13 @@
 {
   "scripts": {
-    "test": "lerna --stream --scope @essex/network-navigator run test && lerna run test --stream --ignore @essex/network-navigator",
-    "test:powerbi": "lerna --stream --scope @essex/network-navigator run test && lerna run test --stream --scope @essex/network-navigator-powerbi",
-    "start": "lerna --stream --scope @essex/network-navigator run test && lerna run start --stream --scope @essex/network-navigator-powerbi",
-    "postinstall": "lerna exec --concurrency=1 -- yarn && lerna exec --concurrency=99 -- linklocal --named @essex/network-navigator ../network-navigator"
+    "lint": "tslint \"packages/*/src/**/*[!.d,.spec].{ts,tsx}\"",
+    "test": "npm run lint && lerna run test --stream",
+    "start": "lerna run test --stream --scope @essex/network-navigator && lerna run start --scope @essex/network-navigator-powerbi --stream"
   },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "devDependencies": {
     "@types/chai": "^3.4.34",
     "@types/d3": "^3.x",
@@ -31,7 +34,6 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
     "lerna": "2.0.0-beta.38",
-    "linklocal": "^2.8.0",
     "lolex": "^1.4.0",
     "mocha": "^3.2.0",
     "mv": "^2.1.1",

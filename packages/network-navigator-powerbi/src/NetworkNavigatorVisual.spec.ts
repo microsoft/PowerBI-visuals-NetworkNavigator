@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-import { Utils as SpecUtils } from "@essex/pbi-base/dist/spec/visualHelpers";
-import { UpdateType } from "@essex/pbi-base";
+import { Utils as SpecUtils } from "@essex/visual-testing-tools";
+import { UpdateType } from "@essex/visual-utils";
 import NetworkNavigator from "./NetworkNavigatorVisual";
 import { expect } from "chai";
 import * as $ from "jquery";

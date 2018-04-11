@@ -27,7 +27,7 @@ import "powerbi-visuals-tools/templates/visuals/.api/v1.7.0/PowerBI-visuals";
 import { default as NetworkNavigatorImpl } from "@essex/network-navigator";
 import { INetworkNavigatorNode } from "@essex/network-navigator";
 import { INetworkNavigatorSelectableNode } from "./models";
-import { UpdateType, receiveDimensions, IDimensions, calcUpdateType } from "@essex/pbi-base";
+import { UpdateType, receiveDimensions, IDimensions, calcUpdateType } from "@essex/visual-utils";
 import converter from "./dataConversion";
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
