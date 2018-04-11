@@ -2,6 +2,7 @@
   "name": "@essex/network-navigator-powerbi",
   "version": "1.0.1",
   "description": "",
+  "private": true,
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "scripts": {
@@ -13,20 +14,18 @@
     "package": "node bin/packageVisual",
     "test": "npm run compile && karma start --color && node bin/packageVisual",
     "test:tdd": "npm run compile && karma start --color --tdd",
-    "lint": "tslint src/**/*.ts",
-    "clean": "rm -rf node_modules .tmp"
+    "docs": "typedoc --out docs --exclude **/src/**/*.spec.ts"
   },
   "author": "Microsoft",
   "license": "MIT",
   "dependencies": {
     "@essex/network-navigator": "file:../network-navigator",
+    "@essex/visual-settings": "^2.0.1",
     "@essex/visual-styling": "^2.0.0",
     "@essex/visual-testing-tools": "^2.0.1",
     "@essex/visual-utils": "^2.0.1",
     "@types/d3": "^3.x",
     "@types/node": "^6.0.52",
-    "@types/react": "^0.14.47",
-    "@types/react-dom": "^0.14.18",
     "d3": "3.5.12",
     "dompurify": "^0.7.4",
     "imports-loader": "^0.7.1",

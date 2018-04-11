@@ -2,17 +2,16 @@
   "name": "@essex/network-navigator",
   "version": "1.0.1",
   "description": "",
-  "main": "src/index.js",
-  "typings": "src/index.d.ts",
+  "private": true,
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "lint": "tslint \"src/**/*[!.d].{ts,tsx}\"",
+    "copy:css": "copyfiles -u 1 \"src/**/*.scss\" dist/",
     "karma:tdd": "karma start --tdd",
     "karma:once": "karma start",
-    "docs": "typedoc --out docs --ignoreCompilerErrors ./ --externalPattern \"**/node_modules/**/*.*\" --exclude \"**/src/**/*.spec.ts\"",
-    "verify": "npm run clean && tsc && npm-run-all lint karma:once docs",
-    "test": "npm run verify",
-    "version": "npm run verify"
+    "docs": "typedoc --out docs --exclude **/src/**/*.spec.ts",
+    "test": "npm run clean && tsc && npm-run-all copy:css karma:once docs"
   },
   "author": "Microsoft",
   "license": "MIT",
@@ -23,5 +22,7 @@
     "lodash": "4.0.0",
     "ts-loader": "^2.3.2"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "copyfiles": "^2.0.0"
+  }
 }

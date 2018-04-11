@@ -6,7 +6,8 @@
     "jsx": "react",
     "declaration": true,
     "noImplicitAny": true,
-    "suppressImplicitAnyIndexErrors": true
+    "suppressImplicitAnyIndexErrors": true,
+    "outDir": "dist"
   },
   "compileOnSave": false,
   "exclude": [
