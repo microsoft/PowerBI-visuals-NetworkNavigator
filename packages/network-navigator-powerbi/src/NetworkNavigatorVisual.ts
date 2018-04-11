@@ -24,10 +24,10 @@
 
 import "powerbi-visuals-tools/templates/visuals/.api/v1.7.0/PowerBI-visuals";
 
-import { default as NetworkNavigatorImpl } from "@essex/network-navigator";
-import { INetworkNavigatorNode } from "@essex/network-navigator";
+import { default as NetworkNavigatorImpl, INetworkNavigatorData, INetworkNavigatorNode } from "@essex/network-navigator";
 import { INetworkNavigatorSelectableNode } from "./models";
 import { UpdateType, receiveDimensions, IDimensions, calcUpdateType } from "@essex/visual-utils";
+import { filter, dataview } from "../powerbi-visuals-utils";
 import converter from "./dataConversion";
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
@@ -37,6 +37,7 @@ import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInst
 import SelectionId = powerbi.visuals.ISelectionId;
 import NetworkNavigatorState from "./state";
 import * as $ from "jquery";
+import * as _ from "lodash";
 
 /* tslint:disable */
 const MY_CSS_MODULE = require("./css/NetworkNavigatorVisual.scss");
@@ -47,7 +48,6 @@ const EVENTS_TO_IGNORE = "mousedown mouseup click focus blur input pointerdown p
 import { DATA_ROLES } from "./constants";
 
 /* tslint:enable */
-declare var _: any;
 
 /**
  * A visual which supports the displaying of graph based datasets in power bi
@@ -109,17 +109,7 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
      * A debounced event listener for when a node is selected through NetworkNavigator
      */
     private onNodeSelected = _.debounce((node: INetworkNavigatorSelectableNode) => {
-        const isInternalStateNodeUnset = this._internalState.selectedNodeIndex === undefined;
-        const areBothUndefined = !node && isInternalStateNodeUnset;
-        const areIndexesEqual = node && this._internalState.selectedNodeIndex === node.index;
-
-        if (areBothUndefined || areIndexesEqual) {
-            return;
-        }
-
-        this._internalState = this._internalState.receive({ selectedNodeIndex: node ? node.index : undefined });
         this.persistNodeSelection(node as INetworkNavigatorSelectableNode);
-        const label = node ? `Select ${node.name}` : "Clear selection";
     }, 100);
 
     /*
@@ -180,8 +170,11 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
                     nodes: [],
                 });
             }
-            this.loadSelectionFromPowerBI();
         }
+
+        // Load the settings after we have loaded the nodes, cause otherwise
+        this.loadSelectionFromPowerBI();
+
         this.myNetworkNavigator.redrawLabels();
     }
 
@@ -223,27 +216,52 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
      * Loads the selection state from powerbi
      */
     private loadSelectionFromPowerBI() {
-        const data = this.myNetworkNavigator.getData();
+        const data = this.myNetworkNavigator.getData() as INetworkNavigatorData<INetworkNavigatorNode>;
         const nodes = data && data.nodes;
-        const selectedIds = this._internalState.selectedNodeIndex; this.selectionManager.getSelectionIds();
 
         // For each of the nodes, check to see if their ids are in the selection manager, and
         // mark them as selected
         if (nodes && nodes.length) {
             this._nodes = nodes;
-            let updated = false;
-            nodes.forEach((n) => {
-                const isSelected =
-                    !!_.find(selectedIds, (id: SelectionId) => id.equals((<INetworkNavigatorSelectableNode>n).identity));
-                if (isSelected !== n.selected) {
-                    n.selected = isSelected;
-                    updated = true;
+            const filterValues = getFilterValues(this._dataView, "general.filter");
+            const valueMap = (filterValues || []).reduce((acc, cur) => { acc[cur] = 1; return acc; }, {});
+            let selectedNode: INetworkNavigatorSelectableNode;
+
+            nodes.forEach((n: INetworkNavigatorSelectableNode) => {
+                const isSelected = !!valueMap[pretty(n.name)];
+                n.selected = isSelected;
+
+                // Just select the last one for now
+                if (isSelected) {
+                    selectedNode = n;
                 }
             });
 
-            if (updated) {
-                this.myNetworkNavigator.redrawSelection();
+            this.myNetworkNavigator.selectedNode = selectedNode;
+        }
+    }
+
+    /**
+     * Sets the selected ids on the selection manager
+     * @param ids The ids to select
+     * @param forceManual If true, selection will be performed through selectionManager.select method
+     */
+    private setSelectionOnSelectionManager(ids: powerbi.visuals.ISelectionId[], forceManual = false) {
+        const selectIds = () => {
+            if (ids.length > 0 && this.selectionManager.select) {
+                this.selectionManager.select(ids);
+            } else if (this.selectionManager.clear) {
+                this.selectionManager.clear();
             }
+        };
+
+        // This avoids an extra host.onSelect call, which causes visuals to repaint
+        if (!forceManual && this.selectionManager["setSelectionIds"]) {
+            this.selectionManager["setSelectionIds"](ids);
+        } else if (!forceManual && this.selectionManager["selectedIds"]) {
+            this.selectionManager["selectedIds"] = ids;
+        } else {
+            selectIds();
         }
     }
 
@@ -270,7 +288,7 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
                 this.selectionChangedListener.destroy();
             }
             const dispatcher = this.myNetworkNavigator.events;
-            this.selectionChangedListener = dispatcher.on("selectionChanged", (node: INetworkNavigatorNode) => this.onNodeSelected(node));
+            this.selectionChangedListener = dispatcher.on("selectionChanged", (node: INetworkNavigatorSelectableNode) => this.onNodeSelected(node));
             dispatcher.on("zoomed", ({ scale, translate }: { scale: number, translate: [number, number] }) => {
                 this._internalState = this._internalState.receive({scale, translate});
             });
@@ -284,4 +302,52 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
             this.element.find(".filter-box input").on(EVENTS_TO_IGNORE, (e) => e.stopPropagation());
         }
     }
+}
+
+/**
+ * Gets the text values that form the current selection filter
+ * @param dv The dataView
+ * @param filterPath The path to the filter within the metadata objets
+ */
+function getFilterValues(dv: powerbi.DataView, filterPath: string): string[] {
+    const savedFilter: any = _.get(
+        dv,
+        `metadata.objects.${filterPath}`,
+    );
+    if (savedFilter) {
+        const appliedFilter = filter.FilterManager.restoreFilter(savedFilter);
+        if (appliedFilter) {
+            // The way we do this is a little funky
+            // Cause it doesn't always produce what the interface says it should
+            // sometimes it has 'values' property, other times it has conditions
+            const conditions = _.get(appliedFilter, "conditions", _.get(appliedFilter, "values", []));
+            return conditions.map((n: any) => {
+                // This is also a little funky cause sometimes the actual value is nested under a 'value'
+                // property, other times it is just the value
+                let text = pretty(n);
+
+                // Is an array
+                if (n && n.splice) {
+                    text = pretty(n[0].value);
+
+                // If we have a non empty value property
+                } else if (n && (n.value !== undefined && n.value !== null)) {
+                    text = pretty(n.value);
+                }
+                return text;
+            });
+        }
+    }
+    return [];
+}
+
+/**
+ * Pretty prints a string value
+ * @param val The value to pretty print
+ */
+function pretty(val: string) {
+    if (val === null || val === undefined) {
+        return "";
+    }
+    return val + "";
 }

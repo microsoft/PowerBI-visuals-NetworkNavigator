@@ -1598,6 +1598,10 @@ d3@3.5.12:
   version "3.5.12"
   resolved "https://registry.yarnpkg.com/d3/-/d3-3.5.12.tgz#3b821f5b72c5371eccea1aaf4da2f317eb473240"
 
+d3@3.5.5:
+  version "3.5.5"
+  resolved "https://registry.yarnpkg.com/d3/-/d3-3.5.5.tgz#be1aba6a84fb6653283b3ebebb7f570e3bda187e"
+
 d@1:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/d/-/d-1.0.0.tgz#754bb5bfe55451da69a58b94d45f4c5b0462d58f"
@@ -2302,6 +2306,10 @@ exports-loader@^0.6.2:
     loader-utils "^1.0.2"
     source-map "0.5.x"
 
+expose-loader@^0.7.3:
+  version "0.7.5"
+  resolved "https://registry.yarnpkg.com/expose-loader/-/expose-loader-0.7.5.tgz#e29ea2d9aeeed3254a3faa1b35f502db9f9c3f6f"
+
 extend@^3.0.0, extend@~3.0.0, extend@~3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.1.tgz#a755ea7bc1adfcc5a31ce7e762dbaadc5e636444"
@@ -2922,6 +2930,10 @@ global@^4.3.2:
   dependencies:
     min-document "^2.19.0"
     process "~0.5.1"
+
+globalize@0.1.0-a2:
+  version "0.1.0-a2"
+  resolved "https://registry.yarnpkg.com/globalize/-/globalize-0.1.0a2.tgz#7f28b382ebefd9ba0cb3d803635fbba64a87f294"
 
 globals@^8.11.0:
   version "8.18.0"
@@ -6128,6 +6140,37 @@ powerbi-visuals-utils-dataviewutils@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/powerbi-visuals-utils-dataviewutils/-/powerbi-visuals-utils-dataviewutils-1.2.0.tgz#59a1c983355c958a23d9901894f65f1575193213"
 
+powerbi-visuals-utils-dataviewutils@^1.2.0:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/powerbi-visuals-utils-dataviewutils/-/powerbi-visuals-utils-dataviewutils-1.4.1.tgz#fb3f07abb7759a92d5904189cf2ae43113cbafd3"
+
+powerbi-visuals-utils-formattingutils@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/powerbi-visuals-utils-formattingutils/-/powerbi-visuals-utils-formattingutils-3.0.1.tgz#43dff79eac25e2c9373a1d77eeffbff2d09f7fee"
+  dependencies:
+    globalize "0.1.0-a2"
+    powerbi-visuals-utils-dataviewutils "1.2.0"
+    powerbi-visuals-utils-typeutils "1.1.0"
+
+powerbi-visuals-utils-interactivityutils@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/powerbi-visuals-utils-interactivityutils/-/powerbi-visuals-utils-interactivityutils-3.2.0.tgz#1acca44d29bca66a12386dad4e293ff605a95dac"
+  dependencies:
+    d3 "3.5.5"
+    powerbi-visuals-utils-svgutils "^1.0.0"
+    powerbi-visuals-utils-typeutils "^1.0.0"
+
+powerbi-visuals-utils-svgutils@^1.0.0, powerbi-visuals-utils-svgutils@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/powerbi-visuals-utils-svgutils/-/powerbi-visuals-utils-svgutils-1.1.0.tgz#8ba22c6ef5662a402709b477753a4519342257e7"
+  dependencies:
+    d3 "3.5.5"
+    powerbi-visuals-utils-typeutils "1.1.0"
+
+powerbi-visuals-utils-typeutils@1.1.0, powerbi-visuals-utils-typeutils@^1.0.0, powerbi-visuals-utils-typeutils@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/powerbi-visuals-utils-typeutils/-/powerbi-visuals-utils-typeutils-1.1.0.tgz#347942e581873700da55efff5136a693a76df9b2"
+
 powerbi-visuals@^0.3.8:
   version "0.3.10"
   resolved "https://registry.yarnpkg.com/powerbi-visuals/-/powerbi-visuals-0.3.10.tgz#fc6abce25930b29bce9941f85ffeae7dd43e909e"
@@ -6279,7 +6322,7 @@ raw-body@~2.2.0:
     iconv-lite "0.4.15"
     unpipe "1.0.0"
 
-raw-loader@0.5.1:
+raw-loader@0.5.1, raw-loader@~0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/raw-loader/-/raw-loader-0.5.1.tgz#0c3d0beaed8a01c966d9787bf778281252a979aa"
 
@@ -6810,6 +6853,12 @@ sass-loader@^4.1.0:
 sax@~1.2.1:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
+
+script-loader@^0.7.0:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/script-loader/-/script-loader-0.7.2.tgz#2016db6f86f25f5cf56da38915d83378bb166ba7"
+  dependencies:
+    raw-loader "~0.5.1"
 
 scss-tokenizer@^0.2.3:
   version "0.2.3"

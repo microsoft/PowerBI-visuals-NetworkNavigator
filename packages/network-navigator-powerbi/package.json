@@ -28,11 +28,18 @@
     "@types/node": "^6.0.52",
     "d3": "3.5.12",
     "dompurify": "^0.7.4",
+    "globalize": "0.1.0-a2",
     "imports-loader": "^0.7.1",
     "jquery": "^3.1.1",
     "json-stringify-safe": "^5.0.1",
     "lodash": "4.0.0",
     "moment": "^2.12.0",
-    "powerbi-visuals": "^0.3.8"
+    "powerbi-visuals": "^0.3.8",
+    "powerbi-models": "^0.11.3",
+    "powerbi-visuals-utils-dataviewutils": "^1.2.0",
+    "powerbi-visuals-utils-formattingutils": "^3.0.0",
+    "powerbi-visuals-utils-interactivityutils": "^3.2.0",
+    "powerbi-visuals-utils-svgutils": "^1.1.0",
+    "powerbi-visuals-utils-typeutils": "^1.1.0"
   }
 }
