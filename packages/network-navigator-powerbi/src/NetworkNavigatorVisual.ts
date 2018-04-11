@@ -329,7 +329,9 @@ function getFilterValues(dv: powerbi.DataView, filterPath: string): string[] {
                 // Is an array
                 if (n && n.splice) {
                     text = pretty(n[0].value);
-                } else if (n && n.value) {
+
+                // If we have a non empty value property
+                } else if (n && (n.value !== undefined && n.value !== null)) {
                     text = pretty(n.value);
                 }
                 return text;
