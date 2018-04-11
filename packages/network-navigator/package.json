@@ -1,6 +1,6 @@
 {
   "name": "@essex/network-navigator",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "",
   "private": true,
   "main": "dist/index.js",
