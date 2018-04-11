@@ -34,6 +34,8 @@ import * as _ from "lodash";
 const log = require("debug")("NetworkNavigator");
 /* tslint:enable */
 
+const escapeRegExp = (str: string) => str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+
 /**
  * The network navigator is an advanced force graph based component
  */
@@ -125,7 +127,7 @@ export class NetworkNavigator {
         }, 500);
 
         this.filterBox.on("input", handleTextInput);
-        this.dimensions = { width: width, height: height };
+        this.dimensions = { width, height };
         this.svg = d3.select(this.svgContainer[0]).append("svg")
             .attr("width", width)
             .attr("height", height);
@@ -137,13 +139,6 @@ export class NetworkNavigator {
             .size([width, height]);
         this.vis = this.svg.append("svg:g");
         this.redraw();
-    }
-
-    /**
-     * Escapes RegExp
-     */
-    private static escapeRegExp(str: string) {
-        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     }
 
     /**
@@ -216,7 +211,7 @@ export class NetworkNavigator {
             /**
              * Updates the config value if necessary, and returns true if it was updated
              */
-            let updateForceConfig = (name: string, config: { default: number, min: number, max: number }) => {
+            const updateForceConfig = (name: string, config: { default: number, min: number, max: number }) => {
                 const { default: defaultValue, min, max } = config;
                 if (newConfig[name] !== this._configuration[name]) {
                     let newValue = max ? Math.min(newConfig[name], max) : newConfig[name];
@@ -228,10 +223,10 @@ export class NetworkNavigator {
 
             // Bound all of the settings to their appropriate min/maxes
             const { charge, linkDistance, linkStrength, gravity } = CONSTANTS;
-            runStart = runStart || updateForceConfig("linkDistance", linkDistance);
-            runStart = runStart || updateForceConfig("linkStrength", linkStrength);
-            runStart = runStart || updateForceConfig("charge", charge);
-            runStart = runStart || updateForceConfig("gravity", gravity);
+            runStart = updateForceConfig("linkDistance", linkDistance) || runStart;
+            runStart = updateForceConfig("linkStrength", linkStrength) || runStart;
+            runStart = updateForceConfig("charge", charge) || runStart;
+            runStart = updateForceConfig("gravity", gravity) || runStart;
 
             // If the zoom has changed at all, then let the zoom behavior know
             if ((newConfig.minZoom !== this._configuration.minZoom ||
@@ -343,10 +338,10 @@ export class NetworkNavigator {
                 });
             });
 
-            let drag = d3.behavior.drag()
-                .origin(function(d: any) { return <any>d; })
+            const drag = d3.behavior.drag()
+                .origin((d: any) => d)
                 // The use of "function" is important to preserve "this"
-                .on("dragstart", function(d: any) {
+                .on("dragstart", function(d: any) { // tslint:disable-line only-arrow-functions
 
                     // Stop the force graph animation while we are dragging, otherwise it causes the graph to
                     // jitter while you drag it
@@ -354,16 +349,16 @@ export class NetworkNavigator {
                     d3.select(this).classed("dragging", true);
                     me.force.stop();
                 })
-                .on("drag", function(d: any) {
+                .on("drag", function(d: any) { // tslint:disable-line only-arrow-functions
                     // While we drag, adjust the dragged node, and tell our node renderer to draw a frame
-                    let evt = <any>d3.event;
+                    const evt = <any>d3.event;
                     d.px = d.x = evt.x;
                     d.py = d.y = evt.y;
                     /* tslint:disable */
                     tick();
                     /* tslint:enable */
                 })
-                .on("dragend", function(d: any) {
+                .on("dragend", function(d: any) { // tslint:disable-line only-arrow-functions
                     d3.select(this).classed("dragging", false);
 
                     // If we have animation on, then start that beast
@@ -382,16 +377,16 @@ export class NetworkNavigator {
                 .call(this.zoom);
             this.vis = this.svg.append("svg:g");
 
-            let nodes = graph.nodes.slice();
-            let links: { source: any; target: any; }[] = [];
-            let bilinks: any[] = [];
+            const nodes = graph.nodes.slice();
+            const links: Array<{ source: any; target: any; }> = [];
+            const bilinks: any[] = [];
 
-            graph.links.forEach((link) => {
-                let s = nodes[link.source];
-                let t = nodes[link.target];
-                let w = link.value;
-                let cw = link.colorValue;
-                let i = {}; // intermediate node
+            graph.links.forEach((graphLink) => {
+                const s = nodes[graphLink.source];
+                const t = nodes[graphLink.target];
+                const w = graphLink.value;
+                const cw = graphLink.colorValue;
+                const i = {}; // intermediate node
                 nodes.push(<any>i);
                 links.push({ source: s, target: i }, { source: i, target: t });
                 bilinks.push([s, i, t, w, cw]);
@@ -416,8 +411,8 @@ export class NetworkNavigator {
                 if (configMin !== undefined && configMax !== undefined) {
                     return [configMin, configMax];
                 } else {
-                    let min: number = undefined;
-                    let max: number = undefined;
+                    let min: number;
+                    let max: number;
                     const data = bilinks.map(fn);
                     data.forEach((d: number) => {
                         if (min === undefined || d < min) {
@@ -486,11 +481,11 @@ export class NetworkNavigator {
                 .append("svg:path")
                 .attr("d", "M0,-5L10,0L0,5");
 
-            let link = this.vis.selectAll(".link")
+            const link = this.vis.selectAll(".link")
                 .data(bilinks)
                 .enter().append("line")
                 .attr("class", "link")
-                .style("stroke", function(d: any) {
+                .style("stroke", function(d: any) { // tslint:disable-line only-arrow-functions
                     return xform(
                         d[4],
                         edgeColorScale,
@@ -498,7 +493,7 @@ export class NetworkNavigator {
                         "gray",
                     );
                 })
-                .style("stroke-width", function(d: any) {
+                .style("stroke-width", function(d: any) { // tslint:disable-line only-arrow-functions
                     return xform(
                         d[3],
                         edgeWidthScale,
@@ -506,12 +501,12 @@ export class NetworkNavigator {
                         DEFAULT_EDGE_SIZE,
                     );
                 })
-                .attr("id", function(d: any) {
+                .attr("id", function(d: any) { // tslint:disable-line only-arrow-functions
                     return d[0].name.replace(/\./g, "_").replace(/@/g, "_") + "_" +
                         d[2].name.replace(/\./g, "_").replace(/@/g, "_");
                 });
 
-            let node = this.vis.selectAll(".node")
+            const node = this.vis.selectAll(".node")
                 .data(graph.nodes)
                 .enter().append("g")
                 .call(drag)
@@ -560,7 +555,7 @@ export class NetworkNavigator {
 
             node.append("svg:text")
                 .attr("class", "node-label")
-                .text(function(d: any) { return d.name; })
+                .text((d: any) => d.name)
                 .attr("fill", (d: any) => d.labelColor || this.configuration.defaultLabelColor)
                 .attr("stroke", (d: any) => d.labelColor || this.configuration.defaultLabelColor)
                 .attr("font-size", () => `${this.configuration.fontSizePT}pt`)
@@ -649,7 +644,7 @@ export class NetworkNavigator {
             let scale = 1;
             const searchStr = d.name || "";
             const flags = this.configuration.caseInsensitive ? "i" : "";
-            let regex = new RegExp(NetworkNavigator.escapeRegExp(text), flags);
+            const regex = new RegExp(escapeRegExp(text), flags);
             if (text && regex.test(pretty(searchStr))) {
                 scale = 3;
             }

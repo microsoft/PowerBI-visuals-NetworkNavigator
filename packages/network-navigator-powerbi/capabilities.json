@@ -157,6 +157,13 @@
 							"selector": ["Values"]
 						}
 					}
+				},
+				"version": {
+					"displayName": "Version",
+					"description": "The version of Network Navigator",
+					"type": {
+						"text": true
+					}
 				}
 			},
 			"displayName": "General"

@@ -30,7 +30,7 @@ import * as templates from "./templates/networkNavigator.tmpl";
 export {
     constants,
     defaults,
-    templates
+    templates,
 };
 
 export * from "./models";

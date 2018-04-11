@@ -27,9 +27,13 @@ import {
     boolSetting,
     numberSetting,
     colorSetting,
-    colors,
-} from "@essex/pbi-base";
+    textSetting as text,
+} from "@essex/visual-settings";
+import colors from "@essex/visual-styling";
 import { constants, INetworkNavigatorConfiguration } from "@essex/network-navigator";
+
+// Webpack defines this
+declare var BUILD_VERSION: string;
 
 const CAT_SEARCH = "Search";
 const CAT_LAYOUT = "Layout";
@@ -38,6 +42,18 @@ const CAT_LAYOUT = "Layout";
  * Represents the state of the network navigator
  */
 export default class NetworkNavigatorVisualState extends HasSettings implements INetworkNavigatorConfiguration {
+
+    /**
+     * Shows the version of Network Navigator
+     */
+    @text({
+        persist: false,
+        category: "General",
+        displayName: "Version",
+        description: "The version of Network Navigator",
+        compose: () => BUILD_VERSION,
+    })
+    public version?: string;
 
     /**
      * If searches are case insensitive

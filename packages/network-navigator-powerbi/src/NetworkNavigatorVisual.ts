@@ -21,18 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import "powerbi-visuals-tools/templates/visuals/.api/v1.7.0/PowerBI-visuals";
+
 import { default as NetworkNavigatorImpl } from "@essex/network-navigator";
 import { INetworkNavigatorNode } from "@essex/network-navigator";
 import { INetworkNavigatorSelectableNode } from "./models";
-import { Visual, VisualBase, UpdateType, capabilities, receiveDimensions, IDimensions } from "@essex/pbi-base";
+import { UpdateType, receiveDimensions, IDimensions, calcUpdateType } from "@essex/visual-utils";
 import converter from "./dataConversion";
-import IVisualHostServices = powerbi.IVisualHostServices;
-import VisualInitOptions = powerbi.VisualInitOptions;
-import VisualUpdateOptions = powerbi.VisualUpdateOptions;
+import IVisualHost = powerbi.extensibility.visual.IVisualHost;
+import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
+import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import VisualObjectInstance = powerbi.VisualObjectInstance;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
-import SelectionId = powerbi.visuals.SelectionId;
-import utility = powerbi.visuals.utility;
+import SelectionId = powerbi.visuals.ISelectionId;
 import NetworkNavigatorState from "./state";
 import * as $ from "jquery";
 
@@ -43,7 +45,6 @@ const MY_CSS_MODULE = require("./css/NetworkNavigatorVisual.scss");
 const EVENTS_TO_IGNORE = "mousedown mouseup click focus blur input pointerdown pointerup touchstart touchmove touchdown";
 
 import { DATA_ROLES } from "./constants";
-import capabilitiesData from "./capabilities";
 
 /* tslint:enable */
 declare var _: any;
@@ -52,7 +53,7 @@ declare var _: any;
  * A visual which supports the displaying of graph based datasets in power bi
  */
 @receiveDimensions
-export default class NetworkNavigator extends VisualBase {
+export default class NetworkNavigator implements powerbi.extensibility.visual.IVisual {
 
     /**
      * My network navigator instance
@@ -60,9 +61,19 @@ export default class NetworkNavigator extends VisualBase {
     public myNetworkNavigator: NetworkNavigatorImpl;
 
     /**
+     * Whether or not css needs loaded
+     */
+    protected noCss: boolean;
+
+    /**
      * The visual's host
      */
-    private host: IVisualHostServices;
+    private host: IVisualHost;
+
+    /**
+     * This visuals element
+     */
+    private element: JQuery;
 
     /**
      * The selection changed listener for NetworkNavigator
@@ -72,7 +83,7 @@ export default class NetworkNavigator extends VisualBase {
     /**
      * The selection manager, used to sync selection with PowerBI
      */
-    private selectionManager: utility.SelectionManager;
+    private selectionManager: powerbi.extensibility.ISelectionManager;
 
     /**
      * The internal state of the network navigator
@@ -90,9 +101,9 @@ export default class NetworkNavigator extends VisualBase {
     private _dataView: powerbi.DataView;
 
     /**
-     * Whether or not css needs loaded
+     * The previous update options
      */
-    protected noCss: boolean;
+    private prevUpdateOptions: powerbi.extensibility.visual.VisualUpdateOptions;
 
     /**
      * A debounced event listener for when a node is selected through NetworkNavigator
@@ -114,111 +125,54 @@ export default class NetworkNavigator extends VisualBase {
     /*
      * Constructor for the network navigator
      */
-    constructor(noCss = false, options : any) {
-        super("NetworkNavigator", noCss);
+    constructor(options: VisualConstructorOptions, noCss = false) {
         this.noCss = noCss;
+        this.host = options.host;
+        this.element = $(`<div style="height: 100%;"></div>`);
+        this.selectionManager = options.host.createSelectionManager();
+
+        // Add to the container
+        options.element.appendChild(this.element[0]);
+
+        this.selectionManager = this.host.createSelectionManager();
 
         // Some of the css is in a css module (:local() {....}), this adds the auto generated class to our element
         const className = MY_CSS_MODULE && MY_CSS_MODULE.locals && MY_CSS_MODULE.locals.className;
         if (className) {
+            $(options.element).append($("<st" + "yle>" + MY_CSS_MODULE + "</st" + "yle>"));
             this.element.addClass(className);
         }
 
-        this._internalState = NetworkNavigatorState.create() as NetworkNavigatorState;
-        options.element = $(options.element); // make this a jquery object
-        this.init(options);
-    }
+        this._internalState = NetworkNavigatorState.create<NetworkNavigatorState>();
 
-    /**
-     * Gets the template for this visual
-     */
-    public get template() {
-        return `<div id="node_graph" style= "height: 100%;"> </div>`;
-    }
-
-    /**
-     * This is called once when the visual is initialially created
-     */
-    public doInit(options: VisualInitOptions): void {
-        super.doInit(options);
-        this.myNetworkNavigator = new NetworkNavigatorImpl(this.element.find("#node_graph"), 500, 500);
-        this.host = options.host;
+        this.myNetworkNavigator = new NetworkNavigatorImpl(this.element, 500, 500);
         this.attachEvents();
-        this.selectionManager = this.host["createSelectionManager"]();
     }
-
-    /**
-     * Generates a state object
-     */
-    public get state() {
-        return this._internalState.toJSONObject();
-    }
-
-    /**
-     * Called when a new state has been set on the visual
-     * @param state The state that was set
-     */
-    public set state(state: NetworkNavigatorState) {
-        this._internalState = this._internalState.receive(state);
-
-        // Set the Selected Node
-        if (this._internalState.selectedNodeIndex) {
-            const nodeIndex = this._internalState.selectedNodeIndex;
-            const node = this._nodes && this._nodes.length >= nodeIndex ? this._nodes[nodeIndex] : undefined;
-            this.persistNodeSelection(node as INetworkNavigatorSelectableNode);
-            this.myNetworkNavigator.selectedNode = node;
-        } else {
-            this.persistNodeSelection(undefined);
-            this.myNetworkNavigator.selectedNode = undefined;
-        }
-
-        // Set Text Filter
-        this.myNetworkNavigator.textFilter = this._internalState.textFilter;
-
-        // Set pan & zoom
-        const doesStateHaveScaleAndTranslate = this._internalState.scale &&
-            this._internalState.translate &&
-            this._internalState.translate.length === 2;
-
-        let doesScaleAndTranslateDiffer = false;
-        if (doesStateHaveScaleAndTranslate) {
-            doesScaleAndTranslateDiffer = this._internalState.scale !== this.myNetworkNavigator.scale ||
-                !_.isEqual(this._internalState.translate, this.myNetworkNavigator.translate);
-        }
-
-        if (doesStateHaveScaleAndTranslate && doesScaleAndTranslateDiffer) {
-            this.myNetworkNavigator.scale = this._internalState.scale;
-            this.myNetworkNavigator.translate = this._internalState.translate;
-            this.myNetworkNavigator.redraw();
-        }
-
-        // Set configuration
-        this.myNetworkNavigator.configuration = this._internalState;
-    }
-
 
     /**
      * Update is called for data updates, resizes & formatting changes
      * @param options The update options from PBI
+     * @param vm The view model
      * @param type The update type that occurred
      */
-    public updateWithType(options: VisualUpdateOptions, type: UpdateType) {
-        super.updateWithType(options, type);
-        let dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
+    public update(options: VisualUpdateOptions, vm?: any, type?: UpdateType) {
+        const updateType = type !== undefined ? type : calcUpdateType(this.prevUpdateOptions, options);
+        this.prevUpdateOptions = options;
+        const dataView = options.dataViews && options.dataViews.length && options.dataViews[0];
         this._dataView = dataView;
-        let dataViewTable = dataView && dataView.table;
+        const dataViewTable = dataView && dataView.table;
         let forceReloadData = false;
 
         // Some settings have been updated
-        if (type & UpdateType.Settings) {
+        if ((updateType & UpdateType.Settings) === UpdateType.Settings) {
             forceReloadData = this.loadSettingsFromPowerBI(dataView);
         }
 
         // The dataset has been modified, or something has happened that requires us to force reload the data
-        if (type & UpdateType.Data || forceReloadData) {
+        if (((updateType & UpdateType.Data) === UpdateType.Data) || forceReloadData) {
             if (dataViewTable) {
                 const filterColumn = dataView.metadata.columns.filter(n => n.roles[DATA_ROLES.filterField.name])[0];
-                const newData = converter(dataView, this._internalState, filterColumn);
+                const newData = converter(dataView, this._internalState, filterColumn, () => this.host.createSelectionIdBuilder());
                 this.myNetworkNavigator.setData(newData);
             } else {
                 this.myNetworkNavigator.setData({
@@ -248,67 +202,21 @@ export default class NetworkNavigator extends VisualBase {
      * Destroys the visual
      */
     public destroy() {
-        super.destroy();
-        this.container.empty();
+        this.element.empty();
     }
 
     /**
      * Enumerates the instances for the objects (settings) that appear in the power bi panel
      */
-    protected handleEnumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): powerbi.VisualObjectInstanceEnumeration {
+    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): powerbi.VisualObjectInstanceEnumeration {
         return this._internalState.buildEnumerationObjects(options.objectName, this._dataView, false);
     }
-
-    /**
-     * Gets the set of custom modules loaded into this visual
-     */
-    protected getCss(): string[] {
-        return this.noCss ? [] : (super.getCss() || []).concat([MY_CSS_MODULE]);
-    }
-
 
     /**
      * Persists the given node as the seelcted node
      */
     protected persistNodeSelection(node: INetworkNavigatorSelectableNode) {
-        /* tslint:disable */
-        let filter: any = null;
-        /* tslint:enable */
-        if (node) {
-            filter = powerbi.data.SemanticFilter.fromSQExpr(node.filterExpr);
-            this.selectionManager.select(node.identity, false);
-        } else {
-            this.selectionManager.clear();
-        }
-
-        let objects: powerbi.VisualObjectInstancesToPersist = { };
-        if (filter) {
-            $.extend(objects, {
-                merge: [
-                    <VisualObjectInstance>{
-                        objectName: "general",
-                        selector: undefined,
-                        properties: {
-                            filter,
-                        },
-                    },
-                ],
-            });
-        } else {
-            $.extend(objects, {
-                remove: [
-                    <VisualObjectInstance>{
-                        objectName: "general",
-                        selector: undefined,
-                        properties: {
-                            filter,
-                        },
-                    },
-                ],
-            });
-        }
-
-        this.host.persistProperties(objects);
+        this.host.applyJsonFilter(node ? node.filter : null, "general", "filter");
     }
 
     /**
@@ -325,7 +233,7 @@ export default class NetworkNavigator extends VisualBase {
             this._nodes = nodes;
             let updated = false;
             nodes.forEach((n) => {
-                let isSelected =
+                const isSelected =
                     !!_.find(selectedIds, (id: SelectionId) => id.equals((<INetworkNavigatorSelectableNode>n).identity));
                 if (isSelected !== n.selected) {
                     n.selected = isSelected;

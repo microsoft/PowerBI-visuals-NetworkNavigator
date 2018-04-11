@@ -5,7 +5,7 @@
     "experimentalDecorators": true,
     "jsx": "react",
     "declaration": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "suppressImplicitAnyIndexErrors": true
   },
   "compileOnSave": false,
