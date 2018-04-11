@@ -228,7 +228,7 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
             let selectedNode: INetworkNavigatorSelectableNode;
 
             nodes.forEach((n: INetworkNavigatorSelectableNode) => {
-                const isSelected = !!valueMap[n.name];
+                const isSelected = !!valueMap[pretty(n.name)];
                 n.selected = isSelected;
 
                 // Just select the last one for now
@@ -304,7 +304,11 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
     }
 }
 
-
+/**
+ * Gets the text values that form the current selection filter
+ * @param dv The dataView
+ * @param filterPath The path to the filter within the metadata objets
+ */
 function getFilterValues(dv: powerbi.DataView, filterPath: string): string[] {
     const savedFilter: any = _.get(
         dv,
@@ -313,24 +317,35 @@ function getFilterValues(dv: powerbi.DataView, filterPath: string): string[] {
     if (savedFilter) {
         const appliedFilter = filter.FilterManager.restoreFilter(savedFilter);
         if (appliedFilter) {
-        // The way we do this is a little funky
-        // Cause it doesn't always produce what the interface says it should
-        // sometimes it has 'values' property, other times it has conditions
-        const conditions = _.get(appliedFilter, "conditions", _.get(appliedFilter, "values", []));
-        return conditions.map((n: any) => {
-            // This is also a little funky cause sometimes the actual value is nested under a 'value'
-            // property, other times it is just the value
-            let text = n + "";
+            // The way we do this is a little funky
+            // Cause it doesn't always produce what the interface says it should
+            // sometimes it has 'values' property, other times it has conditions
+            const conditions = _.get(appliedFilter, "conditions", _.get(appliedFilter, "values", []));
+            return conditions.map((n: any) => {
+                // This is also a little funky cause sometimes the actual value is nested under a 'value'
+                // property, other times it is just the value
+                let text = pretty(n);
 
-            // Is an array
-            if (n && n.splice) {
-            text = n[0].value + "";
-            } else if (n && n.value) {
-            text = n.value + "";
-            }
-            return text;
-        });
+                // Is an array
+                if (n && n.splice) {
+                    text = pretty(n[0].value);
+                } else if (n && n.value) {
+                    text = pretty(n.value);
+                }
+                return text;
+            });
         }
     }
     return [];
+}
+
+/**
+ * Pretty prints a string value
+ * @param val The value to pretty print
+ */
+function pretty(val: string) {
+    if (val === null || val === undefined) {
+        return "";
+    }
+    return val + "";
 }
