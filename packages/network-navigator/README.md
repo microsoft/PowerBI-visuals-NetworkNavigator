@@ -4,11 +4,7 @@
 
 This is the Network Navigator base visual
 
-> This visual is currently in beta testing and is undergoing active development.
+> This visual is experimental and not actively being developed, only major issues will be addressed.
 
 ## Usage
-* Fork this repo
-* Install [node.js 6+](https://nodejs.org)
-* Install [yarn](https://yarnpkg.com/lang/en/docs/install)
-* Run `yarn` on the project directory, which will install all the dependencies
-* Run `yarn test` which will lint, test, and compile this project.
+See the root [README](../../README.md)
