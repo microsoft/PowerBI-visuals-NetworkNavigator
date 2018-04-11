@@ -223,10 +223,10 @@ export class NetworkNavigator {
 
             // Bound all of the settings to their appropriate min/maxes
             const { charge, linkDistance, linkStrength, gravity } = CONSTANTS;
-            runStart = runStart || updateForceConfig("linkDistance", linkDistance);
-            runStart = runStart || updateForceConfig("linkStrength", linkStrength);
-            runStart = runStart || updateForceConfig("charge", charge);
-            runStart = runStart || updateForceConfig("gravity", gravity);
+            runStart = updateForceConfig("linkDistance", linkDistance) || runStart;
+            runStart = updateForceConfig("linkStrength", linkStrength) || runStart;
+            runStart = updateForceConfig("charge", charge) || runStart;
+            runStart = updateForceConfig("gravity", gravity) || runStart;
 
             // If the zoom has changed at all, then let the zoom behavior know
             if ((newConfig.minZoom !== this._configuration.minZoom ||
