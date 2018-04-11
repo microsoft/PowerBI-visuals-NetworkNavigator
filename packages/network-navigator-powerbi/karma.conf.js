@@ -36,6 +36,24 @@ module.exports = config => {
       'src/**/*.spec.js': ['webpack', 'sourcemap']
     },
     webpack: webpackConf,
+    webpackMiddleware: {
+      // Disables the noisy output of webpack
+      stats: {
+        hash: false,
+        version: false,
+        timings: false,
+        assets: false,
+        chunks: false,
+        modules: false,
+        reasons: false,
+        children: false,
+        source: false,
+        errors: false,
+        errorDetails: false,
+        warnings: false,
+        publicPath: false
+      },
+    },
     reporters: ['progress'],
     port: 9876,
     colors: true,

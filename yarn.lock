@@ -2,15 +2,6 @@
 # yarn lockfile v1
 
 
-"@essex/network-navigator@file:packages/network-navigator":
-  version "1.0.1"
-  dependencies:
-    d3 "3.5.12"
-    debug "^2.6.0"
-    jquery "^2.2.0"
-    lodash "4.0.0"
-    ts-loader "^2.3.2"
-
 "@essex/visual-settings@^2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@essex/visual-settings/-/visual-settings-2.0.1.tgz#48daaadac8725372516cf69a1e7b80d4c9a75a03"

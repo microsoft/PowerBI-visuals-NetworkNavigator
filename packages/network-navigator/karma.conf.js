@@ -21,21 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 "use strict";
 const _ = require("lodash");
 const webpackConf = require("./webpack.config.test");
+
 const isTddMode = process.argv.indexOf("--tdd") > -1;
 
 module.exports = config => {
   config.set({
     basePath: '',
     frameworks: ['mocha'],
-    files: ['src/**/*.spec.js'],
+    files: [ 'src/**/*.spec.ts' ],
     exclude: [],
     preprocessors: {
-      'src/**/*.spec.js': ['webpack', 'sourcemap']
+      'src/**/*.spec.ts': ['webpack']
     },
     webpack: webpackConf,
+    webpackMiddleware: {
+      // Disables the noisy output of webpack
+      stats: {
+        hash: false,
+        version: false,
+        timings: false,
+        assets: false,
+        chunks: false,
+        modules: false,
+        reasons: false,
+        children: false,
+        source: false,
+        errors: false,
+        errorDetails: false,
+        warnings: false,
+        publicPath: false
+      },
+    },
     reporters: ['progress'],
     port: 9876,
     colors: true,
@@ -43,8 +63,12 @@ module.exports = config => {
     autoWatch: isTddMode,
     browsers: isTddMode ? ['Chrome'] : [ 'PhantomJS' ],
     singleRun: !isTddMode,
-    client: {
-      captureConsole: true,
+    concurrency: Infinity,
+    customLaunchers: {
+      'PhantomJS_debug': {
+        base: 'PhantomJS',
+        debug: true
+      }
     },
   });
 };

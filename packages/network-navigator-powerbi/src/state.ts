@@ -28,7 +28,7 @@ import {
     numberSetting,
     colorSetting,
 } from "@essex/visual-settings";
-import { colors } from "@essex/visual-styling";
+import colors from "@essex/visual-styling";
 import { constants, INetworkNavigatorConfiguration } from "@essex/network-navigator";
 
 const CAT_SEARCH = "Search";

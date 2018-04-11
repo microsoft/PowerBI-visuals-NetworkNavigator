@@ -19,7 +19,7 @@
   "author": "Microsoft",
   "license": "MIT",
   "dependencies": {
-    "@essex/network-navigator": "file:../network-navigator",
+    "@essex/network-navigator": "*",
     "@essex/visual-settings": "^2.0.1",
     "@essex/visual-styling": "^2.0.0",
     "@essex/visual-testing-tools": "^2.0.1",
