@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import "powerbi-visuals-tools/templates/visuals/.api/v1.7.0/PowerBI-visuals";
+import "powerbi-visuals-tools/templates/visuals/.api/v1.11.0/PowerBI-visuals";
 import * as models from "powerbi-models";
 import { INetworkNavigatorNode } from "@essex/network-navigator";
 
