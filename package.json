@@ -68,7 +68,6 @@
     "global": "^4.3.1",
     "imports-loader": "^0.7.1",
     "node-noop": "^1.0.0",
-    "powerbi-models": "^0.11.3",
-    "powerbi-visuals-tools": "^1.7.1"
+    "powerbi-models": "^0.11.3"
   }
 }

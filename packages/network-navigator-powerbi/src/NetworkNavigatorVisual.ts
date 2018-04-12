@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import "powerbi-visuals-tools/templates/visuals/.api/v1.7.0/PowerBI-visuals";
+import "powerbi-visuals-tools/templates/visuals/.api/v1.11.0/PowerBI-visuals";
 
 import { default as NetworkNavigatorImpl, INetworkNavigatorData, INetworkNavigatorNode } from "@essex/network-navigator";
 import { INetworkNavigatorSelectableNode } from "./models";
@@ -209,7 +209,18 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
      * Persists the given node as the seelcted node
      */
     protected persistNodeSelection(node: INetworkNavigatorSelectableNode) {
-        this.host.applyJsonFilter(node ? node.filter : null, "general", "filter");
+        const filterToApply = node && node.filter;
+        let hasConditions = false;
+        if (filterToApply && filterToApply["values"]) {
+          hasConditions = filterToApply["values"].length > 0;
+        } else if (filterToApply && filterToApply["conditions"]) {
+          hasConditions = filterToApply["conditions"].length > 0;
+        }
+        const action = hasConditions
+          ? powerbi.FilterAction.merge
+          : powerbi.FilterAction.remove;
+
+        this.host.applyJsonFilter(filterToApply, "general", "filter", action);
     }
 
     /**
