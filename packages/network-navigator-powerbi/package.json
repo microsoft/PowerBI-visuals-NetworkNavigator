@@ -1,6 +1,6 @@
 {
   "name": "@essex/network-navigator-powerbi",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "",
   "private": true,
   "main": "src/index.js",
@@ -19,7 +19,7 @@
   "author": "Microsoft",
   "license": "MIT",
   "dependencies": {
-    "@essex/network-navigator": "^2.0.2",
+    "@essex/network-navigator": "^2.1.0",
     "@essex/visual-settings": "^2.1.3",
     "@essex/visual-styling": "^2.0.0",
     "@essex/visual-testing-tools": "^2.1.2",
