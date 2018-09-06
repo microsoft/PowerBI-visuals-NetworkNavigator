@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 "use strict";
-const _ = require("lodash");
 const webpackConf = require("./webpack.config.test");
 const isTddMode = process.argv.indexOf("--tdd") > -1;
 

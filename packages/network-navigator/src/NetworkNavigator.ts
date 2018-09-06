@@ -28,7 +28,7 @@ import * as CONSTANTS from "./constants";
 import { DEFAULT_EDGE_SIZE, DEFAULT_NODE_SIZE, DEFAULT_CONFIGURATION } from "./defaults";
 import { INetworkNavigatorData, INetworkNavigatorNode, INetworkNavigatorConfiguration } from "./models";
 import template from "./templates/networkNavigator.tmpl";
-import * as _ from "lodash";
+import debounce = require("lodash.debounce");
 
 /* tslint:disable */
 const log = require("debug")("NetworkNavigator");
@@ -121,7 +121,7 @@ export class NetworkNavigator {
             this.events.raiseEvent("textFilter", "");
         });
 
-        const handleTextInput = _.debounce(() => {
+        const handleTextInput = debounce(() => {
             this.filterNodes(this.textFilter);
             this.events.raiseEvent("textFilter", this.textFilter);
         }, 500);

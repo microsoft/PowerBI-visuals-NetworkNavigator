@@ -37,7 +37,8 @@ import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInst
 import SelectionId = powerbi.visuals.ISelectionId;
 import NetworkNavigatorState from "./state";
 import * as $ from "jquery";
-import * as _ from "lodash";
+import debounce = require("lodash.debounce");
+import get = require("lodash.get");
 
 /* tslint:disable */
 const MY_CSS_MODULE = require("./css/NetworkNavigatorVisual.scss");
@@ -108,7 +109,7 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
     /**
      * A debounced event listener for when a node is selected through NetworkNavigator
      */
-    private onNodeSelected = _.debounce((node: INetworkNavigatorSelectableNode) => {
+    private onNodeSelected = debounce((node: INetworkNavigatorSelectableNode) => {
         this.persistNodeSelection(node as INetworkNavigatorSelectableNode);
     }, 100);
 
@@ -321,7 +322,7 @@ export default class NetworkNavigator implements powerbi.extensibility.visual.IV
  * @param filterPath The path to the filter within the metadata objets
  */
 function getFilterValues(dv: powerbi.DataView, filterPath: string): string[] {
-    const savedFilter: any = _.get(
+    const savedFilter: any = get(
         dv,
         `metadata.objects.${filterPath}`,
     );
@@ -331,7 +332,7 @@ function getFilterValues(dv: powerbi.DataView, filterPath: string): string[] {
             // The way we do this is a little funky
             // Cause it doesn't always produce what the interface says it should
             // sometimes it has 'values' property, other times it has conditions
-            const conditions = _.get(appliedFilter, "conditions", _.get(appliedFilter, "values", []));
+            const conditions = get(appliedFilter, "conditions", get(appliedFilter, "values", []));
             return conditions.map((n: any) => {
                 // This is also a little funky cause sometimes the actual value is nested under a 'value'
                 // property, other times it is just the value
