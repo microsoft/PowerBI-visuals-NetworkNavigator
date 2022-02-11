@@ -39,7 +39,7 @@ const patchAPI = function (version) {
     var essexAPIPatcherKey = '__essex_patcher__';
 
     var fetchAPIObject = function (version) {
-        var apiVersions = powerbi.extensibility.visualApiVersions;
+        var apiVersions = powerbi.extensibility.visualApiVersions || powerbi.extensibility.getVisualApiVersions();
         for (var i = 0, n = apiVersions.length; i < n; ++i) {
             if (apiVersions[i].version === version) {
                 return apiVersions[i];
