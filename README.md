@@ -10,7 +10,7 @@ Network Navigator lets you explore node-link data by panning over and zooming in
 
 ## Usage
 * Fork this repo
-* Install [node.js 6+](https://nodejs.org)
+* Install [node.js 16+](https://nodejs.org)
 * Install [yarn](https://yarnpkg.com/lang/en/docs/install)
 * Run `yarn` on the project directory, which will install all the dependencies
 * Run `yarn test` which will lint, test, and compile the `network-navigator`, and `network-navigator-powerbi` packages.

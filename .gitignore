@@ -10,7 +10,17 @@ node_modules/
 .vscode
 *~
 
+# Yarn v2 Gitignores - https://yarnpkg.com/getting-started/qa/#which-files-should-be-gitignored
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
 # Build Artifacts
+**/coverage
 build/
 dist/
 docs/
@@ -26,3 +36,5 @@ yarn-error.log
 lerna-debug.log
 .tmp
 .yarnclean
+webpack*
+!webpack.config*

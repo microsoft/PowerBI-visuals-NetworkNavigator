@@ -1,24 +1,27 @@
 {
-  "visual": {
-    "name": "NetworkNavigator",
-    "displayName": "Network Navigator",
-    "guid": "NetworkNavigator1550434005853",
-    "visualClassName": "NetworkNavigator",
-    "description": "This visual is experimental and not actively being developed, only major issues will be addressed. Network Navigator lets you explore node-link data by panning over and zooming into a force-directed node layout (which can be precomputed or animated live). From an initial overview of all nodes, you can use simple text search to enlarge matching nodes in ways that guide subsequent navigation. Network nodes can also be color-coded based on additional attributes of the dataset and filtered by linked visuals.",
-    "supportUrl": "",
-    "gitHubUrl":  "https://github.com/Microsoft/PowerBI-visuals-NetworkNavigator"
-  },
-  "author": {
-    "name": "Microsoft (experimental)",
-    "email": "msrvizsupport@microsoft.com"
-  },
-  "apiVersion": "1.11.0",
-  "assets": {
-    "icon":"assets/icon.svg",
-    "screenshot": "assets/screenshot.png",
-    "thumbnail": "assets/thumbnail.png"
-  },
-  "style": "src/css/NetworkNavigatorVisual.scss",
-  "capabilities": "capabilities.json",
-  "output": "dist/NetworkNavigator.pbiviz"
+    "visual": {
+        "name": "NetworkNavigator",
+        "displayName": "Network Navigator",
+        "visualClassName": "Visual",
+        "guid": "NetworkNavigator1550434005853",
+        "version": "3.0.0",
+        "description": "This visual is experimental and not actively being developed, only major issues will be addressed. Network Navigator lets you explore node-link data by panning over and zooming into a force-directed node layout (which can be precomputed or animated live). From an initial overview of all nodes, you can use simple text search to enlarge matching nodes in ways that guide subsequent navigation. Network nodes can also be color-coded based on additional attributes of the dataset and filtered by linked visuals.",
+        "supportUrl": "https://github.com/Microsoft/PowerBI-visuals-NetworkNavigator",
+        "gitHubUrl": "https://github.com/Microsoft/PowerBI-visuals-NetworkNavigator"
+    },
+    "apiVersion": "3.8.0",
+    "author": {
+        "name": "Microsoft",
+        "email": "msrvizsupport@microsoft.com"
+    },
+    "assets": {
+        "icon": "assets/icon.svg",
+        "screenshot": "assets/screenshot.png",
+        "thumbnail": "assets/thumbnail.png"
+    },
+    "externalJS": null,
+    "style": "src/style/visual.less",
+    "capabilities": "capabilities.json",
+    "dependencies": null,
+    "stringResources": []
 }
