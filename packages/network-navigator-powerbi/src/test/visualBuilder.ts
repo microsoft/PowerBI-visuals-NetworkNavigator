@@ -21,19 +21,69 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { VisualBuilderBase } from 'powerbi-visuals-utils-testutils'
+import {
+	VisualBuilderBase,
+	renderTimeout,
+} from 'powerbi-visuals-utils-testutils'
+import powerbi from 'powerbi-visuals-api'
+import DataView = powerbi.DataView
+
+import VisualUpdateType = powerbi.VisualUpdateType
+import * as $ from 'jquery'
 
 import { Visual as VisualClass } from '../visual'
 
-import powerbi from 'powerbi-visuals-api'
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions
 
-export class Visual0Builder extends VisualBuilderBase<VisualClass> {
+export class VisualBuilder extends VisualBuilderBase<VisualClass> {
 	constructor(width: number, height: number) {
 		super(width, height)
+	}
+
+	public update(
+		dataView: DataView[] | DataView,
+		updateType?: VisualUpdateType,
+	): void {
+		this.visual.update({
+			dataViews: Array.isArray(dataView) ? dataView : [dataView],
+			viewport: this.viewport,
+			type: updateType,
+		})
+	}
+
+	public get instance(): VisualClass {
+		return this.visual
+	}
+
+	public updateRenderTimeout(
+		dataViews: DataView[] | DataView,
+		fn: Function,
+		updateType?: VisualUpdateType,
+		timeout?: number,
+	): number {
+		this.update(dataViews, updateType)
+		return renderTimeout(fn, timeout)
 	}
 
 	protected build(options: VisualConstructorOptions) {
 		return new VisualClass(options)
 	}
+
+	public get mainElement() {
+		return $(this.element).find('.networkNavigator')
+	}
+
+	public get nodes() {
+		return $(this.element).find('.node')
+	}
+
+	// public getNodes(dataView: powerbi.DataView) {
+	// 	const nn = this.build({ element: this.element, host: this.visualHost })
+	//     nn.networkNavigator = this.update
+
+	// 		.networkNavigator.data.nodes
+	// 	// return $($(this.element).children('svg.networkNavigator')[0]).children(
+	// 	// 	'.nodes',
+	// 	// )
+	// }
 }

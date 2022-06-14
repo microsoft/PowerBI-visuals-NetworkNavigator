@@ -53,6 +53,20 @@ import debounce from 'lodash-es/debounce'
 const EVENTS_TO_IGNORE =
 	'mousedown mouseup click focus blur input pointerdown pointerup touchstart touchmove touchdown'
 
+// 254 is a Misc type not documented and not explained by powerbi
+const DATA_CHANGED_TYPES = [
+	powerbi.VisualUpdateType.Data,
+	powerbi.VisualUpdateType.All,
+	254,
+]
+
+//enum 36 is not documented but is a combination of resize and resizeEnd: https://github.com/Microsoft/PowerBI-visuals-tools/issues/83
+const DATA_RESIZE = [
+	powerbi.VisualUpdateType.Resize,
+	powerbi.VisualUpdateType.ResizeEnd,
+	powerbi.VisualUpdateType.ViewMode,
+	powerbi.VisualUpdateType.Resize + powerbi.VisualUpdateType.ResizeEnd,
+]
 export class Visual implements IVisual {
 	/**
 	 * The selection changed listener for NetworkNavigator
@@ -110,29 +124,44 @@ export class Visual implements IVisual {
 		const dataChanged = this._dataViewTable !== dataViewTable
 		this._dataViewTable = dataViewTable
 
-		this.visualSettings = VisualSettings.parse<VisualSettings>(dataView)
-		this.networkNavigator.configuration = this.visualSettings
+		if (DATA_RESIZE.includes(options.type)) {
+			const dimensions = {
+				width: options.viewport.width,
+				height: options.viewport.height,
+			}
+			this.networkNavigator.dimensions = dimensions
+		} else if (DATA_CHANGED_TYPES.includes(options.type)) {
+			this.visualSettings = VisualSettings.parse<VisualSettings>(dataView)
+			this.networkNavigator.configuration = this.visualSettings
+			if (dataChanged) {
+				if (dataViewTable) {
+					const filterColumn = dataView.metadata.columns.filter(
+						n => n.roles[DATA_ROLES.filterField.name],
+					)[0]
 
-		if (dataChanged) {
-			if (dataViewTable) {
-				const filterColumn = dataView.metadata.columns.filter(
-					n => n.roles[DATA_ROLES.filterField.name],
-				)[0]
+					const newData = converter(
+						dataView,
+						this.visualSettings,
+						filterColumn,
+						() => this.host.createSelectionIdBuilder(),
+					)
 
-				const newData = converter(
-					dataView,
-					this.visualSettings,
-					filterColumn,
-					() => this.host.createSelectionIdBuilder(),
-				)
-
-				this.networkNavigator.data = newData
-			} else {
-				this.networkNavigator.data = {
-					links: [],
-					nodes: [],
+					this.networkNavigator.data = newData
+				} else {
+					this.networkNavigator.data = {
+						links: [],
+						nodes: [],
+					}
 				}
 			}
+		}
+
+		//reset the zoom if leaving focus mode
+		if (
+			options.type === powerbi.VisualUpdateType.ViewMode &&
+			!options.isInFocus
+		) {
+			this.networkNavigator.resetZoom()
 		}
 
 		// Load the settings after we have loaded the nodes, cause otherwise
@@ -268,7 +297,6 @@ function getFilterValues(dv: powerbi.DataView, filterPath: string): string[] {
 			} else if (n && n.value !== undefined && n.value !== null) {
 				text = pretty(n.value)
 			}
-			console.log(savedFilter)
 
 			return text
 		})

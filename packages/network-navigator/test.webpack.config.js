@@ -23,10 +23,7 @@
  */
 
 const path = require('path')
-const webpack = require('webpack')
 const fs = require('fs')
-const package = JSON.parse(fs.readFileSync('./package.json').toString())
-const isDev = process.env.NODE_ENV !== 'production'
 
 module.exports = {
 	devtool: 'source-map',
@@ -73,25 +70,10 @@ module.exports = {
 			},
 		],
 	},
-	externals: {
-		'powerbi-visuals-api': '{}',
-	},
 	resolve: {
 		extensions: ['.tsx', '.ts', '.js', '.css'],
 	},
 	output: {
-		path: path.resolve(__dirname, '.tmp/test'),
+		path: path.resolve(__dirname, 'dist'),
 	},
-	plugins: [
-		new webpack.ProvidePlugin({
-			'powerbi-visuals-api': null,
-		}),
-		new webpack.DefinePlugin({
-			'process.env.DEBUG': '"' + (process.env.DEBUG || '') + '"',
-			BUILD_VERSION: JSON.stringify(
-				package.version +
-					(isDev ? '+dev' : '+' + process.env.TRAVIS_BUILD_NUMBER),
-			),
-		}),
-	],
 }

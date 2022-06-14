@@ -34,6 +34,10 @@ export const DEFAULT_NODE_SIZE = 10
  */
 export const DEFAULT_EDGE_SIZE = 1
 
+export const DEFAULT_ZOOM_SCALE = 1
+
+export const DEFAULT_ZOOM_TRANSLATE: [number, number] = [0, 0]
+
 /**
  * The default configuration used with network navigator
  */

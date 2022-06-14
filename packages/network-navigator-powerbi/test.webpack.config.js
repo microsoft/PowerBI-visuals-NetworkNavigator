@@ -25,8 +25,8 @@
 const path = require('path')
 const webpack = require('webpack')
 const fs = require('fs')
-const package = JSON.parse(fs.readFileSync('./package.json').toString())
-const isDev = process.env.NODE_ENV !== 'production'
+// const package = JSON.parse(fs.readFileSync('./package.json').toString())
+// const isDev = process.env.NODE_ENV !== 'production'
 
 module.exports = {
 	devtool: 'source-map',
@@ -43,16 +43,17 @@ module.exports = {
 				exclude: /node_modules/,
 			},
 			{
-				test: /\.json$/,
-				loader: 'json-loader',
-			},
-			{
 				test: /\.tsx?$/i,
 				enforce: 'post',
 				include: /(src)/,
 				exclude: /(node_modules|resources\/js\/vendor)/,
 				loader: 'istanbul-instrumenter-loader',
 				options: { esModules: true },
+			},
+			{
+				test: /\.json$/,
+				use: [{ loader: 'json-loader' }],
+				type: 'javascript/auto',
 			},
 			{
 				test: /\.less$/,
@@ -66,26 +67,39 @@ module.exports = {
 					{
 						loader: 'less-loader',
 						options: {
-							paths: [path.resolve(__dirname, 'node_modules')],
+							lessOptions: {
+								paths: [
+									path.resolve(__dirname, 'node_modules'),
+								],
+							},
 						},
 					},
 				],
 			},
 		],
 	},
+	externals: {
+		'powerbi-visuals-api': '{}',
+	},
 	resolve: {
 		extensions: ['.tsx', '.ts', '.js', '.css'],
 	},
 	output: {
-		path: path.resolve(__dirname, 'dist'),
+		path: path.resolve(__dirname, '.tmp/test'),
 	},
 	plugins: [
-		new webpack.DefinePlugin({
-			'process.env.DEBUG': '"' + (process.env.DEBUG || '') + '"',
-			BUILD_VERSION: JSON.stringify(
-				package.version +
-					(isDev ? '+dev' : '+' + process.env.TRAVIS_BUILD_NUMBER),
-			),
+		new webpack.ProvidePlugin({
+			'powerbi-visuals-api': null,
 		}),
+		new webpack.ProvidePlugin({
+			process: 'process/browser',
+		}),
+		// new webpack.DefinePlugin({
+		// 	'process.env.DEBUG': '"' + (process.env.DEBUG || '') + '"',
+		// 	BUILD_VERSION: JSON.stringify(
+		// 		package.version +
+		// 			(isDev ? '+dev' : '+' + process.env.TRAVIS_BUILD_NUMBER),
+		// 	),
+		// }),
 	],
 }

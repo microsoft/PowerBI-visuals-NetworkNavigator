@@ -23,7 +23,7 @@
  */
 'use strict'
 
-const webpackConfig = require('./webpack.config.js')
+const webpackConfig = require('./test.webpack.config.js')
 const tsconfig = require('./tsconfig.json')
 const path = require('path')
 
@@ -83,7 +83,11 @@ module.exports = (config: Config) => {
 				{ type: 'lcov', subdir: 'lcov' },
 				// reporters supporting the `file` property, use `subdir` to directly
 				// output them in the `dir` directory
-				{ type: 'cobertura', subdir: '.', file: 'cobertura-coverage.xml' },
+				{
+					type: 'cobertura',
+					subdir: '.',
+					file: 'cobertura-coverage.xml',
+				},
 				{ type: 'lcovonly', subdir: '.', file: 'report-lcovonly.txt' },
 				{ type: 'text-summary', subdir: '.', file: 'text-summary.txt' },
 			],

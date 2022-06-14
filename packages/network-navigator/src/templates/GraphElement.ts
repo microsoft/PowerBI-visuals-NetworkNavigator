@@ -29,7 +29,7 @@ export class GraphElement {
 	}
 
 	public get textFilter(): string {
-		return this.filterBox.val() as string
+		return this.filterBox.val().toString()
 	}
 	private template(): string {
 		return `

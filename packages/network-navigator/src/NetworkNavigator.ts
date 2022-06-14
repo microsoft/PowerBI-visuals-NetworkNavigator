@@ -35,6 +35,8 @@ import {
 	charge,
 	DEFAULT_EDGE_SIZE,
 	DEFAULT_NODE_SIZE,
+	DEFAULT_ZOOM_SCALE,
+	DEFAULT_ZOOM_TRANSLATE,
 	gravity,
 	linkDistance,
 	linkStrength,
@@ -62,12 +64,12 @@ export class NetworkNavigator {
 	/**
 	 * The current translate
 	 */
-	public translate: [number, number] = [0, 0]
+	public translate: [number, number] = DEFAULT_ZOOM_TRANSLATE
 
 	/**
 	 * The current scale
 	 */
-	public scale = 1
+	public scale = DEFAULT_ZOOM_SCALE
 
 	/**
 	 * The element into which the network navigator is loaded
@@ -124,7 +126,6 @@ export class NetworkNavigator {
 	 */
 	constructor(element: JQuery, width = 500, height = 500) {
 		this.element = new GraphElement()
-
 		element.append(this.element.graphTemplate)
 
 		this.svgContainer = this.element.svgContainer
@@ -144,6 +145,7 @@ export class NetworkNavigator {
 			.append('svg')
 			.attr('width', width)
 			.attr('height', height)
+
 		this.force = d3.layout
 			.force()
 			.linkDistance(10)
@@ -185,7 +187,7 @@ export class NetworkNavigator {
 		// If we have created the force graph, then size all of our elements
 		if (this.force) {
 			this.force.size([this.dimensions?.width, this.dimensions.height])
-			this.force.resume()
+			// this.force.resume()
 			this.element.graphTemplate.css({
 				width: this.dimensions.width,
 				height: this.dimensions.height,
@@ -234,7 +236,9 @@ export class NetworkNavigator {
 					let newValue = max
 						? Math.min(newConfig[settingName][name] as number, max)
 						: newConfig[settingName][name]
-					newValue = min ? Math.max(newValue as number, min) : newValue
+					newValue = min
+						? Math.max(newValue as number, min)
+						: newValue
 					this.force[name as keyof d3.layout.Force<any, any>](
 						(newValue || defaultValue) as string,
 					)
@@ -246,11 +250,14 @@ export class NetworkNavigator {
 
 			// Bound all of the settings to their appropriate min/maxes
 			runStart =
-				updateForceConfig('layout', 'linkDistance', linkDistance) || runStart
+				updateForceConfig('layout', 'linkDistance', linkDistance) ||
+				runStart
 			runStart =
-				updateForceConfig('layout', 'linkStrength', linkStrength) || runStart
+				updateForceConfig('layout', 'linkStrength', linkStrength) ||
+				runStart
 			runStart = updateForceConfig('layout', 'charge', charge) || runStart
-			runStart = updateForceConfig('layout', 'gravity', gravity) || runStart
+			runStart =
+				updateForceConfig('layout', 'gravity', gravity) || runStart
 
 			// If the zoom has changed at all, then let the zoom behavior know
 			if (
@@ -274,7 +281,10 @@ export class NetworkNavigator {
 			} else {
 				this.force.stop()
 				if (runStart) {
-					this.reflow(this.vis.selectAll('.link'), this.vis.selectAll('.node'))
+					this.reflow(
+						this.vis.selectAll('.link'),
+						this.vis.selectAll('.node'),
+					)
 				}
 			}
 
@@ -293,7 +303,8 @@ export class NetworkNavigator {
 			}
 
 			if (
-				newConfig.layout.fontSizePT !== this._configuration.layout.fontSizePT
+				newConfig.layout.fontSizePT !==
+				this._configuration.layout.fontSizePT
 			) {
 				newConfig.layout.fontSizePT = newConfig.layout.fontSizePT || 8
 				this.vis
@@ -392,6 +403,7 @@ export class NetworkNavigator {
 				.attr('height', this.dimensions.height)
 				.attr('preserveAspectRatio', 'xMidYMid meet')
 				.attr('pointer-events', 'all')
+				.classed('networkNavigator', true)
 				.call(this.zoom)
 			this.vis = this.svg.append('svg:g')
 
@@ -443,7 +455,9 @@ export class NetworkNavigator {
 			) => {
 				const isValuePresent = v !== undefined
 				const boundedValue = isValuePresent ? domainBound(v, domain) : v
-				const result = isValuePresent ? scale(boundedValue) : defaultValue
+				const result = isValuePresent
+					? scale(boundedValue)
+					: defaultValue
 				return result
 			}
 
@@ -471,11 +485,21 @@ export class NetworkNavigator {
 				.attr('class', 'link')
 				.style('stroke', function (d: any) {
 					// tslint:disable-line only-arrow-functions
-					return xform(d[4], edgeColorScale, edgeColorWeightDomain, 'gray')
+					return xform(
+						d[4],
+						edgeColorScale,
+						edgeColorWeightDomain,
+						'gray',
+					)
 				})
 				.style('stroke-width', function (d: any) {
 					// tslint:disable-line only-arrow-functions
-					return xform(d[3], edgeWidthScale, edgeWidthDomain, DEFAULT_EDGE_SIZE)
+					return xform(
+						d[3],
+						edgeWidthScale,
+						edgeWidthDomain,
+						DEFAULT_EDGE_SIZE,
+					)
 				})
 				.attr('id', function (d: any) {
 					// tslint:disable-line only-arrow-functions
@@ -494,8 +518,7 @@ export class NetworkNavigator {
 				.call(drag)
 				.attr('class', 'node')
 
-			node
-				.append('svg:circle')
+			node.append('svg:circle')
 				.attr('r', (d: any) => {
 					let width = d.value
 					/* tslint:disable */
@@ -514,11 +537,16 @@ export class NetworkNavigator {
 				.style('stroke', 'red')
 				.style('stroke-width', (d: any) => (d.selected ? 1 : 0))
 
-			node.on('click', (n: INetworkNavigatorNode) => this.updateSelection(n))
+			node.on('click', (n: INetworkNavigatorNode) =>
+				this.updateSelection(n),
+			)
 
 			node.on('mouseover', () => {
 				/* tslint:disable */
-				d3.select(this.svgContainer.find('svg text')[0]).style('display', null)
+				d3.select(this.svgContainer.find('svg text')[0]).style(
+					'display',
+					null,
+				)
 				/* tslint:enable */
 			})
 			node.on('mouseout', () => {
@@ -530,34 +558,43 @@ export class NetworkNavigator {
 				}
 			})
 
-			link
-				.append('svg:text')
+			link.append('svg:text')
 				.text((d: any) => 'yes')
 				.attr('fill', 'black')
 				.attr('stroke', 'black')
-				.attr('font-size', () => `${this._configuration.layout.fontSizePT}pt`)
+				.attr(
+					'font-size',
+					() => `${this._configuration.layout.fontSizePT}pt`,
+				)
 				.attr('stroke-width', '0.5px')
 				.attr('class', 'linklabel')
 				.attr('text-anchor', 'middle')
 
-			node
-				.append('svg:text')
+			node.append('svg:text')
 				.attr('class', 'node-label')
 				.text((d: any) => d.name)
 				.attr(
 					'fill',
 					(d: any) =>
-						d.labelColor || this._configuration.layout.defaultLabelColor,
+						d.labelColor ||
+						this._configuration.layout.defaultLabelColor,
 				)
 				.attr(
 					'stroke',
 					(d: any) =>
-						d.labelColor || this._configuration.layout.defaultLabelColor,
+						d.labelColor ||
+						this._configuration.layout.defaultLabelColor,
 				)
-				.attr('font-size', () => `${this._configuration.layout.fontSizePT}pt`)
+				.attr(
+					'font-size',
+					() => `${this._configuration.layout.fontSizePT}pt`,
+				)
 				.attr('stroke-width', '0.5px')
 				/* tslint:disable */
-				.style('display', this._configuration.layout.labels ? null : 'none')
+				.style(
+					'display',
+					this._configuration.layout.labels ? null : 'none',
+				)
 			/* tslint:enable */
 
 			// If we are not animating, then play the force quickly
@@ -568,12 +605,14 @@ export class NetworkNavigator {
 			// Our tick function, which actually moves the nodes on the svg based on their x/y positions
 			const tick = () => {
 				if (this._configuration.layout.animate) {
-					link
-						.attr('x1', d => d[0].x)
+					link.attr('x1', d => d[0].x)
 						.attr('y1', d => d[0].y)
 						.attr('x2', d => d[2].x)
 						.attr('y2', d => d[2].y)
-					node.attr('transform', (d: any) => `translate(${d.x},${d.y})`)
+					node.attr(
+						'transform',
+						(d: any) => `translate(${d.x},${d.y})`,
+					)
 				}
 			}
 
@@ -601,6 +640,12 @@ export class NetworkNavigator {
 
 		this.force.nodes(nodes).links(links)
 		return bilinks
+	}
+
+	public resetZoom() {
+		this.scale = DEFAULT_ZOOM_SCALE
+		this.translate = DEFAULT_ZOOM_TRANSLATE
+		this.zoomToViewport()
 	}
 
 	private renderZoom() {
@@ -660,21 +705,19 @@ export class NetworkNavigator {
 	 * Redraws the node labels
 	 */
 	public redrawLabels() {
-		console.log(
-			'labelColors here',
-			this._configuration.layout.defaultLabelColor,
-		)
 		this.vis
 			.selectAll('.node .node-label')
 			.attr(
 				'fill',
 				(d: any) =>
-					d.labelColor || this._configuration.layout.defaultLabelColor,
+					d.labelColor ||
+					this._configuration.layout.defaultLabelColor,
 			)
 			.attr(
 				'stroke',
 				(d: any) =>
-					d.labelColor || this._configuration.layout.defaultLabelColor,
+					d.labelColor ||
+					this._configuration.layout.defaultLabelColor,
 			)
 	}
 
@@ -722,7 +765,6 @@ export class NetworkNavigator {
 			}
 			selectedNode = undefined
 		}
-		console.info('raise selectionChanged', this._selectedNode)
 		this.selectedNode = selectedNode
 		this.events.raiseEvent('selectionChanged', this._selectedNode)
 	}
@@ -742,9 +784,11 @@ export class NetworkNavigator {
 		this.createConnections(link, node)
 	}
 
-	private createConnections(link: d3.Selection<any>, node: d3.Selection<any>) {
-		link
-			.attr('x1', (d: any) => d[0].x)
+	private createConnections(
+		link: d3.Selection<any>,
+		node: d3.Selection<any>,
+	) {
+		link.attr('x1', (d: any) => d[0].x)
 			.attr('y1', (d: any) => d[0].y)
 			.attr('x2', (d: any) => d[2].x)
 			.attr('y2', (d: any) => d[2].y)
