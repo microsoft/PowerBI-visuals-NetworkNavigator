@@ -350,7 +350,6 @@ export class NetworkNavigator {
 	 * Renders the graph to the user
 	 */
 	public renderGraph() {
-		// TODO: Break this apart, this is ginormous
 		if (this.graph) {
 			const graph = this.graph
 			const me = this

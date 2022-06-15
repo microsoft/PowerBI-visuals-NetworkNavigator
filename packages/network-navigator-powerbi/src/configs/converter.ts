@@ -20,6 +20,7 @@ import {
 /**
  * Converts the powerbi data view into an internal data structure
  */
+//tslint:disable
 function converter(
 	dataView: DataView,
 	settings: VisualSettings,
@@ -50,7 +51,6 @@ function converter(
 	// source - array index into nodes
 	// target - array index into node
 	// value - The number of times that the link has been made, ie, I emailed bob@gmail.com 10 times, so value would be 10
-
 	const roles = DATA_ROLES
 	const sourceIdx = colMap[roles.source.name]
 	const sourceColorIdx = colMap[roles.sourceColor.name]
@@ -83,7 +83,7 @@ function converter(
 			)[0]
 			const filterTargetColumn = columnToFilter || identityColumn
 			const target: models.IFilterColumnTarget = {
-				table: filterTargetColumn.queryName.substr(
+				table: filterTargetColumn.queryName.substring(
 					0,
 					filterTargetColumn.queryName.indexOf('.'),
 				),
@@ -174,5 +174,5 @@ function converter(
 		links: linkList,
 	}
 }
-
+//tslint:enable
 export default converter

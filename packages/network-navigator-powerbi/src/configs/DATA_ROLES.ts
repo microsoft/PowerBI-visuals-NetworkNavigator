@@ -6,6 +6,7 @@
 /**
  * The data roles used by network navigator
  */
+//tslint:disable-next-line
 export const DATA_ROLES = {
 	/**
 	 * The source node

@@ -40,12 +40,7 @@ import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnume
 import { DATA_ROLES } from './configs/DATA_ROLES'
 import converter from './configs/converter'
 
-import {
-	INetworkNavigatorData,
-	INetworkNavigatorNode,
-	NetworkNavigator,
-	VisualSettings,
-} from '@essex/network-navigator'
+import { NetworkNavigator, VisualSettings } from '@essex/network-navigator'
 import { INetworkNavigatorSelectableNode } from './configs/models'
 import get from 'lodash-es/get'
 import debounce from 'lodash-es/debounce'
