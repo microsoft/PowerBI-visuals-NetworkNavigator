@@ -1,0 +1,133 @@
+html,
+body {
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+}
+
+.node {
+	cursor: pointer;
+}
+
+@keyframes networknavfadein {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes networknavfadeout {
+	from {
+		opacity: 1;
+	}
+
+	to {
+		opacity: 0;
+	}
+}
+
+.graph-container {
+	font-size: 12px;
+	position: relative;
+
+	.button-bar {
+		position: absolute;
+		right: 0;
+		top: 0;
+		margin: 5px;
+		opacity: 0;
+		animation-duration: 0.5s;
+		animation-name: networknavfadeout;
+	}
+
+	&:hover {
+		.button-bar {
+			animation-duration: 0.5s;
+			animation-name: networknavfadein;
+			opacity: 1;
+		}
+	}
+}
+
+.button-bar {
+	border: 1px solid rgb(96, 94, 92);
+}
+
+.button-bar a {
+	font-size: 16px;
+	color: #888;
+	transition: 0.3s color;
+	cursor: pointer;
+	padding: 0.2em;
+	box-sizing: border-box;
+	vertical-align: middle;
+}
+
+#clear-selection:hover {
+	background-color: rgb(243, 242, 241);
+}
+
+#clear-selection {
+	color: #0078d4;
+}
+
+.clear-selection-button {
+	margin: 0.5em;
+}
+
+.clear-selection-button:before {
+	content: '\00D7';
+}
+
+.button-bar a:hover {
+	color: #444;
+}
+
+.button-bar a.active {
+	background-color: #444;
+	//   color: #444;
+	cursor: default;
+}
+
+.input-box {
+	box-shadow: none;
+	margin: 0px;
+	padding: 0px;
+	box-sizing: border-box;
+	border: unset;
+	border-radius: 2px;
+	background: rgb(255, 255, 255);
+	cursor: text;
+	height: 32px;
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+	position: relative;
+}
+
+#search-filter-box {
+	vertical-align: middle;
+	border: unset;
+	font-size: 14px;
+	font-weight: 400;
+	box-shadow: none;
+	margin: 0px;
+	padding: 0px 8px;
+	box-sizing: border-box;
+	border-radius: 0px;
+	color: rgb(50, 49, 48);
+	width: 100%;
+	min-width: 0px;
+	text-overflow: ellipsis;
+}
+
+.button-bar:focus-within {
+	outline: 1px solid #0078d4;
+}
+
+#search-filter-box:focus-visible {
+	outline: unset;
+}

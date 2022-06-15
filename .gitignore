@@ -3,21 +3,38 @@ node_modules/
 
 # Temp Files
 .DS_Store
-/.scripts
+.scripts
 /dump
 
 # IDE / Editors
 .vscode
 *~
 
+# Yarn v2 Gitignores - https://yarnpkg.com/getting-started/qa/#which-files-should-be-gitignored
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
 # Build Artifacts
+**/coverage
 build/
 dist/
 docs/
 *.js
-!/*.js
+!/packages/*/*.js
+!/packages/*/bin/*.js
 *.d.ts
 !/src/references.d.ts
 !/base/powerbi/powerbi.d.ts
 !/base/powerbi/references.d.ts
 build.out
+yarn-error.log
+lerna-debug.log
+.tmp
+.yarnclean
+webpack*
+!webpack.config*
