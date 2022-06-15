@@ -9,7 +9,8 @@
 		"package": "yarn workspaces foreach -pvt run package",
 		"start": "yarn workspaces foreach -piv run start",
 		"lint": "yarn workspaces foreach -piv run lint",
-		"update_sdks": "yarn dlx @yarnpkg/sdks vscode"
+		"update_sdks": "yarn dlx @yarnpkg/sdks vscode",
+		"ci": "run-s lint test"
 	},
 	"repository": {
 		"type": "git",
