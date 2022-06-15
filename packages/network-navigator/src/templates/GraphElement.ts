@@ -50,7 +50,7 @@ export class GraphElement {
 	}
 
 	public get textFilter(): string {
-		return this.filterBox.val().toString()
+		return <string>this.filterBox.val()
 	}
 	private template(): string {
 		return `

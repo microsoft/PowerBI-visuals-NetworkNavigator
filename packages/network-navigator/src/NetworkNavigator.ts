@@ -233,11 +233,11 @@ export class NetworkNavigator {
 					this._configuration[settingName][name]
 				) {
 					let newValue = max
-						? Math.min(+newConfig[settingName][name], max)
+						? Math.min(<number>newConfig[settingName][name], max)
 						: newConfig[settingName][name]
-					newValue = min ? Math.max(+newValue, min) : newValue
+					newValue = min ? Math.max(<number>newValue, min) : newValue
 					this.force[<keyof d3.layout.Force<any, any>>name](
-						(newValue || defaultValue).toString(),
+						<string>(newValue || defaultValue),
 					)
 
 					newConfig[settingName][name] = newValue
@@ -296,7 +296,7 @@ export class NetworkNavigator {
 				newConfig.search.caseInsensitive !==
 				this._configuration.search.caseInsensitive
 			) {
-				this.filterNodes(this.element.filterBox.val().toString())
+				this.filterNodes(<string>this.element.filterBox.val())
 			}
 
 			if (
