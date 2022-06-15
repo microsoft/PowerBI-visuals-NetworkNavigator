@@ -27,6 +27,8 @@ import { expect } from 'chai'
 
 import { VisualBuilder } from './visualBuilder'
 import { VisualData } from './visualData'
+
+const DefaultWaitForRender: number = 300
 describe('NetworkNavigatorVisual', () => {
 	let visualBuilder: VisualBuilder
 	let dataBuilder: VisualData
@@ -65,223 +67,379 @@ describe('NetworkNavigatorVisual', () => {
 				done()
 			},
 			2,
-			300,
+			DefaultWaitForRender,
 		)
 	})
 
-	// it('should load the links for a simple source/target dataset on update', () => {
-	// 	const { instance } = createInstance()
+	it('should load the links for a simple source/target dataset on update', (done: DoneFn) => {
+		dataView = dataBuilder.getDataView()
 
-	// 	instance.update(
-	// 		require('./test_cases/simpleSourceTarget.json'),
-	// 		undefined,
-	// 		7,
-	// 	)
+		const expectedLinks = [
+			'Aaron Bergman->Acme® Preferred Stainless Steel Scissors',
+			'Aaron Bergman->Avery 49',
+			'Aaron Bergman->Canon S750 Color Inkjet Printer',
+			'Aaron Bergman->SANFORD Liquid Accent™ Tank-Style Highlighters',
+			'Aaron Bergman->V70',
+			'Aaron Bergman->Xerox 194',
+			'Aaron Bergman->Xerox 1968',
+			'Aaron Hawkins->*Staples* Highlighting Markers',
+			'Aaron Hawkins->Accessory34',
+			'Aaron Hawkins->DAX Two-Tone Rosewood/Black Document Frame, Desktop, 5 x 7',
+		]
 
-	// 	const data = instance.myNetworkNavigator.data
-	// 	expect(data).to.be.ok
-	// 	expect(data.links).to.be.ok
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				const data = visualBuilder.instance.networkNavigator.data
+				const resultLinks = data.links
+					.map(n => {
+						return (
+							data.nodes[n.source].name +
+							'->' +
+							data.nodes[n.target].name
+						)
+					})
+					.sort()
 
-	// 	const resultLinks = data.links
-	// 		.map(n => {
-	// 			return data.nodes[n.source].name + '->' + data.nodes[n.target].name
-	// 		})
-	// 		.sort()
-	// 	const expectedLinks = [
-	// 		'Aaron Bergman->Acme® Preferred Stainless Steel Scissors',
-	// 		'Aaron Bergman->Avery 49',
-	// 		'Aaron Bergman->Canon S750 Color Inkjet Printer',
-	// 		'Aaron Bergman->SANFORD Liquid Accent™ Tank-Style Highlighters',
-	// 		'Aaron Bergman->V70',
-	// 		'Aaron Bergman->Xerox 194',
-	// 		'Aaron Bergman->Xerox 1968',
-	// 		'Aaron Hawkins->*Staples* Highlighting Markers',
-	// 		'Aaron Hawkins->Accessory34',
-	// 		'Aaron Hawkins->DAX Two-Tone Rosewood/Black Document Frame, Desktop, 5 x 7',
-	// 	]
-	// 	expect(resultLinks).to.be.deep.equal(expectedLinks)
-	// })
+				expect(data).to.be.ok
+				expect(data.links).to.be.ok
+				expect(resultLinks).to.be.deep.equal(expectedLinks)
 
-	// it('should load the node colors correctly', () => {
-	// 	const { instance } = createInstance()
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// 	// instance.update(require("./test_cases/simpleSourceTarget.json"));
-	// 	instance.update(require('./test_cases/allFields.json'))
+	it('should load the node colors correctly', (done: DoneFn) => {
+		dataView = dataBuilder.getAllFieldsDataView()
+		const expected = [
+			'rgb(13,15,94)',
+			'rgb(38,81,84)',
+			'rgb(5,39,75)',
+			'rgb(61,21,25)',
+			'rgb(61,55,47)',
+			'rgb(66,48,54)',
+			'rgb(8,99,96)',
+			'rgb(80,77,44)',
+			'rgb(85,65,64)',
+			'rgb(91,33,90)',
+		]
 
-	// 	const result = instance.myNetworkNavigator.data.nodes
-	// 		.map(n => n.color)
-	// 		.sort()
-	// 	const expected = [
-	// 		'rgb(13,15,94)',
-	// 		'rgb(38,81,84)',
-	// 		'rgb(5,39,75)',
-	// 		'rgb(61,21,25)',
-	// 		'rgb(61,55,47)',
-	// 		'rgb(66,48,54)',
-	// 		'rgb(8,99,96)',
-	// 		'rgb(80,77,44)',
-	// 		'rgb(85,65,64)',
-	// 		'rgb(91,33,90)',
-	// 	]
-	// 	expect(result).to.be.deep.equal(expected)
-	// })
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				const result =
+					visualBuilder.instance.networkNavigator.data.nodes
+						.map(n => n.color)
+						.sort()
+				expect(result).to.be.deep.equal(expected)
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// it('should load the node weights correctly', () => {
-	// 	const { instance } = createInstance()
-	// 	instance.update(require('./test_cases/allFields.json'), undefined, 7)
+	it('should load the node weights correctly', (done: DoneFn) => {
+		dataView = dataBuilder.getAllFieldsDataView()
+		const expected = [
+			1.5845627058297396, 42.687111441046, 46.30725539755076,
+			57.73851005360484, 64.91994569078088, 65.97267149481922,
+			66.24268551822752, 68.77162831369787, 72.27307700086385,
+			8.245853101834655,
+		]
 
-	// 	const result = instance.myNetworkNavigator.data.nodes
-	// 		.map(n => n.value)
-	// 		.sort()
-	// 	const expected = [
-	// 		1.5845627058297396, 42.687111441046, 46.30725539755076, 57.73851005360484,
-	// 		64.91994569078088, 65.97267149481922, 66.24268551822752,
-	// 		68.77162831369787, 72.27307700086385, 8.245853101834655,
-	// 	]
-	// 	expect(result).to.be.deep.equal(expected)
-	// })
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				const result =
+					visualBuilder.instance.networkNavigator.data.nodes
+						.map(n => n.value)
+						.sort()
 
-	// it('should load the node label colors correctly', () => {
-	// 	const { instance } = createInstance()
-	// 	instance.update(require('./test_cases/allFields.json'), undefined, 7)
+				expect(result).to.be.deep.equal(expected)
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// 	const result = instance.myNetworkNavigator.data.nodes
-	// 		.map(n => n.labelColor)
-	// 		.sort()
-	// 	const expected = [
-	// 		'rgb(11,43,50)',
-	// 		'rgb(13,23,82)',
-	// 		'rgb(15,81,13)',
-	// 		'rgb(2,66,74)',
-	// 		'rgb(36,0,49)',
-	// 		'rgb(46,28,54)',
-	// 		'rgb(51,79,8)',
-	// 		'rgb(83,16,32)',
-	// 		'rgb(83,4,36)',
-	// 		'rgb(88,31,55)',
-	// 	]
-	// 	expect(result).to.be.deep.equal(expected)
-	// })
+	it('should load the node label colors correctly', (done: DoneFn) => {
+		dataView = dataBuilder.getAllFieldsDataView()
+		const expected = [
+			'rgb(11,43,50)',
+			'rgb(13,23,82)',
+			'rgb(15,81,13)',
+			'rgb(2,66,74)',
+			'rgb(36,0,49)',
+			'rgb(46,28,54)',
+			'rgb(51,79,8)',
+			'rgb(83,16,32)',
+			'rgb(83,4,36)',
+			'rgb(88,31,55)',
+		]
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				const result =
+					visualBuilder.instance.networkNavigator.data.nodes
+						.map(n => n.labelColor)
+						.sort()
 
-	// it('should load the edge weights correctly', () => {
-	// 	const { instance } = createInstance()
-	// 	instance.update(require('./test_cases/allFields.json'), undefined, 7)
+				expect(result).to.be.deep.equal(expected)
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// 	const result = instance.myNetworkNavigator.data.links
-	// 		.map(n => n.value)
-	// 		.sort()
-	// 	const expected = [
-	// 		18.8387431204319, 27.632435807026923, 28.00233552698046,
-	// 		32.912370190024376, 50.575088267214596, 64.60952623747289,
-	// 		68.25033030472696, 77.2871546447277, 89.9409633828327, 90.69174295291305,
-	// 	]
-	// 	expect(result).to.be.deep.equal(expected)
-	// })
+	it('should load the edge weights correctly', (done: DoneFn) => {
+		dataView = dataBuilder.getAllFieldsDataView()
+		const expected = [
+			18.8387431204319, 27.632435807026923, 28.00233552698046,
+			32.912370190024376, 50.575088267214596, 64.60952623747289,
+			68.25033030472696, 77.2871546447277, 89.9409633828327,
+			90.69174295291305,
+		]
 
-	// /**
-	//  * Sets up a settings test
-	//  */
-	// const settingsTestSetup = () => {
-	// 	const { instance, element } = createInstance()
-	// 	// instance.update(require("./test_cases/simpleSourceTarget.json"));
-	// 	const update = require('./test_cases/complexDataWithSettingsChanged.json')
-	// 	instance.update(update, undefined, 4)
-	// 	return { instance, element }
-	// }
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				const result =
+					visualBuilder.instance.networkNavigator.data.links
+						.map(n => n.value)
+						.sort()
 
-	// it("should update the 'animate' property when it changes in power bi", () => {
-	// 	const { instance } = settingsTestSetup()
+				expect(result).to.be.deep.equal(expected)
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// 	expect(instance.myNetworkNavigator.configuration.animate).to.be.false
-	// })
+	it("should update the 'animate' property when it changes in power bi", (done: DoneFn) => {
+		dataView = dataBuilder.getComplexDataWithSettingsChangedDataView()
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				expect(
+					visualBuilder.instance.networkNavigator.configuration.layout
+						.animate,
+				).to.be.false
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// it("should update the 'maxNodeCount' property when it changes in power bi", () => {
-	// 	const { instance } = settingsTestSetup()
+	it("should update the 'maxNodeCount' property when it changes in power bi", (done: DoneFn) => {
+		dataView = dataBuilder.getComplexDataWithSettingsChangedDataView()
 
-	// 	// Max node count in the settings is 1
-	// 	expect(instance.myNetworkNavigator.data.nodes.length).to.be.equal(1)
-	// })
+		// Max node count in the settings is 1
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				expect(
+					visualBuilder.instance.networkNavigator.data.nodes.length,
+				).to.be.equal(1)
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// it("should update the 'linkDistance' property when it changes in power bi", () => {
-	// 	const { instance } = settingsTestSetup()
+	it("should update the 'linkDistance' property when it changes in power bi", (done: DoneFn) => {
+		dataView = dataBuilder.getComplexDataWithSettingsChangedDataView()
 
-	// 	expect(instance.myNetworkNavigator.configuration.linkDistance).to.be.equal(
-	// 		20,
-	// 	)
-	// })
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				expect(
+					visualBuilder.instance.networkNavigator.configuration.layout
+						.linkDistance,
+				).to.be.equal(20)
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// it("should update the 'linkStrength' property when it changes in power bi", () => {
-	// 	const { instance } = settingsTestSetup()
+	it("should update the 'linkStrength' property when it changes in power bi", (done: DoneFn) => {
+		dataView = dataBuilder.getComplexDataWithSettingsChangedDataView()
 
-	// 	expect(instance.myNetworkNavigator.configuration.linkStrength).to.be.equal(
-	// 		1,
-	// 	)
-	// })
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				expect(
+					visualBuilder.instance.networkNavigator.configuration.layout
+						.linkStrength,
+				).to.be.equal(1)
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// it("should update the 'gravity' property when it changes in power bi", () => {
-	// 	const { instance } = settingsTestSetup()
+	it("should update the 'gravity' property when it changes in power bi", (done: DoneFn) => {
+		dataView = dataBuilder.getComplexDataWithSettingsChangedDataView()
 
-	// 	expect(instance.myNetworkNavigator.configuration.gravity).to.be.equal(0.5)
-	// })
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				expect(
+					visualBuilder.instance.networkNavigator.configuration.layout
+						.gravity,
+				).to.be.equal(0.5)
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// it("should update the 'charge' property when it changes in power bi", () => {
-	// 	const { instance } = settingsTestSetup()
+	it("should update the 'charge' property when it changes in power bi", (done: DoneFn) => {
+		dataView = dataBuilder.getComplexDataWithSettingsChangedDataView()
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				expect(
+					visualBuilder.instance.networkNavigator.configuration.layout
+						.charge,
+				).to.be.equal(-10)
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// 	expect(instance.myNetworkNavigator.configuration.charge).to.be.equal(-10)
-	// })
+	it("should update the 'labels' property when it changes in power bi", (done: DoneFn) => {
+		dataView = dataBuilder.getComplexDataWithSettingsChangedDataView()
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				expect(
+					visualBuilder.instance.networkNavigator.configuration.layout
+						.labels,
+				).to.be.true
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// it("should update the 'labels' property when it changes in power bi", () => {
-	// 	const { instance } = settingsTestSetup()
+	it("should update the 'minZoom' property when it changes in power bi", (done: DoneFn) => {
+		dataView = dataBuilder.getComplexDataWithSettingsChangedDataView()
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				expect(
+					visualBuilder.instance.networkNavigator.configuration.layout
+						.minZoom,
+				).to.be.equal(0.12)
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// 	expect(instance.myNetworkNavigator.configuration.labels).to.be.equal(true)
-	// })
+	it("should update the 'maxZoom' property when it changes in power bi", (done: DoneFn) => {
+		dataView = dataBuilder.getComplexDataWithSettingsChangedDataView()
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				expect(
+					visualBuilder.instance.networkNavigator.configuration.layout
+						.maxZoom,
+				).to.be.equal(1000)
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// it("should update the 'minZoom' property when it changes in power bi", () => {
-	// 	const { instance } = settingsTestSetup()
+	it("should update the 'caseInsensitive' property when it changes in power bi", (done: DoneFn) => {
+		dataView = dataBuilder.getComplexDataWithSettingsChangedDataView()
+		visualBuilder.updateRenderTimeout(
+			dataView,
+			() => {
+				expect(
+					visualBuilder.instance.networkNavigator.configuration.search
+						.caseInsensitive,
+				).to.be.false
+				done()
+			},
+			2,
+			DefaultWaitForRender,
+		)
+	})
 
-	// 	expect(instance.myNetworkNavigator.configuration.minZoom).to.be.equal(0.12)
-	// })
+	describe('defaultLabelColor', () => {
+		it("should update the 'defaultLabelColor' property when it changes in power bi", (done: DoneFn) => {
+			dataView = dataBuilder.getComplexDataWithSettingsChangedDataView()
+			const expectedColor = '#374649' // #374649 is pulled from the test case
 
-	// it("should update the 'maxZoom' property when it changes in power bi", () => {
-	// 	const { instance } = settingsTestSetup()
+			visualBuilder.updateRenderTimeout(
+				dataView,
+				() => {
+					expect(
+						visualBuilder.instance.networkNavigator.configuration
+							.layout.defaultLabelColor,
+					).to.be.equal(expectedColor)
+					done()
+				},
+				2,
+				DefaultWaitForRender,
+			)
+		})
 
-	// 	expect(instance.myNetworkNavigator.configuration.maxZoom).to.be.equal(1000)
-	// })
+		it("should rerender the graph when the 'defaultLabelColor' setting changes", (done: DoneFn) => {
+			const initialDataView =
+				dataBuilder.getComplexDataWithLabelsDataView()
+			const updatedDataView =
+				dataBuilder.getComplexDataWithLabelColorDataView()
+			const defaultColor = '#0078d4'
+			const expectedColor = '#374649' // #374649 is pulled from the test case
 
-	// it("should update the 'caseInsensitive' property when it changes in power bi", () => {
-	// 	const { instance } = settingsTestSetup()
+			visualBuilder.updateRenderTimeout(
+				initialDataView,
+				() => {
+					const labels = visualBuilder.mainElement.find('.node-label')
+					labels.each((_, ele) => {
+						expect(ele.getAttribute('fill')).to.equal(defaultColor)
+					})
 
-	// 	expect(
-	// 		instance.myNetworkNavigator.configuration.caseInsensitive,
-	// 	).to.be.equal(false)
-	// })
-
-	// describe('defaultLabelColor', () => {
-	// 	it("should update the 'defaultLabelColor' property when it changes in power bi", () => {
-	// 		const { instance } = settingsTestSetup()
-	// 		const expectedColor = '#374649' // #374649 is pulled from the test case
-
-	// 		expect(
-	// 			instance.myNetworkNavigator.configuration.defaultLabelColor,
-	// 		).to.be.equal(expectedColor)
-	// 	})
-
-	// 	it("should rerender the graph when the 'defaultLabelColor' setting changes", () => {
-	// 		const { instance, element } = createInstance()
-	// 		let update = require('./test_cases/complexDataWithLabels.json') // Basic data
-	// 		instance.update(update, undefined, UpdateType.DataAndSettings)
-
-	// 		update = require('./test_cases/complexDataWithLabelColor.json') // Basic data
-	// 		instance.update(update, undefined, UpdateType.Settings)
-
-	// 		const expectedColor = '#374649' // #374649 is pulled from the test case
-
-	// 		const labels = element.find('.node-label')
-	// 		expect(labels.length).to.be.greaterThan(0)
-
-	// 		labels.each((i, ele) => {
-	// 			expect($(ele).attr('fill')).to.equal(expectedColor)
-	// 		})
-	// 	})
-	// })
+					visualBuilder.updateRenderTimeout(
+						updatedDataView,
+						() => {
+							const labels =
+								visualBuilder.mainElement.find('.node-label')
+							labels.each((_, ele) => {
+								expect(ele.getAttribute('fill')).to.equal(
+									expectedColor,
+								)
+							})
+							done()
+						},
+						2,
+						DefaultWaitForRender,
+					)
+				},
+				2,
+				DefaultWaitForRender,
+			)
+		})
+	})
 })
