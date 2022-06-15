@@ -6,7 +6,7 @@
 import powerbi from 'powerbi-visuals-api'
 
 import { INetworkNavigatorSelectableNode } from './models'
-import { DATA_ROLES } from './constants'
+import { DATA_ROLES } from './DATA_ROLES'
 import * as models from 'powerbi-models'
 
 import DataView = powerbi.DataView
@@ -20,7 +20,7 @@ import {
 /**
  * Converts the powerbi data view into an internal data structure
  */
-export function converter(
+function converter(
 	dataView: DataView,
 	settings: VisualSettings,
 	columnToFilter?: powerbi.DataViewMetadataColumn,
@@ -130,29 +130,29 @@ export function converter(
 		table.rows.forEach((row, idx) => {
 			const identity = table.identity[idx]
 			if (row[sourceIdx] && row[targetIdx]) {
-				/** These need to be strings to work properly */
+				//These need to be strings to work properly
 				const sourceId = row[sourceIdx] + ''
 				const targetId = row[targetIdx] + ''
-				const edge = {
+				const edge = <INetworkNavigatorLink>{
 					source: getNode(
 						sourceId,
 						identity,
 						true,
-						row[sourceNodeWeightIdx] as number,
-						row[sourceColorIdx] as string,
-						row[sourceLabelColorIdx] as string,
+						+row[sourceNodeWeightIdx],
+						<string>row[sourceColorIdx],
+						<string>row[sourceLabelColorIdx],
 					).index,
 					target: getNode(
 						targetId,
 						identity,
 						false,
-						row[targetNodeWeightIdx] as number,
-						row[targetColorIdx] as string,
-						row[targetLabelColorIdx] as string,
+						+row[targetNodeWeightIdx],
+						<string>row[targetColorIdx],
+						<string>row[targetLabelColorIdx],
 					).index,
 					value: row[edgeValueIdx],
 					colorValue: row[edgeColorValueIdx],
-				} as INetworkNavigatorLink
+				}
 				nodeList[edge.source].neighbors += 1
 				nodeList[edge.target].neighbors += 1
 				linkList.push(edge)

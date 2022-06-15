@@ -29,7 +29,7 @@ import 'core-js/stable'
 import './style/visual.less'
 import powerbi from 'powerbi-visuals-api'
 import * as $ from 'jquery'
-import { pretty } from './helpers'
+import { pretty } from './pretty'
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions
 import IVisual = powerbi.extensibility.visual.IVisual
@@ -37,8 +37,8 @@ import IVisualHost = powerbi.extensibility.visual.IVisualHost
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions
 import VisualObjectInstance = powerbi.VisualObjectInstance
 import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnumerationObject
-import { DATA_ROLES } from './configs/constants'
-import converter from './configs/dataConversion'
+import { DATA_ROLES } from './configs/DATA_ROLES'
+import converter from './configs/converter'
 
 import {
 	INetworkNavigatorData,
@@ -53,6 +53,7 @@ import debounce from 'lodash-es/debounce'
 const EVENTS_TO_IGNORE =
 	'mousedown mouseup click focus blur input pointerdown pointerup touchstart touchmove touchdown'
 
+const target = '<div style="height: 100%;"></div>'
 // 254 is a Misc type not documented and not explained by powerbi
 const DATA_CHANGED_TYPES = [
 	powerbi.VisualUpdateType.Data,
@@ -99,7 +100,7 @@ export class Visual implements IVisual {
 		this.host = options.host
 
 		if (document) {
-			this.target = $(`<div style="height: 100%;"></div>`)
+			this.target = $(target)
 			options.element.appendChild(this.target[0])
 		}
 
@@ -180,8 +181,7 @@ export class Visual implements IVisual {
 	 * Loads the selection state from powerbi
 	 */
 	private loadSelectionFromPowerBI(forceReload: boolean) {
-		const data = this.networkNavigator
-			.data as INetworkNavigatorData<INetworkNavigatorNode>
+		const data = this.networkNavigator.data
 		const nodes = data && data.nodes
 
 		// For each of the nodes, check to see if their ids are in the selection manager, and
@@ -250,7 +250,7 @@ export class Visual implements IVisual {
 	 */
 	private onNodeSelected = debounce(
 		(node: INetworkNavigatorSelectableNode) => {
-			this.persistNodeSelection(node as INetworkNavigatorSelectableNode)
+			this.persistNodeSelection(node)
 		},
 		100,
 	)
