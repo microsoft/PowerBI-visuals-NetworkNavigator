@@ -1,6 +1,6 @@
 name: 'NetworkNavigator CodeQL'
 paths:
-  - packages/
+    - packages/
 paths-ignore:
-  - '**/*.spec.ts'
-  - '.pnp.*'
+    - '**/*.spec.ts'
+    - '.pnp.*'
