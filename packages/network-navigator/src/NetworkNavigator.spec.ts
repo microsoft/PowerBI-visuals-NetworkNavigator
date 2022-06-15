@@ -24,7 +24,7 @@
 
 import { expect } from 'chai'
 import * as $ from 'jquery'
-import { VisualSettings } from './settings'
+import { VisualSettings } from './VisualSettings'
 import { INetworkNavigatorData, INetworkNavigatorNode } from './interfaces'
 
 import { NetworkNavigator } from './NetworkNavigator'
@@ -176,13 +176,13 @@ describe('NetworkNavigator', () => {
 			const { element, instance } = createInstance()
 			const color = '#123456'
 			instance.data = oneSourceTwoTargets
-			instance.configuration = {
+			instance.configuration = <VisualSettings>{
 				...instance.configuration,
 				layout: {
 					...instance.configuration.layout,
 					defaultLabelColor: color,
 				},
-			} as VisualSettings
+			}
 			instance.redrawLabels()
 
 			const labels = element.find('.node .node-label')
@@ -200,13 +200,13 @@ describe('NetworkNavigator', () => {
 					return $.extend(true, {}, n)
 				}),
 			}
-			instance.configuration = {
+			instance.configuration = <VisualSettings>{
 				...instance.configuration,
 				layout: {
 					...instance.configuration.layout,
 					defaultLabelColor: 'purple',
 				},
-			} as VisualSettings
+			}
 			instance.data = myData
 
 			// Tweak the node colors AFTER we set the data into NetworkNavigator
@@ -244,7 +244,6 @@ describe('NetworkNavigator', () => {
 			const highlightedNodes = nodes.filter((i, node) => {
 				const trans = $(node).find('circle').attr('transform')
 
-				// TODO: Better check
 				return trans && trans.indexOf('scale(3)') >= 0
 			})
 
@@ -325,13 +324,13 @@ describe('NetworkNavigator', () => {
 		it('should limit max vertex size', () => {
 			const { instance, element } = createInstance()
 
-			instance.configuration = {
+			instance.configuration = <VisualSettings>{
 				...instance.configuration,
 				layout: {
 					...instance.configuration.layout,
 					maxNodeSize: 5,
 				},
-			} as VisualSettings
+			}
 
 			instance.data = oneSourceTwoTargets
 
@@ -345,13 +344,13 @@ describe('NetworkNavigator', () => {
 		it('should limit min vertex size', () => {
 			const { instance, element } = createInstance()
 
-			instance.configuration = {
+			instance.configuration = <VisualSettings>{
 				...instance.configuration,
 				layout: {
 					...instance.configuration.layout,
 					minNodeSize: 100,
 				},
-			} as VisualSettings
+			}
 
 			instance.data = oneSourceTwoTargets
 
@@ -366,13 +365,13 @@ describe('NetworkNavigator', () => {
 	it('should default the label colors to the color in the configuration', () => {
 		const { element, instance } = createInstance()
 		const color = '#123456'
-		instance.configuration = {
+		instance.configuration = <VisualSettings>{
 			...instance.configuration,
 			layout: {
 				...instance.configuration.layout,
 				defaultLabelColor: color,
 			},
-		} as VisualSettings
+		}
 		instance.data = oneSourceTwoTargets
 
 		const labels = element.find('.node .node-label')
@@ -443,19 +442,22 @@ describe('NetworkNavigator', () => {
 		performDrag(svgEle[0], -1000)
 
 		const transform = svgEle.find('g').attr('transform')
-		expect(transform.indexOf('translate(-1000,-1000)') >= 0).to.be.true
+		expect(transform.indexOf('translate(-1000,-1000)') >= 0).to.equal(
+			true,
+			'should pan when dragged on',
+		)
 	})
 
 	it('should move the nodes when the nodes are dragged on', () => {
 		const { instance, element } = createInstance()
 
-		instance.configuration = {
+		instance.configuration = <VisualSettings>{
 			...instance.configuration,
 			layout: {
 				...instance.configuration.layout,
 				animate: true,
 			},
-		} as VisualSettings
+		}
 
 		// Set that datas
 		instance.data = oneSourceTwoTargets
@@ -491,7 +493,10 @@ describe('NetworkNavigator', () => {
 
 		// Everything should be deselected since we toggled the same node
 		const selected = instance.data.nodes.find(d => d.selected)
-		expect(selected).to.be.undefined
+		expect(selected).to.equal(
+			undefined,
+			'should deselect the node if the same node is selected twice',
+		)
 	})
 
 	it('should set the selected properly correctly', () => {

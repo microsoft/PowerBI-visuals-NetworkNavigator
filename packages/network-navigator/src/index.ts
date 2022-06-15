@@ -7,4 +7,4 @@ export * from './defaults'
 
 export * from './interfaces'
 export * from './NetworkNavigator'
-export * from './settings'
+export * from './VisualSettings'

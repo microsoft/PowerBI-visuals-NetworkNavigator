@@ -27,8 +27,8 @@
 import * as d3 from 'd3'
 import * as $ from 'jquery'
 import debounce from 'lodash-es/debounce'
-import { determineDomain } from './helpers'
-import { VisualSettings } from './settings'
+import { determineDomain } from './determineDomain'
+import { VisualSettings } from './VisualSettings'
 
 import EventEmitter from './base/EventEmitter'
 import {
@@ -54,7 +54,6 @@ const escapeRegExp = (str: string) =>
 /**
  * The network navigator is an advanced force graph based component
  */
-/* @Mixin(EventEmitter) */
 export class NetworkNavigator {
 	/**
 	 * The event emitter for this graph
@@ -77,7 +76,7 @@ export class NetworkNavigator {
 	private element: GraphElement
 
 	/**
-	 * The svg container
+	 * A div to containg the svg
 	 */
 	private svgContainer: JQuery
 
@@ -234,13 +233,11 @@ export class NetworkNavigator {
 					this._configuration[settingName][name]
 				) {
 					let newValue = max
-						? Math.min(newConfig[settingName][name] as number, max)
+						? Math.min(+newConfig[settingName][name], max)
 						: newConfig[settingName][name]
-					newValue = min
-						? Math.max(newValue as number, min)
-						: newValue
-					this.force[name as keyof d3.layout.Force<any, any>](
-						(newValue || defaultValue) as string,
+					newValue = min ? Math.max(+newValue, min) : newValue
+					this.force[<keyof d3.layout.Force<any, any>>name](
+						(newValue || defaultValue).toString(),
 					)
 
 					newConfig[settingName][name] = newValue
@@ -299,7 +296,7 @@ export class NetworkNavigator {
 				newConfig.search.caseInsensitive !==
 				this._configuration.search.caseInsensitive
 			) {
-				this.filterNodes(this.element.filterBox.val() as string)
+				this.filterNodes(this.element.filterBox.val().toString())
 			}
 
 			if (
@@ -363,29 +360,26 @@ export class NetworkNavigator {
 
 			const drag = d3.behavior
 				.drag()
+				// tslint:disable-line only-arrow-functions
 				.origin((d: any) => d)
 				// The use of "function" is important to preserve "this"
 				.on('dragstart', function (d: any) {
-					// tslint:disable-line only-arrow-functions
-
 					// Stop the force graph animation while we are dragging, otherwise it causes the graph to
 					// jitter while you drag it
 					;(<any>d3.event).sourceEvent.stopPropagation()
 					d3.select(this).classed('dragging', true)
 					me.force.stop()
 				})
+				// tslint:disable-next-line
 				.on('drag', function (d: any) {
-					// tslint:disable-line only-arrow-functions
 					// While we drag, adjust the dragged node, and tell our node renderer to draw a frame
 					const evt = <any>d3.event
 					d.px = d.x = evt.x
 					d.py = d.y = evt.y
-					/* tslint:disable */
 					tick()
-					/* tslint:enable */
 				})
+				// tslint:disable-line only-arrow-functions
 				.on('dragend', function (d: any) {
-					// tslint:disable-line only-arrow-functions
 					d3.select(this).classed('dragging', false)
 
 					// If we have animation on, then start that beast
@@ -429,16 +423,16 @@ export class NetworkNavigator {
 			const edgeColorScale = d3.scale
 				.linear()
 				.domain(edgeColorWeightDomain)
-				.interpolate(d3.interpolateRgb as any)
-				.range([
+				.interpolate(<any>d3.interpolateRgb)
+				.range(<any>[
 					this._configuration.layout.edgeStartColor,
 					this._configuration.layout.edgeEndColor,
-				] as any)
+				])
 
 			const edgeWidthScale = d3.scale
 				.linear()
 				.domain(edgeWidthDomain)
-				.interpolate(d3.interpolateNumber as any)
+				.interpolate(<any>d3.interpolateNumber)
 				.range([
 					this._configuration.layout.edgeMinWidth,
 					this._configuration.layout.edgeMaxWidth,
@@ -455,10 +449,7 @@ export class NetworkNavigator {
 			) => {
 				const isValuePresent = v !== undefined
 				const boundedValue = isValuePresent ? domainBound(v, domain) : v
-				const result = isValuePresent
-					? scale(boundedValue)
-					: defaultValue
-				return result
+				return isValuePresent ? scale(boundedValue) : defaultValue
 			}
 
 			this.vis
@@ -483,8 +474,8 @@ export class NetworkNavigator {
 				.enter()
 				.append('line')
 				.attr('class', 'link')
+				// tslint:disable-next-line
 				.style('stroke', function (d: any) {
-					// tslint:disable-line only-arrow-functions
 					return xform(
 						d[4],
 						edgeColorScale,
@@ -492,8 +483,8 @@ export class NetworkNavigator {
 						'gray',
 					)
 				})
+				// tslint:disable-next-line
 				.style('stroke-width', function (d: any) {
-					// tslint:disable-line only-arrow-functions
 					return xform(
 						d[3],
 						edgeWidthScale,
@@ -501,8 +492,8 @@ export class NetworkNavigator {
 						DEFAULT_EDGE_SIZE,
 					)
 				})
+				// tslint:disable-next-line
 				.attr('id', function (d: any) {
-					// tslint:disable-line only-arrow-functions
 					return (
 						d[0].name.replace(/\./g, '_').replace(/@/g, '_') +
 						'_' +
@@ -521,9 +512,9 @@ export class NetworkNavigator {
 			node.append('svg:circle')
 				.attr('r', (d: any) => {
 					let width = d.value
-					/* tslint:disable */
+					// tslint:disable
 					if (typeof width === 'undefined' || width === null) {
-						/* tslint:enable */
+						// tslint:enable
 						width = DEFAULT_NODE_SIZE
 					}
 					const maxSize = this._configuration.layout.maxNodeSize
@@ -542,12 +533,12 @@ export class NetworkNavigator {
 			)
 
 			node.on('mouseover', () => {
-				/* tslint:disable */
+				// tslint:disable
 				d3.select(this.svgContainer.find('svg text')[0]).style(
 					'display',
 					null,
 				)
-				/* tslint:enable */
+				// tslint:enable
 			})
 			node.on('mouseout', () => {
 				if (!this._configuration.layout.labels) {
@@ -590,12 +581,12 @@ export class NetworkNavigator {
 					() => `${this._configuration.layout.fontSizePT}pt`,
 				)
 				.attr('stroke-width', '0.5px')
-				/* tslint:disable */
+				// tslint:disable
 				.style(
 					'display',
 					this._configuration.layout.labels ? null : 'none',
 				)
-			/* tslint:enable */
+			// tslint:enable
 
 			// If we are not animating, then play the force quickly
 			if (!this._configuration.layout.animate) {
@@ -624,8 +615,8 @@ export class NetworkNavigator {
 		graph?: INetworkNavigatorData<INetworkNavigatorNode>,
 	): any[] {
 		const nodes = graph.nodes.slice()
-		const links: Array<{ source: any; target: any }> = []
-		const bilinks: any[] = []
+		const links: { source: any; target: any }[] = []
+		const bilinks = []
 
 		graph.links.forEach(graphLink => {
 			const s = nodes[graphLink.source]
@@ -656,7 +647,7 @@ export class NetworkNavigator {
 				this._configuration.layout.maxZoom,
 			])
 			.on('zoom', () => {
-				const event = d3.event as d3.ZoomEvent
+				const event = <d3.ZoomEvent>d3.event
 				this.scale = event.scale
 				this.translate = event.translate
 				this.zoomToViewport()
