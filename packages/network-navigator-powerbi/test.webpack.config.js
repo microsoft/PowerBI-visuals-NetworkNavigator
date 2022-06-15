@@ -24,9 +24,6 @@
 
 const path = require('path')
 const webpack = require('webpack')
-const fs = require('fs')
-// const package = JSON.parse(fs.readFileSync('./package.json').toString())
-// const isDev = process.env.NODE_ENV !== 'production'
 
 module.exports = {
 	devtool: 'source-map',
@@ -94,12 +91,5 @@ module.exports = {
 		new webpack.ProvidePlugin({
 			process: 'process/browser',
 		}),
-		// new webpack.DefinePlugin({
-		// 	'process.env.DEBUG': '"' + (process.env.DEBUG || '') + '"',
-		// 	BUILD_VERSION: JSON.stringify(
-		// 		package.version +
-		// 			(isDev ? '+dev' : '+' + process.env.TRAVIS_BUILD_NUMBER),
-		// 	),
-		// }),
 	],
 }

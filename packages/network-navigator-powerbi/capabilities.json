@@ -175,13 +175,6 @@
 	"objects": {
 		"general": {
 			"properties": {
-				"version": {
-					"displayName": "Version",
-					"description": "The version of Network Navigator",
-					"type": {
-						"text": true
-					}
-				},
 				"filter": {
 					"type": {
 						"filter": true

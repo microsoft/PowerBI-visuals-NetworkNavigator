@@ -23,19 +23,11 @@
  */
 
 import powerbi from 'powerbi-visuals-api'
-import { NetworkNavigator, VisualSettings } from '@essex/network-navigator'
 import { expect } from 'chai'
-import * as $ from 'jquery'
-import allFields from './test_cases/allFields.json'
-import complexData from './test_cases/complexData.json'
-import complexDataWithLabelColor from './test_cases/complexDataWithLabelColor.json'
-import complexDataWithLabels from './test_cases/complexDataWithLabels.json'
-import complexDataWithSettingsChanged from './test_cases/complexDataWithSettingsChanged.json'
-import simpleSourceTarget from './test_cases/simpleSourceTarget.json'
+
 import { VisualBuilder } from './visualBuilder'
 import { VisualData } from './visualData'
 describe('NetworkNavigatorVisual', () => {
-	// let parentEle: JQuery
 	let visualBuilder: VisualBuilder
 	let dataBuilder: VisualData
 	let dataView: powerbi.DataView
@@ -43,65 +35,38 @@ describe('NetworkNavigatorVisual', () => {
 		visualBuilder = new VisualBuilder(500, 500)
 		dataBuilder = new VisualData()
 	})
-	// beforeEach(() => {
-	// 	parentEle = $('<div></div>')
-	// })
 
-	// afterEach(() => {
-	// 	if (parentEle) {
-	// 		parentEle.remove()
-	// 	}
-	// 	parentEle = undefined
-	// })
-
-	// const createInstance = () => {
-	// 	const ele = $('<div></div>')
-	// 	parentEle.append(ele)
-	// 	const visualSettings = new VisualSettings()
-	// 	visualSettings.layout.animate = false
-
-	// 	const result = {
-	// 		instance: new NetworkNavigator(ele),
-	// 		element: ele,
-	// 	}
-	// 	result.instance.configuration = visualSettings
-	// 	return result
-	// }
-	// it('should load', () => {
-	// 	expect(createInstance().instance).to.not.be.undefined
-	// })
 	it('should load the nodes for a simple source/target dataset on update', (done: DoneFn) => {
-		// const { instance } = createInstance()
-
-		// visualBuilder.update(dataView)
-		// visualBuilder.enumerateObjectInstances()
-		// visualBuilder.update(dataView)
 		dataView = dataBuilder.getDataView()
+		const expectedNames = [
+			'*Staples* Highlighting Markers',
+			'Aaron Bergman',
+			'Aaron Hawkins',
+			'Accessory34',
+			'Acme® Preferred Stainless Steel Scissors',
+			'Avery 49',
+			'Canon S750 Color Inkjet Printer',
+			'DAX Two-Tone Rosewood/Black Document Frame, Desktop, 5 x 7',
+			'SANFORD Liquid Accent™ Tank-Style Highlighters',
+			'V70',
+			'Xerox 194',
+			'Xerox 1968',
+		]
+
 		visualBuilder.updateRenderTimeout(
 			dataView,
 			() => {
-				expect(visualBuilder.nodes.length).to.equal(12)
+				const resultNodeNames =
+					visualBuilder.instance.networkNavigator.data.nodes
+						.map(n => n.name)
+						.sort()
+
+				expect(resultNodeNames).to.be.deep.equal(expectedNames)
 				done()
 			},
 			2,
 			300,
 		)
-		// const resultNodeNames = instance.data.nodes.map(n => n.name).sort()
-		// const expectedNames = [
-		// 	'*Staples* Highlighting Markers',
-		// 	'Aaron Bergman',
-		// 	'Aaron Hawkins',
-		// 	'Accessory34',
-		// 	'Acme® Preferred Stainless Steel Scissors',
-		// 	'Avery 49',
-		// 	'Canon S750 Color Inkjet Printer',
-		// 	'DAX Two-Tone Rosewood/Black Document Frame, Desktop, 5 x 7',
-		// 	'SANFORD Liquid Accent™ Tank-Style Highlighters',
-		// 	'V70',
-		// 	'Xerox 194',
-		// 	'Xerox 1968',
-		// ]
-		// expect(resultNodeNames).to.be.deep.equal(expectedNames)
 	})
 
 	// it('should load the links for a simple source/target dataset on update', () => {

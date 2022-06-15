@@ -29,11 +29,6 @@ import { dataViewObjectsParser } from 'powerbi-visuals-utils-dataviewutils'
 import { DEFAULT_CONFIGURATION } from './defaults'
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser
 
-// Webpack defines this
-// declare var BUILD_VERSION: string;
-class GeneralSettings {
-	public version: string = '01'
-}
 class SearchSettings {
 	public caseInsensitive: boolean = DEFAULT_CONFIGURATION.caseInsensitive
 }
@@ -63,7 +58,6 @@ class LayoutSettings {
 }
 
 export class VisualSettings extends DataViewObjectsParser {
-	public general: GeneralSettings = new GeneralSettings()
 	public search: SearchSettings = new SearchSettings()
 	public layout: LayoutSettings = new LayoutSettings()
 }

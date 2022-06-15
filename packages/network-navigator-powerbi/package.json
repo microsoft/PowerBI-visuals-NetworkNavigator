@@ -2,11 +2,8 @@
 	"name": "@essex/network-navigator-powerbi",
 	"description": "default_template_value",
 	"version": "3.0.0",
-	"repository": {
-		"type": "default_template_value",
-		"url": "default_template_value"
-	},
 	"license": "MIT",
+	"author": "Microsoft",
 	"scripts": {
 		"pbiviz": "pbiviz",
 		"start": "pbiviz start",

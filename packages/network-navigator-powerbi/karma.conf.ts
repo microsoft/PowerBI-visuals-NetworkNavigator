@@ -28,7 +28,7 @@ const tsconfig = require('./test.tsconfig.json')
 const path = require('path')
 
 const testRecursivePath = 'src/test/visual.spec.ts'
-const srcOriginalRecursivePath = 'src/**/*.ts'
+const srcOriginalRecursivePath = 'src/visual.ts'
 const coverageFolder = 'coverage'
 
 process.env.CHROME_BIN = require('puppeteer').executablePath()
