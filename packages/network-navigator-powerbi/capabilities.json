@@ -1,146 +1,174 @@
 {
-	"dataRoles": [{
-		"name": "SOURCE_NODE",
-		"displayName": "Source Node",
-		"kind": 2
-	}, {
-		"name": "TARGET_NODE",
-		"displayName": "Target Node",
-		"kind": 2
-	}, {
-		"name": "EDGE_VALUE",
-		"displayName": "Edge Weight",
-		"kind": 2
-	}, {
-		"name": "EDGE_COLOR_VALUE",
-		"displayName": "Edge Color Weight",
-		"kind": 2
-	}, {
-		"name": "SOURCE_NODE_WEIGHT",
-		"displayName": "Source Node Weight",
-		"kind": 2
-	}, {
-		"name": "SOURCE_NODE_COLOR",
-		"displayName": "Source Node Color",
-		"kind": 2
-	}, {
-		"name": "SOURCE_LABEL_COLOR",
-		"displayName": "Source Node Label Color",
-		"kind": 2
-	}, {
-		"name": "TARGET_NODE_WEIGHT",
-		"displayName": "Target Node Weight",
-		"kind": 2
-	}, {
-		"name": "TARGET_NODE_COLOR",
-		"displayName": "Target Node Color",
-		"kind": 2
-	}, {
-		"name": "TARGET_LABEL_COLOR",
-		"displayName": "Target Node Label Color",
-		"kind": 2
-	}, {
-		"name": "FILTER_FIELD",
-		"displayName": "Filter",
-		"kind": 2
-	}],
-	"dataViewMappings": [{
-		"table": {
-			"rows": {
-				"select": [{
-					"bind": {
-						"to": "SOURCE_NODE"
-					}
-				}, {
-					"bind": {
-						"to": "TARGET_NODE"
-					}
-				}, {
-					"bind": {
-						"to": "EDGE_VALUE"
-					}
-				}, {
-					"bind": {
-						"to": "EDGE_COLOR_VALUE"
-					}
-				}, {
-					"bind": {
-						"to": "SOURCE_NODE_WEIGHT"
-					}
-				}, {
-					"bind": {
-						"to": "SOURCE_NODE_COLOR"
-					}
-				}, {
-					"bind": {
-						"to": "SOURCE_LABEL_COLOR"
-					}
-				}, {
-					"bind": {
-						"to": "TARGET_NODE_WEIGHT"
-					}
-				}, {
-					"bind": {
-						"to": "TARGET_NODE_COLOR"
-					}
-				}, {
-					"bind": {
-						"to": "TARGET_LABEL_COLOR"
-					}
-				}, {
-					"bind": {
-						"to": "FILTER_FIELD"
-					}
-				}]
-			}
+	"dataRoles": [
+		{
+			"name": "SOURCE_NODE",
+			"displayName": "Source Node",
+			"kind": "GroupingOrMeasure"
 		},
-		"conditions": [{
-			"SOURCE_NODE": {
-				"min": 0,
-				"max": 1
+		{
+			"name": "TARGET_NODE",
+			"displayName": "Target Node",
+			"kind": "GroupingOrMeasure"
+		},
+		{
+			"name": "EDGE_VALUE",
+			"displayName": "Edge Weight",
+			"kind": "GroupingOrMeasure"
+		},
+		{
+			"name": "EDGE_COLOR_VALUE",
+			"displayName": "Edge Color Weight",
+			"kind": "GroupingOrMeasure"
+		},
+		{
+			"name": "SOURCE_NODE_WEIGHT",
+			"displayName": "Source Node Weight",
+			"kind": "GroupingOrMeasure"
+		},
+		{
+			"name": "SOURCE_NODE_COLOR",
+			"displayName": "Source Node Color",
+			"kind": "GroupingOrMeasure"
+		},
+		{
+			"name": "SOURCE_LABEL_COLOR",
+			"displayName": "Source Node Label Color",
+			"kind": "GroupingOrMeasure"
+		},
+		{
+			"name": "TARGET_NODE_WEIGHT",
+			"displayName": "Target Node Weight",
+			"kind": "GroupingOrMeasure"
+		},
+		{
+			"name": "TARGET_NODE_COLOR",
+			"displayName": "Target Node Color",
+			"kind": "GroupingOrMeasure"
+		},
+		{
+			"name": "TARGET_LABEL_COLOR",
+			"displayName": "Target Node Label Color",
+			"kind": "GroupingOrMeasure"
+		},
+		{
+			"name": "FILTER_FIELD",
+			"displayName": "Filter",
+			"kind": "GroupingOrMeasure"
+		}
+	],
+	"dataViewMappings": [
+		{
+			"table": {
+				"rows": {
+					"select": [
+						{
+							"bind": {
+								"to": "SOURCE_NODE"
+							}
+						},
+						{
+							"bind": {
+								"to": "TARGET_NODE"
+							}
+						},
+						{
+							"bind": {
+								"to": "EDGE_VALUE"
+							}
+						},
+						{
+							"bind": {
+								"to": "EDGE_COLOR_VALUE"
+							}
+						},
+						{
+							"bind": {
+								"to": "SOURCE_NODE_WEIGHT"
+							}
+						},
+						{
+							"bind": {
+								"to": "SOURCE_NODE_COLOR"
+							}
+						},
+						{
+							"bind": {
+								"to": "SOURCE_LABEL_COLOR"
+							}
+						},
+						{
+							"bind": {
+								"to": "TARGET_NODE_WEIGHT"
+							}
+						},
+						{
+							"bind": {
+								"to": "TARGET_NODE_COLOR"
+							}
+						},
+						{
+							"bind": {
+								"to": "TARGET_LABEL_COLOR"
+							}
+						},
+						{
+							"bind": {
+								"to": "FILTER_FIELD"
+							}
+						}
+					]
+				}
 			},
-			"TARGET_NODE": {
-				"min": 0,
-				"max": 1
-			},
-			"EDGE_VALUE": {
-				"min": 0,
-				"max": 1
-			},
-			"EDGE_COLOR_VALUE": {
-				"min": 0,
-				"max": 1
-			},
-			"SOURCE_NODE_WEIGHT": {
-				"min": 0,
-				"max": 1
-			},
-			"SOURCE_NODE_COLOR": {
-				"min": 0,
-				"max": 1
-			},
-			"SOURCE_LABEL_COLOR": {
-				"min": 0,
-				"max": 1
-			},
-			"TARGET_NODE_WEIGHT": {
-				"min": 0,
-				"max": 1
-			},
-			"TARGET_NODE_COLOR": {
-				"min": 0,
-				"max": 1
-			},
-			"TARGET_LABEL_COLOR": {
-				"min": 0,
-				"max": 1
-			},
-			"FILTER_FIELD": {
-				"min": 0,
-				"max": 1
-			}
-		}]
-	}],
+			"conditions": [
+				{
+					"SOURCE_NODE": {
+						"min": 0,
+						"max": 1
+					},
+					"TARGET_NODE": {
+						"min": 0,
+						"max": 1
+					},
+					"EDGE_VALUE": {
+						"min": 0,
+						"max": 1
+					},
+					"EDGE_COLOR_VALUE": {
+						"min": 0,
+						"max": 1
+					},
+					"SOURCE_NODE_WEIGHT": {
+						"min": 0,
+						"max": 1
+					},
+					"SOURCE_NODE_COLOR": {
+						"min": 0,
+						"max": 1
+					},
+					"SOURCE_LABEL_COLOR": {
+						"min": 0,
+						"max": 1
+					},
+					"TARGET_NODE_WEIGHT": {
+						"min": 0,
+						"max": 1
+					},
+					"TARGET_NODE_COLOR": {
+						"min": 0,
+						"max": 1
+					},
+					"TARGET_LABEL_COLOR": {
+						"min": 0,
+						"max": 1
+					},
+					"FILTER_FIELD": {
+						"min": 0,
+						"max": 1
+					}
+				}
+			]
+		}
+	],
 	"sorting": {
 		"default": {}
 	},
@@ -149,20 +177,7 @@
 			"properties": {
 				"filter": {
 					"type": {
-						"filter": {}
-					},
-					"rule": {
-						"output": {
-							"property": "selected",
-							"selector": ["Values"]
-						}
-					}
-				},
-				"version": {
-					"displayName": "Version",
-					"description": "The version of Network Navigator",
-					"type": {
-						"text": true
+						"filter": true
 					}
 				}
 			},
@@ -270,7 +285,7 @@
 					"displayName": "Default Label Color",
 					"description": "The default color to use for labels"
 				},
-				"textSize": {
+				"fontSizePT": {
 					"type": {
 						"numeric": true
 					},
@@ -316,7 +331,7 @@
 					"type": {
 						"numeric": true
 					},
-					"displayName": "Max Edge width",
+					"displayName": "Max Edge Width",
 					"description": "The maximum edge width to render"
 				},
 				"edgeStartColor": {

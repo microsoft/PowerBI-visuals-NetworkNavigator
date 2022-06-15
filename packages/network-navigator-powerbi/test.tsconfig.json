@@ -8,9 +8,10 @@
 		"outDir": "./.tmp/build/",
 		"moduleResolution": "node",
 		"resolveJsonModule": true,
-        "allowSyntheticDefaultImports": true,
+		"allowSyntheticDefaultImports": true,
 		"declaration": true,
 		"lib": ["es2015", "dom"]
 	},
+	"include": ["src/*"],
 	"files": ["./src/visual.ts"]
 }
