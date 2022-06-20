@@ -493,7 +493,7 @@ describe('NetworkNavigator', () => {
 			const selected = instance.data.nodes.find(d => d.selected)
 			expect(selected).to.equal(undefined, 'no node should be selected')
 			done()
-		}, 0)
+		}, 10)
 	})
 
 	it('should set the selected properly correctly', () => {
