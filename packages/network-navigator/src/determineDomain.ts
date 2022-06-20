@@ -35,17 +35,17 @@ export const determineDomain: (
 	configMin: number | null,
 	configMax: number | null,
 ) => {
-	if (configMin !== null && configMax !== null) {
+	if (configMin != null && configMax != null) {
 		return [configMin, configMax]
 	} else {
 		let min: number
 		let max: number
 		const data = bilinks.map(fn)
 		data.forEach((d: number) => {
-			if (min === undefined || d < min) {
+			if (min == null || d < min) {
 				min = d
 			}
-			if (max === undefined || d > max) {
+			if (max == null || d > max) {
 				max = d
 			}
 		})
