@@ -487,16 +487,10 @@ describe('NetworkNavigator', () => {
 
 	it('should deselect the node if the same node is selected twice', () => {
 		const { instance, singleNode } = selectTest()
-
-		// Same node clicked twice
+		const selectedNodeName = singleNode.text().trim()
 		performClick(singleNode[0])
-
-		// Everything should be deselected since we toggled the same node
 		const selected = instance.data.nodes.find(d => d.selected)
-		expect(selected).to.equal(
-			undefined,
-			'should deselect the node if the same node is selected twice',
-		)
+		expect(selected?.name).to.not.be.eq(selectedNodeName)
 	})
 
 	it('should set the selected properly correctly', () => {

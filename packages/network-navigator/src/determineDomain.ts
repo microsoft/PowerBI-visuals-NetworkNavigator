@@ -27,25 +27,25 @@
 export const determineDomain: (
 	bilinks: any[],
 	fn: (i: any) => number,
-	configMin?: number,
-	configMax?: number,
+	configMin: number | null,
+	configMax: number | null,
 ) => [number, number] = (
 	bilinks: any[],
 	fn: (i: any) => number,
-	configMin?: number,
-	configMax?: number,
+	configMin: number | null,
+	configMax: number | null,
 ) => {
-	if (configMin !== undefined && configMax !== undefined) {
+	if (configMin != null && configMax != null) {
 		return [configMin, configMax]
 	} else {
-		let min = 0
-		let max = 0
+		let min: number
+		let max: number
 		const data = bilinks.map(fn)
 		data.forEach((d: number) => {
-			if (min === 0 || d < min) {
+			if (min == null || d < min) {
 				min = d
 			}
-			if (max === 0 || d > max) {
+			if (max == null || d > max) {
 				max = d
 			}
 		})
