@@ -352,6 +352,23 @@ describe('NetworkNavigator', () => {
 			expect(element.find('.link').length).to.eq(2)
 		})
 
+		it('should limit max node count to 2', () => {
+			const { instance, element } = createInstance()
+
+			instance.configuration = <VisualSettings>{
+				...instance.configuration,
+				layout: {
+					...instance.configuration.layout,
+					maxNodeCount: 2,
+				},
+			}
+
+			// Set that datas
+			instance.data = fourSourcesThreeTargets
+			// The 2 nodes
+			expect(element.find('circle').length).to.eq(2)
+		})
+
 		it('should limit max node count to 10, showing all if less', () => {
 			const { instance, element } = createInstance()
 
@@ -367,23 +384,6 @@ describe('NetworkNavigator', () => {
 			instance.data = fourSourcesThreeTargets
 			// The 8 nodes
 			expect(element.find('circle').length).to.eq(8)
-		})
-
-		it('should limit max node count to 2', () => {
-			const { instance, element } = createInstance()
-
-			instance.configuration = <VisualSettings>{
-				...instance.configuration,
-				layout: {
-					...instance.configuration.layout,
-					maxNodeCount: 2,
-				},
-			}
-
-			// Set that datas
-			instance.data = fourSourcesThreeTargets
-			// The 6 nodes
-			expect(element.find('circle').length).to.eq(4)
 		})
 
 		it('should limit max vertex size', () => {
