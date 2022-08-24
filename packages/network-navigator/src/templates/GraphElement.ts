@@ -48,6 +48,9 @@ export class GraphElement {
 	public get filterBox() {
 		return this.element.find('#search-filter-box')
 	}
+	public get nodeFiltered() {
+		return this.element.find('#node-filtered')
+	}
 
 	public get textFilter(): string {
 		return <string>this.filterBox.val()
@@ -64,6 +67,7 @@ export class GraphElement {
                 </div>
             </div>
             <div class="svg-container">
+                <h3 id="node-filtered">Filter the selections to view the graph</h3>
             </div>
         </div>
     `

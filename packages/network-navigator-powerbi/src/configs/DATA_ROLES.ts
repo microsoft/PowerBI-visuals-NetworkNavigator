@@ -15,6 +15,13 @@ export const DATA_ROLES = {
 		displayName: 'Source Node',
 		name: 'SOURCE_NODE',
 	},
+	/**
+	 * The source node
+	 */
+	nodeFilter: {
+		displayName: 'Node Filter',
+		name: 'NODE_FILTER',
+	},
 
 	/**
 	 * The target node

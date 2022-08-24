@@ -330,6 +330,18 @@ export class NetworkNavigator {
 			this.redrawSelection()
 		}
 	}
+	/**
+	 * Sets the selected node
+	 */
+	public nodeFilteredTrue() {
+		this.element.nodeFiltered.css('display', 'flex')
+	}
+	/**
+	 * Sets the selected node
+	 */
+	public nodeFilteredFalse() {
+		this.element.nodeFiltered.css('display', 'none')
+	}
 
 	/**
 	 * Gets the currently selected node

@@ -5,6 +5,11 @@
 			"displayName": "Source Node",
 			"kind": "GroupingOrMeasure"
 		},
+        {
+			"name": "NODE_FILTER",
+			"displayName": "Filtered Nodes",
+			"kind": "GroupingOrMeasure"
+		},
 		{
 			"name": "TARGET_NODE",
 			"displayName": "Target Node",
@@ -64,6 +69,11 @@
 						{
 							"bind": {
 								"to": "SOURCE_NODE"
+							}
+						},
+						{
+							"bind": {
+								"to": "NODE_FILTER"
 							}
 						},
 						{

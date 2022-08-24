@@ -5,17 +5,17 @@
 
 import powerbi from 'powerbi-visuals-api'
 
-import { INetworkNavigatorSelectableNode } from './models'
-import { DATA_ROLES } from './DATA_ROLES'
-import * as models from 'powerbi-models'
-
-import DataView = powerbi.DataView
-import ISelectionIdBuilder = powerbi.visuals.ISelectionIdBuilder
 import {
 	INetworkNavigatorData,
 	INetworkNavigatorLink,
 	VisualSettings,
 } from '@essex/network-navigator'
+import * as models from 'powerbi-models'
+import { DATA_ROLES } from './DATA_ROLES'
+import { INetworkNavigatorSelectableNode } from './models'
+
+import DataView = powerbi.DataView
+import ISelectionIdBuilder = powerbi.visuals.ISelectionIdBuilder
 
 /**
  * Converts the powerbi data view into an internal data structure
@@ -24,6 +24,7 @@ import {
 function converter(
 	dataView: DataView,
 	settings: VisualSettings,
+	nod: () => void,
 	columnToFilter?: powerbi.DataViewMetadataColumn,
 	createIdBuilder?: () => ISelectionIdBuilder,
 ): INetworkNavigatorData<INetworkNavigatorSelectableNode> {
@@ -62,6 +63,7 @@ function converter(
 	const edgeColorValueIdx = colMap[roles.edgeColorValue.name]
 	const sourceNodeWeightIdx = colMap[roles.sourceNodeWeight.name]
 	const targetNodeWeightIdx = colMap[roles.targetNodeWeight.name]
+	const nodeFilterIdx = colMap[roles.nodeFilter.name]
 
 	/**
 	 * Creates a node with the given value if the node has not already been seen/created
@@ -166,6 +168,17 @@ function converter(
 			linkList = linkList.filter(
 				n => n.source < maxNodes && n.target < maxNodes,
 			)
+		}
+	}
+
+	if (
+		nodeFilterIdx !== undefined &&
+		new Set(linkList.flatMap(x => x.source)).size > 1
+	) {
+		nod()
+		return {
+			nodes: [],
+			links: [],
 		}
 	}
 
