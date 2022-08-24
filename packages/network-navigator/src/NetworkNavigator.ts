@@ -1,4 +1,3 @@
-import { nodeCount } from './defaults'
 /*
  *  Power BI Visual CLI
  *
@@ -41,6 +40,7 @@ import {
 	gravity,
 	linkDistance,
 	linkStrength,
+	nodeCount,
 } from './defaults'
 import type {
 	INetworkNavigatorConfiguration,
