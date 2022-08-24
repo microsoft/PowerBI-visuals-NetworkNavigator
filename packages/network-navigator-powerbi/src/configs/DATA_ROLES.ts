@@ -18,9 +18,9 @@ export const DATA_ROLES = {
 	/**
 	 * The source node
 	 */
-	nodeFilter: {
-		displayName: 'Node Filter',
-		name: 'NODE_FILTER',
+	singleValueColumn: {
+		displayName: 'Single Value Column',
+		name: 'SINGLE_VALUE_COLUMN',
 	},
 
 	/**

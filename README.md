@@ -13,7 +13,7 @@ Network Navigator lets you explore node-link data by panning over and zooming in
 -   Install [yarn](https://yarnpkg.com/lang/en/docs/install)
 -   Run `yarn` on the project directory, which will install all the dependencies
 -   Run `yarn package` which compile the `network-navigator`, and `network-navigator-powerbi` packages.
-    -   Compiling `network-navigator-powerbi` will also create a `.pbiviz` file in the `packages/network-navigator/powerbi/dist` directory, which can be imported directly in [Power BI](https://app.powerbi.com/)
+    -   Compiling `network-navigator-powerbi` will also create a `.pbiviz` file in the `packages/network-navigator-powerbi/dist` directory, which can be imported directly in [Power BI](https://app.powerbi.com/)
 
 ## Test
 

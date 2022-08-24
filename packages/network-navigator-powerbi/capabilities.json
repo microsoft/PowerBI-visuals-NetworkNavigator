@@ -6,8 +6,8 @@
 			"kind": "GroupingOrMeasure"
 		},
         {
-			"name": "NODE_FILTER",
-			"displayName": "Filtered Nodes",
+			"name": "SINGLE_VALUE_COLUMN",
+			"displayName": "Column to be filtered",
 			"kind": "GroupingOrMeasure"
 		},
 		{
@@ -73,7 +73,7 @@
 						},
 						{
 							"bind": {
-								"to": "NODE_FILTER"
+								"to": "SINGLE_VALUE_COLUMN"
 							}
 						},
 						{

@@ -63,7 +63,7 @@ function converter(
 	const edgeColorValueIdx = colMap[roles.edgeColorValue.name]
 	const sourceNodeWeightIdx = colMap[roles.sourceNodeWeight.name]
 	const targetNodeWeightIdx = colMap[roles.targetNodeWeight.name]
-	const nodeFilterIdx = colMap[roles.nodeFilter.name]
+	const nodeFilterIdx = colMap[roles.singleValueColumn.name]
 
 	/**
 	 * Creates a node with the given value if the node has not already been seen/created
