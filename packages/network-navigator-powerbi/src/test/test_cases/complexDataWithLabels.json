@@ -11,7 +11,8 @@
             "metadata": {
                 "objects": {
                     "layout": {
-                        "labels": true
+                        "labels": true,
+                        "maxNodeCount": 2
                     }
                 },
                 "columns": [

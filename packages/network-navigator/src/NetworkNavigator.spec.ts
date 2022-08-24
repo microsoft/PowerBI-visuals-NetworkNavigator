@@ -170,37 +170,6 @@ describe('NetworkNavigator', () => {
 			},
 		],
 	}
-	const fourSourcesThreeTargets: INetworkNavigatorData<INetworkNavigatorNode> =
-		{
-			nodes: [
-				{ selected: false, name: 'SOURCE_NODE_1' },
-				{ selected: false, name: 'SOURCE_NODE_2' },
-				{ selected: false, name: 'SOURCE_NODE_3' },
-				{ selected: false, name: 'SOURCE_NODE_4' },
-				{ selected: false, name: 'TARGET_NODE_1' },
-				{ selected: false, name: 'TARGET_NODE_2' },
-				{ selected: false, name: 'TARGET_NODE_3' },
-				{ selected: false, name: 'TARGET_NODE_4' },
-			],
-			links: [
-				{
-					source: 0,
-					target: 4,
-				},
-				{
-					source: 1,
-					target: 5,
-				},
-				{
-					source: 2,
-					target: 6,
-				},
-				{
-					source: 3,
-					target: 7,
-				},
-			],
-		}
 
 	describe('redrawLabels', () => {
 		it('should default the label colors to the color in the configuration', () => {
@@ -350,40 +319,6 @@ describe('NetworkNavigator', () => {
 
 			// The 2 links
 			expect(element.find('.link').length).to.eq(2)
-		})
-
-		it('should limit max node count to 2', () => {
-			const { instance, element } = createInstance()
-
-			instance.configuration = <VisualSettings>{
-				...instance.configuration,
-				layout: {
-					...instance.configuration.layout,
-					maxNodeCount: 2,
-				},
-			}
-
-			// Set that datas
-			instance.data = fourSourcesThreeTargets
-			// The 2 nodes
-			expect(element.find('circle').length).to.eq(2)
-		})
-
-		it('should limit max node count to 10, showing all if less', () => {
-			const { instance, element } = createInstance()
-
-			instance.configuration = <VisualSettings>{
-				...instance.configuration,
-				layout: {
-					...instance.configuration.layout,
-					maxNodeCount: 10,
-				},
-			}
-
-			// Set that datas
-			instance.data = fourSourcesThreeTargets
-			// The 8 nodes
-			expect(element.find('circle').length).to.eq(8)
 		})
 
 		it('should limit max vertex size', () => {
