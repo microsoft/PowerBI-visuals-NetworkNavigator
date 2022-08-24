@@ -60,6 +60,11 @@
 		{
 			"table": {
 				"rows": {
+                    "dataReductionAlgorithm": {
+                        "top": {
+                            "count": 30000
+                        }
+                    },
 					"select": [
 						{
 							"bind": {

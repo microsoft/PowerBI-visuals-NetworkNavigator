@@ -51,6 +51,7 @@ export const DEFAULT_CONFIGURATION: INetworkNavigatorConfiguration = {
 	minZoom: 0.1,
 	maxZoom: 100,
 	caseInsensitive: true,
+	maxNodeCount: 1000,
 	defaultLabelColor: '#0078d4',
 	fontSizePT: 8,
 	maxNodeSize: 500,
@@ -68,6 +69,14 @@ export const linkDistance = {
 	min: 1,
 	max: 30,
 	default: DEFAULT_CONFIGURATION.linkDistance,
+}
+/**
+ * Defines the minimum, maximum, and default values for node count
+ */
+export const nodeCount = {
+	min: 0,
+	max: 30000,
+	default: DEFAULT_CONFIGURATION.maxNodeCount,
 }
 
 /**

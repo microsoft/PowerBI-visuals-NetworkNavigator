@@ -24,8 +24,8 @@
 
 import { expect } from 'chai'
 import * as $ from 'jquery'
-import { VisualSettings } from './VisualSettings'
 import { INetworkNavigatorData, INetworkNavigatorNode } from './interfaces'
+import { VisualSettings } from './VisualSettings'
 
 import { NetworkNavigator } from './NetworkNavigator'
 

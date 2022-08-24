@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-import powerbi from 'powerbi-visuals-api'
 import { expect } from 'chai'
+import powerbi from 'powerbi-visuals-api'
 
 import { VisualBuilder } from './visualBuilder'
 import { VisualData } from './visualData'
@@ -384,6 +384,27 @@ describe('NetworkNavigatorVisual', () => {
 			2,
 			DefaultWaitForRender,
 		)
+	})
+
+	describe('maxNodeCount', () => {
+		it('should update the maxNodeCount property when it changes in power bi', (done: DoneFn) => {
+			dataView = dataBuilder.getComplexDataWithLabelsDataView()
+			visualBuilder.updateRenderTimeout(
+				dataView,
+				() => {
+					expect(
+						visualBuilder.instance.networkNavigator.configuration
+							.layout.maxNodeCount,
+					).to.equal(2)
+
+					const nodeLength = visualBuilder.nodes.length
+					expect(nodeLength).to.equal(2)
+					done()
+				},
+				2,
+				DefaultWaitForRender,
+			)
+		})
 	})
 
 	describe('defaultLabelColor', () => {
