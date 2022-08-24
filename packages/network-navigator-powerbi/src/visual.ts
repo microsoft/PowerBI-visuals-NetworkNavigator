@@ -26,10 +26,12 @@
 'use strict'
 
 import 'core-js/stable'
-import './style/visual.less'
-import powerbi from 'powerbi-visuals-api'
 import * as $ from 'jquery'
+import powerbi from 'powerbi-visuals-api'
+import converter from './configs/converter'
+import { DATA_ROLES } from './configs/DATA_ROLES'
 import { pretty } from './pretty'
+import './style/visual.less'
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions
 import IVisual = powerbi.extensibility.visual.IVisual
@@ -37,13 +39,11 @@ import IVisualHost = powerbi.extensibility.visual.IVisualHost
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions
 import VisualObjectInstance = powerbi.VisualObjectInstance
 import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnumerationObject
-import { DATA_ROLES } from './configs/DATA_ROLES'
-import converter from './configs/converter'
 
 import { NetworkNavigator, VisualSettings } from '@essex/network-navigator'
-import { INetworkNavigatorSelectableNode } from './configs/models'
-import get from 'lodash-es/get'
 import debounce from 'lodash-es/debounce'
+import get from 'lodash-es/get'
+import { INetworkNavigatorSelectableNode } from './configs/models'
 
 const EVENTS_TO_IGNORE =
 	'mousedown mouseup click focus blur input pointerdown pointerup touchstart touchmove touchdown'
@@ -115,7 +115,6 @@ export class Visual implements IVisual {
 			options.dataViews &&
 			options.dataViews.length &&
 			options.dataViews[0]
-
 		this._dataView = dataView
 		const dataViewTable = dataView && dataView.table
 		const dataChanged = this._dataViewTable !== dataViewTable

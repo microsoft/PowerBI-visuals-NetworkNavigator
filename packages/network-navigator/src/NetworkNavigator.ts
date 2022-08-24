@@ -222,13 +222,17 @@ export class NetworkNavigator {
 			const getRangeValue = (
 				settingName: string,
 				name: string,
-				min: number,
-				max: number,
+				config: { default: number; min: number; max: number },
 			): number => {
+				const { default: defaultValue, min, max } = config
+
 				let newValue = max
 					? Math.min(<number>newConfig[settingName][name], max)
 					: newConfig[settingName][name]
-				return min ? Math.max(<number>newValue, min) : newValue
+				return (
+					(min ? Math.max(<number>newValue, min) : newValue) ||
+					defaultValue
+				)
 			}
 
 			/**
@@ -239,15 +243,13 @@ export class NetworkNavigator {
 				name: keyof INetworkNavigatorConfiguration,
 				config: { default: number; min: number; max: number },
 			) => {
-				const { default: defaultValue, min, max } = config
-
 				if (
 					newConfig[settingName][name] !==
 					this._configuration[settingName][name]
 				) {
-					const newValue = getRangeValue(settingName, name, min, max)
+					const newValue = getRangeValue(settingName, name, config)
 					this.force[<keyof d3.layout.Force<any, any>>name](
-						<string>(newValue.toString() || defaultValue),
+						<string>newValue.toString(),
 					)
 
 					newConfig[settingName][name] = newValue
@@ -284,15 +286,12 @@ export class NetworkNavigator {
 				this._configuration.layout.maxNodeCount !==
 				newConfig.layout.maxNodeCount
 			) {
-				const { default: defaultValue, min, max } = nodeCount
-
 				const newValue = getRangeValue(
 					'layout',
 					'maxNodeCount',
-					min,
-					max,
+					nodeCount,
 				)
-				newConfig.layout.maxNodeCount = newValue || defaultValue
+				newConfig.layout.maxNodeCount = newValue
 			}
 
 			if (newConfig.layout.animate) {
