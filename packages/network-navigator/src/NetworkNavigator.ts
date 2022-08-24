@@ -1,3 +1,4 @@
+import { nodeCount } from './defaults'
 /*
  *  Power BI Visual CLI
  *
@@ -218,6 +219,18 @@ export class NetworkNavigator {
 		if (this.force) {
 			let runStart = false
 
+			const getRangeValue = (
+				settingName: string,
+				name: string,
+				min: number,
+				max: number,
+			): number => {
+				let newValue = max
+					? Math.min(<number>newConfig[settingName][name], max)
+					: newConfig[settingName][name]
+				return min ? Math.max(<number>newValue, min) : newValue
+			}
+
 			/**
 			 * Updates the config value if necessary, and returns true if it was updated
 			 */
@@ -232,12 +245,9 @@ export class NetworkNavigator {
 					newConfig[settingName][name] !==
 					this._configuration[settingName][name]
 				) {
-					let newValue = max
-						? Math.min(<number>newConfig[settingName][name], max)
-						: newConfig[settingName][name]
-					newValue = min ? Math.max(<number>newValue, min) : newValue
+					const newValue = getRangeValue(settingName, name, min, max)
 					this.force[<keyof d3.layout.Force<any, any>>name](
-						<string>(newValue || defaultValue),
+						<string>(newValue.toString() || defaultValue),
 					)
 
 					newConfig[settingName][name] = newValue
@@ -268,6 +278,21 @@ export class NetworkNavigator {
 					newConfig.layout.minZoom,
 					newConfig.layout.maxZoom,
 				])
+			}
+
+			if (
+				this._configuration.layout.maxNodeCount !==
+				newConfig.layout.maxNodeCount
+			) {
+				const { default: defaultValue, min, max } = nodeCount
+
+				const newValue = getRangeValue(
+					'layout',
+					'maxNodeCount',
+					min,
+					max,
+				)
+				newConfig.layout.maxNodeCount = newValue || defaultValue
 			}
 
 			if (newConfig.layout.animate) {

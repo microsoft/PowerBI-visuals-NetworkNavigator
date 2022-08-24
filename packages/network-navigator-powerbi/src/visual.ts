@@ -115,6 +115,7 @@ export class Visual implements IVisual {
 			options.dataViews &&
 			options.dataViews.length &&
 			options.dataViews[0]
+
 		this._dataView = dataView
 		const dataViewTable = dataView && dataView.table
 		const dataChanged = this._dataViewTable !== dataViewTable
