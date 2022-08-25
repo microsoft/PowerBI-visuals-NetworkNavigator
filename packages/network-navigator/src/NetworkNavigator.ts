@@ -33,19 +33,19 @@ import { VisualSettings } from './VisualSettings'
 
 import EventEmitter from './base/EventEmitter'
 import {
-	charge,
-	DEFAULT_EDGE_SIZE,
-	DEFAULT_NODE_SIZE,
-	DEFAULT_ZOOM_SCALE,
-	DEFAULT_ZOOM_TRANSLATE,
-	gravity,
-	linkDistance,
-	linkStrength,
+    charge,
+    DEFAULT_EDGE_SIZE,
+    DEFAULT_NODE_SIZE,
+    DEFAULT_ZOOM_SCALE,
+    DEFAULT_ZOOM_TRANSLATE,
+    gravity,
+    linkDistance,
+    linkStrength
 } from './defaults'
 import type {
-	INetworkNavigatorConfiguration,
-	INetworkNavigatorData,
-	INetworkNavigatorNode,
+    INetworkNavigatorConfiguration,
+    INetworkNavigatorData,
+    INetworkNavigatorNode
 } from './interfaces'
 import { GraphElement } from './templates/GraphElement'
 
@@ -225,10 +225,11 @@ export class NetworkNavigator {
 				config: { default: number; min: number; max: number },
 			): number => {
 				const { default: defaultValue, min, max } = config
+				const assignedValue = <number>newConfig[settingName][name]
 
-				let newValue = max
-					? Math.min(<number>newConfig[settingName][name], max)
-					: newConfig[settingName][name]
+                let newValue = max
+					? Math.min(assignedValue, max)
+					: assignedValue
 				return (
 					(min ? Math.max(<number>newValue, min) : newValue) ||
 					defaultValue

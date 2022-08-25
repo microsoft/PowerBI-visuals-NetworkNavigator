@@ -35,7 +35,7 @@ class SearchSettings {
 
 class LayoutSettings {
 	public animate: boolean = DEFAULT_CONFIGURATION.animate
-	public maxNodeCount?: number = DEFAULT_CONFIGURATION.maxNodeCount
+	public maxNodeCount: number = DEFAULT_CONFIGURATION.maxNodeCount
 	public maxNodeSize?: number = DEFAULT_CONFIGURATION.maxNodeSize
 	public minNodeSize: number = DEFAULT_CONFIGURATION.minNodeSize
 	public linkDistance: number = DEFAULT_CONFIGURATION.linkDistance
