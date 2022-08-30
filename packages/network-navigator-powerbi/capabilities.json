@@ -7,7 +7,7 @@
 		},
         {
 			"name": "SINGLE_VALUE_COLUMN",
-			"displayName": "Column to be filtered",
+			"displayName": "Render on single value",
 			"kind": "GroupingOrMeasure"
 		},
 		{

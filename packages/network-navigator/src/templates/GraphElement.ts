@@ -67,7 +67,7 @@ export class GraphElement {
                 </div>
             </div>
             <div class="svg-container">
-                <h3 id="node-filtered">Filter the selections to view the graph</h3>
+                <h3 id="node-filtered">Make a selection to view the graph</h3>
             </div>
         </div>
     `
