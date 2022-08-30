@@ -65,6 +65,16 @@ function converter(
 	const targetNodeWeightIdx = colMap[roles.targetNodeWeight.name]
 	const nodeFilterIdx = colMap[roles.singleValueColumn.name]
 
+	if (
+		nodeFilterIdx !== undefined &&
+		new Set(table.rows.map(x => x[nodeFilterIdx])).size > 1
+	) {
+		nod()
+		return {
+			nodes: [],
+			links: [],
+		}
+	}
 	/**
 	 * Creates a node with the given value if the node has not already been seen/created
 	 */
@@ -168,17 +178,6 @@ function converter(
 			linkList = linkList.filter(
 				n => n.source < maxNodes && n.target < maxNodes,
 			)
-		}
-	}
-
-	if (
-		nodeFilterIdx !== undefined &&
-		new Set(linkList.flatMap(x => x.source)).size > 1
-	) {
-		nod()
-		return {
-			nodes: [],
-			links: [],
 		}
 	}
 
