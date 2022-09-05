@@ -48,8 +48,8 @@ export class GraphElement {
 	public get filterBox() {
 		return this.element.find('#search-filter-box')
 	}
-	public get nodeFiltered() {
-		return this.element.find('#node-filtered')
+	public get singleValueMessage() {
+		return this.element.find('#single-value-message')
 	}
 
 	public get textFilter(): string {
@@ -67,7 +67,7 @@ export class GraphElement {
                 </div>
             </div>
             <div class="svg-container">
-                <h3 id="node-filtered">Make a selection to view the graph</h3>
+                <h3 id="single-value-message">Make a selection to view the graph</h3>
             </div>
         </div>
     `

@@ -136,11 +136,12 @@ export class Visual implements IVisual {
 						n => n.roles[DATA_ROLES.filterField.name],
 					)[0]
 
-					this.networkNavigator.nodeFilteredFalse()
+					this.networkNavigator.deactivateSingleValueMessage()
 					const newData = converter(
 						dataView,
 						this.visualSettings,
-						() => this.networkNavigator.nodeFilteredTrue(),
+						() =>
+							this.networkNavigator.activateSingleValueMessage(),
 						filterColumn,
 						() => this.host.createSelectionIdBuilder(),
 					)

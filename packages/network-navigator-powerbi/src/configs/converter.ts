@@ -24,7 +24,7 @@ import ISelectionIdBuilder = powerbi.visuals.ISelectionIdBuilder
 function converter(
 	dataView: DataView,
 	settings: VisualSettings,
-	nod: () => void,
+	activateSingleValueFilter: () => void,
 	columnToFilter?: powerbi.DataViewMetadataColumn,
 	createIdBuilder?: () => ISelectionIdBuilder,
 ): INetworkNavigatorData<INetworkNavigatorSelectableNode> {
@@ -69,7 +69,7 @@ function converter(
 		nodeFilterIdx !== undefined &&
 		new Set(table.rows.map(x => x[nodeFilterIdx])).size > 1
 	) {
-		nod()
+		activateSingleValueFilter()
 		return {
 			nodes: [],
 			links: [],

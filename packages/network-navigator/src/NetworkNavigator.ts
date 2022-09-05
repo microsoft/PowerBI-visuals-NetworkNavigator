@@ -33,19 +33,19 @@ import { VisualSettings } from './VisualSettings'
 
 import EventEmitter from './base/EventEmitter'
 import {
-    charge,
-    DEFAULT_EDGE_SIZE,
-    DEFAULT_NODE_SIZE,
-    DEFAULT_ZOOM_SCALE,
-    DEFAULT_ZOOM_TRANSLATE,
-    gravity,
-    linkDistance,
-    linkStrength
+	charge,
+	DEFAULT_EDGE_SIZE,
+	DEFAULT_NODE_SIZE,
+	DEFAULT_ZOOM_SCALE,
+	DEFAULT_ZOOM_TRANSLATE,
+	gravity,
+	linkDistance,
+	linkStrength,
 } from './defaults'
 import type {
-    INetworkNavigatorConfiguration,
-    INetworkNavigatorData,
-    INetworkNavigatorNode
+	INetworkNavigatorConfiguration,
+	INetworkNavigatorData,
+	INetworkNavigatorNode,
 } from './interfaces'
 import { GraphElement } from './templates/GraphElement'
 
@@ -227,7 +227,7 @@ export class NetworkNavigator {
 				const { default: defaultValue, min, max } = config
 				const assignedValue = <number>newConfig[settingName][name]
 
-                let newValue = max
+				let newValue = max
 					? Math.min(assignedValue, max)
 					: assignedValue
 				return (
@@ -356,16 +356,16 @@ export class NetworkNavigator {
 		}
 	}
 	/**
-	 * Sets the selected node
+	 * Shows the single value message
 	 */
-	public nodeFilteredTrue() {
-		this.element.nodeFiltered.css('display', 'flex')
+	public activateSingleValueMessage() {
+		this.element.singleValueMessage.css('display', 'flex')
 	}
 	/**
-	 * Sets the selected node
+	 * Hides the single value message
 	 */
-	public nodeFilteredFalse() {
-		this.element.nodeFiltered.css('display', 'none')
+	public deactivateSingleValueMessage() {
+		this.element.singleValueMessage.css('display', 'none')
 	}
 
 	/**
