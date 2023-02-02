@@ -48,6 +48,9 @@ export class GraphElement {
 	public get filterBox() {
 		return this.element.find('#search-filter-box')
 	}
+	public get singleValueMessage() {
+		return this.element.find('#single-value-message')
+	}
 
 	public get textFilter(): string {
 		return <string>this.filterBox.val()
@@ -64,6 +67,7 @@ export class GraphElement {
                 </div>
             </div>
             <div class="svg-container">
+                <h3 id="single-value-message">Make a selection to view the graph</h3>
             </div>
         </div>
     `

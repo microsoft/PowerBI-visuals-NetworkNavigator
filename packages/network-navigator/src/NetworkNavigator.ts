@@ -1,3 +1,4 @@
+import { nodeCount } from './defaults'
 /*
  *  Power BI Visual CLI
  *
@@ -40,7 +41,6 @@ import {
 	gravity,
 	linkDistance,
 	linkStrength,
-	nodeCount,
 } from './defaults'
 import type {
 	INetworkNavigatorConfiguration,
@@ -225,10 +225,11 @@ export class NetworkNavigator {
 				config: { default: number; min: number; max: number },
 			): number => {
 				const { default: defaultValue, min, max } = config
+				const assignedValue = <number>newConfig[settingName][name]
 
 				let newValue = max
-					? Math.min(<number>newConfig[settingName][name], max)
-					: newConfig[settingName][name]
+					? Math.min(assignedValue, max)
+					: assignedValue
 				return (
 					(min ? Math.max(<number>newValue, min) : newValue) ||
 					defaultValue
@@ -353,6 +354,18 @@ export class NetworkNavigator {
 			}
 			this.redrawSelection()
 		}
+	}
+	/**
+	 * Shows the single value message
+	 */
+	public activateSingleValueMessage() {
+		this.element.singleValueMessage.css('display', 'flex')
+	}
+	/**
+	 * Hides the single value message
+	 */
+	public deactivateSingleValueMessage() {
+		this.element.singleValueMessage.css('display', 'none')
 	}
 
 	/**

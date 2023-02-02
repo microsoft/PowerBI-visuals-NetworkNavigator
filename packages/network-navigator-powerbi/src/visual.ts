@@ -115,6 +115,7 @@ export class Visual implements IVisual {
 			options.dataViews &&
 			options.dataViews.length &&
 			options.dataViews[0]
+
 		this._dataView = dataView
 		const dataViewTable = dataView && dataView.table
 		const dataChanged = this._dataViewTable !== dataViewTable
@@ -135,9 +136,12 @@ export class Visual implements IVisual {
 						n => n.roles[DATA_ROLES.filterField.name],
 					)[0]
 
+					this.networkNavigator.deactivateSingleValueMessage()
 					const newData = converter(
 						dataView,
 						this.visualSettings,
+						() =>
+							this.networkNavigator.activateSingleValueMessage(),
 						filterColumn,
 						() => this.host.createSelectionIdBuilder(),
 					)

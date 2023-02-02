@@ -15,6 +15,13 @@ export const DATA_ROLES = {
 		displayName: 'Source Node',
 		name: 'SOURCE_NODE',
 	},
+	/**
+	 * The source node
+	 */
+	singleValueColumn: {
+		displayName: 'Single Value Column',
+		name: 'SINGLE_VALUE_COLUMN',
+	},
 
 	/**
 	 * The target node

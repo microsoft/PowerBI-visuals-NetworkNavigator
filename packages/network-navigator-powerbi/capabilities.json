@@ -5,6 +5,11 @@
 			"displayName": "Source Node",
 			"kind": "GroupingOrMeasure"
 		},
+        {
+			"name": "SINGLE_VALUE_COLUMN",
+			"displayName": "Render on single value",
+			"kind": "GroupingOrMeasure"
+		},
 		{
 			"name": "TARGET_NODE",
 			"displayName": "Target Node",
@@ -69,6 +74,11 @@
 						{
 							"bind": {
 								"to": "SOURCE_NODE"
+							}
+						},
+						{
+							"bind": {
+								"to": "SINGLE_VALUE_COLUMN"
 							}
 						},
 						{
